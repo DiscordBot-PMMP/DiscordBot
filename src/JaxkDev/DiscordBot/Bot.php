@@ -14,6 +14,8 @@ namespace JaxkDev\DiscordBot;
 
 use Discord\Discord;
 use Discord\Exceptions\IntentException;
+use Discord\Parts\Guild\Emoji;
+use Discord\Parts\User\Activity;
 
 class Bot {
 	/* @var Discord */
@@ -34,6 +36,10 @@ class Bot {
 	private function registerHandlers(){
 		$this->client->on('ready', function ($discord) {
 			echo "Bot is ready!", PHP_EOL;
+			$discord->updatePresence($discord->factory(Activity::class, [
+				'name' => 'on a PMMP Server',
+				'type' => Activity::TYPE_PLAYING
+			]));
 
 			// Listen for messages.
 			$discord->on('message', function ($message, $discord) {
