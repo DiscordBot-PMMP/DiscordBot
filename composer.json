@@ -1,0 +1,14 @@
+{
+    "name": "jaxkdev/discord-bot",
+    "type": "project",
+    "require": {
+        "team-reflex/discord-php": "^5.0"
+    },
+    "license": "OSL",
+    "authors": [
+        {
+            "name": "JaxkDev",
+            "email": "JaxkDev@gmail.com"
+        }
+    ]
+}
