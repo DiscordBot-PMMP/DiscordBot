@@ -1,0 +1,14 @@
+---
+version: 1
+
+discord:
+  token: "Long Token with random characters here."
+  presence:
+    type: 0
+    text: "PocketMine Server"
+
+logging:
+  debug: false
+  maxFiles: 28
+  directory: "logs"
+...

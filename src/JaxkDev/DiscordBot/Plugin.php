@@ -24,15 +24,24 @@ class Plugin extends PluginBase {
 		if(!is_dir($this->getDataFolder().DIRECTORY_SEPARATOR."logs")){
 			mkdir($this->getDataFolder().DIRECTORY_SEPARATOR."logs");
 		}
+
+		$this->saveResource("config.yml");
 	}
 
 	public function onEnable() {
-		$this->getLogger()->debug("Starting DiscordBot Thread...");
-		$initialConfig = [
-			'token' => "TOKEN HERE",
-			'logDirectory' => $this->getDataFolder().DIRECTORY_SEPARATOR."logs"
-		];
-		$this->discordBot = new BotThread($this->getServer()->getLogger(), $initialConfig);
+		$this->getLogger()->debug("Loading initial configuration...");
+
+		$config = yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."config.yml");
+		if($config === false){
+			$this->getLogger()->critical("Failed to parse config.yml");
+			$this->getServer()->getPluginManager()->disablePlugin($this);
+		}
+		// TODO Verify Config before using it.
+		$config['logging']['directory'] = $this->getDataFolder().DIRECTORY_SEPARATOR.($initialConfig['logging']['directory'] ?? "logs");
+
+		$this->getLogger()->debug("Constructing DiscordBot...");
+
+		$this->discordBot = new BotThread($this->getServer()->getLogger(), $config);
 	}
 
 	public function onDisable() {

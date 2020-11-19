@@ -34,14 +34,17 @@ class Bot {
 	/** @var bool */
 	private $ready = false;
 
-	public function __construct(BotThread $thread, array $initialConfig) {
+	/** @var array */
+	private $config;
+
+	public function __construct(BotThread $thread, array $config) {
 		$this->thread = $thread;
+		$this->config = $config;
 
 		register_shutdown_function(array($this, 'shutdownHandler'));
 
 		$logger = new Logger('logger');
-		$handler = new RotatingFileHandler($initialConfig['logDirectory'].DIRECTORY_SEPARATOR.'DiscordBot.log',
-			$initialConfig['maxLogs'] ?? 28, Logger::DEBUG);
+		$handler = new RotatingFileHandler($config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['maxFiles'], Logger::DEBUG);
 		$handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
 		$logger->setHandlers(array($handler));
 
@@ -49,9 +52,10 @@ class Bot {
 
 		try {
 			$this->client = new Discord([
-				'token' => $initialConfig['token'],
+				'token' => $config['discord']['token'],
 				'logger' => $logger
 			]);
+			$this->config['discord']['token'] = "REDACTED";
 		} catch (IntentException $e) {
 			MainLogger::getLogger()->logException($e);
 			return;
@@ -88,10 +92,11 @@ class Bot {
 	private function registerHandlers(): void{
 		$this->client->on('ready', function ($discord) {
 			$this->ready = true;
-			MainLogger::getLogger()->info("Client ready.");
+			MainLogger::getLogger()->info("Client (".$this->client->username."#".$this->client->discriminator.")(".
+				$this->client->id.") ready, Currently in ".$this->client->guilds->count()." servers/guilds.");
 			$discord->updatePresence($discord->factory(Activity::class, [
-				'name' => "PocketMine-MP Server",
-				'type' => Activity::TYPE_PLAYING
+				'name' => $this->config['discord']['presence']['text'],
+				'type' => $this->config['discord']['presence']['type']
 			]));
 
 			// Listen for messages.
