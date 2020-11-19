@@ -36,10 +36,14 @@ class BotThread extends Thread {
 			$this->logger->registerStatic();
 		}
 
-		if(!defined('JaxkDev\DiscordBot\COMPOSER_AUTOLOADER_PATH')) {
-			define('JaxkDev\DiscordBot\COMPOSER_AUTOLOADER_PATH', dirname(__DIR__, 4) . "/DiscordBot/vendor/autoload.php");
+		if(!defined('JaxkDev\DiscordBot\COMPOSER')) {
+			if(\Phar::running(true) !== "") {
+				define('JaxkDev\DiscordBot\COMPOSER', \Phar::running(true) . "/vendor/autoload.php");
+			} else {
+				define('JaxkDev\DiscordBot\COMPOSER', dirname(__DIR__, 4) . "/DiscordBot/vendor/autoload.php");
+			}
 		}
-		require_once(\JaxkDev\DiscordBot\COMPOSER_AUTOLOADER_PATH);
+		require_once(\JaxkDev\DiscordBot\COMPOSER);
 
 		new Bot();
 		// TODO Integrate DiscordPHP's logger with this one.

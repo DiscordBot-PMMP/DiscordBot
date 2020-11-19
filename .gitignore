@@ -1,4 +1,5 @@
 /vendor/
 /.idea/
 
-/KEY.txt
+*.phar
+*.txt
