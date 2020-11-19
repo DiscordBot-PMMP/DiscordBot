@@ -26,7 +26,11 @@ if($metadata === null) {
 	exit(1);
 }
 
-foreach(buildPhar(__DIR__ . DIRECTORY_SEPARATOR . str_replace(".","_",("DiscordBot_v".$metadata['version'])).".phar", $basePath, $includedPaths, $excludedPaths, $metadata, "<?php __HALT_COMPILER();") as $line){
+$name = ((($opt = getopt("o:")) === [] || $opt === false) ? str_replace(".","_",("DiscordBot_v".$metadata['version'])).".phar" : $opt["o"]);
+
+if (!is_dir("dist")) mkdir("dist");
+
+foreach(buildPhar(__DIR__ . DIRECTORY_SEPARATOR . "dist" . DIRECTORY_SEPARATOR . $name, $basePath, $includedPaths, $excludedPaths, $metadata, "<?php __HALT_COMPILER();") as $line){
 	echo $line . PHP_EOL;
 }
 
@@ -61,6 +65,8 @@ function buildPhar(string $pharPath, string $basePath, array $includedPaths, arr
 			unlink($pharPath);
 		}
 	}
+
+	yield "Output File: $pharPath";
 
 	yield "Adding files...";
 
