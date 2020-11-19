@@ -20,13 +20,23 @@ class Plugin extends PluginBase {
 	 */
 	private $discordBot;
 
+	public function onLoad(){
+		if(!is_dir($this->getDataFolder().DIRECTORY_SEPARATOR."logs")){
+			mkdir($this->getDataFolder().DIRECTORY_SEPARATOR."logs");
+		}
+	}
+
 	public function onEnable() {
 		$this->getLogger()->debug("Starting DiscordBot Thread...");
-		$this->discordBot = new BotThread($this->getServer()->getLogger());
+		$initialConfig = [
+			'token' => "TOKEN HERE",
+			'logDirectory' => $this->getDataFolder().DIRECTORY_SEPARATOR."logs"
+		];
+		$this->discordBot = new BotThread($this->getServer()->getLogger(), $initialConfig);
 	}
 
 	public function onDisable() {
-		if($this->discordBot->isStarted() and !$this->discordBot->isStopping()){
+		if($this->discordBot !== null and $this->discordBot->isStarted() and !$this->discordBot->isStopping()){
 			$this->discordBot->stop();
 		}
 	}

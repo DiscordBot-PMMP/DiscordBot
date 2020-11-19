@@ -23,13 +23,18 @@ class BotThread extends Thread {
 	 * @var AttachableThreadedLogger
 	 */
 	private $logger;
+
+	/** @var array */
+	private $initialConfig;
+
 	/**
 	 * @var bool
 	 */
 	private $stopping = false;
 
-	public function __construct(AttachableThreadedLogger $logger) {
+	public function __construct(AttachableThreadedLogger $logger, array $initialConfig) {
 		$this->logger = $logger;
+		$this->initialConfig = $initialConfig;
 
 		$this->start(PTHREADS_INHERIT_NONE | PTHREADS_INHERIT_CONSTANTS);
 	}
@@ -54,7 +59,7 @@ class BotThread extends Thread {
 		/** @noinspection PhpIncludeInspection */
 		require_once(COMPOSER);
 
-		new Bot($this);
+		new Bot($this, (array)$this->initialConfig);
 	}
 
 	public function isStopping(): bool{

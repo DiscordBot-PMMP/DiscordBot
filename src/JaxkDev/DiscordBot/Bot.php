@@ -15,8 +15,10 @@ namespace JaxkDev\DiscordBot;
 use Discord\Discord;
 use Discord\Exceptions\IntentException;
 use Discord\Parts\User\Activity;
-use pocketmine\utils\MainLogger;
+use Monolog\Logger;
+use Monolog\Handler\RotatingFileHandler;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use pocketmine\utils\MainLogger;
 
 class Bot {
 	/**
@@ -32,16 +34,23 @@ class Bot {
 	/** @var bool */
 	private $ready = false;
 
-	public function __construct(BotThread $thread) {
+	public function __construct(BotThread $thread, array $initialConfig) {
 		$this->thread = $thread;
 
 		register_shutdown_function(array($this, 'shutdownHandler'));
 
-		// TODO Bot Config.
+		$logger = new Logger('logger');
+		$handler = new RotatingFileHandler($initialConfig['logDirectory'].DIRECTORY_SEPARATOR.'DiscordBot.log',
+			$initialConfig['maxLogs'] ?? 28, Logger::DEBUG);
+		$handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
+		$logger->setHandlers(array($handler));
+
+		// TODO Add pipe handler for debugging.
 
 		try {
 			$this->client = new Discord([
-				'token' => 'KEY HERE REMINDER TO SELF, MY KEY IS IN SERVER_KEY.TXT',
+				'token' => $initialConfig['token'],
+				'logger' => $logger
 			]);
 		} catch (IntentException $e) {
 			MainLogger::getLogger()->logException($e);
@@ -68,7 +77,7 @@ class Bot {
 		// Handles any problems pre-ready.
 		$this->client->getLoop()->addTimer(10, function(){
 			if(!$this->ready){
-				MainLogger::getLogger()->error("Client failed to login/connect within 10 seconds, See log for details.");
+				MainLogger::getLogger()->critical("Client failed to login/connect within 10 seconds, See log for details.");
 				$this->shutdown();
 			}
 		});
