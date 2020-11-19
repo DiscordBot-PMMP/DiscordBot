@@ -14,14 +14,23 @@ namespace JaxkDev\DiscordBot;
 
 use Discord\Discord;
 use Discord\Exceptions\IntentException;
-use Discord\Parts\Guild\Emoji;
 use Discord\Parts\User\Activity;
+use pocketmine\utils\MainLogger;
 
 class Bot {
-	/* @var Discord */
+	/**
+	 * @var BotThread
+	 */
+	private $thread;
+
+	/**
+	 * @var Discord
+	 */
 	private $client;
 
-	public function __construct() {
+	public function __construct(BotThread $thread) {
+		$this->thread = $thread;
+
 		try {
 			$this->client = new Discord([
 				'token' => 'KEY HERE REMINDER TO SELF, MY KEY IS IN SERVER_KEY.TXT',
@@ -29,13 +38,26 @@ class Bot {
 		} catch (IntentException $e) {
 			var_dump($e);
 		}
+
 		$this->registerHandlers();
+		$this->registerTimers();
+
 		$this->client->run();
 	}
 
-	private function registerHandlers(){
+	private function registerTimers(): void{
+		// Handles shutdown.
+		$this->client->getLoop()->addPeriodicTimer(1, function(){
+			if($this->thread->isStopping()){
+				$this->client->close(true);
+				MainLogger::getLogger()->info("Client closed.");
+			}
+		});
+	}
+
+	private function registerHandlers(): void{
 		$this->client->on('ready', function ($discord) {
-			echo "Bot is ready!", PHP_EOL;
+			MainLogger::getLogger()->info("Client ready.");
 			$discord->updatePresence($discord->factory(Activity::class, [
 				'name' => 'on a PMMP Server',
 				'type' => Activity::TYPE_PLAYING
@@ -43,7 +65,7 @@ class Bot {
 
 			// Listen for messages.
 			$discord->on('message', function ($message, $discord) {
-				echo "{$message->author->username}: {$message->content}",PHP_EOL;
+				MainLogger::getLogger()->info("{$message->author->username}: {$message->content}");
 			});
 		});
 	}

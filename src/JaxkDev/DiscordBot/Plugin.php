@@ -15,6 +15,9 @@ namespace JaxkDev\DiscordBot;
 use pocketmine\plugin\PluginBase;
 
 class Plugin extends PluginBase {
+	/**
+	 * @var BotThread
+	 */
 	private $discordBot;
 
 	public function onEnable() {
@@ -23,6 +26,8 @@ class Plugin extends PluginBase {
 	}
 
 	public function onDisable() {
-		//Stop Thread
+		if($this->discordBot->isStarted() and !$this->discordBot->isStopping()){
+			$this->discordBot->stop();
+		}
 	}
 }
