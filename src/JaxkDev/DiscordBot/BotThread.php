@@ -20,10 +20,6 @@ use pocketmine\utils\MainLogger;
 class BotThread extends Thread {
 
 	/**
-	 * @var Bot
-	 */
-	private $bot = null;
-	/**
 	 * @var AttachableThreadedLogger
 	 */
 	private $logger;
@@ -35,7 +31,7 @@ class BotThread extends Thread {
 	public function __construct(AttachableThreadedLogger $logger) {
 		$this->logger = $logger;
 
-		$this->start(PTHREADS_INHERIT_NONE);
+		$this->start(PTHREADS_INHERIT_NONE | PTHREADS_INHERIT_CONSTANTS);
 	}
 
 	public function run() {
@@ -59,7 +55,6 @@ class BotThread extends Thread {
 		require_once(COMPOSER);
 
 		new Bot($this);
-		// TODO Integrate DiscordPHP's logger with this one.
 	}
 
 	public function isStopping(): bool{
