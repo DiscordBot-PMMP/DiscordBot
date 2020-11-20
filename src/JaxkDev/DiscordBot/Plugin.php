@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot;
 
+use Phar;
 use pocketmine\plugin\PluginBase;
 
 class Plugin extends PluginBase {
@@ -21,14 +22,16 @@ class Plugin extends PluginBase {
 	private $discordBot;
 
 	public function onLoad(){
+		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
+			define('JaxkDev\DiscordBot\COMPOSER', (Phar::running(true) !== "") ? Phar::running(true) . "/vendor/autoload.php" : dirname(__DIR__, 4) . "/DiscordBot/vendor/autoload.php");
+		}
+
 		if(!is_dir($this->getDataFolder().DIRECTORY_SEPARATOR."logs")){
 			mkdir($this->getDataFolder().DIRECTORY_SEPARATOR."logs");
 		}
 
 		$this->saveResource("config.yml");
-	}
 
-	public function onEnable() {
 		$this->getLogger()->debug("Loading initial configuration...");
 
 		$config = yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."config.yml");
@@ -42,6 +45,11 @@ class Plugin extends PluginBase {
 		$this->getLogger()->debug("Constructing DiscordBot...");
 
 		$this->discordBot = new BotThread($this->getServer()->getLogger(), $config);
+	}
+
+	public function onEnable() {
+		$this->getLogger()->debug("Starting DiscordBot Thread...");
+		$this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
 	}
 
 	public function onDisable() {

@@ -12,7 +12,6 @@
 
 namespace JaxkDev\DiscordBot;
 
-use Phar;
 use AttachableThreadedLogger;
 use pocketmine\Thread;
 use pocketmine\utils\MainLogger;
@@ -35,8 +34,6 @@ class BotThread extends Thread {
 	public function __construct(AttachableThreadedLogger $logger, array $initialConfig) {
 		$this->logger = $logger;
 		$this->initialConfig = $initialConfig;
-
-		$this->start(PTHREADS_INHERIT_NONE | PTHREADS_INHERIT_CONSTANTS);
 	}
 
 	public function run() {
@@ -48,16 +45,8 @@ class BotThread extends Thread {
 			$this->logger->registerStatic();
 		}
 
-		if(!defined('JaxkDev\DiscordBot\COMPOSER')) {
-			if(Phar::running(true) !== "") {
-				define('JaxkDev\DiscordBot\COMPOSER', Phar::running(true) . "/vendor/autoload.php");
-			} else {
-				define('JaxkDev\DiscordBot\COMPOSER', dirname(__DIR__, 4) . "/DiscordBot/vendor/autoload.php");
-			}
-		}
-
 		/** @noinspection PhpIncludeInspection */
-		require_once(COMPOSER);
+		require_once(\JaxkDev\DiscordBot\COMPOSER);
 
 		new Bot($this, (array)$this->initialConfig);
 	}
