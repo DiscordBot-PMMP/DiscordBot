@@ -32,7 +32,7 @@ class Bot {
 	private $thread;
 
 	/**
-	 * @var Discord|null
+	 * @var Discord
 	 */
 	private $client;
 
@@ -40,6 +40,11 @@ class Bot {
 	 * @var bool
 	 */
 	private $ready = false;
+
+	/**
+	 * @var bool
+	 */
+	private $closed = false;
 
 	/**
 	 * @var TimerInterface|null
@@ -55,7 +60,7 @@ class Bot {
 		$this->thread = $thread;
 		$this->config = $config;
 
-		register_shutdown_function(array($this, 'shutdownHandler'));
+		register_shutdown_function(array($this, 'close'));
 
 		$logger = new Logger('DiscordPHP');
 		$handler = new RotatingFileHandler($config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['maxFiles'], Logger::DEBUG);
@@ -88,7 +93,7 @@ class Bot {
 		// Handles shutdown.
 		$this->client->getLoop()->addPeriodicTimer(1, function(){
 			if($this->thread->isStopping()){
-				$this->shutdown();
+				$this->close();
 			}
 		});
 
@@ -99,12 +104,12 @@ class Bot {
 				$this->client->getLoop()->addTimer(30, function(){
 					if(!$this->ready) {
 						MainLogger::getLogger()->critical("Client has taken too long to become ready, shutting down.");
-						$this->shutdown();
+						$this->close();
 					}
 				});
 			} else {
 				MainLogger::getLogger()->critical("Client failed to login/connect within 30 seconds, See log file for details.");
-				$this->shutdown();
+				$this->close();
 			}
 		});
 
@@ -117,8 +122,10 @@ class Bot {
 		// https://github.com/teamreflex/DiscordPHP/issues/433
 		// Note ready is emitted after successful connection + all servers/users loaded.
 		$this->client->on('ready', function (Discord $discord) {
-			$this->client->getLoop()->cancelTimer($this->readyTimer);
-			$this->readyTimer = null;
+			if($this->readyTimer !== null) {
+				$this->client->getLoop()->cancelTimer($this->readyTimer);
+				$this->readyTimer = null;
+			}
 			$this->ready = true;
 
 			$this->logDebugInfo();
@@ -182,19 +189,10 @@ class Bot {
 		);
 	}
 
-	public function shutdown(): void{
-		if($this->client !== null){
-			$this->client->close(true);
-			$this->client = null;
-			MainLogger::getLogger()->debug("Client closed.");
-		}
-	}
-
-	public function shutdownHandler(): void{
-		if($this->client !== null) {
-			$this->client->close();
-			$this->client = null;
-		}
-		MainLogger::getLogger()->debug("BotThread shutdown.");
+	public function close(): void{
+		if($this->closed) return;
+		$this->client->close(true);
+		$this->closed = true;
+		MainLogger::getLogger()->debug("Client closed.");
 	}
 }

@@ -42,7 +42,7 @@ foreach(buildPhar(__DIR__ . DIRECTORY_SEPARATOR . "dist" . DIRECTORY_SEPARATOR .
  * @return string[]
  */
 function preg_quote_array(array $strings, string $delim = null) : array{
-	return array_map(function(string $str) use ($delim) : string{ return preg_quote($str, $delim); }, $strings);
+	return array_map(function(string $str) use ($delim) : string{ return preg_quote($str, $delim); }, $strings); /** @phpstan-ignore-line  */
 }
 
 /**
