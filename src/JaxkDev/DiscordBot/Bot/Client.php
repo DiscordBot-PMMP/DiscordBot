@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot;
+namespace JaxkDev\DiscordBot\Bot;
 
 use Carbon\Carbon;
 use Discord\Discord;
@@ -20,16 +20,15 @@ use Discord\Parts\User\Activity;
 use Discord\Parts\User\Member;
 use ErrorException;
 use Exception;
+use JaxkDev\DiscordBot\Communication\BotThread;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
+use pocketmine\utils\MainLogger;
 use React\EventLoop\TimerInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
-use pocketmine\utils\MainLogger;
-
-// TODO Move to Bot namespace (Bot vs Plugin)
-class Bot {
+class Client {
 	/**
 	 * @var BotThread
 	 */
@@ -155,7 +154,6 @@ class Bot {
 					switch($cmd){
 						case 'version':
 						case 'ver':
-							/** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
 							$message->channel->sendMessage("Version information:```\n".
 								"> PHP - v".PHP_VERSION."\n".
 								"> DiscordPHP - ".Discord::VERSION."\n".

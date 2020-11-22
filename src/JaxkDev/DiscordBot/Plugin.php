@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot;
 
 use Phar;
 use pocketmine\plugin\PluginBase;
+use JaxkDev\DiscordBot\Communication\BotThread;
 
 class Plugin extends PluginBase {
 	/**

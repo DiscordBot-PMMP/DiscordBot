@@ -10,9 +10,10 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot;
+namespace JaxkDev\DiscordBot\Communication;
 
 use AttachableThreadedLogger;
+use JaxkDev\DiscordBot\Bot\Client;
 use pocketmine\Thread;
 use pocketmine\utils\MainLogger;
 
@@ -46,10 +47,9 @@ class BotThread extends Thread {
 		}
 
 		/** @noinspection PhpIncludeInspection */
-		/** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
 		require_once(\JaxkDev\DiscordBot\COMPOSER);
 
-		new Bot($this, (array)$this->initialConfig);
+		new Client($this, (array)$this->initialConfig);
 	}
 
 	public function isStopping(): bool{
