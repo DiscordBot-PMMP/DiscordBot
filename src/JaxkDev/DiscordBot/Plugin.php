@@ -15,12 +15,23 @@ namespace JaxkDev\DiscordBot;
 use Phar;
 use pocketmine\plugin\PluginBase;
 use JaxkDev\DiscordBot\Communication\BotThread;
+use Volatile;
 
 class Plugin extends PluginBase {
 	/**
 	 * @var BotThread
 	 */
 	private $discordBot;
+
+	/**
+	 * @var Volatile
+	 */
+	private $inboundData;
+
+	/**
+	 * @var Volatile
+	 */
+	private $outboundData;
 
 	public function onLoad(){
 		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
@@ -46,7 +57,24 @@ class Plugin extends PluginBase {
 
 		$this->getLogger()->debug("Constructing DiscordBot...");
 
-		$this->discordBot = new BotThread($this->getServer()->getLogger(), $config);
+		$this->inboundData = new Volatile();
+		$this->outboundData = new Volatile();
+
+		$this->discordBot = new BotThread($this->getServer()->getLogger(), $config, $this->outboundData, $this->inboundData);
+	}
+
+	/**
+	 * @return array<int, array>
+	 */
+	public function readInboundData(){
+		return $this->inboundData->shift();
+	}
+
+	/**
+	 * @param array<int, array> $data
+	 */
+	public function writeOutboundData(array $data): void{
+		$this->outboundData[] = (array)$data;
 	}
 
 	public function onEnable() {

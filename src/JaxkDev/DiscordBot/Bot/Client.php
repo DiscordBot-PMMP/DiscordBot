@@ -75,7 +75,7 @@ class Client {
 		$logger->setHandlers(array($handler));
 
 		// TODO ONLY IF DEBUG ENABLED:
-		$handler = new StreamHandler(fopen('php://stdout', 'w'));
+		$handler = new StreamHandler(($r = fopen('php://stdout', 'w')) === false ? "" : $r);
 		$logger->pushHandler($handler);
 
 		try {
@@ -197,8 +197,9 @@ class Client {
 		);
 	}
 
-	public function errorHandler($severity, $message, $file, $line): void{
+	public function errorHandler(int $severity, string $message, string $file, int $line): bool{
 		MainLogger::getLogger()->logException(new ErrorException($message, 0, $severity, $file, $line));
+		return true;
 	}
 
 	public function close(): void{
