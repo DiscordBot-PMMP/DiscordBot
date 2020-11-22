@@ -124,7 +124,7 @@ class Bot {
 
 			// Listen for messages.
 			$discord->on('message', function (Message $message, Discord $discord) {
-				if($message->author->bot) return; //Ignore Bot's (including self)
+				if($message->author->user->bot) return; //Ignore Bot's (including self)
 
 				if($message->content[0] === "!"){
 					$args = explode(" ", $message->content);
