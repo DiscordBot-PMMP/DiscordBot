@@ -23,7 +23,9 @@ class BotThread extends Thread {
 	 */
 	private $logger;
 
-	/** @var array */
+	/**
+	 * @var array
+	 */
 	private $initialConfig;
 
 	/**

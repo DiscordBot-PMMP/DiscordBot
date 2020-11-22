@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot;
 
+use Carbon\Carbon;
 use Discord\Discord;
 use Discord\Exceptions\IntentException;
 use Discord\Parts\Channel\Message;
@@ -19,12 +20,14 @@ use Discord\Parts\User\Activity;
 use Discord\Parts\User\Member;
 use Exception;
 use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
 use React\EventLoop\TimerInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 use pocketmine\utils\MainLogger;
 
+// TODO Move to Bot namespace (Bot vs Plugin)
 class Bot {
 	/**
 	 * @var BotThread
@@ -67,7 +70,9 @@ class Bot {
 		$handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
 		$logger->setHandlers(array($handler));
 
-		// TODO Add pipe handler for debugging.
+		// TODO ONLY IF DEBUG ENABLED:
+		$handler = new StreamHandler(fopen('php://stdout', 'w'));
+		$logger->pushHandler($handler);
 
 		try {
 			$this->client = new Discord([
@@ -127,6 +132,7 @@ class Bot {
 				$this->readyTimer = null;
 			}
 			$this->ready = true;
+			MainLogger::getLogger()->info("Client ({$this->client->username}#{$this->client->discriminator})({$this->client->id}) ready.");
 
 			$this->logDebugInfo();
 			$this->updatePresence($this->config['discord']['presence']['text'], $this->config['discord']['presence']['type']);
@@ -144,16 +150,21 @@ class Bot {
 					switch($cmd){
 						case 'version':
 						case 'ver':
+							/** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
 							$message->channel->sendMessage("Version information:```\n".
 								"> PHP - v".PHP_VERSION."\n".
 								"> DiscordPHP - ".Discord::VERSION."\n".
 								"> PocketMine - v".\pocketmine\VERSION."\n".
-								"> DiscordBot - ".VERSION."```"
+								"> DiscordBot - ".\JaxkDev\DiscordBot\VERSION."```"
 							)->otherwise(function($e) use($message) {
 								MainLogger::getLogger()->logException($e);
-								// At least try and static message.
+								// At least try a static message, if this fails client probably only has read-only perms
+								// In that channel.
 								$message->channel->sendMessage("**ERROR** Failed to send version information...");
 							});
+							break;
+						case 'ping':
+							$message->channel->sendMessage("Difference: ".(Carbon::now()->valueOf()-$message->timestamp->valueOf())."ms");
 							break;
 						default:
 							$message->channel->sendMessage("Unknown command.");
@@ -180,12 +191,9 @@ class Bot {
 	}
 
 	public function logDebugInfo(): void{
-		MainLogger::getLogger()->info("Client ({$this->client->username}#{$this->client->discriminator})({$this->client->id}) ready.");
-
 		MainLogger::getLogger()->debug("Debug Information:\n".
 			"> Servers: {$this->client->guilds->count()}\n".
-			"> Users: {$this->client->users->count()}\n".
-			"> Private Channels: {$this->client->private_channels->count()}"
+			"> Users: {$this->client->users->count()}"
 		);
 	}
 
