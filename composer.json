@@ -14,6 +14,7 @@
         }
     },
     "require": {
+        "php": "^7.3",
         "team-reflex/discord-php": "^5.0"
     },
     "require-dev": {
