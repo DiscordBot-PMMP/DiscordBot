@@ -64,6 +64,8 @@ class Bot {
 		$this->thread = $thread;
 		$this->config = $config;
 
+		gc_enable();
+
 		error_reporting(E_ALL & ~E_NOTICE);
 		set_error_handler(array($this, 'errorHandler'));
 		register_shutdown_function(array($this, 'close'));
@@ -169,11 +171,8 @@ class Bot {
 						case 'ping':
 							$message->channel->sendMessage("Difference: ".(Carbon::now()->valueOf()-$message->timestamp->valueOf())."ms");
 							break;
-						default:
-							$message->channel->sendMessage("Unknown command.");
 					}
 				}
-				MainLogger::getLogger()->info("[{$message->channel->name}] {$message->author->username}: {$message->content}");
 			});
 		});
 	}
