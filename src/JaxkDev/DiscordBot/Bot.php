@@ -18,6 +18,7 @@ use Discord\Exceptions\IntentException;
 use Discord\Parts\Channel\Message;
 use Discord\Parts\User\Activity;
 use Discord\Parts\User\Member;
+use ErrorException;
 use Exception;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -63,6 +64,8 @@ class Bot {
 		$this->thread = $thread;
 		$this->config = $config;
 
+		error_reporting(E_ALL & ~E_NOTICE);
+		set_error_handler(array($this, 'errorHandler'));
 		register_shutdown_function(array($this, 'close'));
 
 		$logger = new Logger('DiscordPHP');
@@ -195,6 +198,10 @@ class Bot {
 			"> Servers: {$this->client->guilds->count()}\n".
 			"> Users: {$this->client->users->count()}"
 		);
+	}
+
+	public function errorHandler($severity, $message, $file, $line): void{
+		MainLogger::getLogger()->logException(new ErrorException($message, 0, $severity, $file, $line));
 	}
 
 	public function close(): void{

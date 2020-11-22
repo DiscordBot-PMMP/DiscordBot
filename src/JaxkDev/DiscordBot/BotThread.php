@@ -39,8 +39,6 @@ class BotThread extends Thread {
 	}
 
 	public function run() {
-		error_reporting(-1);
-
 		$this->registerClassLoader();
 
 		if($this->logger instanceof MainLogger){
@@ -48,6 +46,7 @@ class BotThread extends Thread {
 		}
 
 		/** @noinspection PhpIncludeInspection */
+		/** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
 		require_once(\JaxkDev\DiscordBot\COMPOSER);
 
 		new Bot($this, (array)$this->initialConfig);
