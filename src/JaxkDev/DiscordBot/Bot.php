@@ -16,6 +16,7 @@ use Discord\Discord;
 use Discord\Exceptions\IntentException;
 use Discord\Parts\Channel\Message;
 use Discord\Parts\User\Activity;
+use Discord\Parts\User\Member;
 use Exception;
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
@@ -125,7 +126,10 @@ class Bot {
 
 			// Listen for messages.
 			$discord->on('message', function (Message $message, Discord $discord) {
-				if($message->author->user->bot) return; //Ignore Bot's (including self)
+				if($message->author instanceof Member ? $message->author->user->bot : $message->author->bot){
+					//Ignore Bot's (including self)
+					return;
+				}
 
 				if($message->content[0] === "!"){
 					$args = explode(" ", $message->content);

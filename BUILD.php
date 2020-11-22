@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 echo "Building plugin...\n";
 
+/** @phpstan-ignore-next-line */
 $basePath = rtrim(realpath(__DIR__), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
 $includedPaths = array_map(function($path) : string{
@@ -77,6 +78,7 @@ function buildPhar(string $pharPath, string $basePath, array $includedPaths, arr
 	$phar->setSignatureAlgorithm($signatureAlgo);
 	$phar->startBuffering();
 
+	/** @phpstan-ignore-next-line */
 	$excludedSubstrings = preg_quote_array(array_merge([
 		realpath($pharPath) //don't add the phar to itself
 	], $excludedPaths), '/');
