@@ -108,6 +108,7 @@ class Bot {
 		});
 
 		// TODO 'Ticking' Communication between thread + plugin via lists/Queues of data
+		// https://github.com/JaxkDev/PyRak/blob/master/src/pyrak/server/udp_server.py#L72
 	}
 
 	/** @noinspection PhpUnusedParameterInspection */
@@ -123,6 +124,29 @@ class Bot {
 
 			// Listen for messages.
 			$discord->on('message', function (Message $message, Discord $discord) {
+				if($message->author->bot) return; //Ignore Bot's (including self)
+
+				if($message->content[0] === "!"){
+					$args = explode(" ", $message->content);
+					$cmd = substr(array_shift($args), 1);
+					switch($cmd){
+						case 'version':
+						case 'ver':
+							$message->channel->sendMessage("Version information:```\n".
+								"> PHP - v".PHP_VERSION."\n".
+								"> DiscordPHP - ".Discord::VERSION."\n".
+								"> PocketMine - v".\pocketmine\VERSION."\n".
+								"> DiscordBot - ".VERSION."```"
+							)->otherwise(function($e) use($message) {
+								MainLogger::getLogger()->logException($e);
+								// At least try and static message.
+								$message->channel->sendMessage("**ERROR** Failed to send version information...");
+							});
+							break;
+						default:
+							$message->channel->sendMessage("Unknown command.");
+					}
+				}
 				MainLogger::getLogger()->info("[{$message->channel->name}] {$message->author->username}: {$message->content}");
 			});
 		});
@@ -148,7 +172,9 @@ class Bot {
 
 		MainLogger::getLogger()->debug("Debug Information:\n".
 			"> Servers: {$this->client->guilds->count()}\n".
-			"> Users: {$this->client->users->count()}");
+			"> Users: {$this->client->users->count()}\n".
+			"> Private Channels: {$this->client->private_channels->count()}"
+		);
 	}
 
 	public function shutdown(): void{

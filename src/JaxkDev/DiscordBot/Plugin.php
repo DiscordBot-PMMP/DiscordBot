@@ -23,6 +23,7 @@ class Plugin extends PluginBase {
 
 	public function onLoad(){
 		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
+			define("JaxkDev\DiscordBot\VERSION", "v".$this->getDescription()->getVersion());
 			define('JaxkDev\DiscordBot\COMPOSER', (Phar::running(true) !== "") ? Phar::running(true) . "/vendor/autoload.php" : dirname(__DIR__, 4) . "/DiscordBot/vendor/autoload.php");
 		}
 
