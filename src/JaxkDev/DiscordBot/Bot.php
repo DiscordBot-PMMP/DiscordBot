@@ -31,7 +31,7 @@ class Bot {
 	private $thread;
 
 	/**
-	 * @var Discord
+	 * @var Discord|null
 	 */
 	private $client;
 
@@ -41,7 +41,7 @@ class Bot {
 	private $ready = false;
 
 	/**
-	 * @var TimerInterface
+	 * @var TimerInterface|null
 	 */
 	private $readyTimer;
 
@@ -117,6 +117,7 @@ class Bot {
 		// Note ready is emitted after successful connection + all servers/users loaded.
 		$this->client->on('ready', function (Discord $discord) {
 			$this->client->getLoop()->cancelTimer($this->readyTimer);
+			$this->readyTimer = null;
 			$this->ready = true;
 
 			$this->logDebugInfo();

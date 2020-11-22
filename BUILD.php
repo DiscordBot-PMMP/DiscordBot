@@ -26,7 +26,7 @@ if($metadata === null) {
 	exit(1);
 }
 
-$name = ((($opt = getopt("o:")) === [] || $opt === false) ? str_replace(".","_",("DiscordBot_v".$metadata['version'])).".phar" : $opt["o"]);
+$name = ((!($opt = getopt("o:")) || $opt['o'] === false) ? str_replace(".","_",("DiscordBot_v".$metadata['version'])).".phar" : $opt["o"]);
 
 if (!is_dir("dist")) mkdir("dist");
 
