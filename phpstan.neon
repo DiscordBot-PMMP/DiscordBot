@@ -1,8 +1,9 @@
 parameters:
-	level: 5
+	level: 6
 	paths:
 		- src
 	excludes_analyse:
 		- vendor/*
 	bootstrapFiles:
 		- test/bootstrap.php
+	checkMissingIterableValueType: false
