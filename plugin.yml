@@ -1,5 +1,5 @@
 name: DiscordBot
-version: 1.0.0_A1
+version: 1.0.0_A2
 author: JaxkDev
 main: JaxkDev\DiscordBot\Plugin
 api: 3.0.0
