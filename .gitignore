@@ -5,5 +5,4 @@
 *.phar
 *.txt
 
-/test/phpstan.bat
 /TEST.php

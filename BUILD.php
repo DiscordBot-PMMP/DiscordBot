@@ -6,6 +6,10 @@
 
 declare(strict_types=1);
 
+echo "Updating dependencies / Removing any dev-dependencies / Optimising Autoloader...\n";
+
+passthru("composer update --no-dev -o");
+
 echo "Building plugin...\n";
 
 /** @phpstan-ignore-next-line */
