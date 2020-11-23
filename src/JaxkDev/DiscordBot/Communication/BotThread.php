@@ -33,12 +33,7 @@ class BotThread extends Thread {
 	/**
 	 * @var Volatile
 	 */
-	private $inboundData;
-
-	/**
-	 * @var Volatile
-	 */
-	private $outboundData;
+	private $inboundData, $outboundData;
 
 	/**
 	 * @var bool
@@ -70,6 +65,9 @@ class BotThread extends Thread {
 	 * @return array<int, array>
 	 */
 	public function readInboundData(){
+		//Stress test
+		//var_dump("Client - ".$this->inboundData->count());
+		//return null;
 		return $this->inboundData->shift();
 	}
 

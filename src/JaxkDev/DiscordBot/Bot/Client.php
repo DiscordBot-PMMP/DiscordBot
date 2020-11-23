@@ -49,7 +49,7 @@ class Client {
 	/**
 	 * @var TimerInterface|null
 	 */
-	private $readyTimer;
+	private $readyTimer, $tickTimer;
 
 	/**
 	 * @var array
@@ -113,7 +113,15 @@ class Client {
 			}
 		});
 
-		// TODO 'Ticking' Communication handling array of data inbound.
+		$this->tickTimer = $this->client->getLoop()->addPeriodicTimer(0.1, function(){
+			$data = $this->thread->readInboundData();
+			if($data !== null){
+				var_dump("Discord Client received: ");
+				var_dump($data);
+			}
+			// Stress test, run at your own risk...
+			// for($i = 0; $i < 200; $i++) $this->thread->writeOutboundData([0, str_repeat("S", 20000)]);
+		});
 	}
 
 	/** @noinspection PhpUnusedParameterInspection */
@@ -201,6 +209,7 @@ class Client {
 		if($this->closed) return;
 		if($this->client instanceof Discord) $this->client->close(true);
 		$this->closed = true;
+		$this->thread->stop();
 		MainLogger::getLogger()->debug("Client closed.");
 		exit(0);
 	}

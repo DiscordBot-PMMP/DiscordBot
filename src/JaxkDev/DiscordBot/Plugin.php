@@ -14,7 +14,9 @@ namespace JaxkDev\DiscordBot;
 
 use Phar;
 use pocketmine\plugin\PluginBase;
+use pocketmine\scheduler\TaskHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\Communication\PluginTickTask;
 use Volatile;
 
 class Plugin extends PluginBase {
@@ -26,12 +28,12 @@ class Plugin extends PluginBase {
 	/**
 	 * @var Volatile
 	 */
-	private $inboundData;
+	private $inboundData, $outboundData;
 
 	/**
-	 * @var Volatile
+	 * @var TaskHandler
 	 */
-	private $outboundData;
+	private $tickTask;
 
 	public function onLoad(){
 		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
@@ -67,6 +69,9 @@ class Plugin extends PluginBase {
 	 * @return array<int, array>
 	 */
 	public function readInboundData(){
+		//Stress Test
+		//var_dump("Plugin - ".$this->inboundData->count());
+		//return null;
 		return $this->inboundData->shift();
 	}
 
@@ -80,6 +85,8 @@ class Plugin extends PluginBase {
 	public function onEnable() {
 		$this->getLogger()->debug("Starting DiscordBot Thread...");
 		$this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
+
+		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new PluginTickTask($this), 1);
 	}
 
 	public function onDisable() {
