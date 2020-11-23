@@ -14,7 +14,6 @@ namespace JaxkDev\DiscordBot\Bot;
 
 use Carbon\Carbon;
 use Discord\Discord;
-use Discord\Exceptions\IntentException;
 use Discord\Parts\Channel\Message;
 use Discord\Parts\User\Activity;
 use Discord\Parts\User\Member;
@@ -26,7 +25,6 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
 use pocketmine\utils\MainLogger;
 use React\EventLoop\TimerInterface;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class Client {
 	/**
@@ -78,19 +76,13 @@ class Client {
 		$handler = new StreamHandler(($r = fopen('php://stdout', 'w')) === false ? "" : $r);
 		$logger->pushHandler($handler);
 
-		try {
-			$this->client = new Discord([
-				'token' => $config['discord']['token'],
-				'logger' => $logger
-			]);
-			$this->config['discord']['token'] = "REDACTED";
-		} catch (IntentException $e) {
-			MainLogger::getLogger()->logException($e);
-			return;
-		} catch (InvalidOptionsException $e) {
-			MainLogger::getLogger()->logException($e);
-			return;
-		}
+		// No intents specified yet so IntentException is impossible.
+		/** @noinspection PhpUnhandledExceptionInspection */
+		$this->client = new Discord([
+			'token' => $config['discord']['token'],
+			'logger' => $logger
+		]);
+		$this->config['discord']['token'] = "REDACTED";
 
 		$this->registerHandlers();
 		$this->registerTimers();
@@ -122,8 +114,7 @@ class Client {
 			}
 		});
 
-		// TODO 'Ticking' Communication between thread + plugin via lists/Queues of data
-		// https://github.com/JaxkDev/PyRak/blob/master/src/pyrak/server/udp_server.py#L72
+		// TODO 'Ticking' Communication handling array of data inbound.
 	}
 
 	/** @noinspection PhpUnusedParameterInspection */
@@ -136,7 +127,7 @@ class Client {
 				$this->readyTimer = null;
 			}
 			$this->ready = true;
-			MainLogger::getLogger()->info("Client ({$this->client->username}#{$this->client->discriminator})({$this->client->id}) ready.");
+			MainLogger::getLogger()->info("Client ready.");
 
 			$this->logDebugInfo();
 			$this->updatePresence($this->config['discord']['presence']['text'], $this->config['discord']['presence']['type']);
@@ -192,20 +183,31 @@ class Client {
 
 	public function logDebugInfo(): void{
 		MainLogger::getLogger()->debug("Debug Information:\n".
+			"> Username: {$this->client->username}#{$this->client->discriminator}\n".
+			"> ID: {$this->client->id}\n".
 			"> Servers: {$this->client->guilds->count()}\n".
 			"> Users: {$this->client->users->count()}"
 		);
 	}
 
 	public function errorHandler(int $severity, string $message, string $file, int $line): bool{
-		MainLogger::getLogger()->logException(new ErrorException($message, 0, $severity, $file, $line));
+		if(substr($message,0,61) === "stream_socket_client(): unable to connect to udp://8.8.8.8:53"){
+			// Really nasty hack to check if connection failed on bot construction,
+			// Could manually ping discord API before ?
+			// Really need to fork/fix the shit in DiscordPHP...
+			MainLogger::getLogger()->emergency("Failed to connect to udp://8.8.8.8:53, please check your internet connection.");
+		} else {
+			MainLogger::getLogger()->logException(new ErrorException($message, 0, $severity, $file, $line));
+		}
+		$this->close();
 		return true;
 	}
 
 	public function close(): void{
 		if($this->closed) return;
-		$this->client->close(true);
+		if($this->client instanceof Discord) $this->client->close(true);
 		$this->closed = true;
 		MainLogger::getLogger()->debug("Client closed.");
+		exit(0);
 	}
 }
