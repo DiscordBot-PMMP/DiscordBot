@@ -12,7 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Bot;
 
-use Carbon\Carbon;
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
 use Discord\Parts\User\Activity;
@@ -157,9 +156,6 @@ class Client {
 								$message->channel->sendMessage("**ERROR** Failed to send version information...");
 							});
 							break;
-						case 'ping':
-							$message->channel->sendMessage("Difference: ".(Carbon::now()->valueOf()-$message->timestamp->valueOf())."ms");
-							break;
 					}
 				}
 			});
@@ -191,14 +187,12 @@ class Client {
 	}
 
 	public function errorHandler(int $severity, string $message, string $file, int $line): bool{
-		if(substr($message,0,61) === "stream_socket_client(): unable to connect to udp://8.8.8.8:53"){
-			// Really nasty hack to check if connection failed on bot construction,
-			// Could manually ping discord API before ?
+		if(substr($message,0,51) === "stream_socket_client(): unable to connect to udp://" and $line === 130){
+			// Really nasty hack to check if connection fails,
 			// Really need to fork/fix the shit in DiscordPHP...
-			MainLogger::getLogger()->emergency("Failed to connect to udp://8.8.8.8:53, please check your internet connection.");
-		} else {
-			MainLogger::getLogger()->logException(new ErrorException($message, 0, $severity, $file, $line));
+			MainLogger::getLogger()->critical("Failed to connect to discord, please check your internet connection.");
 		}
+		MainLogger::getLogger()->logException(new ErrorException($message, 0, $severity, $file, $line));
 		$this->close();
 		return true;
 	}
