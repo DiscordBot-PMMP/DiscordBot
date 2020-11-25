@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8f2a060b87727e07c286ba0a96ff9ea5",
+    "content-hash": "7d3804d00190af91d3a10b3f82bbec42",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -1745,16 +1745,16 @@
         },
         {
             "name": "team-reflex/discord-php",
-            "version": "v5.0.12",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/teamreflex/DiscordPHP.git",
-                "reference": "6899b77909f3bb6e6c91d74dbc88103dee712690"
+                "url": "https://github.com/JaxkDev/DiscordPHPSlim.git",
+                "reference": "064baaa2f6e301de3fb1f37d5defaf09e7d436e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/teamreflex/DiscordPHP/zipball/6899b77909f3bb6e6c91d74dbc88103dee712690",
-                "reference": "6899b77909f3bb6e6c91d74dbc88103dee712690",
+                "url": "https://api.github.com/repos/JaxkDev/DiscordPHPSlim/zipball/064baaa2f6e301de3fb1f37d5defaf09e7d436e3",
+                "reference": "064baaa2f6e301de3fb1f37d5defaf09e7d436e3",
                 "shasum": ""
             },
             "require": {
@@ -1772,7 +1772,9 @@
                 "trafficcophp/bytebuffer": "^0.3"
             },
             "require-dev": {
+                "davidcole1340/reactsh": "dev-master",
                 "friendsofphp/php-cs-fixer": "^2.16",
+                "phpunit/phpunit": "^9.4",
                 "symfony/var-dumper": "*"
             },
             "suggest": {
@@ -1790,7 +1792,14 @@
                     "Discord\\": "src/Discord"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "scripts": {
+                "cs": [
+                    "./vendor/bin/php-cs-fixer fix"
+                ],
+                "unit": [
+                    "./vendor/bin/phpunit"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -1805,7 +1814,11 @@
                 }
             ],
             "description": "An unofficial API to interact with the voice and text service Discord.",
-            "time": "2020-11-10T22:11:15+00:00"
+            "support": {
+                "source": "https://github.com/JaxkDev/DiscordPHPSlim/tree/dev-master",
+                "issues": "https://github.com/JaxkDev/DiscordPHPSlim/issues"
+            },
+            "time": "2020-11-24T09:43:02+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",
@@ -2484,7 +2497,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "team-reflex/discord-php": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
