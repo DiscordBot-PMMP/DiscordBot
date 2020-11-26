@@ -38,7 +38,7 @@ class BotThread extends Thread {
 	/**
 	 * @var bool
 	 */
-	private $stopping = false;
+	private $stopping = false, $ready = false;
 
 	public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData) {
 		$this->logger = $logger;
@@ -69,6 +69,14 @@ class BotThread extends Thread {
 
 	public function writeOutboundData(int $id, array $data): void{
 		$this->outboundData[] = (array)[$id, $data];
+	}
+
+	public function setReady(bool $v = true): void{
+		$this->ready = $v;
+	}
+
+	public function isReady(): bool{
+		return $this->ready;
 	}
 
 	public function isStopping(): bool{

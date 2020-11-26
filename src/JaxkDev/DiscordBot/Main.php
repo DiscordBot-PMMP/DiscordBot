@@ -83,10 +83,7 @@ class Main extends PluginBase {
 
 		if(($currentTick % 20) === 0){
 			//Run every second.
-			if($currentTick > 100){
-				// Bot doesnt start loop until setup + ready, allow 5s head start.
-				$this->botCommsHandler->checkHeartbeat();
-			}
+			if($this->discordBot->isReady()) $this->botCommsHandler->checkHeartbeat();
 			$this->botCommsHandler->sendHeartbeat();
 		}
 	}

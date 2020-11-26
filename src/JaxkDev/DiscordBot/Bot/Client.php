@@ -141,6 +141,7 @@ class Client {
 				$this->readyTimer = null;
 			}
 			$this->ready = true;
+			$this->thread->setReady();
 			MainLogger::getLogger()->info("Client ready.");
 
 			$this->logDebugInfo();
