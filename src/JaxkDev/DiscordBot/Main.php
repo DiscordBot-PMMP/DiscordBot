@@ -19,7 +19,7 @@ use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\PluginTickTask;
 use Volatile;
 
-class Plugin extends PluginBase {
+class Main extends PluginBase {
 	/**
 	 * @var BotThread
 	 */

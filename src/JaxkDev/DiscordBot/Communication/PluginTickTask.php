@@ -12,17 +12,17 @@
 
 namespace JaxkDev\DiscordBot\Communication;
 
-use JaxkDev\DiscordBot\Plugin;
+use JaxkDev\DiscordBot\Main;
 use pocketmine\scheduler\Task;
 
 class PluginTickTask extends Task {
 
 	/**
-	 * @var Plugin
+	 * @var Main
 	 */
 	private $plugin;
 
-	public function __construct(Plugin $plugin){
+	public function __construct(Main $plugin){
 		$this->plugin = $plugin;
 	}
 
