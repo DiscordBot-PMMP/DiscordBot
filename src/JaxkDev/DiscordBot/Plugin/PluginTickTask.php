@@ -10,11 +10,12 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication;
+namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Main;
 use pocketmine\scheduler\Task;
 
+// TODO Closure.
 class PluginTickTask extends Task {
 
 	/**
@@ -27,12 +28,6 @@ class PluginTickTask extends Task {
 	}
 
 	public function onRun(int $currentTick) {
-		$data = $this->plugin->readInboundData();
-		if($data !== null){
-			var_dump("Got data - TickTask Plugin");
-			var_dump($data);
-		}
-		// Stress Test, run at your own risk...
-		// for($i = 0; $i < 100; $i++) $this->plugin->writeOutboundData([0,[str_repeat("S", 20000)]]);
+		$this->plugin->tick($currentTick);
 	}
 }

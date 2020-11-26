@@ -62,20 +62,13 @@ class BotThread extends Thread {
 
 	/**
 	 * https://github.com/pmmp/pthreads/blob/fork/examples/fetching-data-from-a-thread.php
-	 * @return array<int, array>
 	 */
-	public function readInboundData(){
-		//Stress test
-		//var_dump("Client - ".$this->inboundData->count());
-		//return null;
+	public function readInboundData(): ?array{
 		return $this->inboundData->shift();
 	}
 
-	/**
-	 * @param array<int, array> $data
-	 */
-	public function writeOutboundData(array $data): void{
-		$this->outboundData[] = (array)$data;
+	public function writeOutboundData(int $id, array $data): void{
+		$this->outboundData[] = (array)[$id, $data];
 	}
 
 	public function isStopping(): bool{

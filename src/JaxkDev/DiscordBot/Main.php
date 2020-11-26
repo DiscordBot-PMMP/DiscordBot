@@ -12,11 +12,12 @@
 
 namespace JaxkDev\DiscordBot;
 
+use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\Plugin\PluginTickTask;
+use JaxkDev\DiscordBot\Plugin\Handlers\BotCommunicationHandler;
 use Phar;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\TaskHandler;
-use JaxkDev\DiscordBot\Communication\BotThread;
-use JaxkDev\DiscordBot\Communication\PluginTickTask;
 use Volatile;
 
 class Main extends PluginBase {
@@ -34,6 +35,11 @@ class Main extends PluginBase {
 	 * @var TaskHandler
 	 */
 	private $tickTask;
+
+	/**
+	 * @var BotCommunicationHandler
+	 */
+	private $botCommsHandler;
 
 	public function onLoad(){
 		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
@@ -62,24 +68,35 @@ class Main extends PluginBase {
 		$this->inboundData = new Volatile();
 		$this->outboundData = new Volatile();
 
+		$this->botCommsHandler = new BotCommunicationHandler($this);
 		$this->discordBot = new BotThread($this->getServer()->getLogger(), $config, $this->outboundData, $this->inboundData);
 	}
 
-	/**
-	 * @return array<int, array>
-	 */
-	public function readInboundData(){
-		//Stress Test
-		//var_dump("Plugin - ".$this->inboundData->count());
-		//return null;
+	public function tick(int $currentTick): void{
+		$data = $this->readInboundData();
+		$count = 0;
+		while($data !== null and $count < 20){
+			$this->botCommsHandler->handle($data);
+			$data = $this->readInboundData();
+			$count++;
+		}
+
+		if(($currentTick % 20) === 0){
+			//Run every second.
+			if($currentTick > 100){
+				// Bot doesnt start loop until setup + ready, allow 5s head start.
+				$this->botCommsHandler->checkHeartbeat();
+			}
+			$this->botCommsHandler->sendHeartbeat();
+		}
+	}
+
+	public function readInboundData(): ?array{
 		return $this->inboundData->shift();
 	}
 
-	/**
-	 * @param array<int, array> $data
-	 */
-	public function writeOutboundData(array $data): void{
-		$this->outboundData[] = (array)$data;
+	public function writeOutboundData(int $id, array $data): void{
+		$this->outboundData[] = (array)[$id, $data];
 	}
 
 	public function onEnable() {
@@ -90,6 +107,7 @@ class Main extends PluginBase {
 	}
 
 	public function onDisable() {
+		if(!$this->tickTask->isCancelled()) $this->tickTask->cancel();
 		if($this->discordBot !== null and $this->discordBot->isStarted() and !$this->discordBot->isStopping()){
 			$this->discordBot->stop();
 		}

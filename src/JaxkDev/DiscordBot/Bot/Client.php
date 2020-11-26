@@ -18,6 +18,7 @@ use Discord\Parts\User\Activity;
 use Discord\Parts\User\Member;
 use ErrorException;
 use Exception;
+use JaxkDev\DiscordBot\Bot\Handlers\PluginCommunicationHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -37,6 +38,11 @@ class Client {
 	private $client;
 
 	/**
+	 * @var PluginCommunicationHandler
+	 */
+	private $pluginCommsHandler;
+
+	/**
 	 * @var bool
 	 */
 	private $ready = false;
@@ -50,6 +56,11 @@ class Client {
 	 * @var TimerInterface|null
 	 */
 	private $readyTimer, $tickTimer;
+
+	/**
+	 * @var int
+	 */
+	private $tickCount = 1;
 
 	/**
 	 * @var array
@@ -86,6 +97,8 @@ class Client {
 		$this->registerHandlers();
 		$this->registerTimers();
 
+		$this->pluginCommsHandler = new PluginCommunicationHandler($this);
+
 		$this->client->run();
 	}
 
@@ -113,14 +126,8 @@ class Client {
 			}
 		});
 
-		$this->tickTimer = $this->client->getLoop()->addPeriodicTimer(0.1, function(){
-			$data = $this->thread->readInboundData();
-			if($data !== null){
-				var_dump("Discord Client received: ");
-				var_dump($data);
-			}
-			// Stress test, run at your own risk...
-			// for($i = 0; $i < 200; $i++) $this->thread->writeOutboundData([0, str_repeat("S", 20000)]);
+		$this->tickTimer = $this->client->getLoop()->addPeriodicTimer(0.05, function(){
+			$this->tick();
 		});
 	}
 
@@ -170,6 +177,28 @@ class Client {
 		});
 	}
 
+	public function tick(): void{
+		$data = $this->thread->readInboundData();
+		$count = 0;
+		while($data !== null and $count < 20){
+			$this->pluginCommsHandler->handle($data);
+			$data = $this->thread->readInboundData();
+			$count++;
+		}
+
+		if(($this->tickCount % 20) === 0){
+			//Run every second.
+			$this->pluginCommsHandler->checkHeartbeat();
+			$this->pluginCommsHandler->sendHeartbeat();
+		}
+
+		$this->tickCount++;
+	}
+
+	public function getThread(): BotThread{
+		return $this->thread;
+	}
+
 	public function updatePresence(string $text, int $type): bool{
 		/** @var Activity $presence */
 		$presence = $this->client->factory(Activity::class, [
@@ -207,7 +236,13 @@ class Client {
 
 	public function close(): void{
 		if($this->closed) return;
-		if($this->client instanceof Discord) $this->client->close(true);
+		if($this->client instanceof Discord){
+			try{
+				$this->client->close(true);
+			} catch (\Error $e){
+				MainLogger::getLogger()->debug("Failed to close client, probably due it not being started.");
+			}
+		}
 		$this->closed = true;
 		$this->thread->stop();
 		MainLogger::getLogger()->debug("Client closed.");
