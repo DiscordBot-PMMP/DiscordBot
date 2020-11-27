@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Bot\Handlers;
 
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Utils;
 use pocketmine\utils\MainLogger;
 
 class PluginCommunicationHandler {
@@ -33,28 +34,37 @@ class PluginCommunicationHandler {
 	}
 
 	public function handle(array $data): bool{
-		assert(is_int($data[0]));
+		Utils::assert(is_int($data[0]), "Corrupt internal communication data received.");
 
 		switch ($data[0]){
-			case Protocol::TYPE_HEARTBEAT:
+			case Protocol::ID_HEARTBEAT:
 				return $this->handleHeartbeat($data[1]);
-			case Protocol::TYPE_BOT_READY:
-				//return $this->handleBotReady($data[1]);
-			case Protocol::TYPE_STATS_REQUEST:
-				//return $this->handleStatsRequest($data[1]);
-			case Protocol::TYPE_STATS_RESPONSE:
-				//return $this->handleStatsResponse($data[1]);
+			case Protocol::ID_UPDATE_ACTIVITY:
+				return $this->handleUpdateActivity($data[1]);
 			default:
 				return false;
 			// throw new \InvalidKeyException("Invalid ID ({$data[0]}) Received from internal communication.");
 		}
 	}
 
+	/**
+	 * @param array $data [ACTIVITY_TYPE, TEXT]
+	 * @return bool
+	 */
+	private function handleUpdateActivity(array $data): bool{
+		Utils::assert((count($data) === 2) and is_int($data[0]) and is_string($data[1]), "Invalid UpdateActivity data received.");
+		Utils::assert(in_array($data[0],
+			[Protocol::ACTIVITY_TYPE_PLAYING, Protocol::ACTIVITY_TYPE_LISTENING, Protocol::ACTIVITY_TYPE_STREAMING],
+			"Activity type '{$data[0]}' received is not valid."));
+
+		$this->client->updatePresence($data[1], $data[0]);
+
+		return true;
+	}
 
 	private function handleHeartbeat(array $data): bool{
-		assert((count($data) === 1) and is_numeric($data[0]));
+		Utils::assert((count($data) === 1) and is_numeric($data[0]), "Invalid Heartbeat data received.");
 
-		//MainLogger::getLogger()->debug("Heartbeat received: {$data[0]}");
 		$this->lastHeartbeat = (float)$data[0];
 
 		return true;
@@ -70,7 +80,7 @@ class PluginCommunicationHandler {
 
 	public function sendHeartbeat(): void{
 		$this->client->getThread()->writeOutboundData(
-			Protocol::TYPE_HEARTBEAT,
+			Protocol::ID_HEARTBEAT,
 			[microtime(true)]
 		);
 	}

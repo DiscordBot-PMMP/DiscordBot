@@ -17,8 +17,11 @@ abstract class Protocol {
 	const HEARTBEAT_ALLOWANCE = 2.5;// How long until declared dead. (seconds)
 
 	const 							// Emitted by, Plugin|Bot
-		TYPE_HEARTBEAT 		= 0,	// P|B
-		TYPE_BOT_READY 		= 1,	//  |B
-		TYPE_STATS_REQUEST 	= 2,	// P|B
-		TYPE_STATS_RESPONSE = 3;	// P|B
+		ID_HEARTBEAT 		= 0,	// P|B
+		ID_UPDATE_ACTIVITY	= 1;	// P|
+
+	const
+		ACTIVITY_TYPE_PLAYING = 0,
+		ACTIVITY_TYPE_STREAMING = 1,
+		ACTIVITY_TYPE_LISTENING = 2;
 }

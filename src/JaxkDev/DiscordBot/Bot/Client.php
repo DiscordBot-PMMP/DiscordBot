@@ -162,9 +162,9 @@ class Client {
 						case 'ver':
 							$message->channel->sendMessage("Version information:```\n".
 								"> PHP - v".PHP_VERSION."\n".
-								"> DiscordPHP - ".Discord::VERSION."\n".
 								"> PocketMine - v".\pocketmine\VERSION."\n".
-								"> DiscordBot - ".\JaxkDev\DiscordBot\VERSION."```"
+								"> DiscordBot - ".\JaxkDev\DiscordBot\VERSION."\n".
+								"> DiscordPHPSlim - ".Discord::VERSION."```"
 							)->otherwise(function($e) use($message) {
 								MainLogger::getLogger()->logException($e);
 								// At least try a static message, if this fails client probably only has read-only perms

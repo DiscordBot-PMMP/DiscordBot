@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Main;
+use JaxkDev\DiscordBot\Utils;
 use pocketmine\utils\MainLogger;
 
 class BotCommunicationHandler {
@@ -32,16 +33,10 @@ class BotCommunicationHandler {
 	}
 
 	public function handle(array $data): bool{
-		assert(is_int($data[0]));
+		Utils::assert(is_int($data[0]), "Corrupt internal communication data received.");
 		switch ($data[0]){
-			case Protocol::TYPE_HEARTBEAT:
+			case Protocol::ID_HEARTBEAT:
 				return $this->handleHeartbeat($data[1]);
-			case Protocol::TYPE_BOT_READY:
-				//return $this->handleBotReady($data[1]);
-			case Protocol::TYPE_STATS_REQUEST:
-				//return $this->handleStatsRequest($data[1]);
-			case Protocol::TYPE_STATS_RESPONSE:
-				//return $this->handleStatsResponse($data[1]);
 			default:
 				return false;
 				// throw new \InvalidKeyException("Invalid ID ({$data[0]}) Received from internal communication.");
@@ -50,9 +45,8 @@ class BotCommunicationHandler {
 
 
 	private function handleHeartbeat(array $data): bool{
-		assert((count($data) === 1) and is_numeric($data[0]));
+		Utils::assert((count($data) === 1) and is_numeric($data[0]), "Invalid heartbeat data.");
 
-		//$this->plugin->getLogger()->debug("Heartbeat received: {$data[0]}");
 		$this->lastHeartbeat = (float)$data[0];
 
 		return true;
@@ -68,7 +62,7 @@ class BotCommunicationHandler {
 
 	public function sendHeartbeat(): void{
 		$this->plugin->writeOutboundData(
-			Protocol::TYPE_HEARTBEAT,
+			Protocol::ID_HEARTBEAT,
 			[microtime(true)]
 		);
 	}
