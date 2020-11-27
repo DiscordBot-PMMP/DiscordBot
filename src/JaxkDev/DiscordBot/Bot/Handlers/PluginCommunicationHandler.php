@@ -48,7 +48,7 @@ class PluginCommunicationHandler {
 	}
 
 	/**
-	 * @param array $data [ACTIVITY_TYPE, TEXT]
+	 * @param array $data [int ACTIVITY_TYPE, string TEXT]
 	 * @return bool
 	 */
 	private function handleUpdateActivity(array $data): bool{
@@ -62,6 +62,10 @@ class PluginCommunicationHandler {
 		return true;
 	}
 
+	/**
+	 * @param array $data [float TIMESTAMP]
+	 * @return bool
+	 */
 	private function handleHeartbeat(array $data): bool{
 		Utils::assert((count($data) === 1) and is_numeric($data[0]), "Invalid Heartbeat data received.");
 

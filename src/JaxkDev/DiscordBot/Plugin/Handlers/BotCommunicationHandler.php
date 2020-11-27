@@ -43,7 +43,10 @@ class BotCommunicationHandler {
 		}
 	}
 
-
+	/**
+	 * @param array $data [float TIMESTAMP]
+	 * @return bool
+	 */
 	private function handleHeartbeat(array $data): bool{
 		Utils::assert((count($data) === 1) and is_numeric($data[0]), "Invalid heartbeat data.");
 
