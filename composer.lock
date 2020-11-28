@@ -1749,12 +1749,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JaxkDev/DiscordPHPSlim.git",
-                "reference": "4e3a01a76a7bcd2c69dd0c367efb11804b23f3da"
+                "reference": "1fa269f28d2b5704ea4078b2fd99a1d2fa99d81a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JaxkDev/DiscordPHPSlim/zipball/4e3a01a76a7bcd2c69dd0c367efb11804b23f3da",
-                "reference": "4e3a01a76a7bcd2c69dd0c367efb11804b23f3da",
+                "url": "https://api.github.com/repos/JaxkDev/DiscordPHPSlim/zipball/1fa269f28d2b5704ea4078b2fd99a1d2fa99d81a",
+                "reference": "1fa269f28d2b5704ea4078b2fd99a1d2fa99d81a",
                 "shasum": ""
             },
             "require": {
@@ -1763,7 +1763,7 @@
                 "mollie/polyfill-libsodium": "^1.1",
                 "monolog/monolog": "^2.1",
                 "nesbot/carbon": "^2.38",
-                "php": "^7.2",
+                "php": "^7.2|^8.0",
                 "ratchet/pawl": "0.3.*",
                 "react/datagram": "1.5.*",
                 "react/http": "^1.1",
@@ -1818,7 +1818,7 @@
                 "source": "https://github.com/JaxkDev/DiscordPHPSlim/tree/dev-master",
                 "issues": "https://github.com/JaxkDev/DiscordPHPSlim/issues"
             },
-            "time": "2020-11-27T11:36:09+00:00"
+            "time": "2020-11-28T04:39:27+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",

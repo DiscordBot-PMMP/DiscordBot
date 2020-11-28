@@ -16,6 +16,7 @@ use Discord\Discord;
 use Discord\Parts\Channel\Message;
 use Discord\Parts\User\Activity;
 use Discord\Parts\User\Member;
+use Error;
 use ErrorException;
 use Exception;
 use JaxkDev\DiscordBot\Bot\Handlers\PluginCommunicationHandler;
@@ -99,13 +100,15 @@ class Client {
 
 		$this->pluginCommsHandler = new PluginCommunicationHandler($this);
 
+		$this->thread->setStatus(BotThread::STATUS_STARTED);
+
 		$this->client->run();
 	}
 
 	private function registerTimers(): void{
 		// Handles shutdown.
 		$this->client->getLoop()->addPeriodicTimer(1, function(){
-			if($this->thread->isStopping()){
+			if($this->thread->getStatus() === BotThread::STATUS_CLOSED){
 				$this->close();
 			}
 		});
@@ -141,11 +144,10 @@ class Client {
 				$this->readyTimer = null;
 			}
 			$this->ready = true;
-			$this->thread->setReady();
+			$this->thread->setStatus(BotThread::STATUS_READY);
 			MainLogger::getLogger()->info("Client ready.");
 
 			$this->logDebugInfo();
-			$this->updatePresence($this->config['discord']['presence']['text'], $this->config['discord']['presence']['type']);
 
 			// Listen for messages.
 			$discord->on('message', function (Message $message, Discord $discord) {
@@ -160,6 +162,7 @@ class Client {
 					switch($cmd){
 						case 'version':
 						case 'ver':
+							// $this->thread->setStatus(BotThread::STATUS_CLOSED);
 							$message->channel->sendMessage("Version information:```\n".
 								"> PHP - v".PHP_VERSION."\n".
 								"> PocketMine - v".\pocketmine\VERSION."\n".
@@ -227,7 +230,7 @@ class Client {
 	public function errorHandler(int $severity, string $message, string $file, int $line): bool{
 		if(substr($message,0,51) === "stream_socket_client(): unable to connect to udp://" and $line === 130){
 			// Really nasty hack to check if connection fails,
-			// Really need to fork/fix the shit in DiscordPHP...
+			// Really need to fork/fix this in DiscordPHP...
 			MainLogger::getLogger()->critical("Failed to connect to discord, please check your internet connection.");
 		}
 		MainLogger::getLogger()->logException(new ErrorException($message, 0, $severity, $file, $line));
@@ -240,12 +243,12 @@ class Client {
 		if($this->client instanceof Discord){
 			try{
 				$this->client->close(true);
-			} catch (\Error $e){
+			} catch (Error $e){
 				MainLogger::getLogger()->debug("Failed to close client, probably due it not being started.");
 			}
 		}
 		$this->closed = true;
-		$this->thread->stop();
+		$this->thread->setStatus(BotThread::STATUS_CLOSED);
 		MainLogger::getLogger()->debug("Client closed.");
 		exit(0);
 	}

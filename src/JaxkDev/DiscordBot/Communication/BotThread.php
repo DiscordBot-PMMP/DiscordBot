@@ -14,11 +14,16 @@ namespace JaxkDev\DiscordBot\Communication;
 
 use AttachableThreadedLogger;
 use JaxkDev\DiscordBot\Bot\Client;
+use JaxkDev\DiscordBot\Utils;
 use pocketmine\Thread;
 use pocketmine\utils\MainLogger;
 use Volatile;
 
 class BotThread extends Thread {
+	const STATUS_STARTING = 0,
+		STATUS_STARTED = 1,
+		STATUS_READY = 2,
+		STATUS_CLOSED = 9;
 
 	/**
 	 * @var AttachableThreadedLogger
@@ -36,9 +41,9 @@ class BotThread extends Thread {
 	private $inboundData, $outboundData;
 
 	/**
-	 * @var bool
+	 * @var int
 	 */
-	private $stopping = false, $ready = false;
+	private $status = self::STATUS_STARTING;
 
 	public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData) {
 		$this->logger = $logger;
@@ -71,19 +76,12 @@ class BotThread extends Thread {
 		$this->outboundData[] = (array)[$id, $data];
 	}
 
-	public function setReady(bool $v = true): void{
-		$this->ready = $v;
+	public function setStatus(int $status): void{
+		Utils::assert($status >= 0 and $status < 10);
+		$this->status = $status;
 	}
 
-	public function isReady(): bool{
-		return $this->ready;
-	}
-
-	public function isStopping(): bool{
-		return $this->stopping === true;
-	}
-
-	public function stop(): void{
-		$this->stopping = true;
+	public function getStatus(): int{
+		return $this->status;
 	}
 }

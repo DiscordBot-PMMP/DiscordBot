@@ -83,7 +83,8 @@ class Main extends PluginBase {
 
 		if(($currentTick % 20) === 0){
 			//Run every second.
-			if($this->discordBot->isReady()) $this->botCommsHandler->checkHeartbeat();
+			if($this->discordBot->getStatus() === BotThread::STATUS_READY) $this->botCommsHandler->checkHeartbeat();
+			if($this->discordBot->getStatus() === BotThread::STATUS_CLOSED) $this->stopAll();
 			$this->botCommsHandler->sendHeartbeat();
 		}
 	}
@@ -104,9 +105,18 @@ class Main extends PluginBase {
 	}
 
 	public function onDisable() {
-		if(!$this->tickTask->isCancelled()) $this->tickTask->cancel();
-		if($this->discordBot !== null and $this->discordBot->isStarted() and !$this->discordBot->isStopping()){
-			$this->discordBot->stop();
+		$this->stopAll(false);
+	}
+
+	public function stopAll(bool $stopPlugin = true) {
+		if(!$this->tickTask->isCancelled()){
+			$this->tickTask->cancel();
+		}
+		if($this->discordBot !== null and ($this->discordBot->getStatus() !== BotThread::STATUS_CLOSED)){
+			$this->discordBot->setStatus(BotThread::STATUS_CLOSED);
+		}
+		if($stopPlugin){
+			$this->getServer()->getPluginManager()->disablePlugin($this);
 		}
 	}
 }
