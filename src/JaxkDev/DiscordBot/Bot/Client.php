@@ -78,10 +78,11 @@ class Client {
 		$logger->setHandlers(array($handler));
 		$httpLogger->setHandlers(array($handler));
 
-		// TODO ONLY IF DEBUG ENABLED:
-		$handler = new StreamHandler(($r = fopen('php://stdout', 'w')) === false ? "" : $r);
-		$logger->pushHandler($handler);
-		$httpLogger->pushHandler($handler);
+		if($config['logging']['debug']) {
+			$handler = new StreamHandler(($r = fopen('php://stdout', 'w')) === false ? "" : $r);
+			$logger->pushHandler($handler);
+			$httpLogger->pushHandler($handler);
+		}
 
 		// No intents specified yet so IntentException is impossible.
 		/** @noinspection PhpUnhandledExceptionInspection */

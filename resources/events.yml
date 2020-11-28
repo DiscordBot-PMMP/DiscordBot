@@ -1,7 +1,7 @@
 ---
 version: 1
 
-message_logger:
+message:
   toDiscord:
     channels: []
     format: "[{TIME}] **{USERNAME}**: ```{MESSAGE}```"
@@ -9,12 +9,12 @@ message_logger:
     channels: []
     format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} : {MESSAGE}"
 
-command_logger:
+command:
   toDiscord:
     channels: []
     format: "[{TIME}] **{USERNAME}** Used command: ```{COMMAND}```"
 
-member_join_logger:
+member_join:
   toDiscord:
     channels: []
     format: "[{TIME}] **{USERNAME}** Has joined the minecraft server."
@@ -22,7 +22,7 @@ member_join_logger:
     channels: []
     format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} Has joined the discord server."
 
-member_leave_logger:
+member_leave:
   toDiscord:
     channels: []
     format: "[{TIME}] **{USERNAME}** Has left the minecraft server."

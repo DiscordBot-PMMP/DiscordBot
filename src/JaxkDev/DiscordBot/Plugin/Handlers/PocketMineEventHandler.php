@@ -37,7 +37,7 @@ class PocketMineEventHandler implements Listener{
 
 	public function onJoin(PlayerJoinEvent $event): void{
 		// TODO Function below.
-		$config = $this->eventConfig['member_join_logger']['toDiscord'];
+		$config = $this->eventConfig['member_join']['toDiscord'];
 		if(count($config['channels']) === 0) return;
 
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
@@ -49,7 +49,7 @@ class PocketMineEventHandler implements Listener{
 	}
 
 	public function onPlayerQuit(PlayerQuitEvent $event): void{
-		$config = $this->eventConfig['member_leave_logger']['toDiscord'];
+		$config = $this->eventConfig['member_leave']['toDiscord'];
 		if(count($config['channels']) === 0) return;
 
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
@@ -61,7 +61,7 @@ class PocketMineEventHandler implements Listener{
 	}
 
 	public function onPlayerChat(PlayerChatEvent $event): void{
-		$config = $this->eventConfig['message_logger']['toDiscord'];
+		$config = $this->eventConfig['message']['toDiscord'];
 		if(count($config['channels']) === 0) return;
 
 		$message = str_replace(['{TIME}', '{USERNAME}', '{MESSAGE}'],
@@ -74,7 +74,7 @@ class PocketMineEventHandler implements Listener{
 	}
 
 	public function onPlayerCommand(CommandEvent $event): void{
-		$config = $this->eventConfig['command_logger']['toDiscord'];
+		$config = $this->eventConfig['command']['toDiscord'];
 		if(count($config['channels']) === 0) return;
 
 		$message = str_replace(['{TIME}', '{USERNAME}', '{COMMAND}'],
