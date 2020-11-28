@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot;
 
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Plugin\Handlers\PocketMineEventHandler;
 use JaxkDev\DiscordBot\Plugin\PluginTickTask;
 use JaxkDev\DiscordBot\Plugin\Handlers\BotCommunicationHandler;
 use Phar;
@@ -42,6 +43,11 @@ class Main extends PluginBase {
 	 */
 	private $botCommsHandler;
 
+	/**
+	 * @var PocketMineEventHandler
+	 */
+	private $pocketmineEventHandler;
+
 	public function onLoad(){
 		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
 			define("JaxkDev\DiscordBot\VERSION", "v".$this->getDescription()->getVersion());
@@ -53,6 +59,7 @@ class Main extends PluginBase {
 		}
 
 		$this->saveResource("config.yml");
+		$this->saveResource("events.yml");
 
 		$this->getLogger()->debug("Loading initial configuration...");
 
@@ -70,6 +77,7 @@ class Main extends PluginBase {
 		$this->outboundData = new Volatile();
 
 		$this->botCommsHandler = new BotCommunicationHandler($this);
+		$this->pocketmineEventHandler = new PocketMineEventHandler($this, yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml"));
 		$this->discordBot = new BotThread($this->getServer()->getLogger(), $config, $this->outboundData, $this->inboundData);
 	}
 
@@ -77,6 +85,7 @@ class Main extends PluginBase {
 		$this->getLogger()->debug("Starting DiscordBot Thread...");
 		$this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
 
+		$this->getServer()->getPluginManager()->registerEvents($this->pocketmineEventHandler, $this);
 		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new PluginTickTask($this), 1);
 	}
 
@@ -107,6 +116,10 @@ class Main extends PluginBase {
 
 	public function writeOutboundData(int $id, array $data): void{
 		$this->outboundData[] = (array)[$id, $data];
+	}
+
+	public function getBotCommunicationHandler(): BotCommunicationHandler{
+		return $this->botCommsHandler;
 	}
 
 	public function stopAll(bool $stopPlugin = true): void{

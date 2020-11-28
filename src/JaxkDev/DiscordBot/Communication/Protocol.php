@@ -16,12 +16,15 @@ abstract class Protocol {
 
 	const
 		PPT = 20, 					// How much data should be processed per tick ?
-		HEARTBEAT_ALLOWANCE = 2.5;	// How long until declared dead. (seconds)
+		HEARTBEAT_ALLOWANCE = 5;	// How long until declared dead. (seconds)
 
 	const 							// Emitted by, Plugin|Bot
-		ID_HEARTBEAT 		= 0,	// P|B
-		ID_UPDATE_ACTIVITY	= 1,	// P|
-		ID_SEND_MESSAGE		= 2;	// P|
+		ID_HEARTBEAT = 0,			// P|B
+		ID_UPDATE_ACTIVITY = 1,		// P|
+		ID_SEND_MESSAGE	= 2,		// P|
+		ID_EVENT_MESSAGE_SENT = 3,	//  |B
+		ID_EVENT_MEMBER_JOIN = 4,	//  |B
+		ID_EVENT_MEMBER_LEAVE = 5;	//  |B
 
 	const
 		THREAD_STATUS_STARTING = 0,

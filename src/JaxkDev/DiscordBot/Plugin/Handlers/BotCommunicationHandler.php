@@ -66,7 +66,7 @@ class BotCommunicationHandler {
 	 * Checks last KNOWN Heartbeat timestamp with current time, does not check pre-start condition.
 	 */
 	public function checkHeartbeat(): void{
-		if(($diff = microtime(true) - $this->lastHeartbeat ?? microtime(true)) > Protocol::HEARTBEAT_ALLOWANCE){
+		if(($diff = microtime(true) - ($this->lastHeartbeat ?? microtime(true))) > Protocol::HEARTBEAT_ALLOWANCE){
 			// Bot is dead, shutdown plugin.
 			MainLogger::getLogger()->emergency("DiscordBot has not responded for 2 seconds, disabling plugin + bot.");
 			$this->plugin->stopAll();

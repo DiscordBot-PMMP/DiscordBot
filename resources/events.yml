@@ -1,0 +1,32 @@
+---
+version: 1
+
+message_logger:
+  toDiscord:
+    channels: []
+    format: "[{TIME}] **{USERNAME}**: ```{MESSAGE}```"
+  fromDiscord:
+    channels: []
+    format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} : {MESSAGE}"
+
+command_logger:
+  toDiscord:
+    channels: []
+    format: "[{TIME}] **{USERNAME}** Used command: ```{COMMAND}```"
+
+member_join_logger:
+  toDiscord:
+    channels: []
+    format: "[{TIME}] **{USERNAME}** Has joined the minecraft server."
+  fromDiscord:
+    channels: []
+    format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} Has joined the discord server."
+
+member_leave_logger:
+  toDiscord:
+    channels: []
+    format: "[{TIME}] **{USERNAME}** Has left the minecraft server."
+  fromDiscord:
+    channels: []
+    format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} Has left the discord server."
+...
