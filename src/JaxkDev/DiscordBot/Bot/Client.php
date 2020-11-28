@@ -81,19 +81,23 @@ class Client {
 		register_shutdown_function(array($this, 'close'));
 
 		$logger = new Logger('DiscordPHP');
+		$httpLogger = new Logger('DiscordPHP-HTTP');
 		$handler = new RotatingFileHandler($config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['maxFiles'], Logger::DEBUG);
 		$handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
 		$logger->setHandlers(array($handler));
+		$httpLogger->setHandlers(array($handler));
 
 		// TODO ONLY IF DEBUG ENABLED:
 		$handler = new StreamHandler(($r = fopen('php://stdout', 'w')) === false ? "" : $r);
 		$logger->pushHandler($handler);
+		$httpLogger->pushHandler($handler);
 
 		// No intents specified yet so IntentException is impossible.
 		/** @noinspection PhpUnhandledExceptionInspection */
 		$this->client = new Discord([
 			'token' => $config['discord']['token'],
-			'logger' => $logger
+			'logger' => $logger,
+			'httpLogger' => $httpLogger
 		]);
 		$this->config['discord']['token'] = "REDACTED";
 
