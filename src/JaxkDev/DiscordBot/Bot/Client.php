@@ -23,6 +23,7 @@ use ErrorException;
 use Exception;
 use JaxkDev\DiscordBot\Bot\Handlers\PluginCommunicationHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\Communication\Protocol;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
@@ -106,7 +107,7 @@ class Client {
 
 		$this->pluginCommsHandler = new PluginCommunicationHandler($this);
 
-		$this->thread->setStatus(BotThread::STATUS_STARTED);
+		$this->thread->setStatus(Protocol::THREAD_STATUS_STARTED);
 
 		$this->client->run();
 	}
@@ -114,7 +115,7 @@ class Client {
 	private function registerTimers(): void{
 		// Handles shutdown.
 		$this->client->getLoop()->addPeriodicTimer(1, function(){
-			if($this->thread->getStatus() === BotThread::STATUS_CLOSED){
+			if($this->thread->getStatus() === Protocol::THREAD_STATUS_CLOSED){
 				$this->close();
 			}
 		});
@@ -150,13 +151,14 @@ class Client {
 				$this->readyTimer = null;
 			}
 			$this->ready = true;
-			$this->thread->setStatus(BotThread::STATUS_READY);
+			$this->thread->setStatus(Protocol::THREAD_STATUS_READY);
 			MainLogger::getLogger()->info("Client ready.");
 
 			$this->logDebugInfo();
 
 			// Listen for messages.
 			$discord->on('message', function (Message $message, Discord $discord) {
+				// TODO Move to handler.
 				if($message->author instanceof Member ? $message->author->user->bot : $message->author->bot){
 					//Ignore Bot's (including self)
 					return;
@@ -168,7 +170,7 @@ class Client {
 					switch($cmd){
 						case 'version':
 						case 'ver':
-							// $this->thread->setStatus(BotThread::STATUS_CLOSED);
+							// $this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
 							$message->channel->sendMessage("Version information:```\n".
 								"> PHP - v".PHP_VERSION."\n".
 								"> PocketMine - v".\pocketmine\VERSION."\n".
@@ -190,7 +192,7 @@ class Client {
 	public function tick(): void{
 		$data = $this->thread->readInboundData();
 		$count = 0;
-		while($data !== null and $count < 20){
+		while($data !== null and $count < Protocol::PPT){
 			$this->pluginCommsHandler->handle($data);
 			$data = $this->thread->readInboundData();
 			$count++;
@@ -260,7 +262,7 @@ class Client {
 	}
 
 	public function close(): void{
-		$this->thread->setStatus(BotThread::STATUS_CLOSED);
+		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
 		if($this->closed) return;
 		if($this->client instanceof Discord){
 			try{

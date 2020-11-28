@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot;
 
 use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Plugin\PluginTickTask;
 use JaxkDev\DiscordBot\Plugin\Handlers\BotCommunicationHandler;
 use Phar;
@@ -72,33 +73,6 @@ class Main extends PluginBase {
 		$this->discordBot = new BotThread($this->getServer()->getLogger(), $config, $this->outboundData, $this->inboundData);
 	}
 
-	public function tick(int $currentTick): void{
-		$data = $this->readInboundData();
-		$count = 0;
-		while($data !== null and $count < 20){
-			$this->botCommsHandler->handle($data);
-			$data = $this->readInboundData();
-			$count++;
-		}
-
-		if(($currentTick % 20) === 0){
-			//Run every second.
-			if($this->discordBot->getStatus() === BotThread::STATUS_READY) $this->botCommsHandler->checkHeartbeat();
-			if($this->discordBot->getStatus() === BotThread::STATUS_CLOSED) $this->stopAll();
-			$this->botCommsHandler->sendHeartbeat();
-			//$this->botCommsHandler->sendMessage('554059221847638040', '582866148828381214', "1");
-			//$this->botCommsHandler->sendMessage('554059221847638040', '582866148828381213', "1"); //"Test Message from inside pmmp, Hi - ".microtime());
-		}
-	}
-
-	public function readInboundData(): ?array{
-		return $this->inboundData->shift();
-	}
-
-	public function writeOutboundData(int $id, array $data): void{
-		$this->outboundData[] = (array)[$id, $data];
-	}
-
 	public function onEnable() {
 		$this->getLogger()->debug("Starting DiscordBot Thread...");
 		$this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
@@ -110,14 +84,38 @@ class Main extends PluginBase {
 		$this->stopAll(false);
 	}
 
-	public function stopAll(bool $stopPlugin = true) {
+	public function tick(int $currentTick): void{
+		$data = $this->readInboundData();
+		$count = 0;
+		while($data !== null and $count < Protocol::PPT){
+			$this->botCommsHandler->handle($data);
+			$data = $this->readInboundData();
+			$count++;
+		}
+
+		if(($currentTick % 20) === 0){
+			//Run every second.
+			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_READY) $this->botCommsHandler->checkHeartbeat();
+			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_CLOSED) $this->stopAll();
+			$this->botCommsHandler->sendHeartbeat();
+		}
+	}
+
+	public function readInboundData(): ?array{
+		return $this->inboundData->shift();
+	}
+
+	public function writeOutboundData(int $id, array $data): void{
+		$this->outboundData[] = (array)[$id, $data];
+	}
+
+	public function stopAll(bool $stopPlugin = true): void{
 		if(!$this->tickTask->isCancelled()){
 			$this->tickTask->cancel();
 		}
 		if($this->discordBot !== null){
-			$this->discordBot->setStatus(BotThread::STATUS_CLOSED);
+			$this->discordBot->setStatus(Protocol::THREAD_STATUS_CLOSED);
 			$this->discordBot->quit();  // Joins thread (<-- beware)
-			$this->discordBot = null;
 		}
 		if($stopPlugin){
 			$this->getServer()->getPluginManager()->disablePlugin($this);

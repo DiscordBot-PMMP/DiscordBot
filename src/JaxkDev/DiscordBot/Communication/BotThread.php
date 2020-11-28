@@ -20,10 +20,6 @@ use pocketmine\utils\MainLogger;
 use Volatile;
 
 class BotThread extends Thread {
-	const STATUS_STARTING = 0,
-		STATUS_STARTED = 1,
-		STATUS_READY = 2,
-		STATUS_CLOSED = 9;
 
 	/**
 	 * @var AttachableThreadedLogger
@@ -43,7 +39,7 @@ class BotThread extends Thread {
 	/**
 	 * @var int
 	 */
-	private $status = self::STATUS_STARTING;
+	private $status = Protocol::THREAD_STATUS_STARTING;
 
 	public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData) {
 		$this->logger = $logger;

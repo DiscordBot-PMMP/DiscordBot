@@ -24,7 +24,7 @@ abstract class Utils {
 	 */
 	static function assert(bool $assertion, $message = "Assertion failed."): void{
 		if(!$assertion){
-			throw new AssertionError($message instanceof Throwable ?: $message, 0,
+			throw new AssertionError(($message instanceof Throwable ? "" : $message), 0,
 				$message instanceof Throwable ? $message : null);
 		}
 	}

@@ -45,7 +45,6 @@ class PluginCommunicationHandler {
 				return $this->handleSendMessage($data[1]);
 			default:
 				return false;
-			// throw new \InvalidKeyException("Invalid ID ({$data[0]}) Received from internal communication.");
 		}
 	}
 
@@ -69,8 +68,8 @@ class PluginCommunicationHandler {
 	private function handleUpdateActivity(array $data): bool{
 		Utils::assert((count($data) === 2) and is_int($data[0]) and is_string($data[1]), "Invalid UpdateActivity data received.");
 		Utils::assert(in_array($data[0],
-			[Protocol::ACTIVITY_TYPE_PLAYING, Protocol::ACTIVITY_TYPE_LISTENING, Protocol::ACTIVITY_TYPE_STREAMING],
-			"Activity type '{$data[0]}' received is not valid."));
+			[Protocol::ACTIVITY_TYPE_PLAYING, Protocol::ACTIVITY_TYPE_LISTENING, Protocol::ACTIVITY_TYPE_STREAMING]),
+			"Activity type '{$data[0]}' received is not valid.");
 
 		$this->client->updatePresence($data[1], $data[0]);
 
@@ -89,19 +88,21 @@ class PluginCommunicationHandler {
 		return true;
 	}
 
-	public function checkHeartbeat(): void{
-		if(($diff = microtime(true) - $this->lastHeartbeat ?? microtime(true)) > Protocol::HEARTBEAT_ALLOWANCE){
-			// Plugin is dead, shutdown self.
-			MainLogger::getLogger()->emergency("Plugin has not responded for 2 seconds, shutting self down.");
-			$this->client->close();
-		}
-	}
 
 	public function sendHeartbeat(): void{
 		$this->client->getThread()->writeOutboundData(
 			Protocol::ID_HEARTBEAT,
 			[microtime(true)]
 		);
+	}
+
+
+	public function checkHeartbeat(): void{
+		if(($diff = microtime(true) - $this->lastHeartbeat ?? microtime(true)) > Protocol::HEARTBEAT_ALLOWANCE){
+			// Plugin is dead, shutdown self.
+			MainLogger::getLogger()->emergency("Plugin has not responded for 2 seconds, shutting self down.");
+			$this->client->close();
+		}
 	}
 
 	public function getLastHeartbeat(): float {
