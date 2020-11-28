@@ -41,10 +41,25 @@ class PluginCommunicationHandler {
 				return $this->handleHeartbeat($data[1]);
 			case Protocol::ID_UPDATE_ACTIVITY:
 				return $this->handleUpdateActivity($data[1]);
+			case Protocol::ID_SEND_MESSAGE:
+				return $this->handleSendMessage($data[1]);
 			default:
 				return false;
 			// throw new \InvalidKeyException("Invalid ID ({$data[0]}) Received from internal communication.");
 		}
+	}
+
+	/**
+	 * @param array $data [string(18) SERVER_ID, string(18) CHANNEL_ID, string(2000) TEXT]
+	 * @return bool
+	 */
+	private function handleSendMessage(array $data): bool{
+		Utils::assert((count($data) === 3) and strlen($data[0]) === 18 and strlen($data[1]) === 18
+			and strlen($data[2]) < 2000, "Invalid message data received.");
+
+		$this->client->sendMessage($data[0], $data[1], $data[2]);
+
+		return true;
 	}
 
 	/**

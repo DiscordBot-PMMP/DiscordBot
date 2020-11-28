@@ -86,6 +86,8 @@ class Main extends PluginBase {
 			if($this->discordBot->getStatus() === BotThread::STATUS_READY) $this->botCommsHandler->checkHeartbeat();
 			if($this->discordBot->getStatus() === BotThread::STATUS_CLOSED) $this->stopAll();
 			$this->botCommsHandler->sendHeartbeat();
+			//$this->botCommsHandler->sendMessage('554059221847638040', '582866148828381214', "1");
+			//$this->botCommsHandler->sendMessage('554059221847638040', '582866148828381213', "1"); //"Test Message from inside pmmp, Hi - ".microtime());
 		}
 	}
 

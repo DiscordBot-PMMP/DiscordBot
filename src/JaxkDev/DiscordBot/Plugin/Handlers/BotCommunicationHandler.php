@@ -55,6 +55,13 @@ class BotCommunicationHandler {
 		return true;
 	}
 
+	public function sendMessage(string $guild, string $channel, string $content): void{
+		$this->plugin->writeOutboundData(
+			Protocol::ID_SEND_MESSAGE,
+			[$guild, $channel, $content]
+		);
+	}
+
 	/**
 	 * Checks last KNOWN Heartbeat timestamp with current time, does not check pre-start condition.
 	 */

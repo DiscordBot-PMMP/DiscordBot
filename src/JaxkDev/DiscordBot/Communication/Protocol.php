@@ -18,7 +18,8 @@ abstract class Protocol {
 
 	const 							// Emitted by, Plugin|Bot
 		ID_HEARTBEAT 		= 0,	// P|B
-		ID_UPDATE_ACTIVITY	= 1;	// P|
+		ID_UPDATE_ACTIVITY	= 1,	// P|
+		ID_SEND_MESSAGE		= 2;	// P|
 
 	const
 		ACTIVITY_TYPE_PLAYING = 0,

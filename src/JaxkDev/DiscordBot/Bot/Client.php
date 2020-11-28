@@ -13,7 +13,9 @@
 namespace JaxkDev\DiscordBot\Bot;
 
 use Discord\Discord;
+use Discord\Parts\Channel\Channel;
 use Discord\Parts\Channel\Message;
+use Discord\Parts\Guild\Guild;
 use Discord\Parts\User\Activity;
 use Discord\Parts\User\Member;
 use Error;
@@ -203,9 +205,24 @@ class Client {
 		return $this->thread;
 	}
 
+	public function sendMessage(string $guild, string $channel, string $content): void{
+		if(!$this->ready) return;
+
+		/** @noinspection PhpUnhandledExceptionInspection */
+		$this->client->guilds->fetch($guild)->done(function(Guild $guild) use($channel, $content) {
+			$guild->channels->fetch($channel)->done(function(Channel $channel) use($guild, $content) {
+				$channel->sendMessage($content);
+				MainLogger::getLogger()->debug("Sent message(".strlen($content).") to ({$guild->id}|{$channel->id})");
+			}, function() use($guild, $channel) {
+				MainLogger::getLogger()->warning("Failed to fetch channel {$channel} in guild {$guild->id} while attempting to send message.");
+			});
+		}, function() use($guild) {
+			MainLogger::getLogger()->warning("Failed to fetch guild ${guild} while attempting to send message.");
+		});
+	}
+
 	public function updatePresence(string $text, int $type): bool{
-		/** @var Activity $presence */
-		$presence = $this->client->factory(Activity::class, [
+		$presence = new Activity($this->client, [
 			'name' => $text,
 			'type' => $type
 		]);
