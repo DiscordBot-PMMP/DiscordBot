@@ -239,6 +239,7 @@ class Client {
 	}
 
 	public function close(): void{
+		$this->thread->setStatus(BotThread::STATUS_CLOSED);
 		if($this->closed) return;
 		if($this->client instanceof Discord){
 			try{
@@ -248,7 +249,6 @@ class Client {
 			}
 		}
 		$this->closed = true;
-		$this->thread->setStatus(BotThread::STATUS_CLOSED);
 		MainLogger::getLogger()->debug("Client closed.");
 		exit(0);
 	}
