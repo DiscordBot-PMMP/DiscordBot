@@ -47,16 +47,6 @@ class Client {
 	private $pluginCommsHandler;
 
 	/**
-	 * @var bool
-	 */
-	private $ready = false;
-
-	/**
-	 * @var bool
-	 */
-	private $closed = false;
-
-	/**
 	 * @var TimerInterface|null
 	 */
 	private $readyTimer, $tickTimer;
@@ -113,9 +103,10 @@ class Client {
 	}
 
 	private function registerTimers(): void{
-		// Handles shutdown.
+		// Handles shutdown, rather than a SHUTDOWN const to send through internal communication, set flag to closed.
+		// Saves time & will guarantee closure ASAP rather then waiting in line through ^
 		$this->client->getLoop()->addPeriodicTimer(1, function(){
-			if($this->thread->getStatus() === Protocol::THREAD_STATUS_CLOSED){
+			if($this->thread->getStatus() === Protocol::THREAD_STATUS_CLOSING){
 				$this->close();
 			}
 		});
@@ -125,7 +116,7 @@ class Client {
 			if($this->client->id !== null){
 				MainLogger::getLogger()->warning("Client has taken >30s to get ready, is your discord server large ?");
 				$this->client->getLoop()->addTimer(30, function(){
-					if(!$this->ready) {
+					if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) {
 						MainLogger::getLogger()->critical("Client has taken too long to become ready, shutting down.");
 						$this->close();
 					}
@@ -150,7 +141,6 @@ class Client {
 				$this->client->getLoop()->cancelTimer($this->readyTimer);
 				$this->readyTimer = null;
 			}
-			$this->ready = true;
 			$this->thread->setStatus(Protocol::THREAD_STATUS_READY);
 			MainLogger::getLogger()->info("Client ready.");
 
@@ -170,7 +160,6 @@ class Client {
 					switch($cmd){
 						case 'version':
 						case 'ver':
-							// $this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
 							$message->channel->sendMessage("Version information:```\n".
 								"> PHP - v".PHP_VERSION."\n".
 								"> PocketMine - v".\pocketmine\VERSION."\n".
@@ -212,7 +201,7 @@ class Client {
 	}
 
 	public function sendMessage(string $guild, string $channel, string $content): void{
-		if(!$this->ready) return;
+		if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) return;
 
 		/** @noinspection PhpUnhandledExceptionInspection */
 		$this->client->guilds->fetch($guild)->done(function(Guild $guild) use($channel, $content) {
@@ -262,8 +251,7 @@ class Client {
 	}
 
 	public function close(): void{
-		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
-		if($this->closed) return;
+		if($this->thread->getStatus() === Protocol::THREAD_STATUS_CLOSED) return;
 		if($this->client instanceof Discord){
 			try{
 				$this->client->close(true);
@@ -271,7 +259,7 @@ class Client {
 				MainLogger::getLogger()->debug("Failed to close client, probably due it not being started.");
 			}
 		}
-		$this->closed = true;
+		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
 		MainLogger::getLogger()->debug("Client closed.");
 		exit(0);
 	}

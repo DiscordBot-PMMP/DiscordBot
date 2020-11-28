@@ -69,7 +69,7 @@ class BotCommunicationHandler {
 		if(($diff = microtime(true) - $this->lastHeartbeat ?? microtime(true)) > Protocol::HEARTBEAT_ALLOWANCE){
 			// Bot is dead, shutdown plugin.
 			MainLogger::getLogger()->emergency("DiscordBot has not responded for 2 seconds, disabling plugin + bot.");
-			$this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
+			$this->plugin->stopAll();
 		}
 	}
 

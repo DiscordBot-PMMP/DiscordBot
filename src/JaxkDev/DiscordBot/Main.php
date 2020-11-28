@@ -114,8 +114,8 @@ class Main extends PluginBase {
 			$this->tickTask->cancel();
 		}
 		if($this->discordBot !== null){
-			$this->discordBot->setStatus(Protocol::THREAD_STATUS_CLOSED);
-			$this->discordBot->quit();  // Joins thread (<-- beware)
+			$this->discordBot->setStatus(Protocol::THREAD_STATUS_CLOSING);
+			$this->discordBot->quit();  // Joins thread (<-- beware) (Right now this forces bot to close)
 		}
 		if($stopPlugin){
 			$this->getServer()->getPluginManager()->disablePlugin($this);
