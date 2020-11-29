@@ -71,8 +71,14 @@ class Client {
 		set_error_handler(array($this, 'errorHandler'));
 		register_shutdown_function(array($this, 'close'));
 
+		// Mono logger can have issues with other timezones, for now use UTC.
+		// Note, this does not effect outside thread config.
+		// TODO CDT Investigate.
+		ini_set("date.timezone", "UTC");
+		MainLogger::getLogger()->debug("Log files will be in UTC timezone.");
+
 		$logger = new Logger('DiscordPHP');
-		$httpLogger = new Logger('DiscordPHP-HTTP');
+		$httpLogger = new Logger('DiscordPHP.HTTP');
 		$handler = new RotatingFileHandler($config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['maxFiles'], Logger::DEBUG);
 		$handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
 		$logger->setHandlers(array($handler));
@@ -155,7 +161,15 @@ class Client {
 					return;
 				}
 
-				if($message->content[0] === "!"){
+				try{
+					//So apparently message content can just disappear...
+					//TODO Investigate.
+					$prefix = $message->content[0];
+				} catch(Error $e){
+					return;
+				}
+
+				if($prefix === "!"){
 					$args = explode(" ", $message->content);
 					$cmd = substr(array_shift($args), 1);
 					switch($cmd){
