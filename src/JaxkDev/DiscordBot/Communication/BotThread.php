@@ -61,11 +61,11 @@ class BotThread extends Thread {
 		new Client($this, (array)$this->initialConfig);
 	}
 
-	/**
+	/*
 	 * https://github.com/pmmp/pthreads/blob/fork/examples/fetching-data-from-a-thread.php
 	 */
-	public function readInboundData(): ?array{
-		return $this->inboundData->shift();
+	public function readInboundData(int $count = 1): array{
+		return $this->inboundData->chunk($count);
 	}
 
 	public function writeOutboundData(int $id, array $data): void{

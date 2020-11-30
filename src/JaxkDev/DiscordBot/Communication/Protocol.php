@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Communication;
 abstract class Protocol {
 
 	const
-		PPT = 20, 					// How much data should be processed per tick ?
+		PPT = 50, 					// How much data should be processed per tick ?
 		HEARTBEAT_ALLOWANCE = 5;	// How long until declared dead. (seconds)
 
 	const 							// Emitted by, Plugin|Bot

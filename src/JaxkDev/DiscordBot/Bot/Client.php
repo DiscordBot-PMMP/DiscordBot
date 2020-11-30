@@ -194,13 +194,9 @@ class Client {
 	}
 
 	public function tick(): void{
-		$data = $this->thread->readInboundData();
-		$count = 0;
-		while($data !== null and $count < Protocol::PPT){
-			$this->pluginCommsHandler->handle($data);
-			$data = $this->thread->readInboundData();
-			$count++;
-		}
+		$data = $this->thread->readInboundData(Protocol::PPT);
+
+		foreach($data as $d) $this->pluginCommsHandler->handle($d);
 
 		if(($this->tickCount % 20) === 0){
 			//Run every second.

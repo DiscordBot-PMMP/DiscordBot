@@ -94,13 +94,9 @@ class Main extends PluginBase {
 	}
 
 	public function tick(int $currentTick): void{
-		$data = $this->readInboundData();
-		$count = 0;
-		while($data !== null and $count < Protocol::PPT){
-			$this->botCommsHandler->handle($data);
-			$data = $this->readInboundData();
-			$count++;
-		}
+		$data = $this->readInboundData(Protocol::PPT);
+
+		foreach($data as $d) $this->botCommsHandler->handle($d);
 
 		if(($currentTick % 20) === 0){
 			//Run every second.
@@ -108,10 +104,22 @@ class Main extends PluginBase {
 			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_CLOSED) $this->stopAll();
 			$this->botCommsHandler->sendHeartbeat();
 		}
+
+		if($this->inboundData->count() > 5000){
+			//That's 20MB, Bail and clear all data.
+			//Although technically the heartbeat would get backlogged and cause a death event after 5000.
+			$this->getLogger()->emergency("Too much data coming in from discord, wiping past 5000 events.");
+			$this->inboundData->chunk(5000);  // Return and remove (note keys are not changed)
+		}
+
+		if($this->outboundData->count() > 5000){
+			$this->getLogger()->emergency("Too much data going out, wiping past 5000 events.");
+			$this->outboundData->chunk(5000);
+		}
 	}
 
-	public function readInboundData(): ?array{
-		return $this->inboundData->shift();
+	public function readInboundData(int $count = 1): array{
+		return $this->inboundData->chunk($count);
 	}
 
 	public function writeOutboundData(int $id, array $data): void{
