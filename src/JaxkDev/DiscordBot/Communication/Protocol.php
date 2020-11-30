@@ -37,4 +37,21 @@ abstract class Protocol {
 		ACTIVITY_TYPE_PLAYING = 0,
 		ACTIVITY_TYPE_STREAMING = 1,
 		ACTIVITY_TYPE_LISTENING = 2;
+
+	/**
+	 * DOCUMENTATION OF PROTOCOL:
+	 *
+	 * General format: [ID, DATA]
+	 *
+	 *
+	 * ID_HEARTBEAT
+	 * [0, [float Timestamp]]
+	 *
+	 * ID_UPDATE_ACTIVITY
+	 * [1, [ACTIVITY_TYPE_..., string Status]]
+	 *
+	 * ID_SEND_MESSAGE
+	 * [2, [string(18) ServerID, string(18) ChannelID, string(<2000) Content]]
+	 *
+	 */
 }
