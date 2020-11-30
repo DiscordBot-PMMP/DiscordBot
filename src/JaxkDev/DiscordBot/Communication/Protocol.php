@@ -53,5 +53,14 @@ abstract class Protocol {
 	 * ID_SEND_MESSAGE
 	 * [2, [string(18) ServerID, string(18) ChannelID, string(<2000) Content]]
 	 *
+	 *
+	 *
+	 * ID_EVENT_MEMBER_JOIN
+	 * [4, [string(18) ServerId, string ServerName, string(18) UserId, string(4) UserDiscriminator, string UserName,
+	 *		int Timestamp]]
+	 *
+	 * ID_EVENT_MEMBER_LEAVE
+	 * [5, [string(18) ServerId, string ServerName, string(18) UserId, string(4) UserDiscriminator, string UserName,
+	 *		int Timestamp]]
 	 */
 }

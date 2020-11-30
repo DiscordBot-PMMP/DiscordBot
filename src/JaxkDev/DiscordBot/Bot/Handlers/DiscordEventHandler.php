@@ -44,10 +44,24 @@ class DiscordEventHandler {
 	}
 
 	public function onMemberJoin(Member $member, Discord $discord){
-		//Send event to plugin.
+		$this->client->getPluginCommunicationHandler()->sendMemberJoinEvent(
+			$member->guild->id,
+			$member->guild->name,
+			$member->id,
+			$member->discriminator,
+			$member->username,
+			$member->joined_at->getTimestamp()
+		);
 	}
 
 	public function onMemberLeave(Member $member, Discord $discord){
-		//Send event to plugin
+		$this->client->getPluginCommunicationHandler()->sendMemberLeaveEvent(
+			$member->guild->id,
+			$member->guild->name,
+			$member->id,
+			$member->discriminator,
+			$member->username,
+			time()
+		);
 	}
 }

@@ -96,6 +96,53 @@ class PluginCommunicationHandler {
 		);
 	}
 
+	/**
+	 * @param string $serverId			Server's ID (18-length)
+	 * @param string $serverName		Server's Name
+	 * @param string $userId			User's ID (18-length)
+	 * @param string $userDiscriminator	User's Discriminator (4-length)
+	 * @param string $userName			Username
+	 * @param float $timestamp			Timestamp of join
+	 * @return void
+	 */
+	public function sendMemberJoinEvent(string $serverId, string $serverName, string $userId, string $userDiscriminator,
+										string $userName, float $timestamp): void{
+		$this->client->getThread()->writeOutboundData(
+			Protocol::ID_EVENT_MEMBER_JOIN,
+			[
+				$serverId,
+				$serverName,
+				$userId,
+				$userDiscriminator,
+				$userName,
+				$timestamp
+			]
+		);
+	}
+
+	/**
+	 * @param string $serverId			Server's ID (18-length)
+	 * @param string $serverName		Server's Name
+	 * @param string $userId			User's ID (18-length)
+	 * @param string $userDiscriminator	User's Discriminator (4-length)
+	 * @param string $userName			Username
+	 * @param float $timestamp			Timestamp of join
+	 * @return void
+	 */
+	public function sendMemberLeaveEvent(string $serverId, string $serverName, string $userId, string $userDiscriminator,
+										string $userName, float $timestamp): void{
+		$this->client->getThread()->writeOutboundData(
+			Protocol::ID_EVENT_MEMBER_LEAVE,
+			[
+				$serverId,
+				$serverName,
+				$userId,
+				$userDiscriminator,
+				$userName,
+				$timestamp
+			]
+		);
+	}
 
 	public function checkHeartbeat(): void{
 		if(($diff = microtime(true) - ($this->lastHeartbeat ?? microtime(true))) > Protocol::HEARTBEAT_ALLOWANCE){

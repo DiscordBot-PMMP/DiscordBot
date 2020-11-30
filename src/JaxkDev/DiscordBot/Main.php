@@ -48,6 +48,11 @@ class Main extends PluginBase {
 	 */
 	private $pocketmineEventHandler;
 
+	/**
+	 * @var array
+	 */
+	private $eventConfig;
+
 	public function onLoad(){
 		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
 			define("JaxkDev\DiscordBot\VERSION", "v".$this->getDescription()->getVersion());
@@ -60,6 +65,7 @@ class Main extends PluginBase {
 
 		$this->saveResource("config.yml");
 		$this->saveResource("events.yml");
+		$this->saveResource("discord_commands.yml");
 
 		$this->getLogger()->debug("Loading initial configuration...");
 
@@ -70,6 +76,12 @@ class Main extends PluginBase {
 		}
 		// TODO Verify Config before using it.
 		$config['logging']['directory'] = $this->getDataFolder().DIRECTORY_SEPARATOR.($initialConfig['logging']['directory'] ?? "logs");
+
+		$this->eventConfig = yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml");
+		if($this->eventConfig === false){
+			$this->getLogger()->critical("Failed to parse events.yml");
+			$this->getServer()->getPluginManager()->disablePlugin($this);
+		}
 
 		$this->getLogger()->debug("Constructing DiscordBot...");
 
@@ -128,6 +140,10 @@ class Main extends PluginBase {
 
 	public function getBotCommunicationHandler(): BotCommunicationHandler{
 		return $this->botCommsHandler;
+	}
+
+	public function getEventsConfig(): array{
+		return $this->eventConfig;
 	}
 
 	public function stopAll(bool $stopPlugin = true): void{
