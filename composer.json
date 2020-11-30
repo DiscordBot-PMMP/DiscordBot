@@ -1,6 +1,7 @@
 {
     "name": "jaxkdev/discord-bot",
     "type": "project",
+    "description": "A PocketMine-MP Plugin that hosts your very own discord bot using DiscordPHP.",
     "license": "OSL-3.0",
     "authors": [
         {
@@ -10,7 +11,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "": ["src"]
+            "JaxkDev\\DiscordBot\\": "src/JaxkDev/DiscordBot"
         }
     },
     "repositories": [
