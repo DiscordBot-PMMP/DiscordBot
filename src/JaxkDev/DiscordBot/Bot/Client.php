@@ -14,13 +14,12 @@ namespace JaxkDev\DiscordBot\Bot;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Channel;
-use Discord\Parts\Channel\Message;
 use Discord\Parts\Guild\Guild;
 use Discord\Parts\User\Activity;
-use Discord\Parts\User\Member;
 use Error;
 use ErrorException;
 use Exception;
+use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\Bot\Handlers\PluginCommunicationHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Protocol;
@@ -45,6 +44,11 @@ class Client {
 	 * @var PluginCommunicationHandler
 	 */
 	private $pluginCommsHandler;
+
+	/**
+	 * @var DiscordEventHandler
+	 */
+	private $discordEventHandler;
 
 	/**
 	 * @var TimerInterface|null
@@ -90,7 +94,7 @@ class Client {
 			$httpLogger->pushHandler($handler);
 		}
 
-		// No intents specified yet so IntentException is impossible.
+		// TODO Intents.
 		/** @noinspection PhpUnhandledExceptionInspection */
 		$this->client = new Discord([
 			'token' => $config['discord']['token'],
@@ -99,10 +103,11 @@ class Client {
 		]);
 		$this->config['discord']['token'] = "REDACTED";
 
+		$this->pluginCommsHandler = new PluginCommunicationHandler($this);
+		$this->discordEventHandler = new DiscordEventHandler($this);
+
 		$this->registerHandlers();
 		$this->registerTimers();
-
-		$this->pluginCommsHandler = new PluginCommunicationHandler($this);
 
 		$this->thread->setStatus(Protocol::THREAD_STATUS_STARTED);
 
@@ -142,54 +147,21 @@ class Client {
 	/** @noinspection PhpUnusedParameterInspection */
 	private function registerHandlers(): void{
 		// https://github.com/teamreflex/DiscordPHP/issues/433
-		// Note ready is emitted after successful connection + all servers/users loaded.
+		// Note ready is emitted after successful connection + all servers/users loaded, so only register events
+		// After this event.
 		$this->client->on('ready', function (Discord $discord) {
 			if($this->readyTimer !== null) {
 				$this->client->getLoop()->cancelTimer($this->readyTimer);
 				$this->readyTimer = null;
 			}
+
+			// Register all over events.
+			$this->discordEventHandler->registerEvents();
+
 			$this->thread->setStatus(Protocol::THREAD_STATUS_READY);
 			MainLogger::getLogger()->info("Client ready.");
 
 			$this->logDebugInfo();
-
-			// Listen for messages.
-			$discord->on('message', function (Message $message, Discord $discord) {
-				// TODO Move to handler.
-				if($message->author instanceof Member ? $message->author->user->bot : $message->author->bot){
-					//Ignore Bot's (including self)
-					return;
-				}
-
-				try{
-					//So apparently message content can just disappear...
-					//TODO Investigate.
-					$prefix = $message->content[0];
-				} catch(Error $e){
-					return;
-				}
-
-				if($prefix === "!"){
-					$args = explode(" ", $message->content);
-					$cmd = substr(array_shift($args), 1);
-					switch($cmd){
-						case 'version':
-						case 'ver':
-							$message->channel->sendMessage("Version information:```\n".
-								"> PHP - v".PHP_VERSION."\n".
-								"> PocketMine - v".\pocketmine\VERSION."\n".
-								"> DiscordBot - ".\JaxkDev\DiscordBot\VERSION."\n".
-								"> DiscordPHPSlim - ".Discord::VERSION."```"
-							)->otherwise(function($e) use($message) {
-								MainLogger::getLogger()->logException($e);
-								// At least try a static message, if this fails client probably only has read-only perms
-								// In that channel.
-								$message->channel->sendMessage("**ERROR** Failed to send version information...");
-							});
-							break;
-					}
-				}
-			});
 		});
 	}
 
@@ -211,6 +183,17 @@ class Client {
 		return $this->thread;
 	}
 
+	public function getDiscordClient(): Discord{
+		return $this->client;
+	}
+
+	public function getPluginCommunicationHandler(): PluginCommunicationHandler{
+		return $this->pluginCommsHandler;
+	}
+	/*
+	 * Note, It will only show warning ONCE per channel/guild that fails.
+	 * Fix on the way hopefully.
+	 */
 	public function sendMessage(string $guild, string $channel, string $content): void{
 		if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) return;
 

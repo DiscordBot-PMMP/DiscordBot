@@ -37,6 +37,12 @@ class BotCommunicationHandler {
 		switch ($data[0]){
 			case Protocol::ID_HEARTBEAT:
 				return $this->handleHeartbeat($data[1]);
+			/*case Protocol::ID_EVENT_MEMBER_JOIN:
+				return $this->handleMemberJoin($data[1]);
+			case Protocol::ID_EVENT_MEMBER_LEAVE:
+				return $this->handleMemberLeave($data[1]);
+			case Protocol::ID_EVENT_MESSAGE_SENT:
+				return $this->handleMessageSent($data[1]);*/
 			default:
 				return false;
 				// throw new \InvalidKeyException("Invalid ID ({$data[0]}) Received from internal communication.");
