@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e9cdba661560212e77fc6dfc0ee6bec6",
+    "content-hash": "0668d95ddff8289c133f0eaf80618d9c",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -1932,16 +1932,16 @@
         },
         {
             "name": "team-reflex/discord-php",
-            "version": "dev-master",
+            "version": "dev-stable",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JaxkDev/DiscordPHPSlim.git",
-                "reference": "1fa269f28d2b5704ea4078b2fd99a1d2fa99d81a"
+                "reference": "1bcbef244d4fb30485f8f94af82811f79d1793ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JaxkDev/DiscordPHPSlim/zipball/1fa269f28d2b5704ea4078b2fd99a1d2fa99d81a",
-                "reference": "1fa269f28d2b5704ea4078b2fd99a1d2fa99d81a",
+                "url": "https://api.github.com/repos/JaxkDev/DiscordPHPSlim/zipball/1bcbef244d4fb30485f8f94af82811f79d1793ed",
+                "reference": "1bcbef244d4fb30485f8f94af82811f79d1793ed",
                 "shasum": ""
             },
             "require": {
@@ -1970,7 +1970,6 @@
                 "ext-mbstring": "For accurate calculations of string length when handling non-english characters.",
                 "ext-uv": "For a faster, and more performant loop. PHP >=7 only. Preferred."
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -2003,10 +2002,10 @@
             ],
             "description": "An unofficial API to interact with the voice and text service Discord.",
             "support": {
-                "source": "https://github.com/JaxkDev/DiscordPHPSlim/tree/dev-master",
+                "source": "https://github.com/JaxkDev/DiscordPHPSlim/tree/v1.0.0",
                 "issues": "https://github.com/JaxkDev/DiscordPHPSlim/issues"
             },
-            "time": "2020-11-28T04:39:27+00:00"
+            "time": "2020-12-01T16:20:39+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",

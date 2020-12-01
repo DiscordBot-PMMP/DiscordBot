@@ -21,8 +21,7 @@ $includedPaths = array_map(function($path) : string{
 
 $excludedPaths = [
 	".md",  // Nobody will look at readme's etc in a phar...
-	"carbon\\lang\\",  // More useless crap not needed and wasting ridiculous amount of space.
-	"discord-php\\bin\\"  // Binaries used for mac+linux voice client, cost 15MB and not used.
+	"carbon\\lang\\"  // More useless crap not needed and wasting ridiculous amount of space.
 ];
 
 $metadata = generatePluginMetadataFromYml($basePath . "plugin.yml");
