@@ -96,6 +96,25 @@ class PluginCommunicationHandler {
 		);
 	}
 
+	public function sendMessageSentEvent(string $serverId, string $serverName, string $userId, string $userDiscriminator,
+									 string $userName, string $channelId, string $channelName, string $content,
+									 float $timestamp){
+		$this->client->getThread()->writeOutboundData(
+			Protocol::ID_EVENT_MESSAGE_SENT,
+			[
+				$serverId,
+				$serverName,
+				$userId,
+				$userDiscriminator,
+				$userName,
+				$channelId,
+				$channelName,
+				$content,
+				$timestamp
+			]
+		);
+	}
+
 	/**
 	 * @param string $serverId			Server's ID (18-length)
 	 * @param string $serverName		Server's Name

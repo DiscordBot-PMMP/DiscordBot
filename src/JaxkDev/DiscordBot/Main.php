@@ -65,7 +65,7 @@ class Main extends PluginBase {
 
 		$this->saveResource("config.yml");
 		$this->saveResource("events.yml");
-		$this->saveResource("discord_commands.yml");
+		$this->saveResource("HELP_ENG.txt");
 
 		$this->getLogger()->debug("Loading initial configuration...");
 

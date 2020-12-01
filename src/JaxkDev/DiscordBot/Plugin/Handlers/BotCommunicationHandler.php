@@ -41,8 +41,8 @@ class BotCommunicationHandler {
 				return $this->handleMemberJoin($data[1]);
 			case Protocol::ID_EVENT_MEMBER_LEAVE:
 				return $this->handleMemberLeave($data[1]);
-			/*case Protocol::ID_EVENT_MESSAGE_SENT:
-				return $this->handleMessageSent($data[1]);*/
+			case Protocol::ID_EVENT_MESSAGE_SENT:
+				return $this->handleMessageSent($data[1]);
 			default:
 				return false;
 				// throw new \InvalidKeyException("Invalid ID ({$data[0]}) Received from internal communication.");
@@ -62,6 +62,28 @@ class BotCommunicationHandler {
 	}
 
 	/**
+	 * @param array $data [string serverID, string serverName, string userId, string userDiscriminator, string userName,
+	 * string channelId, string channelName, string content, int timestamp]
+	 * @return bool
+	 */
+	private function handleMessageSent(array $data): bool{
+		Utils::assert((count($data) === 9)/* and all values here */);
+
+		$config = $this->plugin->getEventsConfig()['message']['fromDiscord'];
+
+		if(!in_array($data[0].".".$data[5], $config['channels'])) return true;
+
+		$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}',
+			'{SERVER_NAME}', '{CHANNEL_ID}', '{CHANNEL_NAME}', '{MESSAGE}'],
+			[date('G:i:s', $data[8]), $data[2], $data[4], $data[3], $data[0], $data[1], $data[5], $data[6], $data[7]],
+			$config['format']);
+
+		$this->plugin->getServer()->broadcastMessage($message);
+
+		return true;
+	}
+
+	/**
 	 * @param array $data [string serverID, string serverName, string userId, string userDiscriminator, string userName, int timestamp]
 	 * @return bool
 	 */
@@ -69,6 +91,8 @@ class BotCommunicationHandler {
 		Utils::assert((count($data) === 6)/* and all values here */);
 
 		$config = $this->plugin->getEventsConfig()['member_join']['fromDiscord'];
+		if(($config['format'] ?? "") === "") return true;
+
 		$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
 			[date('G:i:s', $data[5]), $data[2], $data[4], $data[3], $data[0], $data[1]], $config['format']);
 
@@ -85,6 +109,8 @@ class BotCommunicationHandler {
 		Utils::assert((count($data) === 6)/* and all values here */);
 
 		$config = $this->plugin->getEventsConfig()['member_leave']['fromDiscord'];
+		if(($config['format'] ?? "") === "") return true;
+
 		$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
 			[date('G:i:s', $data[5]), $data[2], $data[4], $data[3], $data[0], $data[1]], $config['format']);
 
