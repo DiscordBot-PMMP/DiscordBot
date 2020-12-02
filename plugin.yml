@@ -1,5 +1,5 @@
 name: DiscordBot
-version: 1.0.0
+version: 1.1.0
 author: JaxkDev
 main: JaxkDev\DiscordBot\Main
 api: 3.0.0
