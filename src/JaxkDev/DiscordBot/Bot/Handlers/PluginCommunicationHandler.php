@@ -96,9 +96,21 @@ class PluginCommunicationHandler {
 		);
 	}
 
+	/**
+	 * @param string $serverId			Server's ID (18-length)
+	 * @param string $serverName		Server's Name
+	 * @param string $userId			User's ID (18-length)
+	 * @param string $userDiscriminator	User's Discriminator (4-length)
+	 * @param string $userName			Username
+	 * @param string $channelId			Channel's ID (18-length)
+	 * @param string $channelName		Channel's Name
+	 * @param string $content			Message content (<~2000 length)
+	 * @param float $timestamp			Timestamp of join
+	 * @return void
+	 */
 	public function sendMessageSentEvent(string $serverId, string $serverName, string $userId, string $userDiscriminator,
 									 string $userName, string $channelId, string $channelName, string $content,
-									 float $timestamp){
+									 float $timestamp): void{
 		$this->client->getThread()->writeOutboundData(
 			Protocol::ID_EVENT_MESSAGE_SENT,
 			[

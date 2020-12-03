@@ -121,17 +121,17 @@ class Main extends PluginBase {
 			//That's 20MB, Bail and clear all data.
 			//Although technically the heartbeat would get backlogged and cause a death event after 5000.
 			$this->getLogger()->emergency("Too much data coming in from discord, wiping past 5000 events.");
-			$this->inboundData->chunk(5000);  // Return and remove (note keys are not changed)
+			$this->inboundData->chunk(5000); /* @phpstan-ignore-line */ // Return and remove (note keys are not changed)
 		}
 
 		if($this->outboundData->count() > 5000){
 			$this->getLogger()->emergency("Too much data going out, wiping past 5000 events.");
-			$this->outboundData->chunk(5000);
+			$this->outboundData->chunk(5000); /* @phpstan-ignore-line */
 		}
 	}
 
 	public function readInboundData(int $count = 1): array{
-		return $this->inboundData->chunk($count);
+		return $this->inboundData->chunk($count); /* @phpstan-ignore-line */
 	}
 
 	public function writeOutboundData(int $id, array $data): void{

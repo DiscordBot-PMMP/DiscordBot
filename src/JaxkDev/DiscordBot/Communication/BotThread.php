@@ -65,7 +65,7 @@ class BotThread extends Thread {
 	 * https://github.com/pmmp/pthreads/blob/fork/examples/fetching-data-from-a-thread.php
 	 */
 	public function readInboundData(int $count = 1): array{
-		return $this->inboundData->chunk($count);
+		return $this->inboundData->chunk($count); /* @phpstan-ignore-line */
 	}
 
 	public function writeOutboundData(int $id, array $data): void{
