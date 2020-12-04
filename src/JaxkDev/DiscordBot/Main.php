@@ -15,10 +15,10 @@ namespace JaxkDev\DiscordBot;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Plugin\Handlers\PocketMineEventHandler;
-use JaxkDev\DiscordBot\Plugin\PluginTickTask;
 use JaxkDev\DiscordBot\Plugin\Handlers\BotCommunicationHandler;
 use Phar;
 use pocketmine\plugin\PluginBase;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
 use Volatile;
 
@@ -98,7 +98,9 @@ class Main extends PluginBase {
 		$this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
 
 		$this->getServer()->getPluginManager()->registerEvents($this->pocketmineEventHandler, $this);
-		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new PluginTickTask($this), 1);
+		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void {
+			$this->tick($currentTick);
+		}), 1);
 	}
 
 	public function onDisable() {
@@ -130,7 +132,7 @@ class Main extends PluginBase {
 		}
 	}
 
-	public function readInboundData(int $count = 1): array{
+	private function readInboundData(int $count = 1): array{
 		return $this->inboundData->chunk($count); /* @phpstan-ignore-line */
 	}
 
