@@ -190,6 +190,7 @@ class Client {
 	public function getPluginCommunicationHandler(): PluginCommunicationHandler{
 		return $this->pluginCommsHandler;
 	}
+
 	/*
 	 * Note, It will only show warning ONCE per channel/guild that fails.
 	 * Fix on the way hopefully.

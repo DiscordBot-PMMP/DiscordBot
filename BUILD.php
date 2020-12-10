@@ -21,7 +21,8 @@ $includedPaths = array_map(function($path) : string{
 
 $excludedPaths = [
 	".md",  // Nobody will look at readme's etc in a phar...
-	"carbon\\lang\\"  // More useless crap not needed and wasting ridiculous amount of space.
+	"carbon\\lang\\",  // More useless crap not needed and wasting ridiculous amount of space.
+	"vendor\\bin"
 ];
 
 $metadata = generatePluginMetadataFromYml($basePath . "plugin.yml");

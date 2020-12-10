@@ -46,7 +46,7 @@ class DiscordEventHandler {
 		// Eg webhooks ?
 		if(!$message->author instanceof Member) return;
 
-		// Clean mentions:
+		// Clean mentions, TODO Should we clean content before sending ?
 		// Channels:
 		$message->content = preg_replace_callback("/<#[0-9]+>/", function($d){
 			$id = substr($d[0], 2, 18); //Fixed format afaik.
