@@ -1,0 +1,123 @@
+<?php
+/*
+ * DiscordBot, PocketMine-MP Plugin.
+ *
+ * Licensed under the Open Software License version 3.0 (OSL-3.0)
+ * Copyright (C) 2020 JaxkDev
+ *
+ * Twitter :: @JaxkDev
+ * Discord :: JaxkDev#2698
+ * Email   :: JaxkDev@gmail.com
+ */
+
+namespace JaxkDev\DiscordBot\Communication\Models;
+
+class Role implements \Serializable {
+
+	/** @var int */
+	private $id;
+
+	/** @var string */
+	private $name;
+
+	/** @var int (Bitwise) */
+	private $permissions;
+
+	/** @var int */
+	private $colour;
+
+	/** @var int */
+	private $hoistedPosition;
+
+	/** @var bool */
+	private $mentionable;
+
+	/**
+	 * @inheritDoc
+	 */
+	public function serialize(): ?string{
+		return serialize([
+			$this->id,
+			$this->name,
+			$this->colour,
+			$this->permissions,
+			$this->mentionable,
+			$this->hoistedPosition
+		]);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function unserialize($serialized): void{
+		[
+			$this->id,
+			$this->name,
+			$this->colour,
+			$this->permissions,
+			$this->mentionable,
+			$this->hoistedPosition
+		] = unserialize($serialized);
+	}
+
+	public function getId(): int{
+		return $this->id;
+	}
+
+	public function setId(int $id): self{
+		$this->id = $id;
+		return $this;
+	}
+
+	public function getName(): string{
+		return $this->name;
+	}
+
+	public function setName(string $name): self{
+		$this->name = $name;
+		return $this;
+	}
+
+	public function getPermissions(): int{
+		return $this->permissions;
+	}
+
+	public function setPermissions(int $permissions): self{
+		$this->permissions = $permissions;
+		return $this;
+	}
+
+	public function getColour(): int{
+		return $this->colour;
+	}
+
+	/**
+	 * @param int $colour [0x000000 - 0xFFFFFF]
+	 * @return self
+	 */
+	public function setColour(int $colour): self{
+		$this->colour = $colour;
+		return $this;
+	}
+
+	/**
+	 * @return int [-1 if not hoisted.]
+	 */
+	public function getHoistedPosition(): int{
+		return $this->hoistedPosition;
+	}
+
+	public function setHoistedPosition(int $hoistedPosition): self{
+		$this->hoistedPosition = $hoistedPosition;
+		return $this;
+	}
+
+	public function isMentionable(): bool{
+		return $this->mentionable;
+	}
+
+	public function setMentionable(bool $mentionable): self{
+		$this->mentionable = $mentionable;
+		return $this;
+	}
+}

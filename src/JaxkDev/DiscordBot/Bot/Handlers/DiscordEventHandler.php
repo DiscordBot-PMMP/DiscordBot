@@ -36,17 +36,16 @@ class DiscordEventHandler {
 	}
 
 	public function onMessage(Message $message, Discord $discord): void{
-		if($message->author instanceof Member ? $message->author->user->bot : $message->author->bot) return;
+		// Eg webhooks ?
+		if(!$message->author instanceof Member) return;
+		if($message->author->user->bot) return;
 
 		// Other types of messages not used right now.
 		if($message->type !== Message::TYPE_NORMAL) return;
 		if($message->channel->type !== Channel::TYPE_TEXT) return;
 		if(($message->content ?? "") === "") return; //Images/Files, can be empty strings or just null in other cases.
 
-		// Eg webhooks ?
-		if(!$message->author instanceof Member) return;
-
-		// Clean mentions, TODO Should we clean content before sending ?
+		/* Clean mentions, TODO Should we clean content before sending ?
 		// Channels:
 		$message->content = preg_replace_callback("/<#[0-9]+>/", function($d){
 			$id = substr($d[0], 2, 18); //Fixed format afaik.
@@ -69,19 +68,9 @@ class DiscordEventHandler {
 			$role = $message->author->guild->roles->get("id", $id);
 			if($role === null) return $d[0];
 			return "@".$role->name;
-		}, $message->content) ?? "";
+		}, $message->content) ?? "";*/
 
-		$this->client->getPluginCommunicationHandler()->sendMessageSentEvent(
-			$message->author->guild->id,
-			$message->author->guild->name,
-			$message->author->user->id,
-			$message->author->user->discriminator,
-			$message->author->user->username,
-			$message->channel->id,
-			$message->channel->name,
-			$message->content,
-			$message->timestamp->getTimestamp()
-		);
+		$this->client->getPluginCommunicationHandler()->sendMessageSentEvent($message);
 	}
 
 	public function onMemberJoin(Member $member, Discord $discord): void{

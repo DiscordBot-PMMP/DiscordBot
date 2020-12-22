@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Communication;
 
 use AttachableThreadedLogger;
 use JaxkDev\DiscordBot\Bot\Client;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Utils;
 use pocketmine\Thread;
 use pocketmine\utils\MainLogger;
@@ -65,11 +66,16 @@ class BotThread extends Thread {
 	 * https://github.com/pmmp/pthreads/blob/fork/examples/fetching-data-from-a-thread.php
 	 */
 	public function readInboundData(int $count = 1): array{
-		return $this->inboundData->chunk($count); /* @phpstan-ignore-line */
+		return array_map(function($data){
+			/** @var Packet $packet */
+			$packet = unserialize($data);
+			Utils::assert($packet instanceof Packet);
+			return $packet;
+		}, $this->inboundData->chunk($count) /* @phpstan-ignore-line */);
 	}
 
-	public function writeOutboundData(int $id, array $data): void{
-		$this->outboundData[] = (array)[$id, $data];
+	public function writeOutboundData(Packet $packet): void{
+		$this->outboundData[] = serialize($packet);
 	}
 
 	public function setStatus(int $status): void{

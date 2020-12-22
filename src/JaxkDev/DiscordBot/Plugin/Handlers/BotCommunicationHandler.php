@@ -12,6 +12,9 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
+use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
+use JaxkDev\DiscordBot\Communication\Packets\MemberJoin;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Main;
 use JaxkDev\DiscordBot\Utils;
@@ -32,32 +35,20 @@ class BotCommunicationHandler {
 		$this->plugin = $plugin;
 	}
 
-	public function handle(array $data): bool{
-		Utils::assert(is_int($data[0]), "Corrupt internal communication data received.");
-		switch ($data[0]){
-			case Protocol::ID_HEARTBEAT:
-				return $this->handleHeartbeat($data[1]);
-			case Protocol::ID_EVENT_MEMBER_JOIN:
-				return $this->handleMemberJoin($data[1]);
-			case Protocol::ID_EVENT_MEMBER_LEAVE:
-				return $this->handleMemberLeave($data[1]);
-			case Protocol::ID_EVENT_MESSAGE_SENT:
-				return $this->handleMessageSent($data[1]);
-			default:
-				return false;
-				// throw new \InvalidKeyException("Invalid ID ({$data[0]}) Received from internal communication.");
-		}
+	public function handle(Packet $packet): bool{
+		// TODO, Dictionary Based compression of servers to reduce load/memory going across threads.
+		// If's instances instead of ID switching due to phpstan/types.
+		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
+		if($packet instanceof MemberJoin) return $this->handleMemberJoin($packet);
+		if($packet instanceof MemberLeave) return $this->handleMemberLeave($packet);
+		if($packet instanceof MessageSent) return $this->handleMessageSent($packet);
+
+		// throw new \InvalidKeyException("Invalid ID ({$data[0]}) Received from internal communication.");
+		return false;
 	}
 
-	/**
-	 * @param array $data [float TIMESTAMP]
-	 * @return bool
-	 */
-	private function handleHeartbeat(array $data): bool{
-		Utils::assert((count($data) === 1) and is_numeric($data[0]), "Invalid heartbeat data.");
-
-		$this->lastHeartbeat = (float)$data[0];
-
+	private function handleHeartbeat(Heartbeat $packet): bool{
+		$this->lastHeartbeat = $packet->getHeartbeat();
 		return true;
 	}
 
@@ -120,10 +111,10 @@ class BotCommunicationHandler {
 	}
 
 	public function sendMessage(string $guild, string $channel, string $content): void{
-		$this->plugin->writeOutboundData(
+		/*$this->plugin->writeOutboundData(
 			Protocol::ID_SEND_MESSAGE,
 			[$guild, $channel, $content]
-		);
+		);*/
 	}
 
 	/**
@@ -138,10 +129,9 @@ class BotCommunicationHandler {
 	}
 
 	public function sendHeartbeat(): void{
-		$this->plugin->writeOutboundData(
-			Protocol::ID_HEARTBEAT,
-			[microtime(true)]
-		);
+		$p = new Heartbeat();
+		$p->setHeartbeat(microtime(true));
+		$this->plugin->writeOutboundData($p);
 	}
 
 	public function getLastHeartbeat(): float {

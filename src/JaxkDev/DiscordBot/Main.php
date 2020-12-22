@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot;
 
 use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Plugin\Handlers\PocketMineEventHandler;
 use JaxkDev\DiscordBot\Plugin\Handlers\BotCommunicationHandler;
@@ -133,11 +134,17 @@ class Main extends PluginBase {
 	}
 
 	private function readInboundData(int $count = 1): array{
-		return $this->inboundData->chunk($count); /* @phpstan-ignore-line */
+		return array_map(function($data){
+			/** @var Packet $packet */
+			$packet = unserialize($data);
+			Utils::assert($packet instanceof Packet);
+			return $packet;
+		}, $this->inboundData->chunk($count) /* @phpstan-ignore-line */);
 	}
 
-	public function writeOutboundData(int $id, array $data): void{
-		$this->outboundData[] = (array)[$id, $data];
+	public function writeOutboundData(Packet $packet): void{
+		/** @noinspection PhpUnhandledExceptionInspection */
+		$this->outboundData[] = $packet->serialize();
 	}
 
 	public function getBotCommunicationHandler(): BotCommunicationHandler{

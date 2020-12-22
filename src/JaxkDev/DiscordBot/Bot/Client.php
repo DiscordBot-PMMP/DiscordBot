@@ -99,8 +99,10 @@ class Client {
 		$this->client = new Discord([
 			'token' => $config['discord']['token'],
 			'logger' => $logger,
-			'httpLogger' => $httpLogger
+			'httpLogger' => $httpLogger,
+			'loadAllMembers' => true  // Seems like this is the only way...
 		]);
+
 		$this->config['discord']['token'] = "REDACTED";
 
 		$this->pluginCommsHandler = new PluginCommunicationHandler($this);
@@ -126,9 +128,9 @@ class Client {
 		// Handles any problems pre-ready.
 		$this->readyTimer = $this->client->getLoop()->addTimer(30, function(){
 			if($this->client->id !== null){
-				MainLogger::getLogger()->warning("Client has taken >30s to get ready, is your discord server large ?");
+				MainLogger::getLogger()->warning("Client has taken >30s to get ready, How large is your discord server !?  [Create an issue on github is this persists]");
 				$this->client->getLoop()->addTimer(30, function(){
-					if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) {
+					if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY){
 						MainLogger::getLogger()->critical("Client has taken too long to become ready, shutting down.");
 						$this->close();
 					}
@@ -139,7 +141,7 @@ class Client {
 			}
 		});
 
-		$this->tickTimer = $this->client->getLoop()->addPeriodicTimer(0.05, function(){
+		$this->tickTimer = $this->client->getLoop()->addPeriodicTimer(1/20, function(){
 			$this->tick();
 		});
 	}

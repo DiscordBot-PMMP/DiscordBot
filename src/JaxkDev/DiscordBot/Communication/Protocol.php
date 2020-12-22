@@ -18,7 +18,7 @@ abstract class Protocol {
 		PPT = 50, 					// How much data should be processed per tick ?
 		HEARTBEAT_ALLOWANCE = 5;	// How long until declared dead. (seconds)
 
-	// TODO, Look into serialisation for more OOP Approach. (Public Events serialising)
+	/*
 	const 							// Emitted by, Plugin|Bot
 		ID_HEARTBEAT = 0,			// P|B
 		ID_UPDATE_ACTIVITY = 1,		// P|
@@ -26,7 +26,7 @@ abstract class Protocol {
 		ID_EVENT_READY = "x",		//  |B (Large event) (IDEA NOT IMPLEMENTED)
 		ID_EVENT_MESSAGE_SENT = 3,	//  |B
 		ID_EVENT_MEMBER_JOIN = 4,	//  |B
-		ID_EVENT_MEMBER_LEAVE = 5;	//  |B
+		ID_EVENT_MEMBER_LEAVE = 5;	//  |B*/
 
 	const
 		THREAD_STATUS_STARTING = 0,
@@ -35,40 +35,8 @@ abstract class Protocol {
 		THREAD_STATUS_CLOSING = 8,
 		THREAD_STATUS_CLOSED = 9;
 
-	const
+	/*const
 		ACTIVITY_TYPE_PLAYING = 0,
 		ACTIVITY_TYPE_STREAMING = 1,
-		ACTIVITY_TYPE_LISTENING = 2;
-
-	/**
-	 * DOCUMENTATION OF PROTOCOL:
-	 *
-	 * General format: [ID, DATA]
-	 *
-	 *
-	 * ID_HEARTBEAT
-	 * [0, [float Timestamp]]
-	 *
-	 * ID_UPDATE_ACTIVITY
-	 * [1, [ACTIVITY_TYPE_..., string Status]]
-	 *
-	 * ID_SEND_MESSAGE
-	 * [2, [string(18) ServerID, string(18) ChannelID, string(<2000) Content]]
-	 *
-	 * (IDEA ONLY
-	 * ID_EVENT_READY
-	 * [X, [MASSIVE AMOUNT OF DATA, YET TO DECIDE HOW MUCH TO SEND]])
-	 *
-	 * ID_EVENT_MESSAGE
-	 * [3, [string(18) ServerId, string ServerName, string(18) UserId, string(4) UserDiscriminator, string UserName,
-	 *		string(18) ChannelID, string ChannelName, string(<~2000) content, int Timestamp]]
-	 *
-	 * ID_EVENT_MEMBER_JOIN
-	 * [4, [string(18) ServerId, string ServerName, string(18) UserId, string(4) UserDiscriminator, string UserName,
-	 *		int Timestamp]]
-	 *
-	 * ID_EVENT_MEMBER_LEAVE
-	 * [5, [string(18) ServerId, string ServerName, string(18) UserId, string(4) UserDiscriminator, string UserName,
-	 *		int Timestamp]]
-	 */
+		ACTIVITY_TYPE_LISTENING = 2;*/
 }

@@ -12,7 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
+use Discord\Parts\Channel\Channel;
+use Discord\Parts\Guild\Guild;
+use Discord\Parts\User\Member;
 use JaxkDev\DiscordBot\Bot\Client;
+use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Utils;
 use pocketmine\utils\MainLogger;
@@ -33,19 +38,14 @@ class PluginCommunicationHandler {
 		$this->client = $client;
 	}
 
-	public function handle(array $data): bool{
-		Utils::assert(is_int($data[0]), "Corrupt internal communication data received.");
+	public function handle(Packet $packet): bool{
+		// Utils::assert(is_int($data[0]), "Corrupt internal communication data received.");
 
-		switch ($data[0]){
-			case Protocol::ID_HEARTBEAT:
-				return $this->handleHeartbeat($data[1]);
-			case Protocol::ID_UPDATE_ACTIVITY:
-				return $this->handleUpdateActivity($data[1]);
-			case Protocol::ID_SEND_MESSAGE:
-				return $this->handleSendMessage($data[1]);
-			default:
-				return false;
-		}
+		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
+		if($packet instanceof UpdateActivity) return $this->handleUpdateActivity($packet);
+		if($packet instanceof SendMessage) return $this->handleSendMessage($packet;
+
+		return false;
 	}
 
 	/**
@@ -66,7 +66,6 @@ class PluginCommunicationHandler {
 	 * @return bool
 	 */
 	private function handleUpdateActivity(array $data): bool{
-		Utils::assert((count($data) === 2) and is_int($data[0]) and is_string($data[1]), "Invalid UpdateActivity data received.");
 		Utils::assert(in_array($data[0],
 			[Protocol::ACTIVITY_TYPE_PLAYING, Protocol::ACTIVITY_TYPE_LISTENING, Protocol::ACTIVITY_TYPE_STREAMING]),
 			"Activity type '{$data[0]}' received is not valid.");
@@ -76,41 +75,19 @@ class PluginCommunicationHandler {
 		return true;
 	}
 
-	/**
-	 * @param array $data [float TIMESTAMP]
-	 * @return bool
-	 */
-	private function handleHeartbeat(array $data): bool{
-		Utils::assert((count($data) === 1) and is_numeric($data[0]), "Invalid Heartbeat data received.");
-
-		$this->lastHeartbeat = (float)$data[0];
-
+	private function handleHeartbeat(Heartbeat $packet): bool{
+		$this->lastHeartbeat = $packet->getHeartbeat();
 		return true;
 	}
 
 
 	public function sendHeartbeat(): void{
-		$this->client->getThread()->writeOutboundData(
-			Protocol::ID_HEARTBEAT,
-			[microtime(true)]
-		);
+		$p = new Heartbeat();
+		$p->setHeartbeat(microtime(true));
+		$this->client->getThread()->writeOutboundData($p);
 	}
 
-	/**
-	 * @param string $serverId			Server's ID (18-length)
-	 * @param string $serverName		Server's Name
-	 * @param string $userId			User's ID (18-length)
-	 * @param string $userDiscriminator	User's Discriminator (4-length)
-	 * @param string $userName			Username
-	 * @param string $channelId			Channel's ID (18-length)
-	 * @param string $channelName		Channel's Name
-	 * @param string $content			Message content (<~2000 length)
-	 * @param float $timestamp			Timestamp of join
-	 * @return void
-	 */
-	public function sendMessageSentEvent(string $serverId, string $serverName, string $userId, string $userDiscriminator,
-									 string $userName, string $channelId, string $channelName, string $content,
-									 float $timestamp): void{
+	public function sendMessageSentEvent(Guild $server, Channel $channel, Member $author, string $content): void{
 		$this->client->getThread()->writeOutboundData(
 			Protocol::ID_EVENT_MESSAGE_SENT,
 			[
