@@ -25,10 +25,10 @@ class Message implements \Serializable {
 	/** @var string (<=2000) */
 	private $content;
 
-	/** @var int[] */
+	/** @var int */
 	private $author_id;
 
-	/** @var int[] */
+	/** @var int */
 	private $channel_id;
 
 	/** @var float */
@@ -38,28 +38,13 @@ class Message implements \Serializable {
 	private $everyone_mentioned;
 
 	/** @var int[] */
-	private $users_mentioned;
+	private $users_mentioned = [];
 
 	/** @var int[] */
-	private $roles_mentioned;
+	private $roles_mentioned = [];
 
 	/** @var int[] */
-	private $channels_mentioned;
-
-	/**
-	 * @inheritDoc
-	 */
-	public function serialize(): ?string{
-		// TODO: Implement serialize() method.
-		return "Serialized";
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function unserialize($serialized): void{
-		// TODO: Implement unserialize() method.
-	}
+	private $channels_mentioned = [];
 
 	public function getId(): int{
 		return $this->id;
@@ -85,34 +70,20 @@ class Message implements \Serializable {
 		return $this;
 	}
 
-	/**
-	 * @return int[]
-	 */
-	public function getAuthorId(): array{
+	public function getAuthorId(): int{
 		return $this->author_id;
 	}
 
-	/**
-	 * @param int[] $author_id
-	 * @return Message
-	 */
-	public function setAuthorId(array $author_id): Message{
+	public function setAuthorId(int $author_id): Message{
 		$this->author_id = $author_id;
 		return $this;
 	}
 
-	/**
-	 * @return int[]
-	 */
-	public function getChannelId(): array{
+	public function getChannelId(): int{
 		return $this->channel_id;
 	}
 
-	/**
-	 * @param int[] $channel_id
-	 * @return Message
-	 */
-	public function setChannelId(array $channel_id): Message{
+	public function setChannelId(int $channel_id): Message{
 		$this->channel_id = $channel_id;
 		return $this;
 	}
@@ -183,4 +154,35 @@ class Message implements \Serializable {
 		return $this;
 	}
 
+	//----- Serialization -----//
+
+	public function serialize(): ?string{
+		return serialize([
+			$this->id,
+			$this->type,
+			$this->content,
+			$this->author_id,
+			$this->channel_id,
+			$this->timestamp,
+			$this->everyone_mentioned,
+			$this->users_mentioned,
+			$this->roles_mentioned,
+			$this->channels_mentioned
+		]);
+	}
+
+	public function unserialize($serialized): void{
+		[
+			$this->id,
+			$this->type,
+			$this->content,
+			$this->author_id,
+			$this->channel_id,
+			$this->timestamp,
+			$this->everyone_mentioned,
+			$this->users_mentioned,
+			$this->roles_mentioned,
+			$this->channels_mentioned
+		] = unserialize($serialized);
+	}
 }
