@@ -31,39 +31,39 @@ class Activity implements \Serializable {
 		STATUS_OFFLINE = "offline";
 
 
-	/** @var string */
+	/** @var ?string */
 	private $message;
 
-	/** @var int */
+	/** @var ?int */
 	private $type;
 
-	/** @var string */
+	/** @var ?string */
 	private $status;
 
-	public function getMessage(): string{
+	public function getMessage(): ?string{
 		return $this->message;
 	}
 
-	public function setMessage(string $message): Activity{
+	public function setMessage(?string $message): Activity{
 		$this->message = $message;
 		return $this;
 	}
 
-	public function getType(): int{
+	public function getType(): ?int{
 		return $this->type;
 	}
 
-	public function setType(int $type): Activity{
+	public function setType(?int $type): Activity{
 		Utils::assert($type >= self::TYPE_PLAYING and $type <= self::TYPE_COMPETING);
 		$this->type = $type;
 		return $this;
 	}
 
-	public function getStatus(): string{
+	public function getStatus(): ?string{
 		return $this->status;
 	}
 
-	public function setStatus(string $status): Activity{
+	public function setStatus(?string $status): Activity{
 		$this->status = $status;
 		return $this;
 	}

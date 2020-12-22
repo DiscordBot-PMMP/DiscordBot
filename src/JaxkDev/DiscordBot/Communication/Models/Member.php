@@ -26,7 +26,7 @@ class Member implements \Serializable {
 	/** @var string */
 	private $avatar_url;
 
-	/** @var string */
+	/** @var ?string */
 	private $status;
 
 	/** @var Activity */
@@ -85,11 +85,11 @@ class Member implements \Serializable {
 		return $this;
 	}
 
-	public function getStatus(): string{
+	public function getStatus(): ?string{
 		return $this->status;
 	}
 
-	public function setStatus(string $status): Member{
+	public function setStatus(?string $status): Member{
 		$this->status = $status;
 		return $this;
 	}

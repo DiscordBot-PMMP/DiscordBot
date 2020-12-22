@@ -127,7 +127,7 @@ class DiscordEventHandler {
 			->setBoostTimestamp(null)
 			->setDiscriminator($member->user->discriminator)
 			->setGuildId($member->guild_id)
-			->setJoinTimestamp($member->joined_at->getTimestamp())
+			->setJoinTimestamp($member->joined_at !== null ? $member->joined_at->getTimestamp() : 0)
 			->setNickname($member->nick)
 			->setRolesId(array_keys($member->roles->toArray()));
 
