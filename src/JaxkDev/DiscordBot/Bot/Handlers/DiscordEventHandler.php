@@ -13,10 +13,13 @@
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
 use Discord\Discord;
-use Discord\Parts\Channel\Channel;
-use Discord\Parts\Channel\Message;
-use Discord\Parts\User\Member;
+use Discord\Parts\Channel\Channel as DiscordChannel;
+use Discord\Parts\Channel\Message as DiscordMessage;
+use Discord\Parts\User\Member as DiscordMember;
 use JaxkDev\DiscordBot\Bot\Client;
+use JaxkDev\DiscordBot\Communication\Models\Activity;
+use JaxkDev\DiscordBot\Communication\Models\Member;
+use JaxkDev\DiscordBot\Communication\Models\Message;
 
 class DiscordEventHandler {
 	/**
@@ -35,14 +38,14 @@ class DiscordEventHandler {
 		$discord->on('GUILD_MEMBER_REMOVE', array($this, 'onMemberLeave'));
 	}
 
-	public function onMessage(Message $message, Discord $discord): void{
+	public function onMessage(DiscordMessage $message, Discord $discord): void{
 		// Eg webhooks ?
-		if(!$message->author instanceof Member) return;
+		if(!$message->author instanceof DiscordMember) return;
 		if($message->author->user->bot) return;
 
 		// Other types of messages not used right now.
-		if($message->type !== Message::TYPE_NORMAL) return;
-		if($message->channel->type !== Channel::TYPE_TEXT) return;
+		if($message->type !== DiscordMessage::TYPE_NORMAL) return;
+		if($message->channel->type !== DiscordChannel::TYPE_TEXT) return;
 		if(($message->content ?? "") === "") return; //Images/Files, can be empty strings or just null in other cases.
 
 		/* Clean mentions, TODO Should we clean content before sending ?
@@ -70,28 +73,64 @@ class DiscordEventHandler {
 			return "@".$role->name;
 		}, $message->content) ?? "";*/
 
-		$this->client->getPluginCommunicationHandler()->sendMessageSentEvent($message);
+		if($message->channel->guild_id === null) throw new \AssertionError("GuildID Cannot be null.");
+
+		$m = new Message();
+		$m->setId($message->id)
+			->setTimestamp($message->timestamp->getTimestamp())
+			->setAuthorId($message->author->user->id)
+			->setChannelId($message->channel_id)
+			->setGuildId($message->channel->guild_id)
+			->setEveryoneMentioned($message->mention_everyone)
+			->setContent($message->content)
+			->setChannelsMentioned(array_keys($message->mention_channels->toArray()))
+			->setRolesMentioned(array_keys($message->mention_roles->toArray()))
+			->setUsersMentioned(array_keys($message->mentions->toArray()));
+
+		$this->client->getPluginCommunicationHandler()->sendMessageSentEvent($m);
 	}
 
-	public function onMemberJoin(Member $member, Discord $discord): void{
-		$this->client->getPluginCommunicationHandler()->sendMemberJoinEvent(
-			$member->guild->id,
-			$member->guild->name,
-			$member->id,
-			$member->discriminator,
-			$member->username,
-			$member->joined_at->getTimestamp()
-		);
+	public function onMemberJoin(DiscordMember $member, Discord $discord): void{
+		$activity = new Activity();
+		$activity->setType($member->game->type)
+			->setMessage($member->game->name)
+			->setStatus($member->game->state);
+
+		$m = new Member();
+		$m->setId($member->id)
+			->setUsername($member->username)
+			->setActivity($activity)
+			->setStatus($member->status)
+			->setAvatarUrl($member->user->avatar)
+			->setBoostTimestamp(null)
+			->setDiscriminator($member->user->discriminator)
+			->setGuildId($member->guild_id)
+			->setJoinTimestamp($member->joined_at->getTimestamp())
+			->setNickname($member->nick)
+			->setRolesId(array_keys($member->roles->toArray()));
+
+		$this->client->getPluginCommunicationHandler()->sendMemberJoinEvent($m);
 	}
 
-	public function onMemberLeave(Member $member, Discord $discord): void{
-		$this->client->getPluginCommunicationHandler()->sendMemberLeaveEvent(
-			$member->guild->id,
-			$member->guild->name,
-			$member->id,
-			$member->discriminator,
-			$member->username,
-			time()
-		);
+	public function onMemberLeave(DiscordMember $member, Discord $discord): void{
+		$activity = new Activity();
+		$activity->setType($member->game->type)
+			->setMessage($member->game->name)
+			->setStatus($member->game->state);
+
+		$m = new Member();
+		$m->setId($member->id)
+			->setUsername($member->username)
+			->setActivity($activity)
+			->setStatus($member->status)
+			->setAvatarUrl($member->user->avatar)
+			->setBoostTimestamp(null)
+			->setDiscriminator($member->user->discriminator)
+			->setGuildId($member->guild_id)
+			->setJoinTimestamp($member->joined_at->getTimestamp())
+			->setNickname($member->nick)
+			->setRolesId(array_keys($member->roles->toArray()));
+
+		$this->client->getPluginCommunicationHandler()->sendMemberLeaveEvent($m);
 	}
 }

@@ -12,27 +12,28 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-class Heartbeat extends Packet {
+use JaxkDev\DiscordBot\Communication\Models\Member;
 
-	/* PacketID */
-	const ID = 1;
+class DiscordMemberJoin extends Packet{
 
-	/** @var float */
-	private $heartbeat;
+	const ID = 4;
 
-	public function getHeartbeat(): float{
-		return $this->heartbeat;
+	/** @var Member */
+	private $member;
+
+	public function getMember(): Member{
+		return $this->member;
 	}
 
-	public function setHeartbeat(float $heartbeat): void{
-		$this->heartbeat = $heartbeat;
+	public function setMember(Member $member): void{
+		$this->member = $member;
 	}
 
 	public function serialize(): ?string{
-		return serialize($this->heartbeat);
+		return serialize($this->member);
 	}
 
 	public function unserialize($serialized): void{
-		$this->heartbeat = unserialize($serialized);
+		$this->member = unserialize($serialized);
 	}
 }

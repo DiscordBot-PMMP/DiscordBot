@@ -13,15 +13,15 @@
 namespace JaxkDev\DiscordBot\Bot;
 
 use Discord\Discord;
-use Discord\Parts\Channel\Channel;
-use Discord\Parts\Guild\Guild;
-use Discord\Parts\User\Activity;
+use Discord\Parts\User\Activity as DiscordActivity;
 use Error;
 use ErrorException;
 use Exception;
 use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\Bot\Handlers\PluginCommunicationHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\Communication\Models\Activity;
+use JaxkDev\DiscordBot\Communication\Models\Message;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -197,11 +197,12 @@ class Client {
 	 * Note, It will only show warning ONCE per channel/guild that fails.
 	 * Fix on the way hopefully.
 	 */
-	public function sendMessage(string $guild, string $channel, string $content): void{
+	public function sendMessage(Message $message): void{
 		if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) return;
 
-		/** @noinspection PhpUnhandledExceptionInspection */
-		$this->client->guilds->fetch($guild)->done(function(Guild $guild) use($channel, $content) {
+		var_dump("Sending message...Not.");
+		//** @noinspection PhpUnhandledExceptionInspection */
+		/*$this->client->guilds->fetch($guild)->done(function(Guild $guild) use($channel, $content) {
 			$guild->channels->fetch($channel)->done(function(Channel $channel) use($guild, $content) {
 				$channel->sendMessage($content);
 				MainLogger::getLogger()->debug("Sent message(".strlen($content).") to ({$guild->id}|{$channel->id})");
@@ -210,17 +211,17 @@ class Client {
 			});
 		}, function() use($guild) {
 			MainLogger::getLogger()->warning("Failed to fetch guild ${guild} while attempting to send message.");
-		});
+		});*/
 	}
 
-	public function updatePresence(string $text, int $type): bool{
-		$presence = new Activity($this->client, [
-			'name' => $text,
-			'type' => $type
+	public function updatePresence(Activity $activity): bool{
+		$presence = new DiscordActivity($this->client, [
+			'name' => $activity->getMessage(),
+			'type' => $activity->getType()
 		]);
 
 		try {
-			$this->client->updatePresence($presence);
+			$this->client->updatePresence($presence, $activity->getStatus() === "idle", $activity->getStatus());
 			return true;
 		} catch (Exception $e) {
 			return false;

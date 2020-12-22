@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Models;
 
 class Role implements \Serializable {
 
-	/** @var int */
+	/** @var string */
 	private $id;
 
 	/** @var string */
@@ -32,11 +32,11 @@ class Role implements \Serializable {
 	/** @var bool */
 	private $mentionable;
 
-	public function getId(): int{
+	public function getId(): string{
 		return $this->id;
 	}
 
-	public function setId(int $id): Role{
+	public function setId(string $id): Role{
 		$this->id = $id;
 		return $this;
 	}

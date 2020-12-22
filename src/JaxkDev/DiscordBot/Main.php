@@ -139,12 +139,11 @@ class Main extends PluginBase {
 			$packet = unserialize($data);
 			Utils::assert($packet instanceof Packet);
 			return $packet;
-		}, $this->inboundData->chunk($count) /* @phpstan-ignore-line */);
+		}, /* @phpstan-ignore-line */ $this->inboundData->chunk($count));
 	}
 
 	public function writeOutboundData(Packet $packet): void{
-		/** @noinspection PhpUnhandledExceptionInspection */
-		$this->outboundData[] = $packet->serialize();
+		$this->outboundData[] = serialize($packet);
 	}
 
 	public function getBotCommunicationHandler(): BotCommunicationHandler{

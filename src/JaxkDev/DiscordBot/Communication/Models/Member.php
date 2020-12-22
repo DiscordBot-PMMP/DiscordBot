@@ -14,13 +14,13 @@ namespace JaxkDev\DiscordBot\Communication\Models;
 
 class Member implements \Serializable {
 
-	/** @var int */
+	/** @var string */
 	private $id;
 
 	/** @var string */
 	private $username;
 
-	/** @var int */
+	/** @var string */
 	private $discriminator;
 
 	/** @var string */
@@ -32,28 +32,28 @@ class Member implements \Serializable {
 	/** @var Activity */
 	private $activity;
 
-	/** @var string */
+	/** @var null|string */
 	private $nickname;
 
-	/** @var float */
+	/** @var int */
 	private $join_timestamp;
 
-	/** @var float */
+	/** @var null|int */
 	private $boost_timestamp;
 
-	/** @var int[] */
+	/** @var string[] */
 	private $roles_id;
 
-	/** @var int */
+	/** @var string */
 	private $guild_id;
 
 	//Email, Bot, Verified, Locale etc not inc.
 
-	public function getId(): int{
+	public function getId(): string{
 		return $this->id;
 	}
 
-	public function setId(int $id): Member{
+	public function setId(string $id): Member{
 		$this->id = $id;
 		return $this;
 	}
@@ -67,11 +67,11 @@ class Member implements \Serializable {
 		return $this;
 	}
 
-	public function getDiscriminator(): int{
+	public function getDiscriminator(): string{
 		return $this->discriminator;
 	}
 
-	public function setDiscriminator(int $discriminator): Member{
+	public function setDiscriminator(string $discriminator): Member{
 		$this->discriminator = $discriminator;
 		return $this;
 	}
@@ -103,42 +103,42 @@ class Member implements \Serializable {
 		return $this;
 	}
 
-	public function getNickname(): string{
+	public function getNickname(): ?string{
 		return $this->nickname;
 	}
 
-	public function setNickname(string $nickname): Member{
+	public function setNickname(?string $nickname): Member{
 		$this->nickname = $nickname;
 		return $this;
 	}
 
-	public function getJoinTimestamp(): float{
+	public function getJoinTimestamp(): int{
 		return $this->join_timestamp;
 	}
 
-	public function setJoinTimestamp(float $join_timestamp): Member{
+	public function setJoinTimestamp(int $join_timestamp): Member{
 		$this->join_timestamp = $join_timestamp;
 		return $this;
 	}
 
-	public function getBoostTimestamp(): float{
+	public function getBoostTimestamp(): ?int{
 		return $this->boost_timestamp;
 	}
 
-	public function setBoostTimestamp(float $boost_timestamp): Member{
+	public function setBoostTimestamp(?int $boost_timestamp): Member{
 		$this->boost_timestamp = $boost_timestamp;
 		return $this;
 	}
 
 	/**
-	 * @return int[]
+	 * @return string[]
 	 */
 	public function getRolesId(): array{
 		return $this->roles_id;
 	}
 
 	/**
-	 * @param int[] $roles_id
+	 * @param string[] $roles_id
 	 * @return self
 	 */
 	public function setRolesId(array $roles_id): Member{
@@ -146,11 +146,11 @@ class Member implements \Serializable {
 		return $this;
 	}
 
-	public function getGuildId(): int{
+	public function getGuildId(): string{
 		return $this->guild_id;
 	}
 
-	public function setGuildId(int $guild_id): Member{
+	public function setGuildId(string $guild_id): Member{
 		$this->guild_id = $guild_id;
 		return $this;
 	}

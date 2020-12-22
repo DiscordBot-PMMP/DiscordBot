@@ -12,14 +12,15 @@
 
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
-use Discord\Parts\Channel\Channel;
-use Discord\Parts\Guild\Guild;
-use Discord\Parts\User\Member;
 use JaxkDev\DiscordBot\Bot\Client;
+use JaxkDev\DiscordBot\Communication\Models\Member;
+use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordMemberJoin;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordMemberLeave;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordMessageSent;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
-use JaxkDev\DiscordBot\Utils;
 use pocketmine\utils\MainLogger;
 
 class PluginCommunicationHandler {
@@ -42,30 +43,22 @@ class PluginCommunicationHandler {
 		// Utils::assert(is_int($data[0]), "Corrupt internal communication data received.");
 
 		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
-		if($packet instanceof UpdateActivity) return $this->handleUpdateActivity($packet);
-		if($packet instanceof SendMessage) return $this->handleSendMessage($packet;
+		//if($packet instanceof UpdateActivity) return $this->handleUpdateActivity($packet);
+		//if($packet instanceof SendMessage) return $this->handleSendMessage($packet;
 
 		return false;
 	}
 
-	/**
-	 * @param array $data [string(18) SERVER_ID, string(18) CHANNEL_ID, string(2000) TEXT]
-	 * @return bool
-	 */
-	private function handleSendMessage(array $data): bool{
+	/*private function handleSendMessage(array $data): bool{
 		Utils::assert((count($data) === 3) and strlen($data[0]) === 18 and strlen($data[1]) === 18
 			and strlen($data[2]) < 2000, "Invalid message data received.");
 
 		$this->client->sendMessage($data[0], $data[1], $data[2]);
 
 		return true;
-	}
+	}*/
 
-	/**
-	 * @param array $data [int ACTIVITY_TYPE, string TEXT]
-	 * @return bool
-	 */
-	private function handleUpdateActivity(array $data): bool{
+	/*private function handleUpdateActivity(array $data): bool{
 		Utils::assert(in_array($data[0],
 			[Protocol::ACTIVITY_TYPE_PLAYING, Protocol::ACTIVITY_TYPE_LISTENING, Protocol::ACTIVITY_TYPE_STREAMING]),
 			"Activity type '{$data[0]}' received is not valid.");
@@ -73,7 +66,7 @@ class PluginCommunicationHandler {
 		$this->client->updatePresence($data[1], $data[0]);
 
 		return true;
-	}
+	}*/
 
 	private function handleHeartbeat(Heartbeat $packet): bool{
 		$this->lastHeartbeat = $packet->getHeartbeat();
@@ -82,74 +75,27 @@ class PluginCommunicationHandler {
 
 
 	public function sendHeartbeat(): void{
-		$p = new Heartbeat();
-		$p->setHeartbeat(microtime(true));
-		$this->client->getThread()->writeOutboundData($p);
+		$packet = new Heartbeat();
+		$packet->setHeartbeat(microtime(true));
+		$this->client->getThread()->writeOutboundData($packet);
 	}
 
-	public function sendMessageSentEvent(Guild $server, Channel $channel, Member $author, string $content): void{
-		$this->client->getThread()->writeOutboundData(
-			Protocol::ID_EVENT_MESSAGE_SENT,
-			[
-				$serverId,
-				$serverName,
-				$userId,
-				$userDiscriminator,
-				$userName,
-				$channelId,
-				$channelName,
-				$content,
-				$timestamp
-			]
-		);
+	public function sendMessageSentEvent(Message $message): void{
+		$packet = new DiscordMessageSent();
+		$packet->setMessage($message);
+		$this->client->getThread()->writeOutboundData($packet);
 	}
 
-	/**
-	 * @param string $serverId			Server's ID (18-length)
-	 * @param string $serverName		Server's Name
-	 * @param string $userId			User's ID (18-length)
-	 * @param string $userDiscriminator	User's Discriminator (4-length)
-	 * @param string $userName			Username
-	 * @param float $timestamp			Timestamp of join
-	 * @return void
-	 */
-	public function sendMemberJoinEvent(string $serverId, string $serverName, string $userId, string $userDiscriminator,
-										string $userName, float $timestamp): void{
-		$this->client->getThread()->writeOutboundData(
-			Protocol::ID_EVENT_MEMBER_JOIN,
-			[
-				$serverId,
-				$serverName,
-				$userId,
-				$userDiscriminator,
-				$userName,
-				$timestamp
-			]
-		);
+	public function sendMemberJoinEvent(Member $member): void{
+		$packet = new DiscordMemberJoin();
+		$packet->setMember($member);
+		$this->client->getThread()->writeOutboundData($packet);
 	}
 
-	/**
-	 * @param string $serverId			Server's ID (18-length)
-	 * @param string $serverName		Server's Name
-	 * @param string $userId			User's ID (18-length)
-	 * @param string $userDiscriminator	User's Discriminator (4-length)
-	 * @param string $userName			Username
-	 * @param float $timestamp			Timestamp of join
-	 * @return void
-	 */
-	public function sendMemberLeaveEvent(string $serverId, string $serverName, string $userId, string $userDiscriminator,
-										string $userName, float $timestamp): void{
-		$this->client->getThread()->writeOutboundData(
-			Protocol::ID_EVENT_MEMBER_LEAVE,
-			[
-				$serverId,
-				$serverName,
-				$userId,
-				$userDiscriminator,
-				$userName,
-				$timestamp
-			]
-		);
+	public function sendMemberLeaveEvent(Member $member): void{
+		$packet = new DiscordMemberLeave();
+		$packet->setMember($member);
+		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function checkHeartbeat(): void{

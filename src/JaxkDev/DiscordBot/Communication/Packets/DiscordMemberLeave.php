@@ -13,34 +13,27 @@
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
 use JaxkDev\DiscordBot\Communication\Models\Member;
-use JaxkDev\DiscordBot\Communication\Models\Server;
 
-class MemberJoin extends Packet {
+class DiscordMemberLeave extends Packet{
 
-	const ID = 4;
+	const ID = 5;
 
 	/** @var Member */
 	private $member;
 
-	/** @var Server */
-	private $server;
-
-	public function getHeartbeat(): float{
-		return $this->heartbeat;
+	public function getMember(): Member{
+		return $this->member;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
+	public function setMember(Member $member): void{
+		$this->member = $member;
+	}
+
 	public function serialize(): ?string{
-		return strval($this->heartbeat);
+		return serialize($this->member);
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	public function unserialize($serialized): void{
-		// TODO Load server from cache & add member to cache.
-		$this->heartbeat = floatval($serialized);
+		$this->member = unserialize($serialized);
 	}
 }

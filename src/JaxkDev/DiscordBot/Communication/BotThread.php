@@ -71,7 +71,7 @@ class BotThread extends Thread {
 			$packet = unserialize($data);
 			Utils::assert($packet instanceof Packet);
 			return $packet;
-		}, $this->inboundData->chunk($count) /* @phpstan-ignore-line */);
+		}, /* @phpstan-ignore-line */ $this->inboundData->chunk($count));
 	}
 
 	public function writeOutboundData(Packet $packet): void{

@@ -12,12 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
+use JaxkDev\DiscordBot\Communication\Packets\DiscordMemberJoin;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordMemberLeave;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordMessageSent;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
-use JaxkDev\DiscordBot\Communication\Packets\MemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Main;
-use JaxkDev\DiscordBot\Utils;
 use pocketmine\utils\MainLogger;
 
 class BotCommunicationHandler {
@@ -39,9 +40,9 @@ class BotCommunicationHandler {
 		// TODO, Dictionary Based compression of servers to reduce load/memory going across threads.
 		// If's instances instead of ID switching due to phpstan/types.
 		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
-		if($packet instanceof MemberJoin) return $this->handleMemberJoin($packet);
-		if($packet instanceof MemberLeave) return $this->handleMemberLeave($packet);
-		if($packet instanceof MessageSent) return $this->handleMessageSent($packet);
+		if($packet instanceof DiscordMemberJoin) return $this->handleMemberJoin($packet);
+		if($packet instanceof DiscordMemberLeave) return $this->handleMemberLeave($packet);
+		if($packet instanceof DiscordMessageSent) return $this->handleMessageSent($packet);
 
 		// throw new \InvalidKeyException("Invalid ID ({$data[0]}) Received from internal communication.");
 		return false;
@@ -52,58 +53,47 @@ class BotCommunicationHandler {
 		return true;
 	}
 
-	/**
-	 * @param array $data [string serverID, string serverName, string userId, string userDiscriminator, string userName,
-	 * string channelId, string channelName, string content, int timestamp]
-	 * @return bool
-	 */
-	private function handleMessageSent(array $data): bool{
-		Utils::assert((count($data) === 9)/* and all values here */);
-
+	private function handleMessageSent(DiscordMessageSent $packet): bool{
 		$config = $this->plugin->getEventsConfig()['message']['fromDiscord'];
+		$message = $packet->getMessage();
 
-		if(!in_array($data[0].".".$data[5], $config['channels'])) return true;
+		if(!in_array($message->getGuildId().".".$message->getChannelId(), $config['channels'])) return true;
 
-		$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}',
+		// TODO Cache...
+		/*$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}',
 			'{SERVER_NAME}', '{CHANNEL_ID}', '{CHANNEL_NAME}', '{MESSAGE}'],
 			[date('G:i:s', $data[8]), $data[2], $data[4], $data[3], $data[0], $data[1], $data[5], $data[6], $data[7]],
-			$config['format']);
+			$config['format']);*/
 
-		$this->plugin->getServer()->broadcastMessage($message);
+		$this->plugin->getServer()->broadcastMessage($message->getContent());
 
 		return true;
 	}
 
-	/**
-	 * @param array $data [string serverID, string serverName, string userId, string userDiscriminator, string userName, int timestamp]
-	 * @return bool
-	 */
-	private function handleMemberJoin(array $data): bool{
-		Utils::assert((count($data) === 6)/* and all values here */);
+	private function handleMemberJoin(DiscordMemberJoin $packet): bool{
+		$member = $packet->getMember();
 
 		$config = $this->plugin->getEventsConfig()['member_join']['fromDiscord'];
 		if(($config['format'] ?? "") === "") return true;
 
+		// TODO Cache... (server name)
 		$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
-			[date('G:i:s', $data[5]), $data[2], $data[4], $data[3], $data[0], $data[1]], $config['format']);
+			[date('G:i:s', $member->getJoinTimestamp()), $member->getId(), $member->getUsername(), $member->getDiscriminator(), $member->getGuildId(), "REDACTED"], $config['format']);
 
 		$this->plugin->getServer()->broadcastMessage($message);
 
 		return true;
 	}
 
-	/**
-	 * @param array $data [string serverID, string serverName, string userId, string userDiscriminator, string userName, int timestamp]
-	 * @return bool
-	 */
-	private function handleMemberLeave(array $data): bool{
-		Utils::assert((count($data) === 6)/* and all values here */);
+	private function handleMemberLeave(DiscordMemberLeave $packet): bool{
+		$member = $packet->getMember();
 
 		$config = $this->plugin->getEventsConfig()['member_leave']['fromDiscord'];
 		if(($config['format'] ?? "") === "") return true;
 
+		// TODO Cache... (server name)
 		$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
-			[date('G:i:s', $data[5]), $data[2], $data[4], $data[3], $data[0], $data[1]], $config['format']);
+			[date('G:i:s', $member->getJoinTimestamp()), $member->getId(), $member->getUsername(), $member->getDiscriminator(), $member->getGuildId(), "REDACTED"], $config['format']);
 
 		$this->plugin->getServer()->broadcastMessage($message);
 
