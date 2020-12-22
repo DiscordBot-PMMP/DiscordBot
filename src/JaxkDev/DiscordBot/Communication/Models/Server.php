@@ -14,18 +14,127 @@ namespace JaxkDev\DiscordBot\Communication\Models;
 
 class Server implements \Serializable {
 
-	/**
-	 * @inheritDoc
-	 */
-	public function serialize(): ?string{
-		// TODO: Implement serialize() method.
-		return "Serialized";
+	/** @var int */
+	private $id;
+
+	/** @var string */
+	private $name;
+
+	/** @var string */
+	private $icon_url;
+
+	/** @var string */
+	private $region;
+
+	/** @var int */
+	private $owner_id;
+
+	/** @var float */
+	private $creation_timestamp;
+
+	/** @var bool */
+	private $large;
+
+	/** @var int */
+	private $member_count;
+
+	public function getId(): int{
+		return $this->id;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
+	public function setId(int $id): Server{
+		$this->id = $id;
+		return $this;
+	}
+
+	public function getName(): string{
+		return $this->name;
+	}
+
+	public function setName(string $name): Server{
+		$this->name = $name;
+		return $this;
+	}
+
+	public function getIconUrl(): string{
+		return $this->icon_url;
+	}
+
+	public function setIconUrl(string $icon_url): Server{
+		$this->icon_url = $icon_url;
+		return $this;
+	}
+
+	public function getRegion(): string{
+		return $this->region;
+	}
+
+	public function setRegion(string $region): Server{
+		$this->region = $region;
+		return $this;
+	}
+
+	public function getOwnerId(): int{
+		return $this->owner_id;
+	}
+
+	public function setOwnerId(int $owner_id): Server{
+		$this->owner_id = $owner_id;
+		return $this;
+	}
+
+	public function getCreationTimestamp(): float{
+		return $this->creation_timestamp;
+	}
+
+	public function setCreationTimestamp(float $creation_timestamp): Server{
+		$this->creation_timestamp = $creation_timestamp;
+		return $this;
+	}
+
+	public function isLarge(): bool{
+		return $this->large;
+	}
+
+	public function setLarge(bool $large): Server{
+		$this->large = $large;
+		return $this;
+	}
+
+	public function getMemberCount(): int{
+		return $this->member_count;
+	}
+
+	public function setMemberCount(int $member_count): Server{
+		$this->member_count = $member_count;
+		return $this;
+	}
+
+	//----- Serialization -----//
+
+	public function serialize(): ?string{
+		return serialize([
+			$this->id,
+			$this->name,
+			$this->icon_url,
+			$this->region,
+			$this->owner_id,
+			$this->creation_timestamp,
+			$this->large,
+			$this->member_count
+		]);
+	}
+
 	public function unserialize($serialized): void{
-		// TODO: Implement unserialize() method.
+		[
+			$this->id,
+			$this->name,
+			$this->icon_url,
+			$this->region,
+			$this->owner_id,
+			$this->creation_timestamp,
+			$this->large,
+			$this->member_count
+		] = unserialize($serialized);
 	}
 }

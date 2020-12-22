@@ -14,18 +14,83 @@ namespace JaxkDev\DiscordBot\Communication\Models;
 
 class Channel implements \Serializable {
 
-	/**
-	 * @inheritDoc
-	 */
-	public function serialize(): ?string{
-		// TODO: Implement serialize() method.
-		return "Serialized";
+	const
+		TYPE_TEXT = 0,
+		TYPE_VOICE = 1;
+
+	/** @var int */
+	private $id;
+
+	/** @var string */
+	private $name;
+
+	/** @var string|null */
+	private $category = null;
+
+	///** @var int */
+	//private $type = self::TYPE_TEXT;
+
+	/** @var string */
+	private $description;
+
+	public function getId(): int{
+		return $this->id;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
+	public function setId(int $id): Channel{
+		$this->id = $id;
+		return $this;
+	}
+
+	public function getName(): string{
+		return $this->name;
+	}
+
+	public function setName(string $name): Channel{
+		$this->name = $name;
+		return $this;
+	}
+
+	/* No setType, intentional.
+	public function getType(): int{
+		return $this->type;
+	}*/
+
+	public function getDescription(): string{
+		return $this->description;
+	}
+
+	public function setDescription(string $description): Channel{
+		$this->description = $description;
+		return $this;
+	}
+
+	public function getCategory(): ?string{
+		return $this->category;
+	}
+
+	public function setCategory(?string $category): Channel{
+		$this->category = $category;
+		return $this;
+	}
+
+	//----- Serialization -----//
+
+	public function serialize(): ?string{
+		return serialize([
+			$this->id,
+			$this->name,
+			$this->category,
+			$this->description
+		]);
+	}
+
 	public function unserialize($serialized): void{
-		// TODO: Implement unserialize() method.
+		[
+			$this->id,
+			$this->name,
+			$this->category,
+			$this->description
+		] = unserialize($serialized);
 	}
 }

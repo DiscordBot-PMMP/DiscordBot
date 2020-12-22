@@ -32,39 +32,11 @@ class Role implements \Serializable {
 	/** @var bool */
 	private $mentionable;
 
-	/**
-	 * @inheritDoc
-	 */
-	public function serialize(): ?string{
-		return serialize([
-			$this->id,
-			$this->name,
-			$this->colour,
-			$this->permissions,
-			$this->mentionable,
-			$this->hoistedPosition
-		]);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function unserialize($serialized): void{
-		[
-			$this->id,
-			$this->name,
-			$this->colour,
-			$this->permissions,
-			$this->mentionable,
-			$this->hoistedPosition
-		] = unserialize($serialized);
-	}
-
 	public function getId(): int{
 		return $this->id;
 	}
 
-	public function setId(int $id): self{
+	public function setId(int $id): Role{
 		$this->id = $id;
 		return $this;
 	}
@@ -73,7 +45,7 @@ class Role implements \Serializable {
 		return $this->name;
 	}
 
-	public function setName(string $name): self{
+	public function setName(string $name): Role{
 		$this->name = $name;
 		return $this;
 	}
@@ -82,7 +54,7 @@ class Role implements \Serializable {
 		return $this->permissions;
 	}
 
-	public function setPermissions(int $permissions): self{
+	public function setPermissions(int $permissions): Role{
 		$this->permissions = $permissions;
 		return $this;
 	}
@@ -95,7 +67,7 @@ class Role implements \Serializable {
 	 * @param int $colour [0x000000 - 0xFFFFFF]
 	 * @return self
 	 */
-	public function setColour(int $colour): self{
+	public function setColour(int $colour): Role{
 		$this->colour = $colour;
 		return $this;
 	}
@@ -107,7 +79,7 @@ class Role implements \Serializable {
 		return $this->hoistedPosition;
 	}
 
-	public function setHoistedPosition(int $hoistedPosition): self{
+	public function setHoistedPosition(int $hoistedPosition): Role{
 		$this->hoistedPosition = $hoistedPosition;
 		return $this;
 	}
@@ -116,8 +88,32 @@ class Role implements \Serializable {
 		return $this->mentionable;
 	}
 
-	public function setMentionable(bool $mentionable): self{
+	public function setMentionable(bool $mentionable): Role{
 		$this->mentionable = $mentionable;
 		return $this;
+	}
+
+	//----- Serialization -----//
+
+	public function serialize(): ?string{
+		return serialize([
+			$this->id,
+			$this->name,
+			$this->colour,
+			$this->permissions,
+			$this->mentionable,
+			$this->hoistedPosition
+		]);
+	}
+
+	public function unserialize($serialized): void{
+		[
+			$this->id,
+			$this->name,
+			$this->colour,
+			$this->permissions,
+			$this->mentionable,
+			$this->hoistedPosition
+		] = unserialize($serialized);
 	}
 }
