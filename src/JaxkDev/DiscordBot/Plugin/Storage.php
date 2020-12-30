@@ -27,6 +27,7 @@ use JaxkDev\DiscordBot\Communication\Models\User;
 //todo, removes.
 
 class Storage{
+
 	/** @var Array<int, Server> */
 	private static $serverMap = [];
 

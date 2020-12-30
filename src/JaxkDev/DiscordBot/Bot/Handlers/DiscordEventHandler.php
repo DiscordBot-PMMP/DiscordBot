@@ -22,9 +22,8 @@ use JaxkDev\DiscordBot\Communication\Models\Message;
 use JaxkDev\DiscordBot\Communication\Models\User;
 
 class DiscordEventHandler {
-	/**
-	 * @var Client
-	 */
+
+	/** @var Client */
 	private $client;
 
 	public function __construct(Client $client){

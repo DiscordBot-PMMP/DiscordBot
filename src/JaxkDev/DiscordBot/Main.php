@@ -24,34 +24,23 @@ use pocketmine\scheduler\TaskHandler;
 use Volatile;
 
 class Main extends PluginBase {
-	/**
-	 * @var BotThread
-	 */
+
+	/** @var BotThread */
 	private $discordBot;
 
-	/**
-	 * @var Volatile
-	 */
+	/** @var Volatile */
 	private $inboundData, $outboundData;
 
-	/**
-	 * @var TaskHandler
-	 */
+	/** @var TaskHandler */
 	private $tickTask;
 
-	/**
-	 * @var BotCommunicationHandler
-	 */
+	/** @var BotCommunicationHandler */
 	private $botCommsHandler;
 
-	/**
-	 * @var PocketMineEventHandler
-	 */
+	/** @var PocketMineEventHandler */
 	private $pocketmineEventHandler;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $eventConfig;
 
 	public function onLoad(){

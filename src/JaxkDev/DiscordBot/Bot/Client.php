@@ -34,39 +34,26 @@ use pocketmine\utils\MainLogger;
 use React\EventLoop\TimerInterface;
 
 class Client {
-	/**
-	 * @var BotThread
-	 */
+
+	/** @var BotThread */
 	private $thread;
 
-	/**
-	 * @var Discord
-	 */
+	/** @var Discord */
 	private $client;
 
-	/**
-	 * @var PluginCommunicationHandler
-	 */
+	/** @var PluginCommunicationHandler */
 	private $pluginCommsHandler;
 
-	/**
-	 * @var DiscordEventHandler
-	 */
+	/** @var DiscordEventHandler */
 	private $discordEventHandler;
 
-	/**
-	 * @var TimerInterface|null
-	 */
+	/** @var TimerInterface|null */
 	private $readyTimer, $tickTimer;
 
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	private $tickCount, $lastGCCollection = 0;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $config;
 
 	public function __construct(BotThread $thread, array $config) {

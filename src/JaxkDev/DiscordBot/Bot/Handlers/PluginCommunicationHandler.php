@@ -26,14 +26,10 @@ use pocketmine\utils\MainLogger;
 
 class PluginCommunicationHandler {
 
-	/**
-	 * @var Client
-	 */
+	/** @var Client */
 	private $client;
 
-	/**
-	 * @var float
-	 */
+	/** @var float */
 	private $lastHeartbeat;
 
 	public function __construct(Client $client){

@@ -22,24 +22,16 @@ use Volatile;
 
 class BotThread extends Thread {
 
-	/**
-	 * @var AttachableThreadedLogger
-	 */
+	/** @var AttachableThreadedLogger */
 	private $logger;
 
-	/**
-	 * @var array
-	 */
+	/**  @var array */
 	private $initialConfig;
 
-	/**
-	 * @var Volatile
-	 */
+	/** @var Volatile */
 	private $inboundData, $outboundData;
 
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	private $status = Protocol::THREAD_STATUS_STARTING;
 
 	public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData) {
