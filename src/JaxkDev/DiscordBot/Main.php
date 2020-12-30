@@ -21,6 +21,7 @@ use Phar;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
+use pocketmine\utils\MainLogger;
 use Volatile;
 
 class Main extends PluginBase {
@@ -100,7 +101,12 @@ class Main extends PluginBase {
 	public function tick(int $currentTick): void{
 		$data = $this->readInboundData(Protocol::PPT);
 
-		foreach($data as $d) $this->botCommsHandler->handle($d);
+		/** @var Packet $d */
+		foreach($data as $d){
+			if(!$this->botCommsHandler->handle($d)){
+				MainLogger::getLogger()->debug("Packet ".get_class($d)." [".$d->getUID()."] not handled.");
+			}
+		}
 
 		if(($currentTick % 20) === 0){
 			//Run every second. [Faster/More accurate over bots tick]

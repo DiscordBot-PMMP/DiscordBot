@@ -49,6 +49,9 @@ class Storage{
 	/** @var Array<int, Role> */
 	private static $roleMap = [];
 
+	/** @var int */
+	private static $timestamp = 0;
+
 	public static function getServer(int $id): ?Server{
 		return self::$serverMap[$id];
 	}
@@ -97,5 +100,24 @@ class Storage{
 
 	public static function addRole(Role $role): void{
 		self::$roleMap[$role->getId()] = $role;
+	}
+
+	public static function getTimestamp(): int{
+		return self::$timestamp;
+	}
+
+	public static function setTimestamp(int $timestamp): void{
+		self::$timestamp = $timestamp;
+	}
+
+	public static function reset(): void{
+		self::$serverNameMap = [];
+		self::$serverMap = [];
+		self::$channelNameMap = [];
+		self::$channelMap = [];
+		self::$roleMap = [];
+		self::$memberMap = [];
+		self::$userMap = [];
+		self::$timestamp = 0;
 	}
 }

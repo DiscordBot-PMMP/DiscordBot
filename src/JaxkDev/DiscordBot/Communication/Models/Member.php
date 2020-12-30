@@ -113,6 +113,7 @@ class Member implements \Serializable {
 
 	public function serialize(): ?string{
 		return serialize([
+			$this->id,
 			$this->user_id,
 			$this->nickname,
 			$this->join_timestamp,
@@ -124,6 +125,7 @@ class Member implements \Serializable {
 
 	public function unserialize($serialized): void{
 		[
+			$this->id,
 			$this->user_id,
 			$this->nickname,
 			$this->join_timestamp,

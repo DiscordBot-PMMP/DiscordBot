@@ -12,6 +12,11 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
+use JaxkDev\DiscordBot\Communication\Models\Channel;
+use JaxkDev\DiscordBot\Communication\Models\Member;
+use JaxkDev\DiscordBot\Communication\Models\Server;
+use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordAllData;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordMemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordMessageSent;
@@ -19,6 +24,8 @@ use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Main;
+use JaxkDev\DiscordBot\Plugin\Storage;
+use JaxkDev\DiscordBot\Utils;
 use pocketmine\utils\MainLogger;
 
 class BotCommunicationHandler {
@@ -39,6 +46,7 @@ class BotCommunicationHandler {
 		if($packet instanceof DiscordMemberJoin) return $this->handleMemberJoin($packet);
 		if($packet instanceof DiscordMemberLeave) return $this->handleMemberLeave($packet);
 		if($packet instanceof DiscordMessageSent) return $this->handleMessageSent($packet);
+		if($packet instanceof DiscordAllData) return $this->handleAllDiscordData($packet);
 		return false;
 	}
 
@@ -53,44 +61,111 @@ class BotCommunicationHandler {
 
 		if(!in_array($message->getGuildId().".".$message->getChannelId(), $config['channels'])) return true;
 
-		// TODO Cache...
-		/*$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}',
-			'{SERVER_NAME}', '{CHANNEL_ID}', '{CHANNEL_NAME}', '{MESSAGE}'],
-			[date('G:i:s', $data[8]), $data[2], $data[4], $data[3], $data[0], $data[1], $data[5], $data[6], $data[7]],
-			$config['format']);*/
+		//If any of these asserts fire theres a mismatch between Storage and discord.
 
-		$this->plugin->getServer()->broadcastMessage($message->getContent());
+		/** @var Server $guild */
+		$guild = Storage::getServer($message->getGuildId());
+		Utils::assert($guild instanceof Server);
+
+		/** @var Channel $channel */
+		$channel = Storage::getChannel($message->getChannelId());
+		Utils::assert($channel instanceof Channel);
+
+		/** @var Member $author */
+		$author = Storage::getMember($message->getAuthorId()??"");
+		Utils::assert($author instanceof Member);
+
+		/** @var User $user */
+		$user = Storage::getUser($author->getUserId());
+		Utils::assert($user instanceof User);
+
+		/*var_dump($guild);
+		var_dump($channel);
+		var_dump($author);
+		var_dump($user);*/
+
+		$formatted = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}',
+			'{SERVER_NAME}', '{CHANNEL_ID}', '{CHANNEL_NAME}', '{MESSAGE}'], [
+				date('G:i:s', (int)$message->getTimestamp()??0), $author->getUserId(), $user->getUsername(),
+				$user->getDiscriminator(), $guild->getId(), $guild->getName(), $channel->getId(), $channel->getName(),
+				$message->getContent()
+			],
+			$config['format']);
+
+		$this->plugin->getServer()->broadcastMessage($formatted);
 
 		return true;
 	}
 
 	private function handleMemberJoin(DiscordMemberJoin $packet): bool{
-		$member = $packet->getMember();
-
 		$config = $this->plugin->getEventsConfig()['member_join']['fromDiscord'];
 		if(($config['format'] ?? "") === "") return true;
 
-		// TODO Cache... (server name)
-		$message = str_replace(['{TIME}', '{USER_ID}', /*'{USERNAME}', '{USER_DISCRIMINATOR}',*/ '{SERVER_ID}', '{SERVER_NAME}'],
-			[date('G:i:s', $member->getJoinTimestamp()), $member->getId(), /*$member->getUsername(), $member->getDiscriminator(),*/ $member->getGuildId(), "REDACTED"], $config['format']);
+		/** @var Server $guild */
+		$guild = Storage::getServer($packet->getMember()->getGuildId());
+		Utils::assert($guild instanceof Server);
 
-		$this->plugin->getServer()->broadcastMessage($message);
+		$member = $packet->getMember();
+		$user = $packet->getUser();
+
+		Storage::addMember($member);
+		Storage::addUser($user);
+
+		$formatted = str_replace(
+			['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
+			[date('G:i:s', $member->getJoinTimestamp()), $member->getId(), $user->getUsername(),
+				$user->getDiscriminator(), $guild->getId(), $guild->getName()], $config['format']);
+
+		$this->plugin->getServer()->broadcastMessage($formatted);
 
 		return true;
 	}
 
 	private function handleMemberLeave(DiscordMemberLeave $packet): bool{
-		$member = $packet->getMemberID();
-
 		$config = $this->plugin->getEventsConfig()['member_leave']['fromDiscord'];
 		if(($config['format'] ?? "") === "") return true;
 
-		// TODO Cache... (server name)
-		/*$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
-			[date('G:i:s', $member->getJoinTimestamp()), $member->getId(), $member->getUsername(), $member->getDiscriminator(), $member->getGuildId(), "REDACTED"], $config['format']);
-		*/
+		/** @var Member $member */
+		$member = Storage::getMember($packet->getMemberID());
+		Utils::assert($member instanceof Member);
 
-		$this->plugin->getServer()->broadcastMessage($member." Has left.");
+		/** @var Server $server */
+		$server = Storage::getServer($member->getGuildId());
+		Utils::assert($server instanceof Server);
+
+		/** @var User $user */
+		$user = Storage::getUser($member->getUserId());
+		Utils::assert($user instanceof User);
+
+		$formatted = str_replace(
+			['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
+			[date('G:i:s', $member->getJoinTimestamp()), $user->getId(), $user->getUsername(),
+				$user->getDiscriminator(), $server->getId(), $server->getName()], $config['format']);
+
+		$this->plugin->getServer()->broadcastMessage($formatted);
+
+		return true;
+	}
+
+	public function handleAllDiscordData(DiscordAllData $packet): bool{
+		//Todo verify packet before resetting data.
+		Storage::reset();
+		foreach($packet->getServers() as $server){
+			Storage::addServer($server);
+		}
+		foreach($packet->getChannels() as $channel){
+			Storage::addChannel($channel);
+		}
+		foreach($packet->getRoles() as $role){
+			Storage::addRole($role);
+		}
+		foreach($packet->getMembers() as $member){
+			Storage::addMember($member);
+		}
+		foreach($packet->getUsers() as $user){
+			Storage::addUser($user);
+		}
+		Storage::setTimestamp($packet->getTimestamp());
 
 		return true;
 	}

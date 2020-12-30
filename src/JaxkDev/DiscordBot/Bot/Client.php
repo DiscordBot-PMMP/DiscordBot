@@ -15,7 +15,10 @@ namespace JaxkDev\DiscordBot\Bot;
 use Discord\Discord;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Guild\Guild as DiscordGuild;
+use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Activity as DiscordActivity;
+use Discord\Parts\User\Member as DiscordMember;
+use Discord\Parts\User\User as DiscordUser;
 use Error;
 use ErrorException;
 use Exception;
@@ -23,7 +26,13 @@ use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\Bot\Handlers\PluginCommunicationHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Models\Activity;
+use JaxkDev\DiscordBot\Communication\Models\Channel;
+use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Communication\Models\Role;
+use JaxkDev\DiscordBot\Communication\Models\Server;
+use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordAllData;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Utils;
@@ -158,6 +167,94 @@ class Client {
 			// Register all over events.
 			$this->discordEventHandler->registerEvents();
 
+			// Dump all discord data.
+			$pk = new DiscordAllData();
+			$pk->setTimestamp(time());
+
+			MainLogger::getLogger()->debug("Starting the data pack, this can take up to a minute please be patient.\nNote this does not effect the main thread.");
+			$t = microtime(true);
+			$mem = memory_get_usage(true);
+
+			/** @var DiscordGuild $guild */
+			foreach($this->client->guilds as $guild){
+				$server = new Server();
+				$server->setId((int)$guild->id)
+					->setCreationTimestamp(Utils::convertIdToTime($guild->id))
+					->setIconUrl($guild->icon)
+					->setLarge($guild->large)
+					->setMemberCount($guild->member_count)
+					->setName($guild->name)
+					->setOwnerId((int)$guild->owner_id)
+					->setRegion($guild->region);
+				$pk->addServer($server);
+
+				/** @var DiscordChannel $channel */
+				foreach($guild->channels as $channel){
+					if($channel->type !== DiscordChannel::TYPE_TEXT) continue;
+					$ch = new Channel();
+					$ch->setName($channel->name)
+						->setId((int)$channel->id)
+						->setCategory(null) //todo, parent_id gives ID of channel (Type_category)
+						->setDescription($channel->topic)
+						->setServerId((int)$guild->id);
+					$pk->addChannel($ch);
+				}
+
+				/** @var DiscordRole $role */
+				foreach($guild->roles as $role){
+					$r = new Role();
+					$r->setServerId((int)$guild->id)
+						->setId((int)$role->id)
+						->setName($role->name)
+						->setColour($role->color)
+						->setHoistedPosition($role->position)
+						->setMentionable($role->mentionable)
+						->setPermissions($role->permissions->bitwise);
+					$pk->addRole($r);
+				}
+
+				/** @var DiscordMember $member */
+				foreach($guild->members as $member){
+					$m = new Member();
+					$m->setGuildId((int)$guild->id)
+						->setUserId((int)$member->user->id)
+						->setNickname($member->nick)
+						->setJoinTimestamp($member->joined_at->getTimestamp())
+						->setBoostTimestamp($member->premium_since === null ? null : $member->premium_since->getTimestamp())
+						->setId();
+
+					/** @var int[] $roles */
+					$roles = [];
+
+					/** @var DiscordRole $role */
+					foreach($member->roles as $role){
+						$roles[] = (int)$role->id;
+					}
+					$m->setRolesId($roles);
+
+					$pk->addMember($m);
+				}
+			}
+
+			/** @var DiscordUser $user */
+			foreach($this->client->users as $user){
+				$u = new User();
+				$u->setId((int)$user->id)
+					->setCreationTimestamp((int)$user->createdTimestamp())
+					->setAvatarUrl($user->avatar)
+					->setDiscriminator((int)$user->discriminator)
+					->setUsername($user->username);
+				$pk->addUser($u);
+			}
+
+			$this->thread->writeOutboundData($pk);
+
+			MainLogger::getLogger()->debug("Data pack Took: ".round(microtime(true)-$t, 5)."s & ".
+				round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
+
+			// Force fresh heartbeat asap, as that took quite some time.
+			$this->getPluginCommunicationHandler()->sendHeartbeat();
+
 			$this->thread->setStatus(Protocol::THREAD_STATUS_READY);
 			MainLogger::getLogger()->info("Client ready.");
 
@@ -178,8 +275,8 @@ class Client {
 			//GC Tests.
 			if(microtime(true)-$this->lastGCCollection >= 600){
 				$cycles = gc_collect_cycles();
-				$mem = gc_mem_caches();
-				MainLogger::getLogger()->debug("[GC] Claimed {$mem}b and {$cycles} cycles.");
+				$mem = round(gc_mem_caches()/1024, 3);
+				MainLogger::getLogger()->debug("[GC] Claimed {$mem}kb and {$cycles} cycles.");
 				$this->lastGCCollection = time();
 			}
 		}

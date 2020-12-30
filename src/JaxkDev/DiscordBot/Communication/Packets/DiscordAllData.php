@@ -35,6 +35,83 @@ class DiscordAllData extends Packet{
 	/** @var User[] */
 	private $users = [];
 
+	/** @var int */
+	private $timestamp;
+
+	public function addServer(Server $server): DiscordAllData{
+		$this->servers[] = $server;
+		return $this;
+	}
+
+	/**
+	 * @return Server[]
+	 */
+	public function getServers(): array{
+		return $this->servers;
+	}
+
+	public function addChannel(Channel $channel): DiscordAllData{
+		$this->channels[] = $channel;
+		return $this;
+	}
+
+	/**
+	 * @return Channel[]
+	 */
+	public function getChannels(): array{
+		return $this->channels;
+	}
+
+	public function addRole(Role $role): DiscordAllData{
+		$this->roles[] = $role;
+		return $this;
+	}
+
+	/**
+	 * @return Role[]
+	 */
+	public function getRoles(): array{
+		return $this->roles;
+	}
+
+	public function addMember(Member $member): DiscordAllData{
+		$this->members[] = $member;
+		return $this;
+	}
+
+	/**
+	 * @return Member[]
+	 */
+	public function getMembers(): array{
+		return $this->members;
+	}
+
+	public function addUser(User $user): DiscordAllData{
+		$this->users[] = $user;
+		return $this;
+	}
+
+	/**
+	 * @return User[]
+	 */
+	public function getUsers(): array{
+		return $this->users;
+	}
+
+	public function setTimestamp(int $timestamp): DiscordAllData{
+		$this->timestamp = $timestamp;
+		return $this;
+	}
+
+	public function getTimestamp(): int{
+		return $this->timestamp;
+	}
+
+	public function getSize(): int{
+		return sizeof($this->servers)+sizeof($this->channels)
+			+sizeof($this->roles)+sizeof($this->members)+sizeof($this->users);
+	}
+
 	public function serialize(): ?string{
 		return serialize([
 			$this->UID,
@@ -42,7 +119,8 @@ class DiscordAllData extends Packet{
 			$this->channels,
 			$this->roles,
 			$this->members,
-			$this->users
+			$this->users,
+			$this->timestamp
 		]);
 	}
 
@@ -53,7 +131,8 @@ class DiscordAllData extends Packet{
 			$this->channels,
 			$this->roles,
 			$this->members,
-			$this->users
+			$this->users,
+			$this->timestamp
 		] = unserialize($serialized);
 	}
 }

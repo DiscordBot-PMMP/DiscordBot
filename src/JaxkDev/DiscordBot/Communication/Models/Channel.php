@@ -31,7 +31,7 @@ class Channel implements \Serializable {
 	//private $type = self::TYPE_TEXT;
 	//TODO, Think about DM channel where name,cat,desc,server etc is N/A.
 
-	/** @var string */
+	/** @var string|null */
 	private $description;
 
 	/** @var int */
@@ -61,11 +61,11 @@ class Channel implements \Serializable {
 		return $this->type;
 	}*/
 
-	public function getDescription(): string{
+	public function getDescription(): ?string{
 		return $this->description;
 	}
 
-	public function setDescription(string $description): Channel{
+	public function setDescription(?string $description): Channel{
 		$this->description = $description;
 		return $this;
 	}
@@ -95,7 +95,8 @@ class Channel implements \Serializable {
 			$this->id,
 			$this->name,
 			$this->category,
-			$this->description
+			$this->description,
+			$this->server_id
 		]);
 	}
 
@@ -104,7 +105,8 @@ class Channel implements \Serializable {
 			$this->id,
 			$this->name,
 			$this->category,
-			$this->description
+			$this->description,
+			$this->server_id
 		] = unserialize($serialized);
 	}
 }
