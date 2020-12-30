@@ -14,9 +14,6 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 
 class Heartbeat extends Packet {
 
-	/* PacketID */
-	const ID = 1;
-
 	/** @var float */
 	private $heartbeat;
 
@@ -29,10 +26,10 @@ class Heartbeat extends Packet {
 	}
 
 	public function serialize(): ?string{
-		return serialize($this->heartbeat);
+		return serialize([$this->UID, $this->heartbeat]);
 	}
 
 	public function unserialize($serialized): void{
-		$this->heartbeat = unserialize($serialized);
+		[$this->UID, $this->heartbeat] = unserialize($serialized);
 	}
 }

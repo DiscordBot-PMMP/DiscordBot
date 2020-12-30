@@ -15,18 +15,8 @@ namespace JaxkDev\DiscordBot\Communication;
 abstract class Protocol {
 
 	const
-		PPT = 50, 					// How much data should be processed per tick ?
-		HEARTBEAT_ALLOWANCE = 5;	// How long until declared dead. (seconds)
-
-	/*
-	const 							// Emitted by, Plugin|Bot
-		ID_HEARTBEAT = 0,			// P|B
-		ID_UPDATE_ACTIVITY = 1,		// P|
-		ID_SEND_MESSAGE	= 2,		// P|
-		ID_EVENT_READY = "x",		//  |B (Large event) (IDEA NOT IMPLEMENTED)
-		ID_EVENT_MESSAGE_SENT = 3,	//  |B
-		ID_EVENT_MEMBER_JOIN = 4,	//  |B
-		ID_EVENT_MEMBER_LEAVE = 5;	//  |B*/
+		PPT = 50, 					// How many packets should be processed per tick ?   [PacketsPerTick]
+		HEARTBEAT_ALLOWANCE = 5;	// How long between last known heartbeat until declared dead. (seconds)
 
 	const
 		THREAD_STATUS_STARTING = 0,
@@ -34,9 +24,4 @@ abstract class Protocol {
 		THREAD_STATUS_READY = 2,
 		THREAD_STATUS_CLOSING = 8,
 		THREAD_STATUS_CLOSED = 9;
-
-	/*const
-		ACTIVITY_TYPE_PLAYING = 0,
-		ACTIVITY_TYPE_STREAMING = 1,
-		ACTIVITY_TYPE_LISTENING = 2;*/
 }

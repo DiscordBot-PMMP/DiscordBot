@@ -13,6 +13,8 @@
 namespace JaxkDev\DiscordBot\Bot;
 
 use Discord\Discord;
+use Discord\Parts\Channel\Channel as DiscordChannel;
+use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Error;
 use ErrorException;
@@ -22,7 +24,9 @@ use JaxkDev\DiscordBot\Bot\Handlers\PluginCommunicationHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Utils;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
@@ -58,7 +62,7 @@ class Client {
 	/**
 	 * @var int
 	 */
-	private $tickCount = 1;
+	private $tickCount, $lastGCCollection = 0;
 
 	/**
 	 * @var array
@@ -80,6 +84,9 @@ class Client {
 		// TODO CDT Investigate.
 		ini_set("date.timezone", "UTC");
 		MainLogger::getLogger()->debug("Log files will be in UTC timezone.");
+
+		Utils::$BOT_THREAD = true;
+		Packet::$UID_COUNT = 1;
 
 		$logger = new Logger('DiscordPHP');
 		$httpLogger = new Logger('DiscordPHP.HTTP');
@@ -157,6 +164,10 @@ class Client {
 				$this->readyTimer = null;
 			}
 
+			$ac = new Activity();
+			$ac->setMessage("In PocketMine-MP.")->setType(Activity::TYPE_PLAYING)->setStatus(Activity::STATUS_IDLE);
+			$this->updatePresence($ac);
+
 			// Register all over events.
 			$this->discordEventHandler->registerEvents();
 
@@ -176,6 +187,14 @@ class Client {
 			//Run every second.
 			$this->pluginCommsHandler->checkHeartbeat();
 			$this->pluginCommsHandler->sendHeartbeat();
+
+			//GC Tests.
+			if(microtime(true)-$this->lastGCCollection >= 600){
+				$cycles = gc_collect_cycles();
+				$mem = gc_mem_caches();
+				MainLogger::getLogger()->debug("[GC] Claimed {$mem}b and {$cycles} cycles.");
+				$this->lastGCCollection = time();
+			}
 		}
 
 		$this->tickCount++;
@@ -200,18 +219,17 @@ class Client {
 	public function sendMessage(Message $message): void{
 		if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) return;
 
-		var_dump("Sending message...Not.");
-		//** @noinspection PhpUnhandledExceptionInspection */
-		/*$this->client->guilds->fetch($guild)->done(function(Guild $guild) use($channel, $content) {
-			$guild->channels->fetch($channel)->done(function(Channel $channel) use($guild, $content) {
-				$channel->sendMessage($content);
-				MainLogger::getLogger()->debug("Sent message(".strlen($content).") to ({$guild->id}|{$channel->id})");
-			}, function() use($guild, $channel) {
-				MainLogger::getLogger()->warning("Failed to fetch channel {$channel} in guild {$guild->id} while attempting to send message.");
+		/** @noinspection PhpUnhandledExceptionInspection */
+		$this->client->guilds->fetch((string)$message->getGuildId())->done(function(DiscordGuild $guild) use($message) {
+			$guild->channels->fetch((string)$message->getChannelId())->done(function(DiscordChannel $channel) use($message) {
+				$channel->sendMessage($message->getContent());
+				MainLogger::getLogger()->debug("Sent message(".strlen($message->getContent()).") to ({$message->getGuildId()}|{$message->getChannelId()})");
+			}, function() use($message) {
+				MainLogger::getLogger()->warning("Failed to fetch channel {$message->getChannelId()} in guild {$message->getGuildId()} while attempting to send message.");
 			});
-		}, function() use($guild) {
-			MainLogger::getLogger()->warning("Failed to fetch guild ${guild} while attempting to send message.");
-		});*/
+		}, function() use($message) {
+			MainLogger::getLogger()->warning("Failed to fetch guild {$message->getGuildId()} while attempting to send message.");
+		});
 	}
 
 	public function updatePresence(Activity $activity): bool{
@@ -259,6 +277,7 @@ class Client {
 		}
 		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
 		MainLogger::getLogger()->debug("Client closed.");
+		//if(extension_loaded('xdebug')) var_dump(xdebug_stop_gcstats());
 		exit(0);
 	}
 }

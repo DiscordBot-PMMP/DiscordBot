@@ -17,9 +17,9 @@ use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\User\Member as DiscordMember;
 use JaxkDev\DiscordBot\Bot\Client;
-use JaxkDev\DiscordBot\Communication\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Communication\Models\User;
 
 class DiscordEventHandler {
 	/**
@@ -36,6 +36,14 @@ class DiscordEventHandler {
 		$discord->on('MESSAGE_CREATE', array($this, 'onMessage'));
 		$discord->on('GUILD_MEMBER_ADD', array($this, 'onMemberJoin'));
 		$discord->on('GUILD_MEMBER_REMOVE', array($this, 'onMemberLeave'));
+		/**
+		 * TODO:
+		 * SERVER_JOIN/LEAVE/EDIT
+		 * CHANNEL_CREATE/DELETE/EDIT
+		 * MEMBER_EDIT (Roles,nickname etc)
+		 * ROLE_CREATE/DELETE/EDIT
+		 * MESSAGE_DELETE/EDIT
+		 */
 	}
 
 	public function onMessage(DiscordMessage $message, Discord $discord): void{
@@ -48,39 +56,14 @@ class DiscordEventHandler {
 		if($message->channel->type !== DiscordChannel::TYPE_TEXT) return;
 		if(($message->content ?? "") === "") return; //Images/Files, can be empty strings or just null in other cases.
 
-		/* Clean mentions, TODO Should we clean content before sending ?
-		// Channels:
-		$message->content = preg_replace_callback("/<#[0-9]+>/", function($d){
-			$id = substr($d[0], 2, 18); //Fixed format afaik.
-			$channel = $this->client->getDiscordClient()->getChannel($id);
-			if($channel === null) return $d[0];
-			return "#".$channel->name;
-		}, $message->content) ?? "";
-
-		// Users:
-		$message->content = preg_replace_callback("/<@!?[0-9]+>/", function($d){
-			$id = substr($d[0], ($d[0][2] === "!" ? 3 : 2), 18);
-			$user = $this->client->getDiscordClient()->users->get("id", $id);
-			if($user === null) return $d[0];
-			return "@".$user->username."#".$user->discriminator;
-		}, $message->content) ?? "";
-
-		// Roles:
-		$message->content = preg_replace_callback("/<@&[0-9]+>/", function($d) use($message){
-			$id = substr($d[0], ($d[0][2] === "&" ? 3 : 2), 18);
-			$role = $message->author->guild->roles->get("id", $id);
-			if($role === null) return $d[0];
-			return "@".$role->name;
-		}, $message->content) ?? "";*/
-
 		if($message->channel->guild_id === null) throw new \AssertionError("GuildID Cannot be null.");
 
 		$m = new Message();
-		$m->setId($message->id)
+		$m->setId((int)$message->id)
 			->setTimestamp($message->timestamp->getTimestamp())
-			->setAuthorId($message->author->user->id)
-			->setChannelId($message->channel_id)
-			->setGuildId($message->channel->guild_id)
+			->setAuthorId(($message->channel->guild_id.".".$message->author->id))
+			->setChannelId((int)$message->channel_id)
+			->setGuildId((int)$message->channel->guild_id)
 			->setEveryoneMentioned($message->mention_everyone)
 			->setContent($message->content)
 			->setChannelsMentioned(array_keys($message->mention_channels->toArray()))
@@ -91,46 +74,27 @@ class DiscordEventHandler {
 	}
 
 	public function onMemberJoin(DiscordMember $member, Discord $discord): void{
-		$activity = new Activity();
-		$activity->setType($member->game->type)
-			->setMessage($member->game->name)
-			->setStatus($member->game->state);
+		//TODO, Do we send user data here as well ?
+		$u = new User();
+		$u->setId((int)$member->id)
+			->setUsername($member->username)
+			->setDiscriminator((int)$member->user->discriminator)
+			->setCreationTimestamp((int)($member->user->createdTimestamp()??0))
+			->setAvatarUrl($member->user->avatar);
 
 		$m = new Member();
-		$m->setId($member->id)
-			->setUsername($member->username)
-			->setActivity($activity)
-			->setStatus($member->status)
-			->setAvatarUrl($member->user->avatar)
+		$m->setUserId((int)$member->id)
 			->setBoostTimestamp(null)
-			->setDiscriminator($member->user->discriminator)
-			->setGuildId($member->guild_id)
+			->setGuildId((int)$member->guild_id)
 			->setJoinTimestamp($member->joined_at->getTimestamp())
 			->setNickname($member->nick)
-			->setRolesId(array_keys($member->roles->toArray()));
+			->setRolesId(array_keys($member->roles->toArray()))
+			->setId();
 
-		$this->client->getPluginCommunicationHandler()->sendMemberJoinEvent($m);
+		$this->client->getPluginCommunicationHandler()->sendMemberJoinEvent($m, $u);
 	}
 
 	public function onMemberLeave(DiscordMember $member, Discord $discord): void{
-		$activity = new Activity();
-		$activity->setType($member->game->type)
-			->setMessage($member->game->name)
-			->setStatus($member->game->state);
-
-		$m = new Member();
-		$m->setId($member->id)
-			->setUsername($member->username)
-			->setActivity($activity)
-			->setStatus($member->status)
-			->setAvatarUrl($member->user->avatar)
-			->setBoostTimestamp(null)
-			->setDiscriminator($member->user->discriminator)
-			->setGuildId($member->guild_id)
-			->setJoinTimestamp($member->joined_at !== null ? $member->joined_at->getTimestamp() : 0)
-			->setNickname($member->nick)
-			->setRolesId(array_keys($member->roles->toArray()));
-
-		$this->client->getPluginCommunicationHandler()->sendMemberLeaveEvent($m);
+		$this->client->getPluginCommunicationHandler()->sendMemberLeaveEvent($member->guild_id.".".$member->id);
 	}
 }

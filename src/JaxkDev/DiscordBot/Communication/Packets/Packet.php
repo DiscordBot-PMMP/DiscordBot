@@ -14,8 +14,21 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 
 abstract class Packet implements \Serializable {
 
-	/* PacketID Not used yet, just for auto generating packet map */
-	const ID = 0;
+	// Used to track packets, (ACK's)
+	/** @var int */
+	public static $UID_COUNT = 0;
+
+	/** @var int */
+	protected $UID;
+
+	public function __construct(){
+		Packet::$UID_COUNT += 2;  //BotThread = Odd, PluginThread = Even. (Keeps them unique, *shrugs*)
+		$this->UID = Packet::$UID_COUNT;
+	}
+
+	public function getUID(): int{
+		return $this->UID;
+	}
 
 	public abstract function serialize(): ?string;
 

@@ -20,14 +20,11 @@ use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\CommandEvent;
 
 class PocketMineEventHandler implements Listener{
-	/**
-	 * @var Main
-	 */
+
+	/** @var Main */
 	private $plugin;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $eventConfig;
 
 	public function __construct(Main $plugin, array $eventConfig) {

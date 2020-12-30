@@ -49,12 +49,10 @@ class BotThread extends Thread {
 		$this->outboundData = $outboundData;
 	}
 
-	public function run() {
-		$this->registerClassLoader();
+	public function run(){
+		if($this->logger instanceof MainLogger) $this->logger->registerStatic();
 
-		if($this->logger instanceof MainLogger){
-			$this->logger->registerStatic();
-		}
+		$this->registerClassLoader();
 
 		/** @noinspection PhpIncludeInspection */
 		require_once(\JaxkDev\DiscordBot\COMPOSER);

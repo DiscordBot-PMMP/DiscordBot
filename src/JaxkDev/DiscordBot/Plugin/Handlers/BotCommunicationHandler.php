@@ -22,14 +22,11 @@ use JaxkDev\DiscordBot\Main;
 use pocketmine\utils\MainLogger;
 
 class BotCommunicationHandler {
-	/**
-	 * @var Main
-	 */
+
+	/** @var Main */
 	private $plugin;
 
-	/**
-	 * @var float
-	 */
+	/** @var float */
 	private $lastHeartbeat;
 
 	public function __construct(Main $plugin){
@@ -37,14 +34,11 @@ class BotCommunicationHandler {
 	}
 
 	public function handle(Packet $packet): bool{
-		// TODO, Dictionary Based compression of servers to reduce load/memory going across threads.
 		// If's instances instead of ID switching due to phpstan/types.
 		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
 		if($packet instanceof DiscordMemberJoin) return $this->handleMemberJoin($packet);
 		if($packet instanceof DiscordMemberLeave) return $this->handleMemberLeave($packet);
 		if($packet instanceof DiscordMessageSent) return $this->handleMessageSent($packet);
-
-		// throw new \InvalidKeyException("Invalid ID ({$data[0]}) Received from internal communication.");
 		return false;
 	}
 
@@ -77,8 +71,8 @@ class BotCommunicationHandler {
 		if(($config['format'] ?? "") === "") return true;
 
 		// TODO Cache... (server name)
-		$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
-			[date('G:i:s', $member->getJoinTimestamp()), $member->getId(), $member->getUsername(), $member->getDiscriminator(), $member->getGuildId(), "REDACTED"], $config['format']);
+		$message = str_replace(['{TIME}', '{USER_ID}', /*'{USERNAME}', '{USER_DISCRIMINATOR}',*/ '{SERVER_ID}', '{SERVER_NAME}'],
+			[date('G:i:s', $member->getJoinTimestamp()), $member->getId(), /*$member->getUsername(), $member->getDiscriminator(),*/ $member->getGuildId(), "REDACTED"], $config['format']);
 
 		$this->plugin->getServer()->broadcastMessage($message);
 
@@ -86,16 +80,17 @@ class BotCommunicationHandler {
 	}
 
 	private function handleMemberLeave(DiscordMemberLeave $packet): bool{
-		$member = $packet->getMember();
+		$member = $packet->getMemberID();
 
 		$config = $this->plugin->getEventsConfig()['member_leave']['fromDiscord'];
 		if(($config['format'] ?? "") === "") return true;
 
 		// TODO Cache... (server name)
-		$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
+		/*$message = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
 			[date('G:i:s', $member->getJoinTimestamp()), $member->getId(), $member->getUsername(), $member->getDiscriminator(), $member->getGuildId(), "REDACTED"], $config['format']);
+		*/
 
-		$this->plugin->getServer()->broadcastMessage($message);
+		$this->plugin->getServer()->broadcastMessage($member." Has left.");
 
 		return true;
 	}

@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Bot\Handlers;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordMemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordMessageSent;
@@ -40,8 +41,6 @@ class PluginCommunicationHandler {
 	}
 
 	public function handle(Packet $packet): bool{
-		// Utils::assert(is_int($data[0]), "Corrupt internal communication data received.");
-
 		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
 		//if($packet instanceof UpdateActivity) return $this->handleUpdateActivity($packet);
 		//if($packet instanceof SendMessage) return $this->handleSendMessage($packet;
@@ -86,15 +85,16 @@ class PluginCommunicationHandler {
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
-	public function sendMemberJoinEvent(Member $member): void{
+	public function sendMemberJoinEvent(Member $member, User $user): void{
 		$packet = new DiscordMemberJoin();
 		$packet->setMember($member);
+		$packet->setUser($user);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
-	public function sendMemberLeaveEvent(Member $member): void{
+	public function sendMemberLeaveEvent(string $member_id): void{
 		$packet = new DiscordMemberLeave();
-		$packet->setMember($member);
+		$packet->setMemberID($member_id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 

@@ -18,7 +18,7 @@ class Channel implements \Serializable {
 		TYPE_TEXT = 0,
 		TYPE_VOICE = 1;
 
-	/** @var string */
+	/** @var int */
 	private $id;
 
 	/** @var string */
@@ -29,15 +29,19 @@ class Channel implements \Serializable {
 
 	///** @var int */
 	//private $type = self::TYPE_TEXT;
+	//TODO, Think about DM channel where name,cat,desc,server etc is N/A.
 
 	/** @var string */
 	private $description;
 
-	public function getId(): string{
+	/** @var int */
+	private $server_id;
+
+	public function getId(): int{
 		return $this->id;
 	}
 
-	public function setId(string $id): Channel{
+	public function setId(int $id): Channel{
 		$this->id = $id;
 		return $this;
 	}
@@ -51,7 +55,8 @@ class Channel implements \Serializable {
 		return $this;
 	}
 
-	/* No setType, intentional.
+	// No setType, intentional.
+	/*
 	public function getType(): int{
 		return $this->type;
 	}*/
@@ -71,6 +76,15 @@ class Channel implements \Serializable {
 
 	public function setCategory(?string $category): Channel{
 		$this->category = $category;
+		return $this;
+	}
+
+	public function getServerId(): int{
+		return $this->server_id;
+	}
+
+	public function setServerId(int $server_id): Channel{
+		$this->server_id = $server_id;
 		return $this;
 	}
 

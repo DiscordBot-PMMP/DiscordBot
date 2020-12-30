@@ -28,4 +28,10 @@ abstract class Utils {
 				$message instanceof Throwable ? $message : null);
 		}
 	}
+
+	/**
+	 * Used to distinguish which thread you are in, at runtime.
+	 * @var bool
+	 */
+	public static $BOT_THREAD = false;
 }

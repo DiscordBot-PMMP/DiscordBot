@@ -37,7 +37,7 @@ class Activity implements \Serializable {
 	/** @var ?int */
 	private $type;
 
-	/** @var ?string */
+	/** @var string */
 	private $status;
 
 	public function getMessage(): ?string{
@@ -59,11 +59,11 @@ class Activity implements \Serializable {
 		return $this;
 	}
 
-	public function getStatus(): ?string{
+	public function getStatus(): string{
 		return $this->status;
 	}
 
-	public function setStatus(?string $status): Activity{
+	public function setStatus(string $status): Activity{
 		$this->status = $status;
 		return $this;
 	}
@@ -73,14 +73,16 @@ class Activity implements \Serializable {
 	public function serialize(): ?string{
 		return serialize([
 			$this->message,
-			$this->type
+			$this->type,
+			$this->status
 		]);
 	}
 
 	public function unserialize($serialized): void{
 		[
 			$this->message,
-			$this->type
+			$this->type,
+			$this->status
 		] = unserialize($serialized);
 	}
 }

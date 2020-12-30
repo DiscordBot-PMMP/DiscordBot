@@ -16,8 +16,6 @@ use JaxkDev\DiscordBot\Communication\Models\Message;
 
 class DiscordMessageSent extends Packet{
 
-	const ID = 3;
-
 	/** @var Message */
 	private $message;
 
@@ -30,10 +28,10 @@ class DiscordMessageSent extends Packet{
 	}
 
 	public function serialize(): ?string{
-		return serialize($this->message);
+		return serialize([$this->UID, $this->message]);
 	}
 
 	public function unserialize($serialized): void{
-		$this->message = unserialize($serialized);
+		[$this->UID, $this->message] = unserialize($serialized);
 	}
 }

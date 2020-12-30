@@ -12,28 +12,24 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-use JaxkDev\DiscordBot\Communication\Models\Member;
-
 class DiscordMemberLeave extends Packet{
 
-	const ID = 5;
+	/** @var string */
+	private $member_id;
 
-	/** @var Member */
-	private $member;
-
-	public function getMember(): Member{
-		return $this->member;
+	public function getMemberID(): string{
+		return $this->member_id;
 	}
 
-	public function setMember(Member $member): void{
-		$this->member = $member;
+	public function setMemberID(string $id): void{
+		$this->member_id = $id;
 	}
 
 	public function serialize(): ?string{
-		return serialize($this->member);
+		return serialize([$this->UID, $this->member_id]);
 	}
 
 	public function unserialize($serialized): void{
-		$this->member = unserialize($serialized);
+		[$this->UID, $this->member_id] = unserialize($serialized);
 	}
 }

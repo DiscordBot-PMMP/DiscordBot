@@ -114,7 +114,7 @@ class Main extends PluginBase {
 		foreach($data as $d) $this->botCommsHandler->handle($d);
 
 		if(($currentTick % 20) === 0){
-			//Run every second.
+			//Run every second. [Faster/More accurate over bots tick]
 			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_READY) $this->botCommsHandler->checkHeartbeat();
 			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_CLOSED) $this->stopAll();
 			$this->botCommsHandler->sendHeartbeat();
