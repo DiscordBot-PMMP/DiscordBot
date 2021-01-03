@@ -10,13 +10,14 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot;
+namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Plugin\Handlers\PocketMineEventHandler;
 use JaxkDev\DiscordBot\Plugin\Handlers\BotCommunicationHandler;
+use JaxkDev\DiscordBot\Utils;
 use Phar;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
@@ -56,7 +57,7 @@ class Main extends PluginBase {
 
 		$this->saveResource("config.yml");
 		$this->saveResource("events.yml");
-		$this->saveResource("HELP_ENG.txt");
+		$this->saveResource("HELP_ENG.txt", true); //Always keep that up-to-date.
 
 		$this->getLogger()->debug("Loading initial configuration...");
 
@@ -65,6 +66,8 @@ class Main extends PluginBase {
 			$this->getLogger()->critical("Failed to parse config.yml");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 		}
+		$config = (array)$config;
+
 		// TODO Verify Config before using it.
 		$config['logging']['directory'] = $this->getDataFolder().DIRECTORY_SEPARATOR.($initialConfig['logging']['directory'] ?? "logs");
 
@@ -75,6 +78,14 @@ class Main extends PluginBase {
 		}
 
 		$this->getLogger()->debug("Constructing DiscordBot...");
+
+		if($config['version'] !== ConfigUtils::VERSION){
+			$this->getLogger()->info("Updating your config from v{$config['version']} to v" . ConfigUtils::VERSION);
+			ConfigUtils::update($config);
+			rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
+			yaml_emit_file($this->getDataFolder() . "config.yml", $config);
+			$this->getLogger()->info("Config updated, old config was saved to '{$this->getDataFolder()}config.yml.old'");
+		}
 
 		$this->inboundData = new Volatile();
 		$this->outboundData = new Volatile();

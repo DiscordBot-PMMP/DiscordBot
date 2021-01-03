@@ -98,11 +98,19 @@ class Client {
 		}
 
 		// TODO Intents.
+
+		$socket_opts = [];
+		if($config['security']['disable_ssl']){
+			MainLogger::getLogger()->warning("SSL/TLS verification has been disabled.");
+			$socket_opts['tls'] = ['verify_peer' => false, 'verify_peer_name' => false];
+		}
+
 		/** @noinspection PhpUnhandledExceptionInspection */
 		$this->client = new Discord([
 			'token' => $config['discord']['token'],
 			'logger' => $logger,
 			'httpLogger' => $httpLogger,
+			'socket_options' => $socket_opts,
 			'loadAllMembers' => true  // Seems like this is the only way...
 		]);
 

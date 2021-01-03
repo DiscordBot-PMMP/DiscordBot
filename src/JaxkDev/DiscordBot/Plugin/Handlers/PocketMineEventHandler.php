@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
-use JaxkDev\DiscordBot\Main;
+use JaxkDev\DiscordBot\Plugin\Main;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerJoinEvent;

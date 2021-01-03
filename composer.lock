@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3611d115f0fdb18ffc2de0b4cef1b0fe",
+    "content-hash": "2d44efb37db2c5bdbb5174f102b65976",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -1826,16 +1826,16 @@
         },
         {
             "name": "team-reflex/discord-php",
-            "version": "dev-master",
+            "version": "dev-beta",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JaxkDev/DiscordPHPSlim.git",
-                "reference": "1bcbef244d4fb30485f8f94af82811f79d1793ed"
+                "reference": "4e6129846333defac7ccd6e72f264da9bfbb8f02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JaxkDev/DiscordPHPSlim/zipball/1bcbef244d4fb30485f8f94af82811f79d1793ed",
-                "reference": "1bcbef244d4fb30485f8f94af82811f79d1793ed",
+                "url": "https://api.github.com/repos/JaxkDev/DiscordPHPSlim/zipball/4e6129846333defac7ccd6e72f264da9bfbb8f02",
+                "reference": "4e6129846333defac7ccd6e72f264da9bfbb8f02",
                 "shasum": ""
             },
             "require": {
@@ -1896,10 +1896,10 @@
             ],
             "description": "An unofficial API to interact with the voice and text service Discord.",
             "support": {
-                "source": "https://github.com/JaxkDev/DiscordPHPSlim/tree/v1.0.0",
+                "source": "https://github.com/JaxkDev/DiscordPHPSlim/tree/beta",
                 "issues": "https://github.com/JaxkDev/DiscordPHPSlim/issues"
             },
-            "time": "2020-12-01T16:20:39+00:00"
+            "time": "2021-01-03T19:11:06+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",

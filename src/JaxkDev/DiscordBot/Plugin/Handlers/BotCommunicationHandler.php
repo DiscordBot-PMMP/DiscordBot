@@ -23,7 +23,7 @@ use JaxkDev\DiscordBot\Communication\Packets\DiscordMessageSent;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
-use JaxkDev\DiscordBot\Main;
+use JaxkDev\DiscordBot\Plugin\Main;
 use JaxkDev\DiscordBot\Plugin\Storage;
 use JaxkDev\DiscordBot\Utils;
 use pocketmine\utils\MainLogger;

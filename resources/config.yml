@@ -1,5 +1,5 @@
 ---
-version: 1
+version: 2
 
 discord:
   token: "Long Token with random characters here."
@@ -8,4 +8,7 @@ logging:
   debug: false
   maxFiles: 28
   directory: "logs"
+
+security:
+  disable_ssl: false
 ...

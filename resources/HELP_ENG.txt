@@ -20,6 +20,12 @@ logging:
   maxFiles: 28			How many log files to keep on disk at any one time.
   directory: "logs"		What directory to keep log files in, relative from plugin_data/DiscordBot/
 
+security:
+  disable_ssl: false|true    **WARNING** Only set to true if you have a ssl issue during connection AND you cannot
+  										 configure PHP at all (eg server hosts blocked it and will not help).
+  										 You have been warned.
+
+
 
 
 

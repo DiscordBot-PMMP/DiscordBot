@@ -22,7 +22,7 @@
     ],
     "require": {
         "php": "^7.3",
-        "team-reflex/discord-php": "dev-master"
+        "team-reflex/discord-php": "dev-beta"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.12.64",
