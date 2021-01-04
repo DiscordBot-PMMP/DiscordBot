@@ -16,10 +16,10 @@ use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordAllData;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordMemberJoin;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordMemberLeave;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordMessageSent;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventAllData;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberJoin;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberLeave;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageSent;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
@@ -43,10 +43,10 @@ class BotCommunicationHandler {
 	public function handle(Packet $packet): bool{
 		// If's instances instead of ID switching due to phpstan/types.
 		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
-		if($packet instanceof DiscordMemberJoin) return $this->handleMemberJoin($packet);
-		if($packet instanceof DiscordMemberLeave) return $this->handleMemberLeave($packet);
-		if($packet instanceof DiscordMessageSent) return $this->handleMessageSent($packet);
-		if($packet instanceof DiscordAllData) return $this->handleAllDiscordData($packet);
+		if($packet instanceof DiscordEventMemberJoin) return $this->handleMemberJoin($packet);
+		if($packet instanceof DiscordEventMemberLeave) return $this->handleMemberLeave($packet);
+		if($packet instanceof DiscordEventMessageSent) return $this->handleMessageSent($packet);
+		if($packet instanceof DiscordEventAllData) return $this->handleAllDiscordData($packet);
 		return false;
 	}
 
@@ -55,17 +55,17 @@ class BotCommunicationHandler {
 		return true;
 	}
 
-	private function handleMessageSent(DiscordMessageSent $packet): bool{
+	private function handleMessageSent(DiscordEventMessageSent $packet): bool{
 		$config = $this->plugin->getEventsConfig()['message']['fromDiscord'];
 		$message = $packet->getMessage();
 
-		if(!in_array($message->getGuildId().".".$message->getChannelId(), $config['channels'])) return true;
+		if(!in_array($message->getServerId().".".$message->getChannelId(), $config['channels'])) return true;
 
 		//If any of these asserts fire theres a mismatch between Storage and discord.
 
-		/** @var Server $guild */
-		$guild = Storage::getServer($message->getGuildId());
-		Utils::assert($guild instanceof Server);
+		/** @var Server $server */
+		$server = Storage::getServer($message->getServerId());
+		Utils::assert($server instanceof Server);
 
 		/** @var Channel $channel */
 		$channel = Storage::getChannel($message->getChannelId());
@@ -79,7 +79,7 @@ class BotCommunicationHandler {
 		$user = Storage::getUser($author->getUserId());
 		Utils::assert($user instanceof User);
 
-		/*var_dump($guild);
+		/*var_dump($server);
 		var_dump($channel);
 		var_dump($author);
 		var_dump($user);*/
@@ -87,7 +87,7 @@ class BotCommunicationHandler {
 		$formatted = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}',
 			'{SERVER_NAME}', '{CHANNEL_ID}', '{CHANNEL_NAME}', '{MESSAGE}'], [
 				date('G:i:s', (int)$message->getTimestamp()??0), $author->getUserId(), $user->getUsername(),
-				$user->getDiscriminator(), $guild->getId(), $guild->getName(), $channel->getId(), $channel->getName(),
+				$user->getDiscriminator(), $server->getId(), $server->getName(), $channel->getId(), $channel->getName(),
 				$message->getContent()
 			],
 			$config['format']);
@@ -97,13 +97,13 @@ class BotCommunicationHandler {
 		return true;
 	}
 
-	private function handleMemberJoin(DiscordMemberJoin $packet): bool{
+	private function handleMemberJoin(DiscordEventMemberJoin $packet): bool{
 		$config = $this->plugin->getEventsConfig()['member_join']['fromDiscord'];
 		if(($config['format'] ?? "") === "") return true;
 
-		/** @var Server $guild */
-		$guild = Storage::getServer($packet->getMember()->getGuildId());
-		Utils::assert($guild instanceof Server);
+		/** @var Server $server */
+		$server = Storage::getServer($packet->getMember()->getServerId());
+		Utils::assert($server instanceof Server);
 
 		$member = $packet->getMember();
 		$user = $packet->getUser();
@@ -114,14 +114,14 @@ class BotCommunicationHandler {
 		$formatted = str_replace(
 			['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
 			[date('G:i:s', $member->getJoinTimestamp()), $member->getId(), $user->getUsername(),
-				$user->getDiscriminator(), $guild->getId(), $guild->getName()], $config['format']);
+				$user->getDiscriminator(), $server->getId(), $server->getName()], $config['format']);
 
 		$this->plugin->getServer()->broadcastMessage($formatted);
 
 		return true;
 	}
 
-	private function handleMemberLeave(DiscordMemberLeave $packet): bool{
+	private function handleMemberLeave(DiscordEventMemberLeave $packet): bool{
 		$config = $this->plugin->getEventsConfig()['member_leave']['fromDiscord'];
 		if(($config['format'] ?? "") === "") return true;
 
@@ -130,7 +130,7 @@ class BotCommunicationHandler {
 		Utils::assert($member instanceof Member);
 
 		/** @var Server $server */
-		$server = Storage::getServer($member->getGuildId());
+		$server = Storage::getServer($member->getServerId());
 		Utils::assert($server instanceof Server);
 
 		/** @var User $user */
@@ -147,7 +147,7 @@ class BotCommunicationHandler {
 		return true;
 	}
 
-	public function handleAllDiscordData(DiscordAllData $packet): bool{
+	public function handleAllDiscordData(DiscordEventAllData $packet): bool{
 		//Todo verify packet before resetting data.
 		Storage::reset();
 		foreach($packet->getServers() as $server){
@@ -165,17 +165,18 @@ class BotCommunicationHandler {
 		foreach($packet->getUsers() as $user){
 			Storage::addUser($user);
 		}
+		Storage::setBotUser($packet->getBotUser());
 		Storage::setTimestamp($packet->getTimestamp());
 
 		return true;
 	}
 
-	public function sendMessage(string $guild, string $channel, string $content): void{
-		/*$this->plugin->writeOutboundData(
+	/*public function sendMessage(string $guild, string $channel, string $content): void{
+		$this->plugin->writeOutboundData(
 			Protocol::ID_SEND_MESSAGE,
 			[$guild, $channel, $content]
-		);*/
-	}
+		);
+	}*/
 
 	/**
 	 * Checks last KNOWN Heartbeat timestamp with current time, does not check pre-start condition.

@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 
 use JaxkDev\DiscordBot\Communication\Models\Message;
 
-class DiscordMessageSent extends Packet{
+class PluginRequestSendMessage extends Packet{
 
 	/** @var Message */
 	private $message;

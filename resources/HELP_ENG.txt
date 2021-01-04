@@ -5,6 +5,7 @@ Visit https://github.com/JaxkDev/DiscordBot/wiki
 
 
 
+===========================================================================================
 
 
 Config.yml Explained:
@@ -29,14 +30,14 @@ security:
 
 
 
+===========================================================================================
 
 
 Events.yml Explained:
 
-channels: ["serverID.channelID", "serverID.channelID", ...]
-The . should be left there, Leave array or format empty to disable that event.
+channels: [channelID, channelID, ...]
 
-format: "Format text here, see FORMATTING Explained for keys that can be used."
+format: "Format text here, see 'FORMATTING Explained' for keys that can be used."
 
 
 

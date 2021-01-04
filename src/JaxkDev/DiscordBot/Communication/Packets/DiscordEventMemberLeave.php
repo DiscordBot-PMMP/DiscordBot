@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-class DiscordMemberLeave extends Packet{
+class DiscordEventMemberLeave extends Packet{
 
 	/** @var string */
 	private $member_id;

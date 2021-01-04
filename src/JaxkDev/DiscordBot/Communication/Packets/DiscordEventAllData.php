@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Communication\Models\Role;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
 
-class DiscordAllData extends Packet{
+class DiscordEventAllData extends Packet{
 
 	/** @var Server[] */
 	private $servers = [];
@@ -35,10 +35,13 @@ class DiscordAllData extends Packet{
 	/** @var User[] */
 	private $users = [];
 
+	/** @var null|User */
+	private $botUser = null;
+
 	/** @var int */
 	private $timestamp;
 
-	public function addServer(Server $server): DiscordAllData{
+	public function addServer(Server $server): DiscordEventAllData{
 		$this->servers[] = $server;
 		return $this;
 	}
@@ -50,7 +53,7 @@ class DiscordAllData extends Packet{
 		return $this->servers;
 	}
 
-	public function addChannel(Channel $channel): DiscordAllData{
+	public function addChannel(Channel $channel): DiscordEventAllData{
 		$this->channels[] = $channel;
 		return $this;
 	}
@@ -62,7 +65,7 @@ class DiscordAllData extends Packet{
 		return $this->channels;
 	}
 
-	public function addRole(Role $role): DiscordAllData{
+	public function addRole(Role $role): DiscordEventAllData{
 		$this->roles[] = $role;
 		return $this;
 	}
@@ -74,7 +77,7 @@ class DiscordAllData extends Packet{
 		return $this->roles;
 	}
 
-	public function addMember(Member $member): DiscordAllData{
+	public function addMember(Member $member): DiscordEventAllData{
 		$this->members[] = $member;
 		return $this;
 	}
@@ -86,7 +89,7 @@ class DiscordAllData extends Packet{
 		return $this->members;
 	}
 
-	public function addUser(User $user): DiscordAllData{
+	public function addUser(User $user): DiscordEventAllData{
 		$this->users[] = $user;
 		return $this;
 	}
@@ -98,7 +101,15 @@ class DiscordAllData extends Packet{
 		return $this->users;
 	}
 
-	public function setTimestamp(int $timestamp): DiscordAllData{
+	public function setBotUser(User $bot): void{
+		$this->botUser = $bot;
+	}
+
+	public function getBotUser(): ?User{
+		return $this->botUser;
+	}
+
+	public function setTimestamp(int $timestamp): DiscordEventAllData{
 		$this->timestamp = $timestamp;
 		return $this;
 	}
@@ -120,6 +131,7 @@ class DiscordAllData extends Packet{
 			$this->roles,
 			$this->members,
 			$this->users,
+			$this->botUser,
 			$this->timestamp
 		]);
 	}
@@ -132,6 +144,7 @@ class DiscordAllData extends Packet{
 			$this->roles,
 			$this->members,
 			$this->users,
+			$this->botUser,
 			$this->timestamp
 		] = unserialize($serialized);
 	}

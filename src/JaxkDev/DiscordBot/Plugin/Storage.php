@@ -37,17 +37,23 @@ class Storage{
 	/** @var Array<int, Channel> */
 	private static $channelMap = [];
 
-	/** @var Array<string, int> */
-	private static $channelNameMap = [];
+	/** @var Array<int, int[]> */
+	private static $channelServerMap = [];
 
 	/** @var Array<string, Member> */
 	private static $memberMap = [];
+
+	/** @var Array<int, string[]> */
+	private static $memberServerMap = [];
 
 	/** @var Array<int, User> */
 	private static $userMap = [];
 
 	/** @var Array<int, Role> */
 	private static $roleMap = [];
+
+	/** @var null|User */
+	private static $botUser = null;
 
 	/** @var int */
 	private static $timestamp = 0;
@@ -63,18 +69,28 @@ class Storage{
 	public static function addServer(Server $server): void{
 		self::$serverNameMap[$server->getName()] = $server->getId();
 		self::$serverMap[$server->getId()] = $server;
+		self::$channelServerMap[$server->getId()] = [];
+		self::$memberServerMap[$server->getId()] = [];
 	}
 
 	public static function getChannel(int $id): ?Channel{
 		return self::$channelMap[$id];
 	}
 
-	public static function getChannelByName(string $name): ?Channel{
-		return self::$channelMap[self::$channelNameMap[$name]];
+	/**
+	 * @param int $serverId
+	 * @return Channel[]
+	 */
+	public static function getChannelsByServer(int $serverId): array{
+		$channels = [];
+		foreach((self::$channelServerMap[$serverId] ?? []) as $id){
+			$channels[] = self::getChannel($id);
+		}
+		return $channels;
 	}
 
 	public static function addChannel(Channel $channel): void{
-		self::$channelNameMap[$channel->getName()] = $channel->getId();
+		self::$channelServerMap[$channel->getServerId()][] = $channel->getId();
 		self::$channelMap[$channel->getId()] = $channel;
 	}
 
@@ -82,7 +98,16 @@ class Storage{
 		return self::$memberMap[$id];
 	}
 
+	public static function getMembersByServer(int $serverId): array{
+		$members = [];
+		foreach((self::$memberServerMap[$serverId] ?? []) as $id){
+			$members[] = self::getMember($id);
+		}
+		return $members;
+	}
+
 	public static function addMember(Member $member): void{
+		self::$memberServerMap[$member->getServerId()] = $member->getId();
 		self::$memberMap[$member->getId()] = $member;
 	}
 
@@ -102,6 +127,20 @@ class Storage{
 		self::$roleMap[$role->getId()] = $role;
 	}
 
+	public static function getBotUser(): ?User{
+		return self::$botUser;
+	}
+
+	public static function setBotUser(User $user): void{
+		self::$botUser = $user;
+	}
+
+	public static function getBotMemberByServer(int $serverId): ?Member{
+		$u = self::getBotUser();
+		if($u === null) return null;
+		return self::getMember("{$serverId}.{$u->getId()}");
+	}
+
 	public static function getTimestamp(): int{
 		return self::$timestamp;
 	}
@@ -113,11 +152,13 @@ class Storage{
 	public static function reset(): void{
 		self::$serverNameMap = [];
 		self::$serverMap = [];
-		self::$channelNameMap = [];
+		self::$channelServerMap = [];
 		self::$channelMap = [];
 		self::$roleMap = [];
 		self::$memberMap = [];
+		self::$memberServerMap = [];
 		self::$userMap = [];
+		self::$botUser = null;
 		self::$timestamp = 0;
 	}
 }

@@ -15,27 +15,17 @@ namespace JaxkDev\DiscordBot\Bot;
 use Discord\Discord;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Guild\Guild as DiscordGuild;
-use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Activity as DiscordActivity;
-use Discord\Parts\User\Member as DiscordMember;
-use Discord\Parts\User\User as DiscordUser;
 use Error;
 use ErrorException;
 use Exception;
 use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
-use JaxkDev\DiscordBot\Bot\Handlers\PluginCommunicationHandler;
+use JaxkDev\DiscordBot\Bot\Handlers\CommunicationHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Models\Activity;
-use JaxkDev\DiscordBot\Communication\Models\Channel;
-use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Message;
-use JaxkDev\DiscordBot\Communication\Models\Role;
-use JaxkDev\DiscordBot\Communication\Models\Server;
-use JaxkDev\DiscordBot\Communication\Models\User;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordAllData;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
-use JaxkDev\DiscordBot\Utils;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
@@ -50,8 +40,8 @@ class Client {
 	/** @var Discord */
 	private $client;
 
-	/** @var PluginCommunicationHandler */
-	private $pluginCommsHandler;
+	/** @var CommunicationHandler */
+	private $communicationHandler;
 
 	/** @var DiscordEventHandler */
 	private $discordEventHandler;
@@ -81,7 +71,6 @@ class Client {
 		ini_set("date.timezone", "UTC");
 		MainLogger::getLogger()->debug("Log files will be in UTC timezone.");
 
-		Utils::$BOT_THREAD = true;
 		Packet::$UID_COUNT = 1;
 
 		$logger = new Logger('DiscordPHP');
@@ -116,7 +105,7 @@ class Client {
 
 		$this->config['discord']['token'] = "REDACTED";
 
-		$this->pluginCommsHandler = new PluginCommunicationHandler($this);
+		$this->communicationHandler = new CommunicationHandler($this);
 		$this->discordEventHandler = new DiscordEventHandler($this);
 
 		$this->registerHandlers();
@@ -171,122 +160,19 @@ class Client {
 				$this->client->getLoop()->cancelTimer($this->readyTimer);
 				$this->readyTimer = null;
 			}
-			if($this->getThread()->getStatus() !== Protocol::THREAD_STATUS_STARTED){
-				MainLogger::getLogger()->warning("Closing thread, unexpected state change.");
-				$this->close();
-			}
-
-			$ac = new Activity();
-			$ac->setMessage("In PocketMine-MP.")->setType(Activity::TYPE_PLAYING)->setStatus(Activity::STATUS_IDLE);
-			$this->updatePresence($ac);
-
-			// Register all over events.
-			$this->discordEventHandler->registerEvents();
-
-			// Dump all discord data.
-			$pk = new DiscordAllData();
-			$pk->setTimestamp(time());
-
-			MainLogger::getLogger()->debug("Starting the data pack, this can take up to a minute please be patient.\nNote this does not effect the main thread.");
-			$t = microtime(true);
-			$mem = memory_get_usage(true);
-
-			/** @var DiscordGuild $guild */
-			foreach($this->client->guilds as $guild){
-				$server = new Server();
-				$server->setId((int)$guild->id)
-					->setCreationTimestamp(Utils::convertIdToTime($guild->id))
-					->setIconUrl($guild->icon)
-					->setLarge($guild->large)
-					->setMemberCount($guild->member_count)
-					->setName($guild->name)
-					->setOwnerId((int)$guild->owner_id)
-					->setRegion($guild->region);
-				$pk->addServer($server);
-
-				/** @var DiscordChannel $channel */
-				foreach($guild->channels as $channel){
-					if($channel->type !== DiscordChannel::TYPE_TEXT) continue;
-					$ch = new Channel();
-					$ch->setName($channel->name)
-						->setId((int)$channel->id)
-						->setCategory(null) //todo, parent_id gives ID of channel (Type_category)
-						->setDescription($channel->topic)
-						->setServerId((int)$guild->id);
-					$pk->addChannel($ch);
-				}
-
-				/** @var DiscordRole $role */
-				foreach($guild->roles as $role){
-					$r = new Role();
-					$r->setServerId((int)$guild->id)
-						->setId((int)$role->id)
-						->setName($role->name)
-						->setColour($role->color)
-						->setHoistedPosition($role->position)
-						->setMentionable($role->mentionable)
-						->setPermissions($role->permissions->bitwise);
-					$pk->addRole($r);
-				}
-
-				/** @var DiscordMember $member */
-				foreach($guild->members as $member){
-					$m = new Member();
-					$m->setGuildId((int)$guild->id)
-						->setUserId((int)$member->user->id)
-						->setNickname($member->nick)
-						->setJoinTimestamp($member->joined_at === null ? 0 : $member->joined_at->getTimestamp())
-						->setBoostTimestamp($member->premium_since === null ? null : $member->premium_since->getTimestamp())
-						->setId();
-
-					/** @var int[] $roles */
-					$roles = [];
-
-					/** @var DiscordRole $role */
-					foreach($member->roles as $role){
-						$roles[] = (int)$role->id;
-					}
-					$m->setRolesId($roles);
-
-					$pk->addMember($m);
-				}
-			}
-
-			/** @var DiscordUser $user */
-			foreach($this->client->users as $user){
-				$u = new User();
-				$u->setId((int)$user->id)
-					->setCreationTimestamp((int)$user->createdTimestamp())
-					->setAvatarUrl($user->avatar)
-					->setDiscriminator((int)$user->discriminator)
-					->setUsername($user->username);
-				$pk->addUser($u);
-			}
-
-			$this->thread->writeOutboundData($pk);
-
-			MainLogger::getLogger()->debug("Data pack Took: ".round(microtime(true)-$t, 5)."s & ".
-				round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
-
-			// Force fresh heartbeat asap, as that took quite some time.
-			$this->getPluginCommunicationHandler()->sendHeartbeat();
-
-			$this->thread->setStatus(Protocol::THREAD_STATUS_READY);
-			MainLogger::getLogger()->info("Client ready.");
-
-			$this->logDebugInfo();
+			$this->discordEventHandler->onReady();
 		});
 	}
 
 	public function tick(): void{
 		$data = $this->thread->readInboundData(Protocol::PPT);
 
-		foreach($data as $d) $this->pluginCommsHandler->handle($d);
+		foreach($data as $d) $this->communicationHandler->handle($d);
 
 		if(($this->tickCount % 20) === 0){
 			//Run every second.
-			$this->pluginCommsHandler->checkHeartbeat();
-			$this->pluginCommsHandler->sendHeartbeat();
+			$this->communicationHandler->checkHeartbeat();
+			$this->communicationHandler->sendHeartbeat();
 
 			//GC Tests.
 			if(microtime(true)-$this->lastGCCollection >= 600){
@@ -308,8 +194,8 @@ class Client {
 		return $this->client;
 	}
 
-	public function getPluginCommunicationHandler(): PluginCommunicationHandler{
-		return $this->pluginCommsHandler;
+	public function getCommunicationHandler(): CommunicationHandler{
+		return $this->communicationHandler;
 	}
 
 	/*
@@ -320,15 +206,15 @@ class Client {
 		if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) return;
 
 		/** @noinspection PhpUnhandledExceptionInspection */
-		$this->client->guilds->fetch((string)$message->getGuildId())->done(function(DiscordGuild $guild) use($message) {
+		$this->client->guilds->fetch((string)$message->getServerId())->done(function(DiscordGuild $guild) use($message) {
 			$guild->channels->fetch((string)$message->getChannelId())->done(function(DiscordChannel $channel) use($message) {
 				$channel->sendMessage($message->getContent());
-				MainLogger::getLogger()->debug("Sent message(".strlen($message->getContent()).") to ({$message->getGuildId()}|{$message->getChannelId()})");
+				MainLogger::getLogger()->debug("Sent message(".strlen($message->getContent()).") to ({$message->getServerId()}|{$message->getChannelId()})");
 			}, function() use($message) {
-				MainLogger::getLogger()->warning("Failed to fetch channel {$message->getChannelId()} in guild {$message->getGuildId()} while attempting to send message.");
+				MainLogger::getLogger()->warning("Failed to fetch channel {$message->getChannelId()} in server {$message->getServerId()} while attempting to send message.");
 			});
 		}, function() use($message) {
-			MainLogger::getLogger()->warning("Failed to fetch guild {$message->getGuildId()} while attempting to send message.");
+			MainLogger::getLogger()->warning("Failed to fetch server {$message->getServerId()} while attempting to send message.");
 		});
 	}
 
@@ -339,7 +225,7 @@ class Client {
 		]);
 
 		try {
-			$this->client->updatePresence($presence, $activity->getStatus() === "idle", $activity->getStatus());
+			$this->client->updatePresence($presence, $activity->getStatus() === Activity::STATUS_IDLE, $activity->getStatus());
 			return true;
 		} catch (Exception $e) {
 			return false;

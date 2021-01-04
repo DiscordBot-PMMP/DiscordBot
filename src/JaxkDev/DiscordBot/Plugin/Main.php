@@ -43,6 +43,9 @@ class Main extends PluginBase {
 	/** @var PocketMineEventHandler */
 	private $pocketmineEventHandler;
 
+	/** @var API */
+	private $api;
+
 	/** @var array */
 	private $eventConfig, $config;
 
@@ -63,6 +66,7 @@ class Main extends PluginBase {
 		$this->inboundData = new Volatile();
 		$this->outboundData = new Volatile();
 
+		$this->api = new API($this);
 		$this->botCommsHandler = new BotCommunicationHandler($this);
 		$this->pocketmineEventHandler = new PocketMineEventHandler($this, yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml"));
 	}
@@ -129,7 +133,7 @@ class Main extends PluginBase {
 		return true;
 	}
 
-	public function tick(int $currentTick): void{
+	private function tick(int $currentTick): void{
 		$data = $this->readInboundData(Protocol::PPT);
 
 		/** @var Packet $d */
@@ -146,16 +150,14 @@ class Main extends PluginBase {
 			$this->botCommsHandler->sendHeartbeat();
 		}
 
-		if($this->inboundData->count() > 5000){
-			//That's 20MB, Bail and clear all data.
-			//Although technically the heartbeat would get backlogged and cause a death event after 5000.
-			$this->getLogger()->emergency("Too much data coming in from discord, wiping past 5000 events.");
-			$this->inboundData->chunk(5000); /* @phpstan-ignore-line */ // Return and remove (note keys are not changed)
+		if($this->inboundData->count() > 2000){
+			$this->getLogger()->emergency("Too much data coming in from discord, stopping plugin+thread.  (If this issue persists, contact JaxkDev)");
+			$this->stopAll();
 		}
 
-		if($this->outboundData->count() > 5000){
-			$this->getLogger()->emergency("Too much data going out, wiping past 5000 events.");
-			$this->outboundData->chunk(5000); /* @phpstan-ignore-line */
+		if($this->outboundData->count() > 2000){
+			$this->getLogger()->emergency("Too much data going out, stopping plugin+thread.  (If this issue persists, contact JaxkDev)");
+			$this->stopAll();
 		}
 	}
 
@@ -178,6 +180,10 @@ class Main extends PluginBase {
 
 	public function getEventsConfig(): array{
 		return $this->eventConfig;
+	}
+
+	public function getAPI(): API{
+		return $this->api;
 	}
 
 	public function stopAll(bool $stopPlugin = true): void{

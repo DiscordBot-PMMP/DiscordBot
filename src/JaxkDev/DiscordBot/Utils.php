@@ -28,18 +28,4 @@ abstract class Utils {
 				$message instanceof Throwable ? $message : null);
 		}
 	}
-
-	/**
-	 * @param int|string $id
-	 * @return int
-	 */
-	static function convertIdToTime($id): int{
-		return (int)(((string)$id / 4194304) + 1420070400000);
-	}
-
-	/**
-	 * Used to distinguish which thread you are in, at runtime.
-	 * @var bool
-	 */
-	public static $BOT_THREAD = false;
 }

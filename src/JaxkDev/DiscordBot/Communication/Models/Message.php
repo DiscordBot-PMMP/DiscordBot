@@ -32,7 +32,7 @@ class Message implements \Serializable {
 	private $channel_id;
 
 	/** @var int */
-	private $guild_id;  //This is needed for faster handling discord side.
+	private $server_id;  //This is needed for faster handling discord side.
 
 	/** @var ?float */
 	private $timestamp;
@@ -91,12 +91,12 @@ class Message implements \Serializable {
 		return $this;
 	}
 
-	public function getGuildId(): int{
-		return $this->guild_id;
+	public function getServerId(): int{
+		return $this->server_id;
 	}
 
-	public function setGuildId(int $guild_id): Message{
-		$this->guild_id = $guild_id;
+	public function setServerId(int $server_id): Message{
+		$this->server_id = $server_id;
 		return $this;
 	}
 
@@ -175,7 +175,7 @@ class Message implements \Serializable {
 			$this->content,
 			$this->author_id,
 			$this->channel_id,
-			$this->guild_id,
+			$this->server_id,
 			$this->timestamp,
 			$this->everyone_mentioned,
 			$this->users_mentioned,
@@ -191,7 +191,7 @@ class Message implements \Serializable {
 			$this->content,
 			$this->author_id,
 			$this->channel_id,
-			$this->guild_id,
+			$this->server_id,
 			$this->timestamp,
 			$this->everyone_mentioned,
 			$this->users_mentioned,

@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpUnusedLocalVariableInspection */
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
@@ -40,8 +41,8 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
 
 		foreach ($config['channels'] as $data){
-			[$guild, $channel] = explode(".", $data);
-			$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
+			[$server, $channel] = explode(".", $data);
+			//$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
 		}
 	}
 
@@ -53,7 +54,7 @@ class PocketMineEventHandler implements Listener{
 
 		foreach ($config['channels'] as $data){
 			[$guild, $channel] = explode(".", $data);
-			$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
+			//$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
 		}
 	}
 
@@ -66,7 +67,7 @@ class PocketMineEventHandler implements Listener{
 
 		foreach ($config['channels'] as $data){
 			[$guild, $channel] = explode(".", $data);
-			$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
+			//$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
 		}
 	}
 
@@ -79,7 +80,7 @@ class PocketMineEventHandler implements Listener{
 
 		foreach ($config['channels'] as $data){
 			[$guild, $channel] = explode(".", $data);
-			$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
+			//$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
 		}
 	}
 }

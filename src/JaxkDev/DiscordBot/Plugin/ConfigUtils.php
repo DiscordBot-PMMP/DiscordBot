@@ -14,7 +14,7 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 abstract class ConfigUtils{
-	const EVENT_VERSION = 1;
+	const EVENT_VERSION = 2;
 	const VERSION = 2;
 
 	// Map all versions to a static function.
@@ -23,7 +23,7 @@ abstract class ConfigUtils{
 	];
 
 	private const EVENT_PATCH_MAP = [
-		1 => 'event_patch_test'
+		1 => 'event_patch_1'
 	];
 
 	static function update(array &$config): void{
@@ -49,8 +49,9 @@ abstract class ConfigUtils{
 		return $config;
 	}
 
-	static private function event_patch_test(array $data): array{
-		$data['patch'] = 1;
+	static private function event_patch_1(array $data): array{
+		//Channel ID's no longer a string or have serverID prefixed.
+		//TODO
 		return $data;
 	}
 

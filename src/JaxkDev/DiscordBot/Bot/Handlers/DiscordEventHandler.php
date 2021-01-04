@@ -15,11 +15,21 @@ namespace JaxkDev\DiscordBot\Bot\Handlers;
 use Discord\Discord;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
+use Discord\Parts\Guild\Guild as DiscordGuild;
+use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Member as DiscordMember;
+use Discord\Parts\User\User as DiscordUser;
 use JaxkDev\DiscordBot\Bot\Client;
+use JaxkDev\DiscordBot\Communication\Models\Activity;
+use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Communication\Models\Role;
+use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventAllData;
+use JaxkDev\DiscordBot\Communication\Protocol;
+use pocketmine\utils\MainLogger;
 
 class DiscordEventHandler {
 
@@ -45,6 +55,125 @@ class DiscordEventHandler {
 		 */
 	}
 
+	public function onReady(): void{
+		if($this->client->getThread()->getStatus() !== Protocol::THREAD_STATUS_STARTED){
+			MainLogger::getLogger()->warning("Closing thread, unexpected state change.");
+			$this->client->close();
+		}
+
+		//Default activity.
+		$ac = new Activity();
+		$ac->setMessage("In PocketMine-MP.")->setType(Activity::TYPE_PLAYING)->setStatus(Activity::STATUS_IDLE);
+		$this->client->updatePresence($ac);
+
+		// Register all other events.
+		$this->registerEvents();
+
+		// Dump all discord data.
+		$pk = new DiscordEventAllData();
+		$pk->setTimestamp(time());
+
+		MainLogger::getLogger()->debug("Starting the data pack, this can take several minutes please be patient.\nNote this does not effect the main thread.");
+		$t = microtime(true);
+		$mem = memory_get_usage(true);
+
+		$client = $this->client->getDiscordClient();
+
+		/** @var DiscordGuild $guild */
+		foreach($client->guilds as $guild){
+			$server = new Server();
+			$server->setId((int)$guild->id)
+				->setCreationTimestamp($guild->createdTimestamp())
+				->setIconUrl($guild->icon)
+				->setLarge($guild->large)
+				->setMemberCount($guild->member_count)
+				->setName($guild->name)
+				->setOwnerId((int)$guild->owner_id)
+				->setRegion($guild->region);
+			$pk->addServer($server);
+
+			/** @var DiscordChannel $channel */
+			foreach($guild->channels as $channel){
+				if($channel->type !== DiscordChannel::TYPE_TEXT) continue;
+				$ch = new Channel();
+				$ch->setName($channel->name)
+					->setId((int)$channel->id)
+					->setCategory(null) //todo, parent_id gives ID of channel (Type_category)
+					->setDescription($channel->topic)
+					->setServerId((int)$guild->id);
+				$pk->addChannel($ch);
+			}
+
+			/** @var DiscordRole $role */
+			foreach($guild->roles as $role){
+				$r = new Role();
+				$r->setServerId((int)$guild->id)
+					->setId((int)$role->id)
+					->setName($role->name)
+					->setColour($role->color)
+					->setHoistedPosition($role->position)
+					->setMentionable($role->mentionable)
+					->setPermissions($role->permissions->bitwise);
+				$pk->addRole($r);
+			}
+
+			/** @var DiscordMember $member */
+			foreach($guild->members as $member){
+				$m = new Member();
+				$m->setServerId((int)$guild->id)
+					->setUserId((int)$member->user->id)
+					->setNickname($member->nick)
+					->setJoinTimestamp($member->joined_at === null ? 0 : $member->joined_at->getTimestamp())
+					->setBoostTimestamp($member->premium_since === null ? null : $member->premium_since->getTimestamp())
+					->setId();
+
+				/** @var int[] $roles */
+				$roles = [];
+
+				/** @var DiscordRole $role */
+				foreach($member->roles as $role){
+					$roles[] = (int)$role->id;
+				}
+				$m->setRolesId($roles);
+
+				$pk->addMember($m);
+			}
+		}
+
+		/** @var DiscordUser $user */
+		foreach($client->users as $user){
+			$u = new User();
+			$u->setId((int)$user->id)
+				->setCreationTimestamp((int)$user->createdTimestamp())
+				->setAvatarUrl($user->avatar)
+				->setDiscriminator((int)$user->discriminator)
+				->setUsername($user->username);
+			$pk->addUser($u);
+		}
+
+		$bu = $client->user;
+		$u = new User();
+		$u->setId((int)$bu->id)
+			->setUsername($bu->username)
+			->setDiscriminator((int)$bu->discriminator)
+			->setAvatarUrl($bu->avatar)
+			->setCreationTimestamp($bu->createdTimestamp());
+		$pk->setBotUser($u);
+
+		$this->client->getThread()->writeOutboundData($pk);
+
+		MainLogger::getLogger()->debug("Data pack Took: ".round(microtime(true)-$t, 5)."s & ".
+			round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
+
+		// Force fresh heartbeat asap, as that took quite some time.
+		$this->client->getCommunicationHandler()->sendHeartbeat();
+
+		$this->client->getThread()->setStatus(Protocol::THREAD_STATUS_READY);
+		MainLogger::getLogger()->info("Client ready.");
+
+		$this->client->logDebugInfo();
+	}
+
 	public function onMessage(DiscordMessage $message, Discord $discord): void{
 		// Eg webhooks ?
 		if(!$message->author instanceof DiscordMember) return;
@@ -62,18 +191,17 @@ class DiscordEventHandler {
 			->setTimestamp($message->timestamp->getTimestamp())
 			->setAuthorId(($message->channel->guild_id.".".$message->author->id))
 			->setChannelId((int)$message->channel_id)
-			->setGuildId((int)$message->channel->guild_id)
+			->setServerId((int)$message->channel->guild_id)
 			->setEveryoneMentioned($message->mention_everyone)
 			->setContent($message->content)
 			->setChannelsMentioned(array_keys($message->mention_channels->toArray()))
 			->setRolesMentioned(array_keys($message->mention_roles->toArray()))
 			->setUsersMentioned(array_keys($message->mentions->toArray()));
 
-		$this->client->getPluginCommunicationHandler()->sendMessageSentEvent($m);
+		$this->client->getCommunicationHandler()->sendMessageSentEvent($m);
 	}
 
 	public function onMemberJoin(DiscordMember $member, Discord $discord): void{
-		//TODO, Do we send user data here as well ?
 		$u = new User();
 		$u->setId((int)$member->id)
 			->setUsername($member->username)
@@ -84,16 +212,16 @@ class DiscordEventHandler {
 		$m = new Member();
 		$m->setUserId((int)$member->id)
 			->setBoostTimestamp(null)
-			->setGuildId((int)$member->guild_id)
+			->setServerId((int)$member->guild_id)
 			->setJoinTimestamp($member->joined_at === null ? 0 : $member->joined_at->getTimestamp())
 			->setNickname($member->nick)
 			->setRolesId(array_keys($member->roles->toArray()))
 			->setId();
 
-		$this->client->getPluginCommunicationHandler()->sendMemberJoinEvent($m, $u);
+		$this->client->getCommunicationHandler()->sendMemberJoinEvent($m, $u);
 	}
 
 	public function onMemberLeave(DiscordMember $member, Discord $discord): void{
-		$this->client->getPluginCommunicationHandler()->sendMemberLeaveEvent($member->guild_id.".".$member->id);
+		$this->client->getCommunicationHandler()->sendMemberLeaveEvent($member->guild_id.".".$member->id);
 	}
 }

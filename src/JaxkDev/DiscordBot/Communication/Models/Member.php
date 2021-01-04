@@ -33,7 +33,7 @@ class Member implements \Serializable {
 	private $roles_id;
 
 	/** @var int */
-	private $guild_id;
+	private $server_id;
 
 	/**
 	 * @description Composite key guild_id.user_id
@@ -45,7 +45,7 @@ class Member implements \Serializable {
 
 	/** @internal */
 	public function setId(): void{
-		$this->id = $this->guild_id.".".$this->user_id;
+		$this->id = $this->server_id.".".$this->user_id;
 	}
 
 	public function getUserId(): int{
@@ -100,12 +100,12 @@ class Member implements \Serializable {
 		return $this;
 	}
 
-	public function getGuildId(): int{
-		return $this->guild_id;
+	public function getServerId(): int{
+		return $this->server_id;
 	}
 
-	public function setGuildId(int $guild_id): Member{
-		$this->guild_id = $guild_id;
+	public function setServerId(int $server_id): Member{
+		$this->server_id = $server_id;
 		return $this;
 	}
 
@@ -119,7 +119,7 @@ class Member implements \Serializable {
 			$this->join_timestamp,
 			$this->boost_timestamp,
 			$this->roles_id,
-			$this->guild_id
+			$this->server_id
 		]);
 	}
 
@@ -131,7 +131,7 @@ class Member implements \Serializable {
 			$this->join_timestamp,
 			$this->boost_timestamp,
 			$this->roles_id,
-			$this->guild_id
+			$this->server_id
 		] = unserialize($serialized);
 	}
 }

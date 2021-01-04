@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\User;
 
-class DiscordMemberJoin extends Packet{
+class DiscordEventMemberJoin extends Packet{
 
 	/** @var Member */
 	private $member;
@@ -35,7 +35,7 @@ class DiscordMemberJoin extends Packet{
 		return $this->user;
 	}
 
-	public function setUser(User $user): DiscordMemberJoin{
+	public function setUser(User $user): DiscordEventMemberJoin{
 		$this->user = $user;
 		return $this;
 	}
