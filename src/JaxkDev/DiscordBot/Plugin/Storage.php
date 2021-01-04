@@ -31,7 +31,7 @@ class Storage{
 	/** @var Array<string, Server> */
 	private static $serverMap = [];
 
-	/** @var Array<string, int> */
+	/** @var Array<string, string> */
 	private static $serverNameMap = [];
 
 	/** @var Array<string, Channel> */
@@ -84,7 +84,8 @@ class Storage{
 	public static function getChannelsByServer(string $serverId): array{
 		$channels = [];
 		foreach((self::$channelServerMap[$serverId] ?? []) as $id){
-			$channels[] = self::getChannel($id);
+			$c = self::getChannel($id);
+			if($c !== null) $channels[] = $c;
 		}
 		return $channels;
 	}
@@ -105,13 +106,14 @@ class Storage{
 	public static function getMembersByServer(string $serverId): array{
 		$members = [];
 		foreach((self::$memberServerMap[$serverId] ?? []) as $id){
-			$members[] = self::getMember($id);
+			$m = self::getMember($id);
+			if($m !== null) $members[] = $m;
 		}
 		return $members;
 	}
 
 	public static function addMember(Member $member): void{
-		self::$memberServerMap[$member->getServerId()] = $member->getId();
+		self::$memberServerMap[$member->getServerId()][] = $member->getId();
 		self::$memberMap[$member->getId()] = $member;
 	}
 

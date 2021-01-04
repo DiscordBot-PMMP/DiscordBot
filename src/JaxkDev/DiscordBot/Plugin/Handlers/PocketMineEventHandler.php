@@ -29,7 +29,7 @@ class PocketMineEventHandler implements Listener{
 	/** @var array */
 	private $eventConfig;
 
-	public function __construct(Main $plugin, array $eventConfig) {
+	public function __construct(Main $plugin, array $eventConfig){
 		$this->plugin = $plugin;
 		$this->eventConfig = $eventConfig;
 	}

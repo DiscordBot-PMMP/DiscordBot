@@ -55,7 +55,7 @@ class Client {
 	/** @var array */
 	private $config;
 
-	public function __construct(BotThread $thread, array $config) {
+	public function __construct(BotThread $thread, array $config){
 		$this->thread = $thread;
 		$this->config = $config;
 
@@ -80,7 +80,7 @@ class Client {
 		$logger->setHandlers(array($handler));
 		$httpLogger->setHandlers(array($handler));
 
-		if($config['logging']['debug']) {
+		if($config['logging']['debug']){
 			$handler = new StreamHandler(($r = fopen('php://stdout', 'w')) === false ? "" : $r);
 			$logger->pushHandler($handler);
 			$httpLogger->pushHandler($handler);
@@ -155,7 +155,7 @@ class Client {
 		// https://github.com/teamreflex/DiscordPHP/issues/433
 		// Note ready is emitted after successful connection + all servers/users loaded, so only register events
 		// After this event.
-		$this->client->on('ready', function (Discord $discord) {
+		$this->client->on('ready', function (Discord $discord){
 			if($this->readyTimer !== null){
 				$this->client->getLoop()->cancelTimer($this->readyTimer);
 				$this->readyTimer = null;
@@ -206,14 +206,14 @@ class Client {
 		if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) return;
 
 		/** @noinspection PhpUnhandledExceptionInspection */
-		$this->client->guilds->fetch($message->getServerId())->done(function(DiscordGuild $guild) use($message) {
-			$guild->channels->fetch($message->getChannelId())->done(function(DiscordChannel $channel) use($message) {
+		$this->client->guilds->fetch($message->getServerId())->done(function(DiscordGuild $guild) use($message){
+			$guild->channels->fetch($message->getChannelId())->done(function(DiscordChannel $channel) use($message){
 				$channel->sendMessage($message->getContent());
 				MainLogger::getLogger()->debug("Sent message(".strlen($message->getContent()).") to ({$message->getServerId()}|{$message->getChannelId()})");
-			}, function() use($message) {
+			}, function() use($message){
 				MainLogger::getLogger()->warning("Failed to fetch channel {$message->getChannelId()} in server {$message->getServerId()} while attempting to send message.");
 			});
-		}, function() use($message) {
+		}, function() use($message){
 			MainLogger::getLogger()->warning("Failed to fetch server {$message->getServerId()} while attempting to send message.");
 		});
 	}
@@ -227,7 +227,7 @@ class Client {
 		try {
 			$this->client->updatePresence($presence, $activity->getStatus() === Activity::STATUS_IDLE, $activity->getStatus());
 			return true;
-		} catch (Exception $e) {
+		} catch (Exception $e){
 			return false;
 		}
 	}

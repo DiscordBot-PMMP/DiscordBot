@@ -127,7 +127,7 @@ class DiscordEventHandler {
 					->setBoostTimestamp($member->premium_since === null ? null : $member->premium_since->getTimestamp())
 					->setId();
 
-				/** @var int[] $roles */
+				/** @var string[] $roles */
 				$roles = [];
 
 				/** @var DiscordRole $role */
@@ -144,7 +144,7 @@ class DiscordEventHandler {
 		foreach($client->users as $user){
 			$u = new User();
 			$u->setId($user->id)
-				->setCreationTimestamp($user->createdTimestamp())
+				->setCreationTimestamp((int)$user->createdTimestamp())
 				->setAvatarUrl($user->avatar)
 				->setDiscriminator($user->discriminator)
 				->setUsername($user->username);
@@ -157,7 +157,7 @@ class DiscordEventHandler {
 			->setUsername($bu->username)
 			->setDiscriminator($bu->discriminator)
 			->setAvatarUrl($bu->avatar)
-			->setCreationTimestamp($bu->createdTimestamp());
+			->setCreationTimestamp((int)$bu->createdTimestamp());
 		$pk->setBotUser($u);
 
 		$this->client->getThread()->writeOutboundData($pk);
@@ -206,7 +206,7 @@ class DiscordEventHandler {
 		$u->setId($member->id)
 			->setUsername($member->username)
 			->setDiscriminator($member->user->discriminator)
-			->setCreationTimestamp(($member->user->createdTimestamp()??0))
+			->setCreationTimestamp((int)($member->user->createdTimestamp()??0))
 			->setAvatarUrl($member->user->avatar);
 
 		$m = new Member();

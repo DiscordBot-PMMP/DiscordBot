@@ -79,11 +79,6 @@ class BotCommunicationHandler {
 		$user = Storage::getUser($author->getUserId());
 		Utils::assert($user instanceof User);
 
-		/*var_dump($server);
-		var_dump($channel);
-		var_dump($author);
-		var_dump($user);*/
-
 		$formatted = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}',
 			'{SERVER_NAME}', '{CHANNEL_ID}', '{CHANNEL_NAME}', '{MESSAGE}'], [
 				date('G:i:s', (int)$message->getTimestamp()??0), $author->getUserId(), $user->getUsername(),
@@ -165,18 +160,11 @@ class BotCommunicationHandler {
 		foreach($packet->getUsers() as $user){
 			Storage::addUser($user);
 		}
-		Storage::setBotUser($packet->getBotUser());
+		if($packet->getBotUser() !== null) Storage::setBotUser($packet->getBotUser());
 		Storage::setTimestamp($packet->getTimestamp());
 
 		return true;
 	}
-
-	/*public function sendMessage(string $guild, string $channel, string $content): void{
-		$this->plugin->writeOutboundData(
-			Protocol::ID_SEND_MESSAGE,
-			[$guild, $channel, $content]
-		);
-	}*/
 
 	/**
 	 * Checks last KNOWN Heartbeat timestamp with current time, does not check pre-start condition.
@@ -195,7 +183,7 @@ class BotCommunicationHandler {
 		$this->plugin->writeOutboundData($p);
 	}
 
-	public function getLastHeartbeat(): float {
+	public function getLastHeartbeat(): float{
 		return $this->lastHeartbeat;
 	}
 }

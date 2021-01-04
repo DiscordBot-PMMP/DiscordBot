@@ -35,8 +35,8 @@ abstract class ConfigUtils{
 
 	static function update_event(array &$config): void{
 		for($i = (int)$config['version']; $i < self::EVENT_VERSION; $i += 1){
-			$f = self::EVENT_PATCH_MAP[$i]; /** @phpstan-ignore-line */
-			$config = forward_static_call([self::class, $f], $config); /** @phpstan-ignore-line */
+			$f = self::EVENT_PATCH_MAP[$i];
+			$config = forward_static_call([self::class, $f], $config);
 		}
 	}
 

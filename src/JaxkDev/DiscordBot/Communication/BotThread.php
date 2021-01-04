@@ -34,7 +34,7 @@ class BotThread extends Thread {
 	/** @var int */
 	private $status = Protocol::THREAD_STATUS_STARTING;
 
-	public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData) {
+	public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData){
 		$this->logger = $logger;
 		$this->initialConfig = $initialConfig;
 		$this->inboundData = $inboundData;
