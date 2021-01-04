@@ -16,7 +16,7 @@ class Message implements \Serializable {
 
 	const TYPE_NORMAL = 0;
 
-	/** @var ?int */
+	/** @var ?string */
 	private $id;
 
 	/** @var int */
@@ -28,10 +28,10 @@ class Message implements \Serializable {
 	/** @var ?string MemberID */
 	private $author_id;
 
-	/** @var int */
+	/** @var string */
 	private $channel_id;
 
-	/** @var int */
+	/** @var string */
 	private $server_id;  //This is needed for faster handling discord side.
 
 	/** @var ?float */
@@ -40,20 +40,20 @@ class Message implements \Serializable {
 	/** @var bool */
 	private $everyone_mentioned = false;
 
-	/** @var int[] */
+	/** @var string[] */
 	private $users_mentioned = [];
 
-	/** @var int[] */
+	/** @var string[] */
 	private $roles_mentioned = [];
 
-	/** @var int[] */
+	/** @var string[] */
 	private $channels_mentioned = [];
 
-	public function getId(): ?int{
+	public function getId(): ?string{
 		return $this->id;
 	}
 
-	public function setId(int $id): Message{
+	public function setId(string $id): Message{
 		$this->id = $id;
 		return $this;
 	}
@@ -82,20 +82,20 @@ class Message implements \Serializable {
 		return $this;
 	}
 
-	public function getChannelId(): int{
+	public function getChannelId(): string{
 		return $this->channel_id;
 	}
 
-	public function setChannelId(int $channel_id): Message{
+	public function setChannelId(string $channel_id): Message{
 		$this->channel_id = $channel_id;
 		return $this;
 	}
 
-	public function getServerId(): int{
+	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(int $server_id): Message{
+	public function setServerId(string $server_id): Message{
 		$this->server_id = $server_id;
 		return $this;
 	}
@@ -119,14 +119,14 @@ class Message implements \Serializable {
 	}
 
 	/**
-	 * @return int[]
+	 * @return string[]
 	 */
 	public function getUsersMentioned(): array{
 		return $this->users_mentioned;
 	}
 
 	/**
-	 * @param int[] $users_mentioned
+	 * @param string[] $users_mentioned
 	 * @return Message
 	 */
 	public function setUsersMentioned(array $users_mentioned): Message{
@@ -135,14 +135,14 @@ class Message implements \Serializable {
 	}
 
 	/**
-	 * @return int[]
+	 * @return string[]
 	 */
 	public function getRolesMentioned(): array{
 		return $this->roles_mentioned;
 	}
 
 	/**
-	 * @param int[] $roles_mentioned
+	 * @param string[] $roles_mentioned
 	 * @return Message
 	 */
 	public function setRolesMentioned(array $roles_mentioned): Message{
@@ -151,14 +151,14 @@ class Message implements \Serializable {
 	}
 
 	/**
-	 * @return int[]
+	 * @return string[]
 	 */
 	public function getChannelsMentioned(): array{
 		return $this->channels_mentioned;
 	}
 
 	/**
-	 * @param int[] $channels_mentioned
+	 * @param string[] $channels_mentioned
 	 * @return Message
 	 */
 	public function setChannelsMentioned(array $channels_mentioned): Message{

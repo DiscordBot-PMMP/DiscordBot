@@ -28,28 +28,28 @@ use JaxkDev\DiscordBot\Communication\Models\User;
 
 class Storage{
 
-	/** @var Array<int, Server> */
+	/** @var Array<string, Server> */
 	private static $serverMap = [];
 
 	/** @var Array<string, int> */
 	private static $serverNameMap = [];
 
-	/** @var Array<int, Channel> */
+	/** @var Array<string, Channel> */
 	private static $channelMap = [];
 
-	/** @var Array<int, int[]> */
+	/** @var Array<string, string[]> */
 	private static $channelServerMap = [];
 
 	/** @var Array<string, Member> */
 	private static $memberMap = [];
 
-	/** @var Array<int, string[]> */
+	/** @var Array<string, string[]> */
 	private static $memberServerMap = [];
 
-	/** @var Array<int, User> */
+	/** @var Array<string, User> */
 	private static $userMap = [];
 
-	/** @var Array<int, Role> */
+	/** @var Array<string, Role> */
 	private static $roleMap = [];
 
 	/** @var null|User */
@@ -58,12 +58,12 @@ class Storage{
 	/** @var int */
 	private static $timestamp = 0;
 
-	public static function getServer(int $id): ?Server{
-		return self::$serverMap[$id];
+	public static function getServer(string $id): ?Server{
+		return self::$serverMap[$id] ?? null;
 	}
 
 	public static function getServerByName(string $name): ?Server{
-		return self::$serverMap[self::$serverNameMap[$name]];
+		return self::$serverMap[self::$serverNameMap[$name]] ?? null;
 	}
 
 	public static function addServer(Server $server): void{
@@ -73,15 +73,15 @@ class Storage{
 		self::$memberServerMap[$server->getId()] = [];
 	}
 
-	public static function getChannel(int $id): ?Channel{
-		return self::$channelMap[$id];
+	public static function getChannel(string $id): ?Channel{
+		return self::$channelMap[$id] ?? null;
 	}
 
 	/**
-	 * @param int $serverId
+	 * @param string $serverId
 	 * @return Channel[]
 	 */
-	public static function getChannelsByServer(int $serverId): array{
+	public static function getChannelsByServer(string $serverId): array{
 		$channels = [];
 		foreach((self::$channelServerMap[$serverId] ?? []) as $id){
 			$channels[] = self::getChannel($id);
@@ -95,10 +95,14 @@ class Storage{
 	}
 
 	public static function getMember(string $id): ?Member{
-		return self::$memberMap[$id];
+		return self::$memberMap[$id] ?? null;
 	}
 
-	public static function getMembersByServer(int $serverId): array{
+	/**
+	 * @param string $serverId
+	 * @return Member[]
+	 */
+	public static function getMembersByServer(string $serverId): array{
 		$members = [];
 		foreach((self::$memberServerMap[$serverId] ?? []) as $id){
 			$members[] = self::getMember($id);
@@ -111,16 +115,16 @@ class Storage{
 		self::$memberMap[$member->getId()] = $member;
 	}
 
-	public static function getUser(int $id): ?User{
-		return self::$userMap[$id];
+	public static function getUser(string $id): ?User{
+		return self::$userMap[$id] ?? null;
 	}
 
 	public static function addUser(User $user): void{
 		self::$userMap[$user->getId()] = $user;
 	}
 
-	public static function getRole(int $id): ?Role{
-		return self::$roleMap[$id];
+	public static function getRole(string $id): ?Role{
+		return self::$roleMap[$id] ?? null;
 	}
 
 	public static function addRole(Role $role): void{
@@ -135,7 +139,7 @@ class Storage{
 		self::$botUser = $user;
 	}
 
-	public static function getBotMemberByServer(int $serverId): ?Member{
+	public static function getBotMemberByServer(string $serverId): ?Member{
 		$u = self::getBotUser();
 		if($u === null) return null;
 		return self::getMember("{$serverId}.{$u->getId()}");

@@ -82,13 +82,13 @@ class DiscordEventHandler {
 		/** @var DiscordGuild $guild */
 		foreach($client->guilds as $guild){
 			$server = new Server();
-			$server->setId((int)$guild->id)
+			$server->setId($guild->id)
 				->setCreationTimestamp($guild->createdTimestamp())
 				->setIconUrl($guild->icon)
 				->setLarge($guild->large)
 				->setMemberCount($guild->member_count)
 				->setName($guild->name)
-				->setOwnerId((int)$guild->owner_id)
+				->setOwnerId($guild->owner_id)
 				->setRegion($guild->region);
 			$pk->addServer($server);
 
@@ -97,18 +97,18 @@ class DiscordEventHandler {
 				if($channel->type !== DiscordChannel::TYPE_TEXT) continue;
 				$ch = new Channel();
 				$ch->setName($channel->name)
-					->setId((int)$channel->id)
+					->setId($channel->id)
 					->setCategory(null) //todo, parent_id gives ID of channel (Type_category)
 					->setDescription($channel->topic)
-					->setServerId((int)$guild->id);
+					->setServerId($guild->id);
 				$pk->addChannel($ch);
 			}
 
 			/** @var DiscordRole $role */
 			foreach($guild->roles as $role){
 				$r = new Role();
-				$r->setServerId((int)$guild->id)
-					->setId((int)$role->id)
+				$r->setServerId($guild->id)
+					->setId($role->id)
 					->setName($role->name)
 					->setColour($role->color)
 					->setHoistedPosition($role->position)
@@ -120,8 +120,8 @@ class DiscordEventHandler {
 			/** @var DiscordMember $member */
 			foreach($guild->members as $member){
 				$m = new Member();
-				$m->setServerId((int)$guild->id)
-					->setUserId((int)$member->user->id)
+				$m->setServerId($guild->id)
+					->setUserId($member->user->id)
 					->setNickname($member->nick)
 					->setJoinTimestamp($member->joined_at === null ? 0 : $member->joined_at->getTimestamp())
 					->setBoostTimestamp($member->premium_since === null ? null : $member->premium_since->getTimestamp())
@@ -132,7 +132,7 @@ class DiscordEventHandler {
 
 				/** @var DiscordRole $role */
 				foreach($member->roles as $role){
-					$roles[] = (int)$role->id;
+					$roles[] = $role->id;
 				}
 				$m->setRolesId($roles);
 
@@ -143,19 +143,19 @@ class DiscordEventHandler {
 		/** @var DiscordUser $user */
 		foreach($client->users as $user){
 			$u = new User();
-			$u->setId((int)$user->id)
-				->setCreationTimestamp((int)$user->createdTimestamp())
+			$u->setId($user->id)
+				->setCreationTimestamp($user->createdTimestamp())
 				->setAvatarUrl($user->avatar)
-				->setDiscriminator((int)$user->discriminator)
+				->setDiscriminator($user->discriminator)
 				->setUsername($user->username);
 			$pk->addUser($u);
 		}
 
 		$bu = $client->user;
 		$u = new User();
-		$u->setId((int)$bu->id)
+		$u->setId($bu->id)
 			->setUsername($bu->username)
-			->setDiscriminator((int)$bu->discriminator)
+			->setDiscriminator($bu->discriminator)
 			->setAvatarUrl($bu->avatar)
 			->setCreationTimestamp($bu->createdTimestamp());
 		$pk->setBotUser($u);
@@ -187,11 +187,11 @@ class DiscordEventHandler {
 		if($message->channel->guild_id === null) throw new \AssertionError("GuildID Cannot be null.");
 
 		$m = new Message();
-		$m->setId((int)$message->id)
+		$m->setId($message->id)
 			->setTimestamp($message->timestamp->getTimestamp())
 			->setAuthorId(($message->channel->guild_id.".".$message->author->id))
-			->setChannelId((int)$message->channel_id)
-			->setServerId((int)$message->channel->guild_id)
+			->setChannelId($message->channel_id)
+			->setServerId($message->channel->guild_id)
 			->setEveryoneMentioned($message->mention_everyone)
 			->setContent($message->content)
 			->setChannelsMentioned(array_keys($message->mention_channels->toArray()))
@@ -203,16 +203,16 @@ class DiscordEventHandler {
 
 	public function onMemberJoin(DiscordMember $member, Discord $discord): void{
 		$u = new User();
-		$u->setId((int)$member->id)
+		$u->setId($member->id)
 			->setUsername($member->username)
-			->setDiscriminator((int)$member->user->discriminator)
-			->setCreationTimestamp((int)($member->user->createdTimestamp()??0))
+			->setDiscriminator($member->user->discriminator)
+			->setCreationTimestamp(($member->user->createdTimestamp()??0))
 			->setAvatarUrl($member->user->avatar);
 
 		$m = new Member();
-		$m->setUserId((int)$member->id)
+		$m->setUserId($member->id)
 			->setBoostTimestamp(null)
-			->setServerId((int)$member->guild_id)
+			->setServerId($member->guild_id)
 			->setJoinTimestamp($member->joined_at === null ? 0 : $member->joined_at->getTimestamp())
 			->setNickname($member->nick)
 			->setRolesId(array_keys($member->roles->toArray()))

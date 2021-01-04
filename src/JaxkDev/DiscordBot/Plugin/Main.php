@@ -73,6 +73,10 @@ class Main extends PluginBase {
 
 	public function onEnable(){
 		if(!$this->loadConfig()) return;
+		if(extension_loaded("xdebug")){
+			$this->getLogger()->emergency("Plugin will not run with xdebug due to the performance drops.");
+			$this->getServer()->getPluginManager()->disablePlugin($this);
+		}
 
 		$this->getLogger()->debug("Starting DiscordBot Thread...");
 		$this->discordBot = new BotThread($this->getServer()->getLogger(), $this->config, $this->outboundData, $this->inboundData);

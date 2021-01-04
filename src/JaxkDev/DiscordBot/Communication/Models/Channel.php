@@ -18,7 +18,7 @@ class Channel implements \Serializable {
 		TYPE_TEXT = 0,
 		TYPE_VOICE = 1;
 
-	/** @var int */
+	/** @var string */
 	private $id;
 
 	/** @var string */
@@ -34,14 +34,14 @@ class Channel implements \Serializable {
 	/** @var string|null */
 	private $description;
 
-	/** @var int */
+	/** @var string */
 	private $server_id;
 
-	public function getId(): int{
+	public function getId(): string{
 		return $this->id;
 	}
 
-	public function setId(int $id): Channel{
+	public function setId(string $id): Channel{
 		$this->id = $id;
 		return $this;
 	}
@@ -79,11 +79,11 @@ class Channel implements \Serializable {
 		return $this;
 	}
 
-	public function getServerId(): int{
+	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(int $server_id): Channel{
+	public function setServerId(string $server_id): Channel{
 		$this->server_id = $server_id;
 		return $this;
 	}

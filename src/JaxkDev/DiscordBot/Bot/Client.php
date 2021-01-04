@@ -206,8 +206,8 @@ class Client {
 		if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) return;
 
 		/** @noinspection PhpUnhandledExceptionInspection */
-		$this->client->guilds->fetch((string)$message->getServerId())->done(function(DiscordGuild $guild) use($message) {
-			$guild->channels->fetch((string)$message->getChannelId())->done(function(DiscordChannel $channel) use($message) {
+		$this->client->guilds->fetch($message->getServerId())->done(function(DiscordGuild $guild) use($message) {
+			$guild->channels->fetch($message->getChannelId())->done(function(DiscordChannel $channel) use($message) {
 				$channel->sendMessage($message->getContent());
 				MainLogger::getLogger()->debug("Sent message(".strlen($message->getContent()).") to ({$message->getServerId()}|{$message->getChannelId()})");
 			}, function() use($message) {

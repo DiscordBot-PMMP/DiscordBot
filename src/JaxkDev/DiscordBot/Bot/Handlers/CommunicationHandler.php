@@ -104,7 +104,7 @@ class CommunicationHandler {
 	public function checkHeartbeat(): void{
 		if(($diff = microtime(true) - ($this->lastHeartbeat ?? microtime(true))) > Protocol::HEARTBEAT_ALLOWANCE){
 			// Plugin is dead, shutdown self.
-			MainLogger::getLogger()->emergency("Plugin has not responded for 2 seconds, shutting self down.");
+			MainLogger::getLogger()->emergency("Plugin has not responded for ".Protocol::HEARTBEAT_ALLOWANCE." seconds, shutting self down.");
 			$this->client->close();
 		}
 	}

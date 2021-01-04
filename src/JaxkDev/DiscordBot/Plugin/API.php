@@ -39,8 +39,8 @@ class API{
 	/**
 	 * Creates the Message model ready for sending, or null if not possible to create the message at this time.
 	 * @see API::sendMessage For sending the message.
-	 * @param Channel|int $channel Channel model or channel ID.
-	 * @param string      $content Content, <2000 in length.
+	 * @param Channel|string $channel Channel model or channel ID.
+	 * @param string         $content Content, <2000 in length.
 	 * @return Message|null
 	 */
 	public function createMessage($channel, string $content): ?Message{
@@ -109,10 +109,10 @@ class API{
 	 */
 
 	/**
-	 * @param int $id
+	 * @param string $id
 	 * @return Server|null
 	 */
-	public static function getServer(int $id): ?Server{
+	public static function getServer(string $id): ?Server{
 		return Storage::getServer($id);
 	}
 
@@ -125,18 +125,18 @@ class API{
 	}
 
 	/**
-	 * @param int $id
+	 * @param string $id
 	 * @return Channel|null
 	 */
-	public static function getChannel(int $id): ?Channel{
+	public static function getChannel(string $id): ?Channel{
 		return Storage::getChannel($id);
 	}
 
 	/**
-	 * @param int $serverId
+	 * @param string $serverId
 	 * @return Channel[]
 	 */
-	public static function getChannelsByServer(int $serverId): array{
+	public static function getChannelsByServer(string $serverId): array{
 		return Storage::getChannelsByServer($serverId);
 	}
 
@@ -149,26 +149,26 @@ class API{
 	}
 
 	/**
-	 * @param int $id
+	 * @param string $serverId
 	 * @return array
 	 */
-	public static function getMembersByServer(int $id): array{
-		return Storage::getMembersByServer($id);
+	public static function getMembersByServer(string $serverId): array{
+		return Storage::getMembersByServer($serverId);
 	}
 
 	/**
-	 * @param int $id
+	 * @param string $id
 	 * @return User|null
 	 */
-	public static function getUser(int $id): ?User{
+	public static function getUser(string $id): ?User{
 		return Storage::getUser($id);
 	}
 
 	/**
-	 * @param int $id
+	 * @param string $id
 	 * @return Role|null
 	 */
-	public static function getRole(int $id): ?Role{
+	public static function getRole(string $id): ?Role{
 		return Storage::getRole($id);
 	}
 

@@ -14,13 +14,13 @@ namespace JaxkDev\DiscordBot\Communication\Models;
 
 class User implements \Serializable {
 
-	/** @var int */
+	/** @var string */
 	private $id;
 
 	/** @var string */
 	private $username;
 
-	/** @var int */
+	/** @var string */
 	private $discriminator;
 
 	/** @var string */
@@ -34,11 +34,11 @@ class User implements \Serializable {
 
 	//Email, Bot, Verified, Locale etc not included yet.
 
-	public function getId(): int{
+	public function getId(): string{
 		return $this->id;
 	}
 
-	public function setId(int $id): User{
+	public function setId(string $id): User{
 		$this->id = $id;
 		return $this;
 	}
@@ -52,11 +52,11 @@ class User implements \Serializable {
 		return $this;
 	}
 
-	public function getDiscriminator(): int{
+	public function getDiscriminator(): string{
 		return $this->discriminator;
 	}
 
-	public function setDiscriminator(int $discriminator): User{
+	public function setDiscriminator(string $discriminator): User{
 		$this->discriminator = $discriminator;
 		return $this;
 	}

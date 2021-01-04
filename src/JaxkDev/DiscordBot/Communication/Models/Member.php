@@ -17,7 +17,7 @@ class Member implements \Serializable {
 	/** @var string */
 	private $id;
 
-	/** @var int */
+	/** @var string */
 	private $user_id;
 
 	/** @var null|string */
@@ -29,10 +29,10 @@ class Member implements \Serializable {
 	/** @var null|int */
 	private $boost_timestamp;
 
-	/** @var int[] */
+	/** @var string[] */
 	private $roles_id;
 
-	/** @var int */
+	/** @var string */
 	private $server_id;
 
 	/**
@@ -48,11 +48,11 @@ class Member implements \Serializable {
 		$this->id = $this->server_id.".".$this->user_id;
 	}
 
-	public function getUserId(): int{
+	public function getUserId(): string{
 		return $this->user_id;
 	}
 
-	public function setUserId(int $id): Member{
+	public function setUserId(string $id): Member{
 		$this->user_id = $id;
 		return $this;
 	}
@@ -85,14 +85,14 @@ class Member implements \Serializable {
 	}
 
 	/**
-	 * @return int[]
+	 * @return string[]
 	 */
 	public function getRolesId(): array{
 		return $this->roles_id;
 	}
 
 	/**
-	 * @param int[] $roles_id
+	 * @param string[] $roles_id
 	 * @return Member
 	 */
 	public function setRolesId(array $roles_id): Member{
@@ -100,11 +100,11 @@ class Member implements \Serializable {
 		return $this;
 	}
 
-	public function getServerId(): int{
+	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(int $server_id): Member{
+	public function setServerId(string $server_id): Member{
 		$this->server_id = $server_id;
 		return $this;
 	}

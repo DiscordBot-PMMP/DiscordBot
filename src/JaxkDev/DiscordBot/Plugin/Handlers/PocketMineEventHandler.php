@@ -18,6 +18,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\event\player\PlayerTransferEvent;
 use pocketmine\event\server\CommandEvent;
 
 class PocketMineEventHandler implements Listener{
@@ -40,9 +41,10 @@ class PocketMineEventHandler implements Listener{
 
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
 
-		foreach ($config['channels'] as $data){
-			[$server, $channel] = explode(".", $data);
-			//$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
+		foreach ($config['channels'] as $channel){
+			$msg = $this->plugin->getAPI()->createMessage($channel, $message);
+			if($msg === null) continue;
+			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
 
@@ -52,9 +54,24 @@ class PocketMineEventHandler implements Listener{
 
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
 
-		foreach ($config['channels'] as $data){
-			[$guild, $channel] = explode(".", $data);
-			//$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
+		foreach ($config['channels'] as $channel){
+			$msg = $this->plugin->getAPI()->createMessage($channel, $message);
+			if($msg === null) continue;
+			$this->plugin->getAPI()->sendMessage($msg);
+		}
+	}
+
+	public function onPlayerTransfer(PlayerTransferEvent $event): void{
+		$config = $this->eventConfig['member_transfer']['toDiscord'];
+		if(count($config['channels']) === 0) return;
+
+		$message = str_replace(['{TIME}', '{USERNAME}', '{ADDRESS}', '{PORT}'],
+			[date('G:i:s'), $event->getPlayer()->getName(), $event->getAddress(), $event->getPort()], $config['format']);
+
+		foreach ($config['channels'] as $channel){
+			$msg = $this->plugin->getAPI()->createMessage($channel, $message);
+			if($msg === null) continue;
+			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
 
@@ -65,9 +82,10 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}', '{MESSAGE}'],
 			[date('G:i:s'), $event->getPlayer()->getName(), $event->getMessage()], $config['format']);
 
-		foreach ($config['channels'] as $data){
-			[$guild, $channel] = explode(".", $data);
-			//$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
+		foreach ($config['channels'] as $channel){
+			$msg = $this->plugin->getAPI()->createMessage($channel, $message);
+			if($msg === null) continue;
+			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
 
@@ -78,9 +96,10 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}', '{COMMAND}'],
 			[date('G:i:s'), $event->getSender()->getName(), $event->getCommand()], $config['format']);
 
-		foreach ($config['channels'] as $data){
-			[$guild, $channel] = explode(".", $data);
-			//$this->plugin->getBotCommunicationHandler()->sendMessage($guild, $channel, $message);
+		foreach ($config['channels'] as $channel){
+			$msg = $this->plugin->getAPI()->createMessage($channel, $message);
+			if($msg === null) continue;
+			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
 }

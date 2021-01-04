@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Models;
 
 class Server implements \Serializable {
 
-	/** @var int */
+	/** @var string */
 	private $id;
 
 	/** @var string */
@@ -26,7 +26,7 @@ class Server implements \Serializable {
 	/** @var string */
 	private $region;
 
-	/** @var int */
+	/** @var string */
 	private $owner_id;
 
 	/** @var float */
@@ -38,11 +38,11 @@ class Server implements \Serializable {
 	/** @var int */
 	private $member_count;
 
-	public function getId(): int{
+	public function getId(): string{
 		return $this->id;
 	}
 
-	public function setId(int $id): Server{
+	public function setId(string $id): Server{
 		$this->id = $id;
 		return $this;
 	}
@@ -74,11 +74,11 @@ class Server implements \Serializable {
 		return $this;
 	}
 
-	public function getOwnerId(): int{
+	public function getOwnerId(): string{
 		return $this->owner_id;
 	}
 
-	public function setOwnerId(int $owner_id): Server{
+	public function setOwnerId(string $owner_id): Server{
 		$this->owner_id = $owner_id;
 		return $this;
 	}

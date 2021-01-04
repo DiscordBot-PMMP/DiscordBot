@@ -27,4 +27,9 @@ member_leave:
     format: "[{TIME}] **{USERNAME}** Has left the minecraft server."
   fromDiscord:
     format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} Has left the discord server."
+
+member_transfer:
+  toDiscord:
+    channels: []
+    format: "[{TIME}] **{USERNAME}** Has been transferred to {ADDRESS}:{PORT}."
 ...
