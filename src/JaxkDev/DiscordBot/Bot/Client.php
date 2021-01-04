@@ -122,9 +122,13 @@ class Client {
 		$this->registerHandlers();
 		$this->registerTimers();
 
-		$this->thread->setStatus(Protocol::THREAD_STATUS_STARTED);
-
-		$this->client->run();
+		if($this->thread->getStatus() === Protocol::THREAD_STATUS_STARTING){
+			$this->thread->setStatus(Protocol::THREAD_STATUS_STARTED);
+			$this->client->run();
+		} else {
+			MainLogger::getLogger()->warning("Closing thread, unexpected state change.");
+			$this->close();
+		}
 	}
 
 	private function registerTimers(): void{
@@ -163,9 +167,13 @@ class Client {
 		// Note ready is emitted after successful connection + all servers/users loaded, so only register events
 		// After this event.
 		$this->client->on('ready', function (Discord $discord) {
-			if($this->readyTimer !== null) {
+			if($this->readyTimer !== null){
 				$this->client->getLoop()->cancelTimer($this->readyTimer);
 				$this->readyTimer = null;
+			}
+			if($this->getThread()->getStatus() !== Protocol::THREAD_STATUS_STARTED){
+				MainLogger::getLogger()->warning("Closing thread, unexpected state change.");
+				$this->close();
 			}
 
 			$ac = new Activity();
@@ -227,7 +235,7 @@ class Client {
 					$m->setGuildId((int)$guild->id)
 						->setUserId((int)$member->user->id)
 						->setNickname($member->nick)
-						->setJoinTimestamp($member->joined_at->getTimestamp())
+						->setJoinTimestamp($member->joined_at === null ? 0 : $member->joined_at->getTimestamp())
 						->setBoostTimestamp($member->premium_since === null ? null : $member->premium_since->getTimestamp())
 						->setId();
 

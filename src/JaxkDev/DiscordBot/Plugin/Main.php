@@ -23,6 +23,7 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
 use pocketmine\utils\MainLogger;
+use pocketmine\utils\TextFormat;
 use Volatile;
 
 class Main extends PluginBase {
@@ -43,7 +44,7 @@ class Main extends PluginBase {
 	private $pocketmineEventHandler;
 
 	/** @var array */
-	private $eventConfig;
+	private $eventConfig, $config;
 
 	public function onLoad(){
 		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
@@ -59,25 +60,49 @@ class Main extends PluginBase {
 		$this->saveResource("events.yml");
 		$this->saveResource("HELP_ENG.txt", true); //Always keep that up-to-date.
 
+		$this->inboundData = new Volatile();
+		$this->outboundData = new Volatile();
+
+		$this->botCommsHandler = new BotCommunicationHandler($this);
+		$this->pocketmineEventHandler = new PocketMineEventHandler($this, yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml"));
+	}
+
+	public function onEnable(){
+		if(!$this->loadConfig()) return;
+
+		$this->getLogger()->debug("Starting DiscordBot Thread...");
+		$this->discordBot = new BotThread($this->getServer()->getLogger(), $this->config, $this->outboundData, $this->inboundData);
+		$this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
+		unset($this->config);
+
+		$this->getServer()->getPluginManager()->registerEvents($this->pocketmineEventHandler, $this);
+		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void {
+			$this->tick($currentTick);
+		}), 1);
+	}
+
+	public function onDisable(){
+		$this->stopAll(false);
+	}
+
+	private function loadConfig(): bool{
 		$this->getLogger()->debug("Loading initial configuration...");
 
 		$config = yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."config.yml");
 		if($config === false){
 			$this->getLogger()->critical("Failed to parse config.yml");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
+			return false;
 		}
 		$config = (array)$config;
-
-		// TODO Verify Config before using it.
 		$config['logging']['directory'] = $this->getDataFolder().DIRECTORY_SEPARATOR.($initialConfig['logging']['directory'] ?? "logs");
 
 		$this->eventConfig = yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml");
 		if($this->eventConfig === false){
 			$this->getLogger()->critical("Failed to parse events.yml");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
+			return false;
 		}
-
-		$this->getLogger()->debug("Constructing DiscordBot...");
 
 		if($config['version'] !== ConfigUtils::VERSION){
 			$this->getLogger()->info("Updating your config from v{$config['version']} to v" . ConfigUtils::VERSION);
@@ -87,26 +112,21 @@ class Main extends PluginBase {
 			$this->getLogger()->info("Config updated, old config was saved to '{$this->getDataFolder()}config.yml.old'");
 		}
 
-		$this->inboundData = new Volatile();
-		$this->outboundData = new Volatile();
+		$this->getLogger()->debug("Verifying configs...");
+		$result_raw = ConfigUtils::verify($config);
+		if(sizeof($result_raw) !== 0){
+			$result = TextFormat::RED."There were some problems with your config.yml, see below:\n".TextFormat::RESET;
+			foreach($result_raw as $key => $value){
+				$result .= "'{$key}' - {$value}\n";
+			}
+			$this->getLogger()->error($result);
+			$this->getServer()->getPluginManager()->disablePlugin($this);
+			return false;
+		}
 
-		$this->botCommsHandler = new BotCommunicationHandler($this);
-		$this->pocketmineEventHandler = new PocketMineEventHandler($this, yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml"));
-		$this->discordBot = new BotThread($this->getServer()->getLogger(), $config, $this->outboundData, $this->inboundData);
-	}
-
-	public function onEnable() {
-		$this->getLogger()->debug("Starting DiscordBot Thread...");
-		$this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
-
-		$this->getServer()->getPluginManager()->registerEvents($this->pocketmineEventHandler, $this);
-		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void {
-			$this->tick($currentTick);
-		}), 1);
-	}
-
-	public function onDisable() {
-		$this->stopAll(false);
+		//Config is now updated and verified.
+		$this->config = $config;
+		return true;
 	}
 
 	public function tick(int $currentTick): void{
@@ -161,10 +181,13 @@ class Main extends PluginBase {
 	}
 
 	public function stopAll(bool $stopPlugin = true): void{
-		if(!$this->tickTask->isCancelled()){
-			$this->tickTask->cancel();
+		if($this->tickTask !== null){
+			if(!$this->tickTask->isCancelled()){
+				$this->tickTask->cancel();
+			}
 		}
 		if($this->discordBot !== null){
+			//Stopping while bot is not ready causes it to hang.
 			$this->discordBot->setStatus(Protocol::THREAD_STATUS_CLOSING);
 			$this->discordBot->quit();  // Joins thread (<-- beware) (Right now this forces bot to close)
 		}

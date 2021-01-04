@@ -85,7 +85,7 @@ class DiscordEventHandler {
 		$m->setUserId((int)$member->id)
 			->setBoostTimestamp(null)
 			->setGuildId((int)$member->guild_id)
-			->setJoinTimestamp($member->joined_at->getTimestamp())
+			->setJoinTimestamp($member->joined_at === null ? 0 : $member->joined_at->getTimestamp())
 			->setNickname($member->nick)
 			->setRolesId(array_keys($member->roles->toArray()))
 			->setId();
