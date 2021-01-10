@@ -175,9 +175,8 @@ class DiscordEventHandler {
 	}
 
 	public function onMessage(DiscordMessage $message, Discord $discord): void{
-		// Eg webhooks ?
-		if(!$message->author instanceof DiscordMember) return;
-		if($message->author->user->bot) return;
+		// Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
+		if($message->author instanceof DiscordMember ? $message->author->user->bot : $message->author->bot) return;
 
 		// Other types of messages not used right now.
 		if($message->type !== DiscordMessage::TYPE_NORMAL) return;
