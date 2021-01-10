@@ -59,7 +59,7 @@ class BotCommunicationHandler {
 		$config = $this->plugin->getEventsConfig()['message']['fromDiscord'];
 		$message = $packet->getMessage();
 
-		if(!in_array($message->getServerId().".".$message->getChannelId(), $config['channels'])) return true;
+		if(!in_array($message->getChannelId(), $config['channels'])) return true;
 
 		//If any of these asserts fire theres a mismatch between Storage and discord.
 
