@@ -20,7 +20,7 @@ class Server implements \Serializable {
 	/** @var string */
 	private $name;
 
-	/** @var string */
+	/** @var string|null */
 	private $icon_url;
 
 	/** @var string */
@@ -56,11 +56,11 @@ class Server implements \Serializable {
 		return $this;
 	}
 
-	public function getIconUrl(): string{
+	public function getIconUrl(): ?string{
 		return $this->icon_url;
 	}
 
-	public function setIconUrl(string $icon_url): Server{
+	public function setIconUrl(?string $icon_url): Server{
 		$this->icon_url = $icon_url;
 		return $this;
 	}
