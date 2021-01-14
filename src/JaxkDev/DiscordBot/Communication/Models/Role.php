@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models;
 
+use JaxkDev\DiscordBot\Communication\Models\Permissions\RolePermissions;
+
 class Role implements \Serializable {
 
 	/** @var string */
@@ -20,7 +22,7 @@ class Role implements \Serializable {
 	/** @var string */
 	private $name;
 
-	/** @var int (Bitwise) */
+	/** @var RolePermissions */
 	private $permissions;
 
 	/** @var int */
@@ -53,11 +55,11 @@ class Role implements \Serializable {
 		return $this;
 	}
 
-	public function getPermissions(): int{
+	public function getPermissions(): RolePermissions{
 		return $this->permissions;
 	}
 
-	public function setPermissions(int $permissions): Role{
+	public function setPermissions(RolePermissions $permissions): Role{
 		$this->permissions = $permissions;
 		return $this;
 	}

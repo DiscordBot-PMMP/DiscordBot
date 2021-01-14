@@ -24,6 +24,7 @@ use JaxkDev\DiscordBot\Communication\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Communication\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Communication\Models\Role;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
@@ -106,6 +107,9 @@ class DiscordEventHandler {
 
 			/** @var DiscordRole $role */
 			foreach($guild->roles as $role){
+				$p = new RolePermissions();
+				$p->setBitwise($role->permissions->bitwise);
+
 				$r = new Role();
 				$r->setServerId($guild->id)
 					->setId($role->id)
@@ -113,7 +117,7 @@ class DiscordEventHandler {
 					->setColour($role->color)
 					->setHoistedPosition($role->position)
 					->setMentionable($role->mentionable)
-					->setPermissions($role->permissions->bitwise);
+					->setPermissions($p);
 				$pk->addRole($r);
 			}
 
@@ -135,6 +139,10 @@ class DiscordEventHandler {
 					$roles[] = $role->id;
 				}
 				$m->setRolesId($roles);
+
+				$p = new RolePermissions();
+				$p->setBitwise($member->getPermissions()->bitwise);
+				$m->setPermissions($p);
 
 				$pk->addMember($m);
 			}
@@ -178,6 +186,9 @@ class DiscordEventHandler {
 		// Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
 		if($message->author instanceof DiscordMember ? $message->author->user->bot : $message->author->bot) return;
 
+		//if($message->author->id === "305060807887159296") $message->react("❤️");
+		//Dont ask questions...
+
 		// Other types of messages not used right now.
 		if($message->type !== DiscordMessage::TYPE_NORMAL) return;
 		if($message->channel->type !== DiscordChannel::TYPE_TEXT) return;
@@ -208,12 +219,16 @@ class DiscordEventHandler {
 			->setCreationTimestamp((int)($member->user->createdTimestamp()??0))
 			->setAvatarUrl($member->user->avatar);
 
+		$p = new RolePermissions();
+		$p->setBitwise($member->getPermissions()->bitwise);
+
 		$m = new Member();
 		$m->setUserId($member->id)
 			->setBoostTimestamp(null)
 			->setServerId($member->guild_id)
 			->setJoinTimestamp($member->joined_at === null ? 0 : $member->joined_at->getTimestamp())
 			->setNickname($member->nick)
+			->setPermissions($p)
 			->setRolesId(array_keys($member->roles->toArray()))
 			->setId();
 

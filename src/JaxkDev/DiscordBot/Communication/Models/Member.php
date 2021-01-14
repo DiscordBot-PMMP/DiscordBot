@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models;
 
+use JaxkDev\DiscordBot\Communication\Models\Permissions\RolePermissions;
+
 class Member implements \Serializable {
 
 	/** @var string */
@@ -28,6 +30,9 @@ class Member implements \Serializable {
 
 	/** @var null|int */
 	private $boost_timestamp;
+
+	/** @var RolePermissions */
+	private $permissions;
 
 	/** @var string[] */
 	private $roles_id;
@@ -84,6 +89,15 @@ class Member implements \Serializable {
 		return $this;
 	}
 
+	public function getPermissions(): RolePermissions{
+		return $this->permissions;
+	}
+
+	public function setPermissions(RolePermissions $permissions): Member{
+		$this->permissions = $permissions;
+		return $this;
+	}
+
 	/**
 	 * @return string[]
 	 */
@@ -118,6 +132,7 @@ class Member implements \Serializable {
 			$this->nickname,
 			$this->join_timestamp,
 			$this->boost_timestamp,
+			$this->permissions,
 			$this->roles_id,
 			$this->server_id
 		]);
@@ -130,6 +145,7 @@ class Member implements \Serializable {
 			$this->nickname,
 			$this->join_timestamp,
 			$this->boost_timestamp,
+			$this->permissions,
 			$this->roles_id,
 			$this->server_id
 		] = unserialize($serialized);
