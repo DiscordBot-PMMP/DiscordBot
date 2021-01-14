@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models\Permissions;
 
+use JaxkDev\DiscordBot\Utils;
+
 abstract class Permissions implements \Serializable {
 
 	/*
@@ -66,7 +68,7 @@ abstract class Permissions implements \Serializable {
 	/** @var int */
 	private $bitwise = 0;
 
-	/** @var string[] */
+	/** @var Array<string, bool> */
 	private $permissions = [];
 
 	public function getBitwise(): int{
@@ -80,11 +82,28 @@ abstract class Permissions implements \Serializable {
 	}
 
 	/**
-	 * @see Permissions::getPossiblePermissions() for possible permissions.
-	 * @return string[]
+	 * Returns all the permissions possible and the current state, or an empty array if not initialised.
+	 * @return Array<string, bool>
 	 */
 	public function getPermissions(): array{
 		return $this->permissions;
+	}
+
+	public function getPermission(string $permission): ?bool{
+		return $this->permissions[$permission] ?? null;
+	}
+
+	public function setPermission(string $permission, bool $state = true): Permissions{
+		$permission = strtolower($permission);
+		$posPermissions = $this->getPossiblePermissions();
+
+		Utils::assert(in_array($permission, array_keys($posPermissions)),
+			"Permission '{$permission}' cannot be set to a '".get_parent_class($this)."'");
+
+		if($this->permissions[$permission] === $state) return $this;
+		$this->permissions[$permission] = $state;
+		$this->bitwise ^= $posPermissions[$permission];
+		return $this;
 	}
 
 	/**
@@ -94,12 +113,13 @@ abstract class Permissions implements \Serializable {
 		$this->permissions = [];
 		$possiblePerms = $this->getPossiblePermissions();
 		foreach($possiblePerms as $name => $v){
-			if(($this->bitwise & $v) !== 0){
-				$this->permissions[] = $name;
-			}
+			$this->permissions[$name] = (($this->bitwise & $v) !== 0);
 		}
 	}
 
+	/**
+	 * @return Array<string, int>
+	 */
 	abstract static function getPossiblePermissions(): array;
 
 	//----- Serialization -----//
