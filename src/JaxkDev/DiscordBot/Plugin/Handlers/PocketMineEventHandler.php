@@ -34,6 +34,10 @@ class PocketMineEventHandler implements Listener{
 		$this->eventConfig = $eventConfig;
 	}
 
+	/**
+	 * @priority MONITOR
+	 * @param PlayerJoinEvent $event
+	 */
 	public function onJoin(PlayerJoinEvent $event): void{
 		// TODO Function below.
 		$config = $this->eventConfig['member_join']['toDiscord'];
@@ -48,6 +52,10 @@ class PocketMineEventHandler implements Listener{
 		}
 	}
 
+	/**
+	 * @priority MONITOR
+	 * @param PlayerQuitEvent $event
+	 */
 	public function onPlayerQuit(PlayerQuitEvent $event): void{
 		$config = $this->eventConfig['member_leave']['toDiscord'];
 		if(count($config['channels']) === 0) return;
@@ -75,6 +83,10 @@ class PocketMineEventHandler implements Listener{
 		}
 	}
 
+	/**
+	 * @priority MONITOR
+	 * @param PlayerChatEvent $event
+	 */
 	public function onPlayerChat(PlayerChatEvent $event): void{
 		$config = $this->eventConfig['message']['toDiscord'];
 		if(count($config['channels']) === 0) return;
@@ -89,6 +101,10 @@ class PocketMineEventHandler implements Listener{
 		}
 	}
 
+	/**
+	 * @priority MONITOR
+	 * @param CommandEvent $event
+	 */
 	public function onPlayerCommand(CommandEvent $event): void{
 		$config = $this->eventConfig['command']['toDiscord'];
 		if(count($config['channels']) === 0) return;
