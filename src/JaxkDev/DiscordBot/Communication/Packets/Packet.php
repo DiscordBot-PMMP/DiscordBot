@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-abstract class Packet implements \Serializable {
+abstract class Packet implements \Serializable{
 
 	// Used to track packets, (ACK's)
 	/** @var int */

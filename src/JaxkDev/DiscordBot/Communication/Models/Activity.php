@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Models;
 
 use JaxkDev\DiscordBot\Utils;
 
-class Activity implements \Serializable {
+class Activity implements \Serializable{
 
 	const
 		TYPE_PLAYING = 0,

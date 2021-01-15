@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models;
 
-class Server implements \Serializable {
+class Server implements \Serializable{
 
 	/** @var string */
 	private $id;

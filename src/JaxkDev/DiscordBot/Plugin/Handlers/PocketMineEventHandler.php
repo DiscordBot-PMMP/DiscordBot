@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnusedLocalVariableInspection */
+<?php
 
 /*
  * DiscordBot, PocketMine-MP Plugin.

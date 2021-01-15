@@ -28,13 +28,13 @@ use JaxkDev\DiscordBot\Plugin\Storage;
 use JaxkDev\DiscordBot\Utils;
 use pocketmine\utils\MainLogger;
 
-class BotCommunicationHandler {
+class BotCommunicationHandler{
 
 	/** @var Main */
 	private $plugin;
 
-	/** @var float */
-	private $lastHeartbeat;
+	/** @var float|null */
+	private $lastHeartbeat = null;
 
 	public function __construct(Main $plugin){
 		$this->plugin = $plugin;
@@ -170,8 +170,8 @@ class BotCommunicationHandler {
 	 * Checks last KNOWN Heartbeat timestamp with current time, does not check pre-start condition.
 	 */
 	public function checkHeartbeat(): void{
-		if(($diff = microtime(true) - ($this->lastHeartbeat ?? microtime(true))) > Protocol::HEARTBEAT_ALLOWANCE){
-			// Bot is dead, shutdown plugin.
+		if($this->lastHeartbeat === null) return;
+		if(($diff = microtime(true) - $this->lastHeartbeat) > Protocol::HEARTBEAT_ALLOWANCE){
 			MainLogger::getLogger()->emergency("DiscordBot has not responded for 2 seconds, disabling plugin + bot.");
 			$this->plugin->stopAll();
 		}
@@ -183,7 +183,7 @@ class BotCommunicationHandler {
 		$this->plugin->writeOutboundData($p);
 	}
 
-	public function getLastHeartbeat(): float{
+	public function getLastHeartbeat(): ?float{
 		return $this->lastHeartbeat;
 	}
 }

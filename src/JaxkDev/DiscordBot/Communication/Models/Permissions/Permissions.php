@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Models\Permissions;
 
 use JaxkDev\DiscordBot\Utils;
 
-abstract class Permissions implements \Serializable {
+abstract class Permissions implements \Serializable{
 
 	/*
 	 * TODO:

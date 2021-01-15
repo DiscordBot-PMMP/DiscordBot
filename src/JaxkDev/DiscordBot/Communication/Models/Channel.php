@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models;
 
-class Channel implements \Serializable {
+class Channel implements \Serializable{
 
 	const
 		TYPE_TEXT = 0,
@@ -29,7 +29,7 @@ class Channel implements \Serializable {
 
 	///** @var int */
 	//private $type = self::TYPE_TEXT;
-	//TODO, Think about DM channel where name,cat,desc,server etc is N/A.
+	//TODO, abstract class and make parents, TextChannel, VoiceChannel, CategoryChannel, DmChannel...
 
 	/** @var string|null */
 	private $description;

@@ -26,7 +26,7 @@ use pocketmine\utils\MainLogger;
 use pocketmine\utils\TextFormat;
 use Volatile;
 
-class Main extends PluginBase {
+class Main extends PluginBase{
 
 	/** @var BotThread */
 	private $discordBot;
@@ -84,7 +84,7 @@ class Main extends PluginBase {
 		unset($this->config);
 
 		$this->getServer()->getPluginManager()->registerEvents($this->pocketmineEventHandler, $this);
-		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void {
+		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void{
 			$this->tick($currentTick);
 		}), 1);
 	}

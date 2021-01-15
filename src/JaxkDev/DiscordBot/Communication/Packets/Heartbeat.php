@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-class Heartbeat extends Packet {
+class Heartbeat extends Packet{
 
 	/** @var float */
 	private $heartbeat;

@@ -20,7 +20,7 @@ use pocketmine\Thread;
 use pocketmine\utils\MainLogger;
 use Volatile;
 
-class BotThread extends Thread {
+class BotThread extends Thread{
 
 	/** @var AttachableThreadedLogger */
 	private $logger;
@@ -52,9 +52,6 @@ class BotThread extends Thread {
 		new Client($this, (array)$this->initialConfig);
 	}
 
-	/*
-	 * https://github.com/pmmp/pthreads/blob/fork/examples/fetching-data-from-a-thread.php
-	 */
 	public function readInboundData(int $count = 1): array{
 		return array_map(function($data){
 			/** @var Packet $packet */

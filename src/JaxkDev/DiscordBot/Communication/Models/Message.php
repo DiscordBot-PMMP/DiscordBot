@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models;
 
-class Message implements \Serializable {
+class Message implements \Serializable{
 
 	const TYPE_NORMAL = 0;
 

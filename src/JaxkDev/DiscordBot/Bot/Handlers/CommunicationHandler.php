@@ -27,16 +27,16 @@ use JaxkDev\DiscordBot\Communication\Protocol;
 use pocketmine\utils\MainLogger;
 
 /**
- * The only class that should be dealing with packets (except botThread send/recv)
+ * The only class that should be dealing with packets directly.
  * Class PluginCommunicationHandler
  */
-class CommunicationHandler {
+class CommunicationHandler{
 
 	/** @var Client */
 	private $client;
 
-	/** @var float */
-	private $lastHeartbeat;
+	/** @var float|null */
+	private $lastHeartbeat = null;
 
 	public function __construct(Client $client){
 		$this->client = $client;
@@ -102,14 +102,14 @@ class CommunicationHandler {
 
 
 	public function checkHeartbeat(): void{
-		if(($diff = microtime(true) - ($this->lastHeartbeat ?? microtime(true))) > Protocol::HEARTBEAT_ALLOWANCE){
-			// Plugin is dead, shutdown self.
+		if($this->lastHeartbeat === null) return;
+		if(($diff = (microtime(true) - $this->lastHeartbeat)) > Protocol::HEARTBEAT_ALLOWANCE){
 			MainLogger::getLogger()->emergency("Plugin has not responded for ".Protocol::HEARTBEAT_ALLOWANCE." seconds, shutting self down.");
 			$this->client->close();
 		}
 	}
 
-	public function getLastHeartbeat(): float {
+	public function getLastHeartbeat(): ?float{
 		return $this->lastHeartbeat;
 	}
 }

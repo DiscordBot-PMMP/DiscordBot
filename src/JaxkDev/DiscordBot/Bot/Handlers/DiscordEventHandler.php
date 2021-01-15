@@ -32,7 +32,7 @@ use JaxkDev\DiscordBot\Communication\Packets\DiscordEventAllData;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use pocketmine\utils\MainLogger;
 
-class DiscordEventHandler {
+class DiscordEventHandler{
 
 	/** @var Client */
 	private $client;
@@ -46,13 +46,31 @@ class DiscordEventHandler {
 		$discord->on('MESSAGE_CREATE', array($this, 'onMessage'));
 		$discord->on('GUILD_MEMBER_ADD', array($this, 'onMemberJoin'));
 		$discord->on('GUILD_MEMBER_REMOVE', array($this, 'onMemberLeave'));
-		/**
-		 * TODO:
-		 * SERVER_JOIN/LEAVE/EDIT
-		 * CHANNEL_CREATE/DELETE/EDIT
-		 * MEMBER_EDIT (Roles,nickname etc)
-		 * ROLE_CREATE/DELETE/EDIT
-		 * MESSAGE_DELETE/EDIT
+		/*
+		 * TODO, functions/models/packets:
+		 * $discord->on('GUILD_CREATE', [$this, 'onGuildJoin']);   SERVER_JOIN/LEAVE/EDIT
+		 * $discord->on('GUILD_UPDATE', [$this, 'onGuildUpdate']);
+		 * $discord->on('GUILD_DELETE', [$this, 'onGuildLeave']);
+		 *
+		 * $discord->on('CHANNEL_CREATE', [$this, 'onChannelCreate']);   CHANNEL_CREATE/DELETE/EDIT
+		 * $discord->on('CHANNEL_UPDATE', [$this, 'onChannelUpdate']);
+		 * $discord->on('CHANNEL_DELETE', [$this, 'onChannelDelete']);
+		 *
+		 * $discord->on('GUILD_MEMBER_UPDATE', [$this, 'onMemberUpdate']);   MEMBER_EDIT (Roles,nickname etc)
+		 *
+		 * $discord->on('GUILD_ROLE_CREATE', [$this, 'onRoleCreate']);   ROLE_CREATE/DELETE/EDIT
+		 * $discord->on('GUILD_ROLE_UPDATE', [$this, 'onRoleUpdate']);
+		 * $discord->on('GUILD_ROLE_DELETE', [$this, 'onRoleDelete']);
+		 *
+		 * $discord->on('MESSAGE_DELETE', [$this, 'onMessageDelete']);   MESSAGE_DELETE/EDIT
+		 * $discord->on('MESSAGE_UPDATE', [$this, 'onMessageUpdate']);
+		 *
+		 * TODO (others not yet planned for 2.0.0):
+		 * - Reactions
+		 * - Pins
+		 * - Server Integrations ?
+		 * - Invites
+		 * - Bans
 		 */
 	}
 

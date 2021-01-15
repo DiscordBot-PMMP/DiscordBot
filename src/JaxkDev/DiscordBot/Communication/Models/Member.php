@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Models;
 
 use JaxkDev\DiscordBot\Communication\Models\Permissions\RolePermissions;
 
-class Member implements \Serializable {
+class Member implements \Serializable{
 
 	/** @var string */
 	private $id;

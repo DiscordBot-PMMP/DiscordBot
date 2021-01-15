@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot;
 use AssertionError;
 use Throwable;
 
-abstract class Utils {
+abstract class Utils{
 
 	/**
 	 * @param bool $assertion

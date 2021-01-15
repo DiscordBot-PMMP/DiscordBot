@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication;
 
-abstract class Protocol {
+abstract class Protocol{
 
 	const
 		PPT = 50, 					// How many packets should be processed per tick ?   [PacketsPerTick]

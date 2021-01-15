@@ -100,34 +100,20 @@ class API{
 
 
 
-
-
-
-
 	/*
 	 * Wrappers for Storage
 	 */
 
-	/**
-	 * @param string $id
-	 * @return Server|null
-	 */
+
+
 	public static function getServer(string $id): ?Server{
 		return Storage::getServer($id);
 	}
 
-	/**
-	 * @param string $name
-	 * @return Server|null
-	 */
 	public static function getServerByName(string $name): ?Server{
 		return Storage::getServerByName($name);
 	}
 
-	/**
-	 * @param string $id
-	 * @return Channel|null
-	 */
 	public static function getChannel(string $id): ?Channel{
 		return Storage::getChannel($id);
 	}
@@ -140,48 +126,30 @@ class API{
 		return Storage::getChannelsByServer($serverId);
 	}
 
-	/**
-	 * @param string $id Member's ID is unique 'serverID.userID'
-	 * @return Member|null
-	 */
 	public static function getMember(string $id): ?Member{
 		return Storage::getMember($id);
 	}
 
 	/**
 	 * @param string $serverId
-	 * @return array
+	 * @return Member[]
 	 */
 	public static function getMembersByServer(string $serverId): array{
 		return Storage::getMembersByServer($serverId);
 	}
 
-	/**
-	 * @param string $id
-	 * @return User|null
-	 */
 	public static function getUser(string $id): ?User{
 		return Storage::getUser($id);
 	}
 
-	/**
-	 * @param string $id
-	 * @return Role|null
-	 */
 	public static function getRole(string $id): ?Role{
 		return Storage::getRole($id);
 	}
 
-	/**
-	 * @return User|null
-	 */
 	public static function getBotUser(): ?User{
 		return Storage::getBotUser();
 	}
 
-	/**
-	 * @return int
-	 */
 	public static function getStorageTimestamp(): int{
 		return Storage::getTimestamp();
 	}

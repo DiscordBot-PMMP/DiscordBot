@@ -32,7 +32,7 @@ use Monolog\Handler\RotatingFileHandler;
 use pocketmine\utils\MainLogger;
 use React\EventLoop\TimerInterface;
 
-class Client {
+class Client{
 
 	/** @var BotThread */
 	private $thread;
@@ -94,13 +94,13 @@ class Client {
 			$socket_opts['tls'] = ['verify_peer' => false, 'verify_peer_name' => false];
 		}
 
-		/** @noinspection PhpUnhandledExceptionInspection */
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
 		$this->client = new Discord([
 			'token' => $config['discord']['token'],
 			'logger' => $logger,
 			'httpLogger' => $httpLogger,
 			'socket_options' => $socket_opts,
-			'loadAllMembers' => true  // Seems like this is the only way...
+			'loadAllMembers' => true
 		]);
 
 		$this->config['discord']['token'] = "REDACTED";
@@ -114,7 +114,7 @@ class Client {
 		if($this->thread->getStatus() === Protocol::THREAD_STATUS_STARTING){
 			$this->thread->setStatus(Protocol::THREAD_STATUS_STARTED);
 			$this->client->run();
-		} else {
+		}else{
 			MainLogger::getLogger()->warning("Closing thread, unexpected state change.");
 			$this->close();
 		}
@@ -139,13 +139,14 @@ class Client {
 						$this->close();
 					}
 				});
-			} else {
+			}else{
 				MainLogger::getLogger()->critical("Client failed to login/connect within 30 seconds, See log file for details.");
 				$this->close();
 			}
 		});
 
 		$this->tickTimer = $this->client->getLoop()->addPeriodicTimer(1/20, function(){
+			// Note this is not accurate to 1/20th of a second.
 			$this->tick();
 		});
 	}
@@ -167,7 +168,11 @@ class Client {
 	public function tick(): void{
 		$data = $this->thread->readInboundData(Protocol::PPT);
 
-		foreach($data as $d) $this->communicationHandler->handle($d);
+		foreach($data as $d){
+			if(!$this->communicationHandler->handle($d)){
+				MainLogger::getLogger()->debug("Packet ".get_class($d)." [".$d->getUID()."] not handled.");
+			}
+		}
 
 		if(($this->tickCount % 20) === 0){
 			//Run every second.
@@ -205,7 +210,7 @@ class Client {
 	public function sendMessage(Message $message): void{
 		if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) return;
 
-		/** @noinspection PhpUnhandledExceptionInspection */
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
 		$this->client->guilds->fetch($message->getServerId())->done(function(DiscordGuild $guild) use($message){
 			$guild->channels->fetch($message->getChannelId())->done(function(DiscordChannel $channel) use($message){
 				$channel->sendMessage($message->getContent());
@@ -224,10 +229,10 @@ class Client {
 			'type' => $activity->getType()
 		]);
 
-		try {
+		try{
 			$this->client->updatePresence($presence, $activity->getStatus() === Activity::STATUS_IDLE, $activity->getStatus());
 			return true;
-		} catch (Exception $e){
+		}catch (Exception $e){
 			return false;
 		}
 	}
@@ -257,13 +262,12 @@ class Client {
 		if($this->client instanceof Discord){
 			try{
 				$this->client->close(true);
-			} catch (Error $e){
+			}catch (Error $e){
 				MainLogger::getLogger()->debug("Failed to close client, probably due it not being started.");
 			}
 		}
 		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
 		MainLogger::getLogger()->debug("Client closed.");
-		//if(extension_loaded('xdebug')) var_dump(xdebug_stop_gcstats());
 		exit(0);
 	}
 }
