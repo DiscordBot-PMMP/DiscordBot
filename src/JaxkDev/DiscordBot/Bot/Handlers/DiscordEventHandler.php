@@ -64,7 +64,7 @@ class DiscordEventHandler {
 
 		//Default activity.
 		$ac = new Activity();
-		$ac->setMessage("In PocketMine-MP.")->setType(Activity::TYPE_PLAYING)->setStatus(Activity::STATUS_IDLE);
+		$ac->setMessage("In PMMP v".\pocketmine\VERSION)->setType(Activity::TYPE_PLAYING)->setStatus(Activity::STATUS_IDLE);
 		$this->client->updatePresence($ac);
 
 		// Register all other events.
