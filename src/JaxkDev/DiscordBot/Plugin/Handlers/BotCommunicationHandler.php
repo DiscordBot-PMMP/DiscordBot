@@ -20,6 +20,9 @@ use JaxkDev\DiscordBot\Communication\Packets\DiscordEventAllData;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageSent;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerJoin;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerLeave;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
@@ -46,6 +49,9 @@ class BotCommunicationHandler{
 		if($packet instanceof DiscordEventMemberJoin) return $this->handleMemberJoin($packet);
 		if($packet instanceof DiscordEventMemberLeave) return $this->handleMemberLeave($packet);
 		if($packet instanceof DiscordEventMessageSent) return $this->handleMessageSent($packet);
+		if($packet instanceof DiscordEventServerJoin) return $this->handleServerJoin($packet);
+		if($packet instanceof DiscordEventServerLeave) return $this->handleServerLeave($packet);
+		if($packet instanceof DiscordEventServerUpdate) return $this->handleServerUpdate($packet);
 		if($packet instanceof DiscordEventAllData) return $this->handleAllDiscordData($packet);
 		return false;
 	}
@@ -144,6 +150,26 @@ class BotCommunicationHandler{
 
 		$this->plugin->getServer()->broadcastMessage($formatted);
 
+		return true;
+	}
+
+	private function handleServerJoin(DiscordEventServerJoin $packet): bool{
+		Storage::addServer($packet->getServer());
+		foreach($packet->getMembers() as $member) Storage::addMember($member);
+		foreach($packet->getRoles() as $role) Storage::addRole($role);
+		foreach($packet->getChannels() as $channel) Storage::addChannel($channel);
+		$this->plugin->getServer()->broadcastMessage("Joined discord server: ".$packet->getServer()->getName());
+		return true;
+	}
+
+	private function handleServerLeave(DiscordEventServerLeave $packet): bool{
+		//TODO Wait for storage removal functions.
+		return false;
+	}
+
+	private function handleServerUpdate(DiscordEventServerUpdate $packet): bool{
+		Storage::addServer($packet->getServer()); //Overwrites already set data.
+		$this->plugin->getServer()->broadcastMessage("Updated discord server: ".$packet->getServer()->getName());
 		return true;
 	}
 

@@ -13,12 +13,18 @@
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
 use JaxkDev\DiscordBot\Bot\Client;
+use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Communication\Models\Role;
+use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageSent;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerJoin;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerLeave;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\PluginRequestSendMessage;
@@ -97,6 +103,32 @@ class CommunicationHandler{
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
+	/**
+	 * @param Server 	$server
+	 * @param Channel[] $channels
+	 * @param Role[]  	$roles
+	 * @param Member[]	$members
+	 */
+	public function sendServerJoinEvent(Server $server, array $channels, array $roles, array $members): void{
+		$packet = new DiscordEventServerJoin();
+		$packet->setServer($server);
+		$packet->setChannels($channels);
+		$packet->setMembers($members);
+		$packet->setRoles($roles);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendServerLeaveEvent(Server $server): void{
+		$packet = new DiscordEventServerLeave();
+		$packet->setServer($server);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendServerUpdateEvent(Server $server): void{
+		$packet = new DiscordEventServerUpdate();
+		$packet->setServer($server);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
 
 	//--- Utils:
 

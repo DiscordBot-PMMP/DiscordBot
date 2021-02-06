@@ -69,8 +69,8 @@ class Storage{
 	public static function addServer(Server $server): void{
 		self::$serverNameMap[$server->getName()] = $server->getId();
 		self::$serverMap[$server->getId()] = $server;
-		self::$channelServerMap[$server->getId()] = [];
-		self::$memberServerMap[$server->getId()] = [];
+		if(!isset(self::$channelServerMap[$server->getId()])) self::$channelServerMap[$server->getId()] = [];
+		if(!isset(self::$memberServerMap[$server->getId()])) self::$memberServerMap[$server->getId()] = [];
 	}
 
 	public static function getChannel(string $id): ?Channel{

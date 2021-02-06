@@ -40,11 +40,12 @@ class DiscordEventHandler{
 		$discord->on('MESSAGE_CREATE', array($this, 'onMessage'));
 		$discord->on('GUILD_MEMBER_ADD', array($this, 'onMemberJoin'));
 		$discord->on('GUILD_MEMBER_REMOVE', array($this, 'onMemberLeave'));
+
+		$discord->on('GUILD_CREATE', [$this, 'onGuildJoin']);
+		$discord->on('GUILD_UPDATE', [$this, 'onGuildUpdate']);
+		$discord->on('GUILD_DELETE', [$this, 'onGuildLeave']);
 		/*
 		 * TODO, functions/models/packets:
-		 * $discord->on('GUILD_CREATE', [$this, 'onGuildJoin']);   SERVER_JOIN/LEAVE/EDIT
-		 * $discord->on('GUILD_UPDATE', [$this, 'onGuildUpdate']);
-		 * $discord->on('GUILD_DELETE', [$this, 'onGuildLeave']);
 		 *
 		 * $discord->on('CHANNEL_CREATE', [$this, 'onChannelCreate']);   CHANNEL_CREATE/DELETE/EDIT
 		 * $discord->on('CHANNEL_UPDATE', [$this, 'onChannelUpdate']);
@@ -158,5 +159,35 @@ class DiscordEventHandler{
 
 	public function onMemberLeave(DiscordMember $member, Discord $discord): void{
 		$this->client->getCommunicationHandler()->sendMemberLeaveEvent($member->guild_id.".".$member->id);
+	}
+
+	public function onGuildJoin(DiscordGuild $guild, Discord $discord): void{
+		$channels = [];
+		/** @var DiscordChannel $channel */
+		foreach($guild->channels->toArray() as $channel){
+			if($channel->type === DiscordChannel::TYPE_TEXT){
+				$channels[] = ModelConverter::genModelChannel($channel);
+			}
+		}
+		$roles = [];
+		/** @var DiscordRole $role */
+		foreach($guild->roles->toArray() as $role){
+			$roles[] = ModelConverter::genModelRole($role);
+		}
+		$members = [];
+		/** @var DiscordMember $member */
+		foreach($guild->members->toArray() as $member){
+			$members[] = ModelConverter::genModelMember($member);
+		}
+		$server = ModelConverter::genModelServer($guild);
+		$this->client->getCommunicationHandler()->sendServerJoinEvent($server, $channels, $roles, $members);
+	}
+
+	public function onGuildLeave(DiscordGuild $guild, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendServerLeaveEvent(ModelConverter::genModelServer($guild));
+	}
+
+	public function onGuildUpdate(DiscordGuild $guild, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendServerUpdateEvent(ModelConverter::genModelServer($guild));
 	}
 }
