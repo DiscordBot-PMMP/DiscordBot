@@ -14,17 +14,14 @@ namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Models\Channel;
-use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Message;
-use JaxkDev\DiscordBot\Communication\Models\Role;
-use JaxkDev\DiscordBot\Communication\Models\Server;
-use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\PluginRequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\PluginRequestUpdateActivity;
 
 /**
  * For internal and developers use for interacting with the discord bot.
- * @see Main::getAPI()
+ * @see Main::getAPI() To get instance.
+ * @see Storage For all discord data.
  * @version 2.0.0
  */
 class API{
@@ -45,7 +42,7 @@ class API{
 	 */
 	public function createMessage($channel, string $content): ?Message{
 		if(!$channel instanceof Channel){
-			$channel = self::getChannel($channel);
+			$channel = Storage::getChannel($channel);
 			if(!$channel instanceof Channel) return null;
 		}
 		$bot = Storage::getBotUser();
@@ -96,61 +93,5 @@ class API{
 		$pk = new PluginRequestUpdateActivity();
 		$pk->setActivity($activity);
 		$this->plugin->writeOutboundData($pk);
-	}
-
-
-
-	/*
-	 * Wrappers for Storage
-	 */
-
-
-
-	public static function getServer(string $id): ?Server{
-		return Storage::getServer($id);
-	}
-
-	public static function getServerByName(string $name): ?Server{
-		return Storage::getServerByName($name);
-	}
-
-	public static function getChannel(string $id): ?Channel{
-		return Storage::getChannel($id);
-	}
-
-	/**
-	 * @param string $serverId
-	 * @return Channel[]
-	 */
-	public static function getChannelsByServer(string $serverId): array{
-		return Storage::getChannelsByServer($serverId);
-	}
-
-	public static function getMember(string $id): ?Member{
-		return Storage::getMember($id);
-	}
-
-	/**
-	 * @param string $serverId
-	 * @return Member[]
-	 */
-	public static function getMembersByServer(string $serverId): array{
-		return Storage::getMembersByServer($serverId);
-	}
-
-	public static function getUser(string $id): ?User{
-		return Storage::getUser($id);
-	}
-
-	public static function getRole(string $id): ?Role{
-		return Storage::getRole($id);
-	}
-
-	public static function getBotUser(): ?User{
-		return Storage::getBotUser();
-	}
-
-	public static function getStorageTimestamp(): int{
-		return Storage::getTimestamp();
 	}
 }
