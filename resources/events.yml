@@ -19,6 +19,7 @@ member_join:
     channels: []
     format: "[{TIME}] **{USERNAME}** Has joined the minecraft server."
   fromDiscord:
+    servers: []
     format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} Has joined the {SERVER_NAME} discord server."
 
 member_leave:
@@ -26,6 +27,7 @@ member_leave:
     channels: []
     format: "[{TIME}] **{USERNAME}** Has left the minecraft server."
   fromDiscord:
+    servers: []
     format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} Has left the discord server."
 
 member_transfer:

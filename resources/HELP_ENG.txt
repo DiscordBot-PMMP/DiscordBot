@@ -35,7 +35,9 @@ security:
 
 Events.yml Explained:
 
-channels: ["channelID", "channelID", ...]       Remember to put " around the ID !
+channels: ["channelID", "anotherChannelID", ...]       Remember to put " around the ID !
+
+servers: ["serverID", "anotherServerID", ...]		Remember to put " around the ID !
 
 format: "Format text here, see 'FORMATTING Explained' for keys that can be used."
 

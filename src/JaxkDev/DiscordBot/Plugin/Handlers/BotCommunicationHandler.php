@@ -100,6 +100,8 @@ class BotCommunicationHandler{
 		$server = Storage::getServer($packet->getMember()->getServerId());
 		Utils::assert($server instanceof Server);
 
+		if(!in_array($server->getId(), $config['servers'])) return true;
+
 		$member = $packet->getMember();
 		$user = $packet->getUser();
 
@@ -127,6 +129,9 @@ class BotCommunicationHandler{
 		/** @var Server $server */
 		$server = Storage::getServer($member->getServerId());
 		Utils::assert($server instanceof Server);
+
+		//Have to fetch member first because onLeave we dont have their data direct from discord, so use cache :)
+		if(!in_array($server->getId(), $config['servers'])) return true;
 
 		/** @var User $user */
 		$user = Storage::getUser($member->getUserId());
