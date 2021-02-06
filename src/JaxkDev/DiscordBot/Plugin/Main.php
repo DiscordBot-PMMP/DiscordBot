@@ -105,8 +105,8 @@ class Main extends PluginBase{
 		$config = (array)$config;
 		$config['logging']['directory'] = $this->getDataFolder().DIRECTORY_SEPARATOR.($initialConfig['logging']['directory'] ?? "logs");
 
-		$this->eventConfig = yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml");
-		if($this->eventConfig === false){
+		$eventConfig = yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml");
+		if($eventConfig === false){
 			$this->getLogger()->critical("Failed to parse events.yml");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return false;
@@ -120,7 +120,15 @@ class Main extends PluginBase{
 			$this->getLogger()->info("Config updated, old config was saved to '{$this->getDataFolder()}config.yml.old'");
 		}
 
-		$this->getLogger()->debug("Verifying configs...");
+		if($eventConfig['version'] !== ConfigUtils::EVENT_VERSION){
+			$this->getLogger()->info("Updating your event config from v{$eventConfig['version']} to v" . ConfigUtils::EVENT_VERSION);
+			ConfigUtils::update_event($eventConfig);
+			rename($this->getDataFolder() . "events.yml", $this->getDataFolder() . "events.yml.old");
+			yaml_emit_file($this->getDataFolder() . "events.yml", $eventConfig);
+			$this->getLogger()->info("Event config updated, old event config was saved to '{$this->getDataFolder()}events.yml.old'");
+		}
+
+		$this->getLogger()->debug("Verifying config...");
 		$result_raw = ConfigUtils::verify($config);
 		if(sizeof($result_raw) !== 0){
 			$result = TextFormat::RED."There were some problems with your config.yml, see below:\n".TextFormat::RESET;
@@ -134,6 +142,7 @@ class Main extends PluginBase{
 
 		//Config is now updated and verified.
 		$this->config = $config;
+		$this->eventConfig = $eventConfig;
 		return true;
 	}
 

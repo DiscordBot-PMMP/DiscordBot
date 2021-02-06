@@ -13,6 +13,9 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
+// TODO Event data validation.
+use pocketmine\utils\MainLogger;
+
 abstract class ConfigUtils{
 	const EVENT_VERSION = 2;
 	const VERSION = 2;
@@ -50,8 +53,42 @@ abstract class ConfigUtils{
 	}
 
 	static private function event_patch_1(array $data): array{
-		//Channel ID's no longer have serverID prefixed.
-		//TODO
+		$changeIds = function(array &$data, string $event, string $discord = 'toDiscord', string $key = 'channels'): void{
+			$ids = $data[$event][$discord][$key];
+			$data[$event][$discord][$key] = [];
+			foreach($ids as $id){
+				$d = explode(".", $id);
+				if(sizeof($d) < 2){
+					//Corrupt, reset.
+					MainLogger::getLogger()->warning("[DiscordBot] > event `{$event}.{$discord}.{$key}` ID `{$id}` is " .
+						"corrupt and could not be updated, ID has been removed.");
+					return;
+				}
+				$data[$event][$discord][$key][] = $d[1];
+			}
+		};
+
+		$data['version'] = 2;
+
+		//channels[] no longer has server ID prefixed.
+		$changeIds($data, 'message');
+		$changeIds($data, 'message', 'fromDiscord');
+		$changeIds($data, 'command');
+		$changeIds($data, 'member_join');
+		$changeIds($data, 'member_leave');
+
+		//Added servers option to join/leave event.
+		$data['member_leave']['fromDiscord']['servers'] = [];
+		$data['member_join']['fromDiscord']['servers'] = [];
+
+		//Added member transfer event.
+		$data['member_transfer'] = [
+			'toDiscord' => [
+				'channels' => [],
+				'format' => "[{TIME}] **{USERNAME}** Has been transferred to {ADDRESS}:{PORT}."
+			]
+		];
+
 		return $data;
 	}
 
