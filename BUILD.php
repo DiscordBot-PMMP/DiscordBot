@@ -6,9 +6,9 @@
 
 declare(strict_types=1);
 
-echo "Updating dependencies / Removing any dev-dependencies / Optimising Autoloader...\n";
+echo "Installing dependencies, Removing any dev-dependencies & Optimising Autoloader...\n";
 
-passthru("composer update --no-dev -o");
+passthru("composer install --no-dev -o");
 
 echo "Building plugin...\n";
 
@@ -26,7 +26,7 @@ $excludedPaths = [
 ];
 
 $metadata = generatePluginMetadataFromYml($basePath . "plugin.yml");
-if($metadata === null) {
+if($metadata === null){
 	echo "Missing entry point or plugin.yml" . PHP_EOL;
 	exit(1);
 }
