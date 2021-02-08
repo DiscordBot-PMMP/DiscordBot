@@ -22,7 +22,9 @@ use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageDelete;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageSent;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerUpdate;
@@ -87,6 +89,18 @@ class CommunicationHandler{
 
 	public function sendMessageSentEvent(Message $message): void{
 		$packet = new DiscordEventMessageSent();
+		$packet->setMessage($message);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendMessageDeleteEvent(string $message): void{
+		$packet = new DiscordEventMessageDelete();
+		$packet->setMessageId($message);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendMessageUpdateEvent(Message $message): void{
+		$packet = new DiscordEventMessageUpdate();
 		$packet->setMessage($message);
 		$this->client->getThread()->writeOutboundData($packet);
 	}

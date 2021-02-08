@@ -20,7 +20,9 @@ use JaxkDev\DiscordBot\Communication\Packets\DiscordEventAllData;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageDelete;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageSent;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerUpdate;
@@ -46,11 +48,14 @@ class BotCommunicationHandler{
 
 	public function handle(Packet $packet): bool{
 		// If's instances instead of ID switching due to phpstan/types.
+		// TODO Surely theres a way of getting function based on type expected in param (pmmp listener style?)
 		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
 		if($packet instanceof DiscordEventMemberJoin) return $this->handleMemberJoin($packet);
 		if($packet instanceof DiscordEventMemberLeave) return $this->handleMemberLeave($packet);
 		if($packet instanceof DiscordEventMemberUpdate) return $this->handleMemberUpdate($packet);
 		if($packet instanceof DiscordEventMessageSent) return $this->handleMessageSent($packet);
+		if($packet instanceof DiscordEventMessageUpdate) return $this->handleMessageUpdate($packet);
+		if($packet instanceof DiscordEventMessageDelete) return $this->handleMessageDelete($packet);
 		if($packet instanceof DiscordEventServerJoin) return $this->handleServerJoin($packet);
 		if($packet instanceof DiscordEventServerLeave) return $this->handleServerLeave($packet);
 		if($packet instanceof DiscordEventServerUpdate) return $this->handleServerUpdate($packet);
@@ -97,6 +102,14 @@ class BotCommunicationHandler{
 
 		$this->plugin->getServer()->broadcastMessage($formatted);
 		return true;
+	}
+
+	private function handleMessageUpdate(DiscordEventMessageUpdate $packet): bool{
+		return false;
+	}
+
+	private function handleMessageDelete(DiscordEventMessageDelete $packet): bool{
+		return false;
 	}
 
 	private function handleMemberJoin(DiscordEventMemberJoin $packet): bool{

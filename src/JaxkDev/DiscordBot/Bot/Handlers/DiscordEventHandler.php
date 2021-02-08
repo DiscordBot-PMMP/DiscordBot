@@ -37,7 +37,9 @@ class DiscordEventHandler{
 
 	public function registerEvents(): void{
 		$discord = $this->client->getDiscordClient();
-		$discord->on('MESSAGE_CREATE', [$this, 'onMessage']);
+		$discord->on('MESSAGE_CREATE', [$this, 'onMessageCreate']);
+		$discord->on('MESSAGE_DELETE', [$this, 'onMessageDelete']);
+		$discord->on('MESSAGE_UPDATE', [$this, 'onMessageUpdate']);  //AKA Edit
 
 		$discord->on('GUILD_MEMBER_ADD', [$this, 'onMemberJoin']);
 		$discord->on('GUILD_MEMBER_REMOVE', [$this, 'onMemberLeave']);
@@ -56,9 +58,6 @@ class DiscordEventHandler{
 		 * $discord->on('GUILD_ROLE_CREATE', [$this, 'onRoleCreate']);   ROLE_CREATE/DELETE/EDIT
 		 * $discord->on('GUILD_ROLE_UPDATE', [$this, 'onRoleUpdate']);
 		 * $discord->on('GUILD_ROLE_DELETE', [$this, 'onRoleDelete']);
-		 *
-		 * $discord->on('MESSAGE_DELETE', [$this, 'onMessageDelete']);   MESSAGE_DELETE/EDIT
-		 * $discord->on('MESSAGE_UPDATE', [$this, 'onMessageUpdate']);
 		 *
 		 * TODO (others not yet planned for 2.0.0):
 		 * - Reactions
@@ -135,21 +134,42 @@ class DiscordEventHandler{
 		$this->client->logDebugInfo();
 	}
 
-	public function onMessage(DiscordMessage $message, Discord $discord): void{
+	/**
+	 * Checks if we handle this type of message in this type of channel.
+	 * @param DiscordMessage $message
+	 * @return bool
+	 */
+	private function checkMessage(DiscordMessage $message): bool{
 		// Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
-		if($message->author instanceof DiscordMember ? $message->author->user->bot : $message->author->bot) return;
-
-		//if($message->author->id === "305060807887159296") $message->react("❤️");
-		//Dont ask questions...
+		if($message->author instanceof DiscordMember ? $message->author->user->bot : $message->author->bot) return false;
 
 		// Other types of messages not used right now.
-		if($message->type !== DiscordMessage::TYPE_NORMAL) return;
-		if($message->channel->type !== DiscordChannel::TYPE_TEXT) return;
-		if(($message->content ?? "") === "") return; //Images/Files, can be empty strings or just null in other cases.
+		if($message->type !== DiscordMessage::TYPE_NORMAL) return false;
+		if($message->channel->type !== DiscordChannel::TYPE_TEXT) return false;
+		if(($message->content ?? "") === "") return false; //Images/Files, can be empty strings or just null in other cases.
+		if($message->channel->guild_id === null) return false;
 
-		if($message->channel->guild_id === null) throw new \AssertionError("GuildID Cannot be null.");
+		return true;
+	}
 
+	public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
+		if(!$this->checkMessage($message)) return;
+		//if($message->author->id === "305060807887159296") $message->react("❤️");
+		//Dont ask questions...
 		$this->client->getCommunicationHandler()->sendMessageSentEvent(ModelConverter::genModelMessage($message));
+	}
+
+	/**
+	 * @param DiscordMessage|\stdClass $message
+	 * @param Discord                  $discord
+	 */
+	public function onMessageDelete($message, Discord $discord): void{
+ 		$this->client->getCommunicationHandler()->sendMessageDeleteEvent($message->id);
+	}
+
+	public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
+		if(!$this->checkMessage($message)) return;
+		$this->client->getCommunicationHandler()->sendMessageUpdateEvent(ModelConverter::genModelMessage($message));
 	}
 
 	public function onMemberJoin(DiscordMember $member, Discord $discord): void{
