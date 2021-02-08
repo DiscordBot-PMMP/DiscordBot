@@ -31,9 +31,6 @@ class Storage{
 	/** @var Array<string, Server> */
 	private static $serverMap = [];
 
-	/** @var Array<string, string> */
-	private static $serverNameMap = [];
-
 	/** @var Array<string, Channel> */
 	private static $channelMap = [];
 
@@ -65,12 +62,7 @@ class Storage{
 		return self::$serverMap[$id] ?? null;
 	}
 
-	public static function getServerByName(string $name): ?Server{
-		return self::$serverMap[self::$serverNameMap[$name]] ?? null;
-	}
-
 	public static function addServer(Server $server): void{
-		self::$serverNameMap[$server->getName()] = $server->getId();
 		self::$serverMap[$server->getId()] = $server;
 		if(!isset(self::$channelServerMap[$server->getId()])) self::$channelServerMap[$server->getId()] = [];
 		if(!isset(self::$memberServerMap[$server->getId()])) self::$memberServerMap[$server->getId()] = [];
@@ -173,7 +165,6 @@ class Storage{
 	}
 
 	public static function reset(): void{
-		self::$serverNameMap = [];
 		self::$serverMap = [];
 		self::$channelServerMap = [];
 		self::$channelMap = [];
