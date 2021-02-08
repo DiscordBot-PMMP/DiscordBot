@@ -163,8 +163,9 @@ class BotCommunicationHandler{
 	}
 
 	private function handleServerLeave(DiscordEventServerLeave $packet): bool{
-		//TODO Wait for storage removal functions.
-		return false;
+		Storage::removeServer($packet->getServer()->getId());
+		$this->plugin->getServer()->broadcastMessage("Removed/Left discord server: ".$packet->getServer()->getName());
+		return true;
 	}
 
 	private function handleServerUpdate(DiscordEventServerUpdate $packet): bool{
