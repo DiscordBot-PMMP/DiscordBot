@@ -21,6 +21,7 @@ use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberLeave;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageSent;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerLeave;
@@ -100,6 +101,12 @@ class CommunicationHandler{
 	public function sendMemberLeaveEvent(string $member_id): void{
 		$packet = new DiscordEventMemberLeave();
 		$packet->setMemberID($member_id);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendMemberUpdateEvent(Member $member): void{
+		$packet = new DiscordEventMemberUpdate();
+		$packet->setMember($member);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 

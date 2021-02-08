@@ -19,6 +19,7 @@ use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventAllData;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberLeave;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageSent;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerLeave;
@@ -48,6 +49,7 @@ class BotCommunicationHandler{
 		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
 		if($packet instanceof DiscordEventMemberJoin) return $this->handleMemberJoin($packet);
 		if($packet instanceof DiscordEventMemberLeave) return $this->handleMemberLeave($packet);
+		if($packet instanceof DiscordEventMemberUpdate) return $this->handleMemberUpdate($packet);
 		if($packet instanceof DiscordEventMessageSent) return $this->handleMessageSent($packet);
 		if($packet instanceof DiscordEventServerJoin) return $this->handleServerJoin($packet);
 		if($packet instanceof DiscordEventServerLeave) return $this->handleServerLeave($packet);
@@ -149,6 +151,15 @@ class BotCommunicationHandler{
 				$user->getDiscriminator(), $server->getId(), $server->getName()], $config['format']);
 
 		$this->plugin->getServer()->broadcastMessage($formatted);
+
+		return true;
+	}
+
+	private function handleMemberUpdate(DiscordEventMemberUpdate $packet): bool{
+		$member = $packet->getMember();
+		Storage::removeMember($member->getId());
+		Storage::addMember($member);
+		$this->plugin->getServer()->broadcastMessage("Member updated.");
 
 		return true;
 	}

@@ -24,6 +24,8 @@ use JaxkDev\DiscordBot\Communication\Models\User;
  * (~= 10ms to search for one user in a 30k db
  *
  * unset() on the removes doesnt destroy the objects until all references are unset....
+ *
+ * TODO, Update functions to remove unneccasry logic like removing then adding to get around server maps duping.
  */
 
 class Storage{

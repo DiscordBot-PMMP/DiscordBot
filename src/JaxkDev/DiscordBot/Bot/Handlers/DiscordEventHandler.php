@@ -37,9 +37,11 @@ class DiscordEventHandler{
 
 	public function registerEvents(): void{
 		$discord = $this->client->getDiscordClient();
-		$discord->on('MESSAGE_CREATE', array($this, 'onMessage'));
-		$discord->on('GUILD_MEMBER_ADD', array($this, 'onMemberJoin'));
-		$discord->on('GUILD_MEMBER_REMOVE', array($this, 'onMemberLeave'));
+		$discord->on('MESSAGE_CREATE', [$this, 'onMessage']);
+
+		$discord->on('GUILD_MEMBER_ADD', [$this, 'onMemberJoin']);
+		$discord->on('GUILD_MEMBER_REMOVE', [$this, 'onMemberLeave']);
+		$discord->on('GUILD_MEMBER_UPDATE', [$this, 'onMemberUpdate']);   //Includes Roles,nickname etc
 
 		$discord->on('GUILD_CREATE', [$this, 'onGuildJoin']);
 		$discord->on('GUILD_UPDATE', [$this, 'onGuildUpdate']);
@@ -50,8 +52,6 @@ class DiscordEventHandler{
 		 * $discord->on('CHANNEL_CREATE', [$this, 'onChannelCreate']);   CHANNEL_CREATE/DELETE/EDIT
 		 * $discord->on('CHANNEL_UPDATE', [$this, 'onChannelUpdate']);
 		 * $discord->on('CHANNEL_DELETE', [$this, 'onChannelDelete']);
-		 *
-		 * $discord->on('GUILD_MEMBER_UPDATE', [$this, 'onMemberUpdate']);   MEMBER_EDIT (Roles,nickname etc)
 		 *
 		 * $discord->on('GUILD_ROLE_CREATE', [$this, 'onRoleCreate']);   ROLE_CREATE/DELETE/EDIT
 		 * $discord->on('GUILD_ROLE_UPDATE', [$this, 'onRoleUpdate']);
@@ -159,6 +159,10 @@ class DiscordEventHandler{
 
 	public function onMemberLeave(DiscordMember $member, Discord $discord): void{
 		$this->client->getCommunicationHandler()->sendMemberLeaveEvent($member->guild_id.".".$member->id);
+	}
+
+	public function onMemberUpdate(DiscordMember $member, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendMemberUpdateEvent(ModelConverter::genModelMember($member));
 	}
 
 	public function onGuildJoin(DiscordGuild $guild, Discord $discord): void{
