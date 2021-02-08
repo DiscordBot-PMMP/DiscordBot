@@ -38,6 +38,19 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/ringcentral/psr7" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/translation-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/spl" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/snooze" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/raklib" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/pocketmine-mp" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/nbt" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/math" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/log-pthreads" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/log" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/classloader" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/callback-validator" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/binaryutils" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/adhocore/json-comment" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/phpstan" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

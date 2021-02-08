@@ -22,6 +22,7 @@
     ],
     "require": {
         "php": "^7.3",
+        "composer-runtime-api": "^2.0",
         "team-reflex/discord-php": "dev-beta"
     },
     "require-dev": {
