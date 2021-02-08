@@ -19,6 +19,8 @@ use JaxkDev\DiscordBot\Communication\Models\Message;
 use JaxkDev\DiscordBot\Communication\Models\Role;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventChannelCreate;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventChannelUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberUpdate;
@@ -79,11 +81,30 @@ class CommunicationHandler{
 
 
 	//--- Outbound:
+	// TODO, Dont think this should be here, happy for it to be directly from discord event handler.
 
 
 	public function sendHeartbeat(): void{
 		$packet = new Heartbeat();
 		$packet->setHeartbeat(microtime(true));
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendChannelCreateEvent(Channel $channel): void{
+		$packet = new DiscordEventChannelCreate();
+		$packet->setChannel($channel);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendChannelUpdateEvent(Channel $channel): void{
+		$packet = new DiscordEventChannelUpdate();
+		$packet->setChannel($channel);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendChannelDeleteEvent(Channel $channel): void{
+		$packet = new DiscordEventChannelUpdate();
+		$packet->setChannel($channel);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 

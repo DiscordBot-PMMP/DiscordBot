@@ -17,6 +17,9 @@ use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventAllData;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventChannelCreate;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventChannelDelete;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventChannelUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberUpdate;
@@ -48,7 +51,6 @@ class BotCommunicationHandler{
 
 	public function handle(Packet $packet): bool{
 		// If's instances instead of ID switching due to phpstan/types.
-		// TODO Surely theres a way of getting function based on type expected in param (pmmp listener style?)
 		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
 		if($packet instanceof DiscordEventMemberJoin) return $this->handleMemberJoin($packet);
 		if($packet instanceof DiscordEventMemberLeave) return $this->handleMemberLeave($packet);
@@ -56,6 +58,9 @@ class BotCommunicationHandler{
 		if($packet instanceof DiscordEventMessageSent) return $this->handleMessageSent($packet);
 		if($packet instanceof DiscordEventMessageUpdate) return $this->handleMessageUpdate($packet);
 		if($packet instanceof DiscordEventMessageDelete) return $this->handleMessageDelete($packet);
+		if($packet instanceof DiscordEventChannelCreate) return $this->handleChannelCreate($packet);
+		if($packet instanceof DiscordEventChannelUpdate) return $this->handleChannelUpdate($packet);
+		if($packet instanceof DiscordEventChannelDelete) return $this->handleChannelDelete($packet);
 		if($packet instanceof DiscordEventServerJoin) return $this->handleServerJoin($packet);
 		if($packet instanceof DiscordEventServerLeave) return $this->handleServerLeave($packet);
 		if($packet instanceof DiscordEventServerUpdate) return $this->handleServerUpdate($packet);
@@ -110,6 +115,24 @@ class BotCommunicationHandler{
 
 	private function handleMessageDelete(DiscordEventMessageDelete $packet): bool{
 		return false;
+	}
+
+	private function handleChannelCreate(DiscordEventChannelCreate $packet): bool{
+		Storage::addChannel($packet->getChannel());
+		$this->plugin->getServer()->broadcastMessage("Channel '".$packet->getChannel()->getName()."' created.");
+		return true;
+	}
+
+	private function handleChannelUpdate(DiscordEventChannelUpdate $packet): bool{
+		Storage::updateChannel($packet->getChannel());
+		$this->plugin->getServer()->broadcastMessage("Channel '".$packet->getChannel()->getName()."' updated.");
+		return true;
+	}
+
+	private function handleChannelDelete(DiscordEventChannelDelete $packet): bool{
+		Storage::removeChannel($packet->getChannel()->getId());
+		$this->plugin->getServer()->broadcastMessage("Channel '".$packet->getChannel()->getName()."' deleted.");
+		return true;
 	}
 
 	private function handleMemberJoin(DiscordEventMemberJoin $packet): bool{

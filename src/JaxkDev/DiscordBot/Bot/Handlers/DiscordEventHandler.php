@@ -48,12 +48,13 @@ class DiscordEventHandler{
 		$discord->on('GUILD_CREATE', [$this, 'onGuildJoin']);
 		$discord->on('GUILD_UPDATE', [$this, 'onGuildUpdate']);
 		$discord->on('GUILD_DELETE', [$this, 'onGuildLeave']);
+
+		$discord->on('CHANNEL_CREATE', [$this, 'onChannelCreate']);
+		$discord->on('CHANNEL_UPDATE', [$this, 'onChannelUpdate']);
+		$discord->on('CHANNEL_DELETE', [$this, 'onChannelDelete']);
+
 		/*
 		 * TODO, functions/models/packets:
-		 *
-		 * $discord->on('CHANNEL_CREATE', [$this, 'onChannelCreate']);   CHANNEL_CREATE/DELETE/EDIT
-		 * $discord->on('CHANNEL_UPDATE', [$this, 'onChannelUpdate']);
-		 * $discord->on('CHANNEL_DELETE', [$this, 'onChannelDelete']);
 		 *
 		 * $discord->on('GUILD_ROLE_CREATE', [$this, 'onRoleCreate']);   ROLE_CREATE/DELETE/EDIT
 		 * $discord->on('GUILD_ROLE_UPDATE', [$this, 'onRoleUpdate']);
@@ -141,7 +142,8 @@ class DiscordEventHandler{
 	 */
 	private function checkMessage(DiscordMessage $message): bool{
 		// Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
-		if($message->author instanceof DiscordMember ? $message->author->user->bot : $message->author->bot) return false;
+		if($message->author === null) return false; //Investigating specific case.
+		if($message->author instanceof DiscordMember ? $message->author->user->bot : (isset($message->author) ? $message->author->bot : true)) return false;
 
 		// Other types of messages not used right now.
 		if($message->type !== DiscordMessage::TYPE_NORMAL) return false;
@@ -153,6 +155,7 @@ class DiscordEventHandler{
 	}
 
 	public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
+		//var_dump(microtime(true)." - create message #".$message->id);
 		if(!$this->checkMessage($message)) return;
 		//if($message->author->id === "305060807887159296") $message->react("❤️");
 		//Dont ask questions...
@@ -164,10 +167,12 @@ class DiscordEventHandler{
 	 * @param Discord                  $discord
 	 */
 	public function onMessageDelete($message, Discord $discord): void{
+		//var_dump(microtime(true)." - delete message #".$message->id);
  		$this->client->getCommunicationHandler()->sendMessageDeleteEvent($message->id);
 	}
 
 	public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
+		//var_dump(microtime(true)." - update message #".$message->id);
 		if(!$this->checkMessage($message)) return;
 		$this->client->getCommunicationHandler()->sendMessageUpdateEvent(ModelConverter::genModelMessage($message));
 	}
@@ -213,5 +218,17 @@ class DiscordEventHandler{
 
 	public function onGuildUpdate(DiscordGuild $guild, Discord $discord): void{
 		$this->client->getCommunicationHandler()->sendServerUpdateEvent(ModelConverter::genModelServer($guild));
+	}
+
+	public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendChannelCreateEvent(ModelConverter::genModelChannel($channel));
+	}
+
+	public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendChannelUpdateEvent(ModelConverter::genModelChannel($channel));
+	}
+
+	public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendChannelDeleteEvent(ModelConverter::genModelChannel($channel));
 	}
 }
