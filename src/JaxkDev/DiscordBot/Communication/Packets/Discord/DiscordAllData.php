@@ -10,15 +10,16 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Packets;
+namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Role;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventAllData extends Packet{
+class DiscordAllData extends Packet{
 
 	/** @var Server[] */
 	private $servers = [];
@@ -41,7 +42,7 @@ class DiscordEventAllData extends Packet{
 	/** @var int */
 	private $timestamp;
 
-	public function addServer(Server $server): DiscordEventAllData{
+	public function addServer(Server $server): DiscordAllData{
 		$this->servers[] = $server;
 		return $this;
 	}
@@ -53,7 +54,7 @@ class DiscordEventAllData extends Packet{
 		return $this->servers;
 	}
 
-	public function addChannel(Channel $channel): DiscordEventAllData{
+	public function addChannel(Channel $channel): DiscordAllData{
 		$this->channels[] = $channel;
 		return $this;
 	}
@@ -65,7 +66,7 @@ class DiscordEventAllData extends Packet{
 		return $this->channels;
 	}
 
-	public function addRole(Role $role): DiscordEventAllData{
+	public function addRole(Role $role): DiscordAllData{
 		$this->roles[] = $role;
 		return $this;
 	}
@@ -77,7 +78,7 @@ class DiscordEventAllData extends Packet{
 		return $this->roles;
 	}
 
-	public function addMember(Member $member): DiscordEventAllData{
+	public function addMember(Member $member): DiscordAllData{
 		$this->members[] = $member;
 		return $this;
 	}
@@ -89,7 +90,7 @@ class DiscordEventAllData extends Packet{
 		return $this->members;
 	}
 
-	public function addUser(User $user): DiscordEventAllData{
+	public function addUser(User $user): DiscordAllData{
 		$this->users[] = $user;
 		return $this;
 	}
@@ -109,7 +110,7 @@ class DiscordEventAllData extends Packet{
 		return $this->botUser;
 	}
 
-	public function setTimestamp(int $timestamp): DiscordEventAllData{
+	public function setTimestamp(int $timestamp): DiscordAllData{
 		$this->timestamp = $timestamp;
 		return $this;
 	}

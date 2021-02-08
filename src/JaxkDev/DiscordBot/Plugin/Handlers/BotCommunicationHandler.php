@@ -16,22 +16,22 @@ use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventAllData;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventChannelCreate;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventChannelDelete;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventChannelUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberJoin;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberLeave;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageDelete;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageSent;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventRoleCreate;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventRoleDelete;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventRoleUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerJoin;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerLeave;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordAllData;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberJoin;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberLeave;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMessageDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMessageSent;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMessageUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventRoleCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventRoleDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventRoleUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerJoin;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerLeave;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
@@ -70,7 +70,7 @@ class BotCommunicationHandler{
 		if($packet instanceof DiscordEventServerJoin) return $this->handleServerJoin($packet);
 		if($packet instanceof DiscordEventServerLeave) return $this->handleServerLeave($packet);
 		if($packet instanceof DiscordEventServerUpdate) return $this->handleServerUpdate($packet);
-		if($packet instanceof DiscordEventAllData) return $this->handleAllDiscordData($packet);
+		if($packet instanceof DiscordAllData) return $this->handleAllDiscordData($packet);
 		return false;
 	}
 
@@ -241,7 +241,7 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleAllDiscordData(DiscordEventAllData $packet): bool{
+	private function handleAllDiscordData(DiscordAllData $packet): bool{
 		//Todo verify packet before resetting data.
 		Storage::reset();
 		foreach($packet->getServers() as $server){

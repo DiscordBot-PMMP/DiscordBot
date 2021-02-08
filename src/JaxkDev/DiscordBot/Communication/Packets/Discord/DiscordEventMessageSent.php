@@ -10,11 +10,12 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Packets;
+namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class PluginRequestSendMessage extends Packet{
+class DiscordEventMessageSent extends Packet{
 
 	/** @var Message */
 	private $message;

@@ -10,7 +10,9 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Packets;
+namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
+
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordEventMemberLeave extends Packet{
 

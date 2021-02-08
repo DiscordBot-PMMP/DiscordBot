@@ -15,8 +15,8 @@ namespace JaxkDev\DiscordBot\Plugin;
 use JaxkDev\DiscordBot\Communication\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Message;
-use JaxkDev\DiscordBot\Communication\Packets\PluginRequestSendMessage;
-use JaxkDev\DiscordBot\Communication\Packets\PluginRequestUpdateActivity;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestSendMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestUpdateActivity;
 
 /**
  * For internal and developers use for interacting with the discord bot.

@@ -22,7 +22,7 @@ use Discord\Parts\User\User as DiscordUser;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Models\Activity;
-use JaxkDev\DiscordBot\Communication\Packets\DiscordEventAllData;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordAllData;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use pocketmine\utils\MainLogger;
 
@@ -82,7 +82,7 @@ class DiscordEventHandler{
 		$this->registerEvents();
 
 		// Dump all discord data.
-		$pk = new DiscordEventAllData();
+		$pk = new DiscordAllData();
 		$pk->setTimestamp(time());
 
 		MainLogger::getLogger()->debug("Starting the data pack, please be patient.");
