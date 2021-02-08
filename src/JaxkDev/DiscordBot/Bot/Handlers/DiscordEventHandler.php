@@ -53,13 +53,11 @@ class DiscordEventHandler{
 		$discord->on('CHANNEL_UPDATE', [$this, 'onChannelUpdate']);
 		$discord->on('CHANNEL_DELETE', [$this, 'onChannelDelete']);
 
+		$discord->on('GUILD_ROLE_CREATE', [$this, 'onRoleCreate']);
+		$discord->on('GUILD_ROLE_UPDATE', [$this, 'onRoleUpdate']);
+		$discord->on('GUILD_ROLE_DELETE', [$this, 'onRoleDelete']);
+
 		/*
-		 * TODO, functions/models/packets:
-		 *
-		 * $discord->on('GUILD_ROLE_CREATE', [$this, 'onRoleCreate']);   ROLE_CREATE/DELETE/EDIT
-		 * $discord->on('GUILD_ROLE_UPDATE', [$this, 'onRoleUpdate']);
-		 * $discord->on('GUILD_ROLE_DELETE', [$this, 'onRoleDelete']);
-		 *
 		 * TODO (others not yet planned for 2.0.0):
 		 * - Reactions
 		 * - Pins
@@ -230,5 +228,17 @@ class DiscordEventHandler{
 
 	public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
 		$this->client->getCommunicationHandler()->sendChannelDeleteEvent(ModelConverter::genModelChannel($channel));
+	}
+
+	public function onRoleCreate(DiscordRole $role, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendRoleCreateEvent(ModelConverter::genModelRole($role));
+	}
+
+	public function onRoleUpdate(DiscordRole $role, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendRoleUpdateEvent(ModelConverter::genModelRole($role));
+	}
+
+	public function onRoleDelete(DiscordRole $role, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendRoleDeleteEvent(ModelConverter::genModelRole($role));
 	}
 }

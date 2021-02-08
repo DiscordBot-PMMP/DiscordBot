@@ -27,6 +27,9 @@ use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMemberUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageDelete;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageSent;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventMessageUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventRoleCreate;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventRoleDelete;
+use JaxkDev\DiscordBot\Communication\Packets\DiscordEventRoleUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerJoin;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerLeave;
 use JaxkDev\DiscordBot\Communication\Packets\DiscordEventServerUpdate;
@@ -37,10 +40,6 @@ use JaxkDev\DiscordBot\Communication\Packets\PluginRequestUpdateActivity;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use pocketmine\utils\MainLogger;
 
-/**
- * The only class that should be dealing with packets directly.
- * Class PluginCommunicationHandler
- */
 class CommunicationHandler{
 
 	/** @var Client */
@@ -145,6 +144,23 @@ class CommunicationHandler{
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
+	public function sendRoleCreateEvent(Role $role): void{
+		$packet = new DiscordEventRoleCreate();
+		$packet->setRole($role);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendRoleUpdateEvent(Role $role): void{
+		$packet = new DiscordEventRoleUpdate();
+		$packet->setRole($role);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendRoleDeleteEvent(Role $role): void{
+		$packet = new DiscordEventRoleDelete();
+		$packet->setRole($role);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
 	/**
 	 * @param Server 	$server
 	 * @param Channel[] $channels
