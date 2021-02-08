@@ -52,6 +52,9 @@ class Storage{
 	/** @var Array<string, Role> */
 	private static $roleMap = [];
 
+	/** @var Array<string, string[]> */
+	private static $roleServerMap = [];
+
 	/** @var null|User */
 	private static $botUser = null;
 
@@ -129,7 +132,21 @@ class Storage{
 		return self::$roleMap[$id] ?? null;
 	}
 
+	/**
+	 * @param string $serverId
+	 * @return Role[]
+	 */
+	public static function getRolesByServer(string $serverId): array{
+		$roles = [];
+		foreach((self::$roleServerMap[$serverId] ?? []) as $id){
+			$r = self::getRole($id);
+			if($r !== null) $roles[] = $r;
+		}
+		return $roles;
+	}
+
 	public static function addRole(Role $role): void{
+		self::$roleServerMap[$role->getServerId()][] = $role->getId();
 		self::$roleMap[$role->getId()] = $role;
 	}
 
@@ -161,6 +178,7 @@ class Storage{
 		self::$channelServerMap = [];
 		self::$channelMap = [];
 		self::$roleMap = [];
+		self::$roleServerMap = [];
 		self::$memberMap = [];
 		self::$memberServerMap = [];
 		self::$userMap = [];
