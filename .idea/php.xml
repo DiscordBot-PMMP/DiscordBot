@@ -35,18 +35,18 @@
       <path value="$PROJECT_DIR$/vendor/ringcentral/psr7" />
       <path value="$PROJECT_DIR$/vendor/symfony/translation-contracts" />
       <path value="$PROJECT_DIR$/vendor/composer" />
-      <path value="$PROJECT_DIR$/vendor/pocketmine/spl" />
-      <path value="$PROJECT_DIR$/vendor/pocketmine/snooze" />
-      <path value="$PROJECT_DIR$/vendor/pocketmine/raklib" />
-      <path value="$PROJECT_DIR$/vendor/pocketmine/pocketmine-mp" />
-      <path value="$PROJECT_DIR$/vendor/pocketmine/nbt" />
-      <path value="$PROJECT_DIR$/vendor/pocketmine/math" />
-      <path value="$PROJECT_DIR$/vendor/pocketmine/log-pthreads" />
-      <path value="$PROJECT_DIR$/vendor/pocketmine/log" />
+      <path value="$PROJECT_DIR$/vendor/adhocore/json-comment" />
+      <path value="$PROJECT_DIR$/vendor/pocketmine/binaryutils" />
       <path value="$PROJECT_DIR$/vendor/pocketmine/classloader" />
       <path value="$PROJECT_DIR$/vendor/pocketmine/callback-validator" />
-      <path value="$PROJECT_DIR$/vendor/pocketmine/binaryutils" />
-      <path value="$PROJECT_DIR$/vendor/adhocore/json-comment" />
+      <path value="$PROJECT_DIR$/vendor/pocketmine/log-pthreads" />
+      <path value="$PROJECT_DIR$/vendor/pocketmine/log" />
+      <path value="$PROJECT_DIR$/vendor/pocketmine/nbt" />
+      <path value="$PROJECT_DIR$/vendor/pocketmine/math" />
+      <path value="$PROJECT_DIR$/vendor/pocketmine/raklib" />
+      <path value="$PROJECT_DIR$/vendor/pocketmine/pocketmine-mp" />
+      <path value="$PROJECT_DIR$/vendor/pocketmine/spl" />
+      <path value="$PROJECT_DIR$/vendor/pocketmine/snooze" />
       <path value="$PROJECT_DIR$/vendor/phpstan/phpstan" />
     </include_path>
   </component>

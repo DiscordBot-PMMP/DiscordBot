@@ -37,6 +37,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
+use JaxkDev\DiscordBot\Plugin\Events\DiscordServerDeleted;
+use JaxkDev\DiscordBot\Plugin\Events\DiscordServerJoined;
+use JaxkDev\DiscordBot\Plugin\Events\DiscordServerUpdated;
 use JaxkDev\DiscordBot\Plugin\Main;
 use JaxkDev\DiscordBot\Plugin\Storage;
 use JaxkDev\DiscordBot\Utils;
@@ -234,18 +237,21 @@ class BotCommunicationHandler{
 		foreach($packet->getMembers() as $member) Storage::addMember($member);
 		foreach($packet->getRoles() as $role) Storage::addRole($role);
 		foreach($packet->getChannels() as $channel) Storage::addChannel($channel);
+		(new DiscordServerJoined($this->plugin, $packet->getServer()))->call();
 		$this->plugin->getServer()->broadcastMessage("Joined discord server: ".$packet->getServer()->getName());
 		return true;
 	}
 
 	private function handleServerLeave(DiscordEventServerLeave $packet): bool{
 		Storage::removeServer($packet->getServer()->getId());
+		(new DiscordServerDeleted($this->plugin, $packet->getServer()))->call();
 		$this->plugin->getServer()->broadcastMessage("Removed/Left discord server: ".$packet->getServer()->getName());
 		return true;
 	}
 
 	private function handleServerUpdate(DiscordEventServerUpdate $packet): bool{
 		Storage::updateServer($packet->getServer());
+		(new DiscordServerUpdated($this->plugin, $packet->getServer()))->call();
 		$this->plugin->getServer()->broadcastMessage("Updated discord server: ".$packet->getServer()->getName());
 		return true;
 	}
