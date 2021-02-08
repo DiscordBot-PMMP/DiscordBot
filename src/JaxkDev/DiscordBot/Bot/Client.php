@@ -47,10 +47,14 @@ class Client{
 	private $discordEventHandler;
 
 	/** @var TimerInterface|null */
-	private $readyTimer, $tickTimer;
+	private $readyTimer;
+	/** @var TimerInterface|null */
+	private $tickTimer;
 
 	/** @var int */
-	private $tickCount, $lastGCCollection = 0;
+	private $tickCount;
+	/** @var int */
+	private $lastGCCollection = 0;
 
 	/** @var array */
 	private $config;

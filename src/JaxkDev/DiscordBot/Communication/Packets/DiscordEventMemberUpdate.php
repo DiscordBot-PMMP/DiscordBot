@@ -14,8 +14,6 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 
 use JaxkDev\DiscordBot\Communication\Models\Member;
 
-//TODO, Every discord event has a create, delete and update type have one event eg DiscordMemberEvent that has type
-//create, delete or update. This 'style' can also be applied to plugin->discord event packets.
 class DiscordEventMemberUpdate extends Packet{
 
 	/** @var Member */

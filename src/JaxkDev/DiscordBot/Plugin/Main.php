@@ -32,7 +32,9 @@ class Main extends PluginBase{
 	private $discordBot;
 
 	/** @var Volatile */
-	private $inboundData, $outboundData;
+	private $inboundData;
+	/** @var Volatile */
+	private $outboundData;
 
 	/** @var TaskHandler */
 	private $tickTask;
@@ -47,7 +49,9 @@ class Main extends PluginBase{
 	private $api;
 
 	/** @var array */
-	private $eventConfig, $config;
+	private $eventConfig;
+	/** @var array */
+	private $config;
 
 	public function onLoad(){
 		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
@@ -180,7 +184,7 @@ class Main extends PluginBase{
 			$packet = unserialize($data);
 			Utils::assert($packet instanceof Packet);
 			return $packet;
-		}, /* @phpstan-ignore-line */ $this->inboundData->chunk($count));
+		}, $this->inboundData->chunk($count, false));
 	}
 
 	public function writeOutboundData(Packet $packet): void{
