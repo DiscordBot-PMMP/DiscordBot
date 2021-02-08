@@ -96,7 +96,6 @@ class BotCommunicationHandler{
 			$config['format']);
 
 		$this->plugin->getServer()->broadcastMessage($formatted);
-
 		return true;
 	}
 
@@ -122,7 +121,6 @@ class BotCommunicationHandler{
 				$user->getDiscriminator(), $server->getId(), $server->getName()], $config['format']);
 
 		$this->plugin->getServer()->broadcastMessage($formatted);
-
 		return true;
 	}
 
@@ -145,22 +143,20 @@ class BotCommunicationHandler{
 		$user = Storage::getUser($member->getUserId());
 		Utils::assert($user instanceof User);
 
+		Storage::removeMember($member->getId());
+
 		$formatted = str_replace(
 			['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
 			[date('G:i:s', $member->getJoinTimestamp()), $user->getId(), $user->getUsername(),
 				$user->getDiscriminator(), $server->getId(), $server->getName()], $config['format']);
 
 		$this->plugin->getServer()->broadcastMessage($formatted);
-
 		return true;
 	}
 
 	private function handleMemberUpdate(DiscordEventMemberUpdate $packet): bool{
-		$member = $packet->getMember();
-		Storage::removeMember($member->getId());
-		Storage::addMember($member);
+		Storage::updateMember($packet->getMember());
 		$this->plugin->getServer()->broadcastMessage("Member updated.");
-
 		return true;
 	}
 
@@ -180,7 +176,7 @@ class BotCommunicationHandler{
 	}
 
 	private function handleServerUpdate(DiscordEventServerUpdate $packet): bool{
-		Storage::addServer($packet->getServer()); //Overwrites already set data.
+		Storage::updateServer($packet->getServer());
 		$this->plugin->getServer()->broadcastMessage("Updated discord server: ".$packet->getServer()->getName());
 		return true;
 	}

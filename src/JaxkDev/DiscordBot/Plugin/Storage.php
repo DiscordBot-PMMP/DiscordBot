@@ -24,8 +24,6 @@ use JaxkDev\DiscordBot\Communication\Models\User;
  * (~= 10ms to search for one user in a 30k db
  *
  * unset() on the removes doesnt destroy the objects until all references are unset....
- *
- * TODO, Update functions to remove unneccasry logic like removing then adding to get around server maps duping.
  */
 
 class Storage{
@@ -65,10 +63,19 @@ class Storage{
 	}
 
 	public static function addServer(Server $server): void{
+		if(isset(self::$serverMap[$server->getId()])) return; //Already added.
 		self::$serverMap[$server->getId()] = $server;
-		if(!isset(self::$channelServerMap[$server->getId()])) self::$channelServerMap[$server->getId()] = [];
-		if(!isset(self::$memberServerMap[$server->getId()])) self::$memberServerMap[$server->getId()] = [];
-		if(!isset(self::$roleServerMap[$server->getId()])) self::$roleServerMap[$server->getId()] = [];
+		self::$channelServerMap[$server->getId()] = [];
+		self::$memberServerMap[$server->getId()] = [];
+		self::$roleServerMap[$server->getId()] = [];
+	}
+
+	public static function updateServer(Server $server): void{
+		if(!isset(self::$serverMap[$server->getId()])){
+			self::addServer($server);
+		} else {
+			self::$serverMap[$server->getId()] = $server;
+		}
 	}
 
 	/**
@@ -113,8 +120,17 @@ class Storage{
 	}
 
 	public static function addChannel(Channel $channel): void{
+		if(isset(self::$channelMap[$channel->getId()])) return;
 		self::$channelServerMap[$channel->getServerId()][] = $channel->getId();
 		self::$channelMap[$channel->getId()] = $channel;
+	}
+
+	public static function updateChannel(Channel $channel): void{
+		if(!isset(self::$channelMap[$channel->getId()])){
+			self::addChannel($channel);
+		} else {
+			self::$channelMap[$channel->getId()] = $channel;
+		}
 	}
 
 	public static function removeChannel(string $channelId): void{
@@ -145,8 +161,17 @@ class Storage{
 	}
 
 	public static function addMember(Member $member): void{
+		if(isset(self::$memberMap[$member->getId()])) return;
 		self::$memberServerMap[$member->getServerId()][] = $member->getId();
 		self::$memberMap[$member->getId()] = $member;
+	}
+
+	public static function updateMember(Member $member): void{
+		if(!isset(self::$memberMap[$member->getId()])){
+			self::addMember($member);
+		} else {
+			self::$memberMap[$member->getId()] = $member;
+		}
 	}
 
 	public static function removeMember(string $memberID): void{
@@ -165,6 +190,15 @@ class Storage{
 
 	public static function addUser(User $user): void{
 		self::$userMap[$user->getId()] = $user;
+	}
+
+	/**
+	 * Same function as addUser because no links are kept for users.
+	 * @param User $user
+	 */
+	public static function updateUser(User $user): void{
+		//No links can overwrite.
+		self::addUser($user);
 	}
 
 	public static function removeUser(string $userId): void{
@@ -189,8 +223,17 @@ class Storage{
 	}
 
 	public static function addRole(Role $role): void{
+		if(isset(self::$roleMap[$role->getId()])) return;
 		self::$roleServerMap[$role->getServerId()][] = $role->getId();
 		self::$roleMap[$role->getId()] = $role;
+	}
+
+	public static function updateRole(Role $role): void{
+		if(!isset(self::$roleMap[$role->getId()])){
+			self::addRole($role);
+		} else {
+			self::$roleMap[$role->getId()] = $role;
+		}
 	}
 
 	public static function removeRole(string $roleID): void{
