@@ -24,6 +24,7 @@ use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordAllData;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventReady;
 use pocketmine\utils\MainLogger;
 
 class DiscordEventHandler{
@@ -124,12 +125,11 @@ class DiscordEventHandler{
 		MainLogger::getLogger()->debug("Data pack Took: ".round(microtime(true)-$t, 5)."s & ".
 			round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
 
-		// Force fresh heartbeat asap, as that took quite some time.
-		$this->client->getCommunicationHandler()->sendHeartbeat();
-
 		$this->client->getThread()->setStatus(Protocol::THREAD_STATUS_READY);
 		MainLogger::getLogger()->info("Client ready.");
 
+		$this->client->getThread()->writeOutboundData(new DiscordEventReady());
+		$this->client->getCommunicationHandler()->sendHeartbeat();
 		$this->client->logDebugInfo();
 	}
 

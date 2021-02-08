@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
 use JaxkDev\DiscordBot\Plugin\Handlers\PocketMineEventHandler;
 use JaxkDev\DiscordBot\Plugin\Handlers\BotCommunicationHandler;
 use JaxkDev\DiscordBot\Utils;
@@ -27,6 +28,9 @@ use pocketmine\utils\TextFormat;
 use Volatile;
 
 class Main extends PluginBase{
+
+	/** @var Main */
+	static private $instance;
 
 	/** @var BotThread */
 	private $discordBot;
@@ -54,6 +58,8 @@ class Main extends PluginBase{
 	private $config;
 
 	public function onLoad(){
+		self::$instance = $this;
+
 		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
 			define("JaxkDev\DiscordBot\VERSION", "v".$this->getDescription()->getVersion());
 			define('JaxkDev\DiscordBot\COMPOSER', (Phar::running(true) !== "") ? Phar::running(true) . "/vendor/autoload.php" : dirname(__DIR__, 4) . "/DiscordBot/vendor/autoload.php");
@@ -203,6 +209,10 @@ class Main extends PluginBase{
 		return $this->api;
 	}
 
+	public static function getInstance(): Main{
+		return self::$instance;
+	}
+
 	public function stopAll(bool $stopPlugin = true): void{
 		if($this->tickTask !== null){
 			if(!$this->tickTask->isCancelled()){
@@ -210,9 +220,10 @@ class Main extends PluginBase{
 			}
 		}
 		if($this->discordBot !== null){
-			//Stopping while bot is not ready causes it to hang.
+			//Stopping while bot is not ready (midway through data dump) causes it to wait.
 			$this->discordBot->setStatus(Protocol::THREAD_STATUS_CLOSING);
 			$this->discordBot->quit();  // Joins thread (<-- beware) (Right now this forces bot to close)
+			(new DiscordClosed($this))->call();
 		}
 		if($stopPlugin){
 			$this->getServer()->getPluginManager()->disablePlugin($this);

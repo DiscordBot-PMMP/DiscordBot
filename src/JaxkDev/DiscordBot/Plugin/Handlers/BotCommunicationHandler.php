@@ -32,9 +32,11 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventRoleUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerJoin;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerLeave;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventReady;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
 use JaxkDev\DiscordBot\Plugin\Main;
 use JaxkDev\DiscordBot\Plugin\Storage;
 use JaxkDev\DiscordBot\Utils;
@@ -71,11 +73,18 @@ class BotCommunicationHandler{
 		if($packet instanceof DiscordEventServerLeave) return $this->handleServerLeave($packet);
 		if($packet instanceof DiscordEventServerUpdate) return $this->handleServerUpdate($packet);
 		if($packet instanceof DiscordAllData) return $this->handleAllDiscordData($packet);
+		if($packet instanceof DiscordEventReady) return $this->handleReady();
 		return false;
 	}
 
 	private function handleHeartbeat(Heartbeat $packet): bool{
 		$this->lastHeartbeat = $packet->getHeartbeat();
+		return true;
+	}
+
+	private function handleReady(): bool{
+		(new DiscordReady($this->plugin))->call();
+		//TODO Implement into Main's tick to verify bot is ready for heartbeats etc.
 		return true;
 	}
 
