@@ -64,7 +64,7 @@ class DiscordEventHandler{
 		$discord->on('INVITE_CREATE', [$this, 'onInviteCreate']);
 		$discord->on('INVITE_DELETE', [$this, 'onInviteDelete']);
 
-		//$discord->on('GUILD_BAN_REMOVE', [$this, 'onBanRemove']);
+		$discord->on('GUILD_BAN_REMOVE', [$this, 'onBanRemove']);
 
 		/*
 		 * TODO (others planned for 2.1):
@@ -288,6 +288,10 @@ class DiscordEventHandler{
 	 */
 	public function onInviteDelete(\stdClass $invite, Discord $discord): void{
 		$this->client->getCommunicationHandler()->sendInviteDeleteEvent($invite->code);
+	}
+
+	public function onBanRemove(DiscordBan $ban, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendBanRemoveEvent($ban->guild_id . "." . $ban->user_id);
 	}
 
 	/**

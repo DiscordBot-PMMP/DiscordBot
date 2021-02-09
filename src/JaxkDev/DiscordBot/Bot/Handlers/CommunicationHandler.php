@@ -20,6 +20,7 @@ use JaxkDev\DiscordBot\Communication\Models\Message;
 use JaxkDev\DiscordBot\Communication\Models\Role;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanRemove;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelUpdate;
@@ -175,6 +176,13 @@ class CommunicationHandler{
 	public function sendInviteDeleteEvent(string $invite_code): void{
 		$packet = new DiscordEventInviteDelete();
 		$packet->setInviteCode($invite_code);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+
+	public function sendBanRemoveEvent(string $id): void{
+		$packet = new DiscordEventBanRemove();
+		$packet->setId($id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 

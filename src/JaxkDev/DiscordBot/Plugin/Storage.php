@@ -283,7 +283,8 @@ class Storage{
 	public static function getServerBans(string $server_id): array{
 		$bans = [];
 		foreach((self::$banServerMap[$server_id]??[]) as $member){
-			$bans[] = self::getBan($member);
+			$b = self::getBan($member);
+			if($b !== null) $bans[] = $b;
 		}
 		return $bans;
 	}
