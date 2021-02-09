@@ -41,9 +41,32 @@ abstract class ModelConverter{
 			->setServerId($discordMember->guild_id)
 			->setNickname($discordMember->nick)
 			->setJoinTimestamp($discordMember->joined_at === null ? 0 : $discordMember->joined_at->getTimestamp())
-			->setBoostTimestamp($discordMember->premium_since === null ? null : $discordMember->premium_since->getTimestamp())
-			->setRolesId(array_keys($discordMember->roles->toArray()))
-			->setPermissions(self::genModelRolePermission($discordMember->getPermissions()));
+			->setBoostTimestamp($discordMember->premium_since === null ? null : $discordMember->premium_since->getTimestamp());
+
+		$bitwise = $discordMember->guild->roles->offsetGet($discordMember->guild_id)->permissions->bitwise; //Everyone perms.
+		$roles = [];
+
+		if ($discordMember->guild->owner_id == $discordMember->id) {
+			$bitwise |= 0x8; // Add administrator permission
+			foreach($discordMember->roles ?? [] as $role){
+				$roles[] = $role->id;
+			}
+		} else {
+			/* @var DiscordRole */
+			foreach ($discordMember->roles ?? [] as $role) {
+				$roles[] = $role->id;
+				$bitwise |= $role->permissions->bitwise;
+			}
+		}
+
+		$newPermission = new RolePermissions();
+		$newPermission->setBitwise($bitwise);
+		if ($newPermission->getPermission('administrator')) {
+			$newPermission->setBitwise(2147483647); //All perms.
+		}
+
+		$m->setPermissions($newPermission);
+		$m->setRolesId($roles);
 		return $m;
 	}
 
