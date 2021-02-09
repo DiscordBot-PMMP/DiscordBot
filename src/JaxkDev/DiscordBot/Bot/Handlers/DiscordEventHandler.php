@@ -141,25 +141,6 @@ class DiscordEventHandler{
 		$this->client->logDebugInfo();
 	}
 
-	/**
-	 * Checks if we handle this type of message in this type of channel.
-	 * @param DiscordMessage $message
-	 * @return bool
-	 */
-	private function checkMessage(DiscordMessage $message): bool{
-		// Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
-		if($message->author === null) return false; //Investigating specific case.
-		if($message->author instanceof DiscordMember ? $message->author->user->bot : (isset($message->author) ? $message->author->bot : true)) return false;
-
-		// Other types of messages not used right now.
-		if($message->type !== DiscordMessage::TYPE_NORMAL) return false;
-		if($message->channel->type !== DiscordChannel::TYPE_TEXT) return false;
-		if(($message->content ?? "") === "") return false; //Images/Files, can be empty strings or just null in other cases.
-		if($message->channel->guild_id === null) return false;
-
-		return true;
-	}
-
 	public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
 		//var_dump(microtime(true)." - create message #".$message->id);
 		if(!$this->checkMessage($message)) return;
@@ -227,14 +208,17 @@ class DiscordEventHandler{
 	}
 
 	public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
+		if(!$this->checkChannel($channel)) return;
 		$this->client->getCommunicationHandler()->sendChannelCreateEvent(ModelConverter::genModelChannel($channel));
 	}
 
 	public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
+		if(!$this->checkChannel($channel)) return;
 		$this->client->getCommunicationHandler()->sendChannelUpdateEvent(ModelConverter::genModelChannel($channel));
 	}
 
 	public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
+		if(!$this->checkChannel($channel)) return;
 		$this->client->getCommunicationHandler()->sendChannelDeleteEvent(ModelConverter::genModelChannel($channel));
 	}
 
@@ -260,5 +244,28 @@ class DiscordEventHandler{
 	 */
 	public function onInviteDelete(\stdClass $invite, Discord $discord): void{
 		$this->client->getCommunicationHandler()->sendInviteDeleteEvent($invite->code);
+	}
+
+	/**
+	 * Checks if we handle this type of message in this type of channel.
+	 * @param DiscordMessage $message
+	 * @return bool
+	 */
+	private function checkMessage(DiscordMessage $message): bool{
+		// Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
+		if($message->author === null) return false; //Investigating specific case.
+		if($message->author instanceof DiscordMember ? $message->author->user->bot : (isset($message->author) ? $message->author->bot : true)) return false;
+
+		// Other types of messages not used right now.
+		if($message->type !== DiscordMessage::TYPE_NORMAL) return false;
+		if($message->channel->type !== DiscordChannel::TYPE_TEXT) return false;
+		if(($message->content ?? "") === "") return false; //Images/Files, can be empty strings or just null in other cases.
+		if($message->channel->guild_id === null) return false;
+
+		return true;
+	}
+
+	private function checkChannel(DiscordChannel $channel): bool{
+		return (($channel->type??-1) === DiscordChannel::TYPE_TEXT);
 	}
 }
