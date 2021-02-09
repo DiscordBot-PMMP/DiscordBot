@@ -20,6 +20,7 @@ use JaxkDev\DiscordBot\Communication\Models\Role;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberLeave;
@@ -102,7 +103,7 @@ class CommunicationHandler{
 	}
 
 	public function sendChannelDeleteEvent(Channel $channel): void{
-		$packet = new DiscordEventChannelUpdate();
+		$packet = new DiscordEventChannelDelete();
 		$packet->setChannel($channel);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
