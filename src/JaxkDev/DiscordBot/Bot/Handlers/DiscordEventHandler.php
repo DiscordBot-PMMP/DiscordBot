@@ -18,12 +18,13 @@ use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
+use Discord\Parts\Permissions\RolePermission;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Models\Activity;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordAllData;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventReady;
 use pocketmine\utils\MainLogger;
@@ -63,11 +64,10 @@ class DiscordEventHandler{
 		$discord->on('INVITE_DELETE', [$this, 'onInviteDelete']);
 
 		/*
-		 * TODO (others not yet planned for 2.0.0):
-		 * - Reactions
-		 * - Pins
-		 * - Server Integrations ?
-		 * - Bans
+		 * TODO (others planned for 2.1):
+		 * - Reactions (Probably wont store previous reactions, could be very large...)
+		 * - Pins (Note event only emits the pins for the channel not if one was added/deleted/unpinned etc.)
+		 * - Bans (Ban event wont receive reason, for reason freshen bans repo and get via there, for 'banner' check audit log)
 		 */
 	}
 
@@ -79,14 +79,14 @@ class DiscordEventHandler{
 
 		//Default activity.
 		$ac = new Activity();
-		$ac->setMessage("PocketMine-MP v".\pocketmine\VERSION)->setType(Activity::TYPE_PLAYING)->setStatus(Activity::STATUS_IDLE);
+		$ac->setMessage("PocketMine-MP v".\pocketmine\VERSION)->setType(Activity::TYPE_PLAYING)->setStatus(Activity::STATUS_ONLINE);
 		$this->client->updatePresence($ac);
 
 		// Register all other events.
 		$this->registerEvents();
 
 		// Dump all discord data.
-		$pk = new DiscordAllData();
+		$pk = new DiscordDataDump();
 		$pk->setTimestamp(time());
 
 		MainLogger::getLogger()->debug("Starting the data pack, please be patient.");
@@ -99,6 +99,22 @@ class DiscordEventHandler{
 		foreach($client->guilds as $guild){
 			$pk->addServer(ModelConverter::genModelServer($guild));
 
+			/** @var RolePermission $permissions */
+			$permissions = $guild->members->offsetGet($client->id)->getPermissions();
+
+			if($permissions->ban_members){
+				/** @noinspection PhpUnhandledExceptionInspection */
+				$guild->bans->freshen()->done(function() use ($guild){
+					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->bans)." bans from server '".
+						$guild->name."' (".$guild->id.")");
+				}, function() use ($guild){
+					MainLogger::getLogger()->warning("Failed to fetch bans from server '".$guild->name."' (".$guild->id.")");
+				});
+			} else {
+				MainLogger::getLogger()->notice("Cannot fetch bans from server '".$guild->name."' (".$guild->id.
+					"), Bot does not have 'ban_members' permission.");
+			}
+
 			/** @var DiscordChannel $channel */
 			foreach($guild->channels as $channel){
 				if($channel->type !== DiscordChannel::TYPE_TEXT) continue;
@@ -110,9 +126,24 @@ class DiscordEventHandler{
 				$pk->addRole(ModelConverter::genModelRole($role));
 			}
 
-			/** @var DiscordInvite $invite */
-			foreach($guild->invites as $invite){
-				$pk->addInvite(ModelConverter::genModelInvite($invite));
+			if($permissions->manage_guild){
+				/** @noinspection PhpUnhandledExceptionInspection */
+				$guild->invites->freshen()->done(function() use ($guild){
+					$pk = new DiscordDataDump();
+					$pk->setTimestamp(time());
+					/** @var DiscordInvite $invite */
+					foreach($guild->invites as $invite){
+						$pk->addInvite(ModelConverter::genModelInvite($invite));
+					}
+					$this->client->getThread()->writeOutboundData($pk);
+					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->invites).
+						" invites from server '".$guild->name."' (".$guild->id.")");
+				}, function() use ($guild){
+					MainLogger::getLogger()->warning("Failed to fetch invites from server '".$guild->name."' (".$guild->id.")");
+				});
+			} else {
+				MainLogger::getLogger()->notice("Cannot fetch invites from server '".$guild->name."' (".$guild->id.
+					"), Bot does not have 'manage_guild' permission.");
 			}
 
 			/** @var DiscordMember $member */

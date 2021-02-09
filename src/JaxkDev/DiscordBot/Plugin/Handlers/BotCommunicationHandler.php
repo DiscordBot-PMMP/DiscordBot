@@ -16,7 +16,7 @@ use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordAllData;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelUpdate;
@@ -45,7 +45,6 @@ use JaxkDev\DiscordBot\Plugin\Events\DiscordServerUpdated;
 use JaxkDev\DiscordBot\Plugin\Main;
 use JaxkDev\DiscordBot\Plugin\Storage;
 use JaxkDev\DiscordBot\Utils;
-use pocketmine\utils\MainLogger;
 
 class BotCommunicationHandler{
 
@@ -79,7 +78,7 @@ class BotCommunicationHandler{
 		if($packet instanceof DiscordEventServerJoin) return $this->handleServerJoin($packet);
 		if($packet instanceof DiscordEventServerLeave) return $this->handleServerLeave($packet);
 		if($packet instanceof DiscordEventServerUpdate) return $this->handleServerUpdate($packet);
-		if($packet instanceof DiscordAllData) return $this->handleAllDiscordData($packet);
+		if($packet instanceof DiscordDataDump) return $this->handleDataDump($packet);
 		if($packet instanceof DiscordEventReady) return $this->handleReady();
 		return false;
 	}
@@ -272,9 +271,7 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleAllDiscordData(DiscordAllData $packet): bool{
-		//Todo verify packet before resetting data.
-		Storage::reset();
+	private function handleDataDump(DiscordDataDump $packet): bool{
 		foreach($packet->getServers() as $server){
 			Storage::addServer($server);
 		}
@@ -295,7 +292,7 @@ class BotCommunicationHandler{
 		}
 		if($packet->getBotUser() !== null) Storage::setBotUser($packet->getBotUser());
 		Storage::setTimestamp($packet->getTimestamp());
-
+		$this->plugin->getLogger()->debug("Handled data dump (".$packet->getTimestamp().")");
 		return true;
 	}
 
@@ -305,7 +302,7 @@ class BotCommunicationHandler{
 	public function checkHeartbeat(): void{
 		if($this->lastHeartbeat === null) return;
 		if(($diff = microtime(true) - $this->lastHeartbeat) > Protocol::HEARTBEAT_ALLOWANCE){
-			MainLogger::getLogger()->emergency("DiscordBot has not responded for 2 seconds, disabling plugin + bot.");
+			$this->plugin->getLogger()->emergency("DiscordBot has not responded for 2 seconds, disabling plugin + bot.");
 			$this->plugin->stopAll();
 		}
 	}

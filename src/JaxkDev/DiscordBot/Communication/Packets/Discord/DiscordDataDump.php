@@ -20,7 +20,7 @@ use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordAllData extends Packet{
+class DiscordDataDump extends Packet{
 
 	/** @var Server[] */
 	private $servers = [];
@@ -46,7 +46,7 @@ class DiscordAllData extends Packet{
 	/** @var int */
 	private $timestamp;
 
-	public function addServer(Server $server): DiscordAllData{
+	public function addServer(Server $server): DiscordDataDump{
 		$this->servers[] = $server;
 		return $this;
 	}
@@ -58,7 +58,7 @@ class DiscordAllData extends Packet{
 		return $this->servers;
 	}
 
-	public function addChannel(Channel $channel): DiscordAllData{
+	public function addChannel(Channel $channel): DiscordDataDump{
 		$this->channels[] = $channel;
 		return $this;
 	}
@@ -70,7 +70,7 @@ class DiscordAllData extends Packet{
 		return $this->channels;
 	}
 
-	public function addRole(Role $role): DiscordAllData{
+	public function addRole(Role $role): DiscordDataDump{
 		$this->roles[] = $role;
 		return $this;
 	}
@@ -82,7 +82,7 @@ class DiscordAllData extends Packet{
 		return $this->roles;
 	}
 
-	public function addInvite(Invite $invite): DiscordAllData{
+	public function addInvite(Invite $invite): DiscordDataDump{
 		$this->invites[] = $invite;
 		return $this;
 	}
@@ -94,7 +94,7 @@ class DiscordAllData extends Packet{
 		return $this->invites;
 	}
 
-	public function addMember(Member $member): DiscordAllData{
+	public function addMember(Member $member): DiscordDataDump{
 		$this->members[] = $member;
 		return $this;
 	}
@@ -106,7 +106,7 @@ class DiscordAllData extends Packet{
 		return $this->members;
 	}
 
-	public function addUser(User $user): DiscordAllData{
+	public function addUser(User $user): DiscordDataDump{
 		$this->users[] = $user;
 		return $this;
 	}
@@ -126,7 +126,7 @@ class DiscordAllData extends Packet{
 		return $this->botUser;
 	}
 
-	public function setTimestamp(int $timestamp): DiscordAllData{
+	public function setTimestamp(int $timestamp): DiscordDataDump{
 		$this->timestamp = $timestamp;
 		return $this;
 	}
