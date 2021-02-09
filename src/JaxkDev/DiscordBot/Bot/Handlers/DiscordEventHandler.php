@@ -16,6 +16,7 @@ use Discord\Discord;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Guild\Guild as DiscordGuild;
+use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
@@ -58,12 +59,14 @@ class DiscordEventHandler{
 		$discord->on('GUILD_ROLE_UPDATE', [$this, 'onRoleUpdate']);
 		$discord->on('GUILD_ROLE_DELETE', [$this, 'onRoleDelete']);
 
+		$discord->on('INVITE_CREATE', [$this, 'onInviteCreate']);
+		$discord->on('INVITE_DELETE', [$this, 'onInviteDelete']);
+
 		/*
 		 * TODO (others not yet planned for 2.0.0):
 		 * - Reactions
 		 * - Pins
 		 * - Server Integrations ?
-		 * - Invites
 		 * - Bans
 		 */
 	}
@@ -105,6 +108,11 @@ class DiscordEventHandler{
 			/** @var DiscordRole $role */
 			foreach($guild->roles as $role){
 				$pk->addRole(ModelConverter::genModelRole($role));
+			}
+
+			/** @var DiscordInvite $invite */
+			foreach($guild->invites as $invite){
+				$pk->addInvite(ModelConverter::genModelInvite($invite));
 			}
 
 			/** @var DiscordMember $member */
@@ -240,5 +248,17 @@ class DiscordEventHandler{
 
 	public function onRoleDelete(DiscordRole $role, Discord $discord): void{
 		$this->client->getCommunicationHandler()->sendRoleDeleteEvent(ModelConverter::genModelRole($role));
+	}
+
+	public function onInviteCreate(DiscordInvite $invite, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendInviteCreateEvent(ModelConverter::genModelInvite($invite));
+	}
+
+	/**
+	 * @param \stdClass $invite {channel_id: str, guild_id: str, code: str}
+	 * @param Discord   $discord
+	 */
+	public function onInviteDelete(\stdClass $invite, Discord $discord): void{
+		$this->client->getCommunicationHandler()->sendInviteDeleteEvent($invite->code);
 	}
 }

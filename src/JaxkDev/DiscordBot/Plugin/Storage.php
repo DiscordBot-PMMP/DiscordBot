@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Models\Channel;
+use JaxkDev\DiscordBot\Communication\Models\Invite;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Role;
 use JaxkDev\DiscordBot\Communication\Models\Server;
@@ -52,6 +53,12 @@ class Storage{
 	/** @var Array<string, string[]> */
 	private static $roleServerMap = [];
 
+	/** @var Array<string, Invite> */
+	private static $inviteMap = [];
+
+	/** @var Array<string, string[]> */
+	private static $inviteServerMap = [];
+
 	/** @var null|User */
 	private static $botUser = null;
 
@@ -63,11 +70,12 @@ class Storage{
 	}
 
 	public static function addServer(Server $server): void{
-		if(isset(self::$serverMap[$server->getId()])) return; //Already added.
-		self::$serverMap[$server->getId()] = $server;
-		self::$channelServerMap[$server->getId()] = [];
-		self::$memberServerMap[$server->getId()] = [];
-		self::$roleServerMap[$server->getId()] = [];
+		if(isset(self::$serverMap[($id = $server->getId())])) return; //Already added.
+		self::$serverMap[$id] = $server;
+		self::$channelServerMap[$id] = [];
+		self::$memberServerMap[$id] = [];
+		self::$roleServerMap[$id] = [];
+		self::$inviteServerMap[$id] = [];
 	}
 
 	public static function updateServer(Server $server): void{
@@ -100,6 +108,11 @@ class Storage{
 			unset(self::$roleMap[$rid]);
 		}
 		unset(self::$roleServerMap[$serverId]);
+		//Remove servers invites.
+		foreach(self::$inviteServerMap[$serverId] as $iid){
+			unset(self::$inviteMap[$iid]);
+		}
+		unset(self::$inviteServerMap[$serverId]);
 	}
 
 	public static function getChannel(string $id): ?Channel{
@@ -244,6 +257,47 @@ class Storage{
 		$i = array_search($roleID, self::$roleServerMap[$serverId], true);
 		if($i === false || is_string($i)) return; //Not in this servers role map.
 		array_splice(self::$roleServerMap[$serverId], $i, 1);
+	}
+
+	public static function getInvite(string $code): ?Invite{
+		return self::$inviteMap[$code] ?? null;
+	}
+
+	/**
+	 * @param string $serverId
+	 * @return Invite[]
+	 */
+	public static function getInvitesByServer(string $serverId): array{
+		$invites = [];
+		foreach((self::$inviteServerMap[$serverId] ?? []) as $id){
+			$i = self::getInvite($id);
+			if($i !== null) $invites[] = $i;
+		}
+		return $invites;
+	}
+
+	public static function addInvite(Invite $invite): void{
+		if(isset(self::$inviteMap[$invite->getCode()])) return;
+		self::$inviteServerMap[$invite->getServerId()][] = $invite->getCode();
+		self::$inviteMap[$invite->getCode()] = $invite;
+	}
+
+	public static function updateInvite(Invite $invite): void{
+		if(!isset(self::$inviteMap[$invite->getCode()])){
+			self::addinvite($invite);
+		} else {
+			self::$inviteMap[$invite->getCode()] = $invite;
+		}
+	}
+
+	public static function removeInvite(string $code): void{
+		$invite = self::getinvite($code);
+		if($invite === null) return; //Already deleted or not added.
+		$serverId = $invite->getServerId();
+		unset(self::$inviteMap[$code]);
+		$i = array_search($code, self::$inviteServerMap[$serverId], true);
+		if($i === false || is_string($i)) return; //Not in this servers invite map.
+		array_splice(self::$inviteServerMap[$serverId], $i, 1);
 	}
 
 	public static function getBotUser(): ?User{

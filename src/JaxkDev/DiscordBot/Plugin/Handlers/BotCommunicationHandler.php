@@ -20,6 +20,8 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordAllData;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventInviteCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventInviteDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberUpdate;
@@ -72,6 +74,8 @@ class BotCommunicationHandler{
 		if($packet instanceof DiscordEventRoleCreate) return $this->handleRoleCreate($packet);
 		if($packet instanceof DiscordEventRoleUpdate) return $this->handleRoleUpdate($packet);
 		if($packet instanceof DiscordEventRoleDelete) return $this->handleRoleDelete($packet);
+		if($packet instanceof DiscordEventInviteCreate) return $this->handleInviteCreate($packet);
+		if($packet instanceof DiscordEventInviteDelete) return $this->handleInviteDelete($packet);
 		if($packet instanceof DiscordEventServerJoin) return $this->handleServerJoin($packet);
 		if($packet instanceof DiscordEventServerLeave) return $this->handleServerLeave($packet);
 		if($packet instanceof DiscordEventServerUpdate) return $this->handleServerUpdate($packet);
@@ -171,6 +175,18 @@ class BotCommunicationHandler{
 		return true;
 	}
 
+	private function handleInviteCreate(DiscordEventInviteCreate $packet): bool{
+		Storage::addInvite($packet->getInvite());
+		$this->plugin->getServer()->broadcastMessage("Invite '".$packet->getInvite()->getCode()."' created.");
+		return true;
+	}
+
+	private function handleInviteDelete(DiscordEventInviteDelete $packet): bool{
+		Storage::removeInvite($packet->getInviteCode());
+		$this->plugin->getServer()->broadcastMessage("Invite '".$packet->getInviteCode()."' deleted/expired.");
+		return true;
+	}
+
 	private function handleMemberJoin(DiscordEventMemberJoin $packet): bool{
 		$config = $this->plugin->getEventsConfig()['member_join']['fromDiscord'];
 		if(($config['format'] ?? "") === "") return true;
@@ -267,6 +283,9 @@ class BotCommunicationHandler{
 		}
 		foreach($packet->getRoles() as $role){
 			Storage::addRole($role);
+		}
+		foreach($packet->getInvites() as $invite){
+			Storage::addInvite($invite);
 		}
 		foreach($packet->getMembers() as $member){
 			Storage::addMember($member);

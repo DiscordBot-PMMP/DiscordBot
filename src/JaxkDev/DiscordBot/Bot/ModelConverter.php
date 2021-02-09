@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Bot;
 
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
+use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
 use Discord\Parts\User\Activity as DiscordActivity;
@@ -23,6 +24,7 @@ use Discord\Parts\Guild\Guild as DiscordServer;
 use InvalidArgumentException;
 use JaxkDev\DiscordBot\Communication\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Models\Channel;
+use JaxkDev\DiscordBot\Communication\Models\Invite;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Message;
 use JaxkDev\DiscordBot\Communication\Models\Permissions\RolePermissions;
@@ -120,6 +122,20 @@ abstract class ModelConverter{
 			->setHoistedPosition($discordRole->position)
 			->setColour($discordRole->color);
 		return $r;
+	}
+
+	static public function genModelInvite(DiscordInvite $invite): Invite{
+		$i = new Invite();
+		$i->setCode($invite->code);
+		$i->setServerId($invite->guild_id);
+		$i->setChannelId($invite->channel_id);
+		$i->setCreatedAt($invite->created_at->getTimestamp());
+		$i->setCreator($invite->guild_id.".".$invite->inviter->id);
+		$i->setMaxAge($invite->max_age);
+		$i->setMaxUses($invite->max_uses);
+		$i->setTemporary($invite->temporary);
+		$i->setUses($invite->uses);
+		return $i;
 	}
 
 	/**

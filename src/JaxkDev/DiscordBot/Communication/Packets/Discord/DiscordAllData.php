@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\Models\Channel;
+use JaxkDev\DiscordBot\Communication\Models\Invite;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Role;
 use JaxkDev\DiscordBot\Communication\Models\Server;
@@ -29,6 +30,9 @@ class DiscordAllData extends Packet{
 
 	/** @var Role[] */
 	private $roles = [];
+
+	/** @var Invite[] */
+	private $invites = [];
 
 	/** @var Member[] */
 	private $members = [];
@@ -76,6 +80,18 @@ class DiscordAllData extends Packet{
 	 */
 	public function getRoles(): array{
 		return $this->roles;
+	}
+
+	public function addInvite(Invite $invite): DiscordAllData{
+		$this->invites[] = $invite;
+		return $this;
+	}
+
+	/**
+	 * @return Invite[]
+	 */
+	public function getInvites(): array{
+		return $this->invites;
 	}
 
 	public function addMember(Member $member): DiscordAllData{

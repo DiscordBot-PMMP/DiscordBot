@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Bot\Handlers;
 
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Communication\Models\Channel;
+use JaxkDev\DiscordBot\Communication\Models\Invite;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Message;
 use JaxkDev\DiscordBot\Communication\Models\Role;
@@ -22,6 +23,8 @@ use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventInviteCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventInviteDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberUpdate;
@@ -162,6 +165,19 @@ class CommunicationHandler{
 		$packet->setRole($role);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
+
+	public function sendInviteCreateEvent(Invite $invite): void{
+		$packet = new DiscordEventInviteCreate();
+		$packet->setInvite($invite);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function sendInviteDeleteEvent(string $invite_code): void{
+		$packet = new DiscordEventInviteDelete();
+		$packet->setInviteCode($invite_code);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
 	/**
 	 * @param Server 	$server
 	 * @param Channel[] $channels
