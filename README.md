@@ -10,6 +10,7 @@ All releases that are published are ready to run out of the box, simply add the 
 
 #### Building
 The plugin can work with DevTools in folder structure however it is suggested to build it before using, see below for instructions on building the plugin:
-1. Run `composer install -o --no-dev` in the plugin directory to get all dependencies required.
-2. Run `php BUILD.php`
-3. Copy `DiscordBot.phar` from the `dist` folder into your plugins directory.
+1. Obtain source code, can be done via git `git clone https://github.com/JaxkDev/DiscordBot`
+2. Enter directory via command line. `cd <path where discordbot was cloned to>`
+1. Run `php BUILD.php`
+2. Copy `DiscordBot.phar` from the `dist` folder into your plugins directory.
