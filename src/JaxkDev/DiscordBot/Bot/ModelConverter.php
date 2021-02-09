@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Bot;
 
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
+use Discord\Parts\Guild\Ban as DiscordBan;
 use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
@@ -23,6 +24,7 @@ use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\Guild\Guild as DiscordServer;
 use InvalidArgumentException;
 use JaxkDev\DiscordBot\Communication\Models\Activity;
+use JaxkDev\DiscordBot\Communication\Models\Ban;
 use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Invite;
 use JaxkDev\DiscordBot\Communication\Models\Member;
@@ -41,8 +43,7 @@ abstract class ModelConverter{
 			->setJoinTimestamp($discordMember->joined_at === null ? 0 : $discordMember->joined_at->getTimestamp())
 			->setBoostTimestamp($discordMember->premium_since === null ? null : $discordMember->premium_since->getTimestamp())
 			->setRolesId(array_keys($discordMember->roles->toArray()))
-			->setPermissions(self::genModelRolePermission($discordMember->getPermissions()))
-			->setId();
+			->setPermissions(self::genModelRolePermission($discordMember->getPermissions()));
 		return $m;
 	}
 
@@ -136,6 +137,14 @@ abstract class ModelConverter{
 		$i->setTemporary($invite->temporary);
 		$i->setUses($invite->uses);
 		return $i;
+	}
+
+	static public function genModelBan(DiscordBan $ban): Ban{
+		$b = new Ban();
+		$b->setServerId($ban->guild_id);
+		$b->setUserId($ban->user_id);
+		$b->setReason($ban->reason);
+		return $b;
 	}
 
 	/**

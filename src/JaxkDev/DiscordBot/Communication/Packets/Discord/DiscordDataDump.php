@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\Models\Ban;
 use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Invite;
 use JaxkDev\DiscordBot\Communication\Models\Member;
@@ -33,6 +34,9 @@ class DiscordDataDump extends Packet{
 
 	/** @var Invite[] */
 	private $invites = [];
+
+	/** @var Ban[] */
+	private $bans = [];
 
 	/** @var Member[] */
 	private $members = [];
@@ -94,6 +98,18 @@ class DiscordDataDump extends Packet{
 		return $this->invites;
 	}
 
+	public function addBan(Ban $ban): DiscordDataDump{
+		$this->bans[] = $ban;
+		return $this;
+	}
+
+	/**
+	 * @return Ban[]
+	 */
+	public function getBans(): array{
+		return $this->bans;
+	}
+
 	public function addMember(Member $member): DiscordDataDump{
 		$this->members[] = $member;
 		return $this;
@@ -136,8 +152,8 @@ class DiscordDataDump extends Packet{
 	}
 
 	public function getSize(): int{
-		return sizeof($this->servers)+sizeof($this->channels)
-			+sizeof($this->roles)+sizeof($this->members)+sizeof($this->users);
+		return sizeof($this->servers)+sizeof($this->channels)+sizeof($this->roles)+sizeof($this->members)
+			+sizeof($this->users)+sizeof($this->bans)+sizeof($this->invites);
 	}
 
 	public function serialize(): ?string{
@@ -146,6 +162,8 @@ class DiscordDataDump extends Packet{
 			$this->servers,
 			$this->channels,
 			$this->roles,
+			$this->invites,
+			$this->bans,
 			$this->members,
 			$this->users,
 			$this->botUser,
@@ -159,6 +177,8 @@ class DiscordDataDump extends Packet{
 			$this->servers,
 			$this->channels,
 			$this->roles,
+			$this->invites,
+			$this->bans,
 			$this->members,
 			$this->users,
 			$this->botUser,

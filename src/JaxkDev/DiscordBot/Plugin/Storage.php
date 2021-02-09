@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
+use JaxkDev\DiscordBot\Communication\Models\Ban;
 use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Invite;
 use JaxkDev\DiscordBot\Communication\Models\Member;
@@ -53,6 +54,12 @@ class Storage{
 	/** @var Array<string, string[]> */
 	private static $roleServerMap = [];
 
+	/** @var Array<string, Ban> */
+	private static $banMap = [];
+
+	/** @var Array<string, string[]> */
+	private static $banServerMap = [];
+
 	/** @var Array<string, Invite> */
 	private static $inviteMap = [];
 
@@ -76,6 +83,7 @@ class Storage{
 		self::$memberServerMap[$id] = [];
 		self::$roleServerMap[$id] = [];
 		self::$inviteServerMap[$id] = [];
+		self::$banServerMap[$id] = [];
 	}
 
 	public static function updateServer(Server $server): void{
@@ -113,6 +121,11 @@ class Storage{
 			unset(self::$inviteMap[$iid]);
 		}
 		unset(self::$inviteServerMap[$serverId]);
+		//Remove servers bans.
+		foreach(self::$banServerMap[$serverId] as $bid){
+			unset(self::$banMap[$bid]);
+		}
+		unset(self::$banServerMap[$serverId]);
 	}
 
 	public static function getChannel(string $id): ?Channel{
@@ -259,6 +272,38 @@ class Storage{
 		array_splice(self::$roleServerMap[$serverId], $i, 1);
 	}
 
+	public static function getBan(string $id): ?Ban{
+		return self::$banMap[$id] ?? null;
+	}
+
+	/**
+	 * @param string $server_id
+	 * @return Ban[]
+	 */
+	public static function getServerBans(string $server_id): array{
+		$bans = [];
+		foreach((self::$banServerMap[$server_id]??[]) as $member){
+			$bans[] = self::getBan($member);
+		}
+		return $bans;
+	}
+
+	public static function addBan(Ban $ban): void{
+		if(isset(self::$banMap[$ban->getId()])) return;
+		self::$banMap[$ban->getId()] = $ban;
+		self::$banServerMap[$ban->getServerId()][] = $ban->getId();
+	}
+
+	public static function removeBan(string $id): void{
+		$ban = self::getBan($id);
+		if($ban === null) return; //Already deleted or not added.
+		$serverId = $ban->getServerId();
+		unset(self::$banMap[$id]);
+		$i = array_search($id, self::$banServerMap[$serverId], true);
+		if($i === false || is_string($i)) return; //Not in this servers ban map.
+		array_splice(self::$banServerMap[$serverId], $i, 1);
+	}
+
 	public static function getInvite(string $code): ?Invite{
 		return self::$inviteMap[$code] ?? null;
 	}
@@ -322,7 +367,7 @@ class Storage{
 		self::$timestamp = $timestamp;
 	}
 
-	public static function reset(): void{
+	/*public static function reset(): void{
 		self::$serverMap = [];
 		self::$channelServerMap = [];
 		self::$channelMap = [];
@@ -333,5 +378,5 @@ class Storage{
 		self::$userMap = [];
 		self::$botUser = null;
 		self::$timestamp = 0;
-	}
+	}*/
 }

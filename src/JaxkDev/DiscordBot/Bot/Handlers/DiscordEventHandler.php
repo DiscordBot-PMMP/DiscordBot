@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Bot\Handlers;
 use Discord\Discord;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
+use Discord\Parts\Guild\Ban as DiscordBan;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
@@ -63,11 +64,16 @@ class DiscordEventHandler{
 		$discord->on('INVITE_CREATE', [$this, 'onInviteCreate']);
 		$discord->on('INVITE_DELETE', [$this, 'onInviteDelete']);
 
+		//$discord->on('GUILD_BAN_REMOVE', [$this, 'onBanRemove']);
+
 		/*
 		 * TODO (others planned for 2.1):
 		 * - Reactions (Probably wont store previous reactions, could be very large...)
 		 * - Pins (Note event only emits the pins for the channel not if one was added/deleted/unpinned etc.)
-		 * - Bans (Ban event wont receive reason, for reason freshen bans repo and get via there, for 'banner' check audit log)
+		 *
+		 * TODO:
+		 * - Bans Create.
+		 * event wont receive reason, for reason freshen bans repo and get via there, for 'banner' check audit log
 		 */
 	}
 
@@ -105,6 +111,13 @@ class DiscordEventHandler{
 			if($permissions->ban_members){
 				/** @noinspection PhpUnhandledExceptionInspection */
 				$guild->bans->freshen()->done(function() use ($guild){
+					$pk = new DiscordDataDump();
+					$pk->setTimestamp(time());
+					/** @var DiscordBan $ban */
+					foreach($guild->bans as $ban){
+						$pk->addBan(ModelConverter::genModelBan($ban));
+					}
+					$this->client->getThread()->writeOutboundData($pk);
 					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->bans)." bans from server '".
 						$guild->name."' (".$guild->id.")");
 				}, function() use ($guild){

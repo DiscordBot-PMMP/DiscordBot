@@ -17,9 +17,6 @@ use JaxkDev\DiscordBot\Communication\Models\Permissions\RolePermissions;
 class Member implements \Serializable{
 
 	/** @var string */
-	private $id;
-
-	/** @var string */
 	private $user_id;
 
 	/** @var null|string */
@@ -42,15 +39,11 @@ class Member implements \Serializable{
 
 	/**
 	 * @description Composite key guild_id.user_id
+	 * @see Member::getServerId()
 	 * @see Member::getUserId()
 	 */
 	public function getId(): string{
-		return $this->id;
-	}
-
-	/** @internal */
-	public function setId(): void{
-		$this->id = $this->server_id.".".$this->user_id;
+		return $this->server_id.".".$this->user_id;
 	}
 
 	public function getUserId(): string{
@@ -127,7 +120,6 @@ class Member implements \Serializable{
 
 	public function serialize(): ?string{
 		return serialize([
-			$this->id,
 			$this->user_id,
 			$this->nickname,
 			$this->join_timestamp,
@@ -140,7 +132,6 @@ class Member implements \Serializable{
 
 	public function unserialize($serialized): void{
 		[
-			$this->id,
 			$this->user_id,
 			$this->nickname,
 			$this->join_timestamp,

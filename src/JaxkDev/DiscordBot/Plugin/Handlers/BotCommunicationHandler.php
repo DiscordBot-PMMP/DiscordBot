@@ -281,6 +281,9 @@ class BotCommunicationHandler{
 		foreach($packet->getRoles() as $role){
 			Storage::addRole($role);
 		}
+		foreach($packet->getBans() as $ban){
+			Storage::addBan($ban);
+		}
 		foreach($packet->getInvites() as $invite){
 			Storage::addInvite($invite);
 		}
@@ -292,7 +295,7 @@ class BotCommunicationHandler{
 		}
 		if($packet->getBotUser() !== null) Storage::setBotUser($packet->getBotUser());
 		Storage::setTimestamp($packet->getTimestamp());
-		$this->plugin->getLogger()->debug("Handled data dump (".$packet->getTimestamp().")");
+		$this->plugin->getLogger()->debug("Handled data dump (".$packet->getTimestamp().") (".$packet->getSize().")");
 		return true;
 	}
 
