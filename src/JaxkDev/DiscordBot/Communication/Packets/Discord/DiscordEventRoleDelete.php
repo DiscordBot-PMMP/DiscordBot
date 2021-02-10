@@ -12,27 +12,26 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Communication\Models\Role;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordEventRoleDelete extends Packet{
 
-	/** @var Role */
-	private $role;
+	/** @var string */
+	private $role_id;
 
-	public function getRole(): Role{
-		return $this->role;
+	public function getRoleId(): string{
+		return $this->role_id;
 	}
 
-	public function setRole(Role $role): void{
-		$this->role = $role;
+	public function setRoleId(string $role_id): void{
+		$this->role_id = $role_id;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->role]);
+		return serialize([$this->UID, $this->role_id]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->role] = unserialize($serialized);
+		[$this->UID, $this->role_id] = unserialize($serialized);
 	}
 }

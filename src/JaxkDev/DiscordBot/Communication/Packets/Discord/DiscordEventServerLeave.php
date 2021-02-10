@@ -12,27 +12,26 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordEventServerLeave extends Packet{
 
-	/** @var Server */
-	private $server;
+	/** @var string */
+	private $server_id;
 
-	public function getServer(): Server{
-		return $this->server;
+	public function getServerId(): string{
+		return $this->server_id;
 	}
 
-	public function setServer(Server $server): void{
-		$this->server = $server;
+	public function setServerId(string $server_id): void{
+		$this->server_id = $server_id;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->server]);
+		return serialize([$this->UID, $this->server_id]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->server] = unserialize($serialized);
+		[$this->UID, $this->server_id] = unserialize($serialized);
 	}
 }

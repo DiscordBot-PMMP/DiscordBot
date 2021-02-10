@@ -153,8 +153,9 @@ class BotCommunicationHandler{
 	}
 
 	private function handleChannelDelete(DiscordEventChannelDelete $packet): bool{
-		Storage::removeChannel($packet->getChannel()->getId());
-		$this->plugin->getServer()->broadcastMessage("Channel '".$packet->getChannel()->getName()."' deleted.");
+		$channel = Storage::getChannel($packet->getChannelId());
+		if($channel === null) return false;
+		$this->plugin->getServer()->broadcastMessage("Channel '".$channel->getName()."' deleted.");
 		return true;
 	}
 
@@ -171,8 +172,10 @@ class BotCommunicationHandler{
 	}
 
 	private function handleRoleDelete(DiscordEventRoleDelete $packet): bool{
-		Storage::removeRole($packet->getRole()->getId());
-		$this->plugin->getServer()->broadcastMessage("Role '".$packet->getRole()->getName()."' deleted.");
+		$role = Storage::getRole($packet->getRoleId());
+		if($role === null) return false;
+		$this->plugin->getServer()->broadcastMessage("Role '".$role->getName()."' deleted.");
+		Storage::removeRole($packet->getRoleId());
 		return true;
 	}
 
@@ -272,9 +275,11 @@ class BotCommunicationHandler{
 	}
 
 	private function handleServerLeave(DiscordEventServerLeave $packet): bool{
-		Storage::removeServer($packet->getServer()->getId());
-		(new DiscordServerDeleted($this->plugin, $packet->getServer()))->call();
-		$this->plugin->getServer()->broadcastMessage("Removed/Left discord server: ".$packet->getServer()->getName());
+		$server = Storage::getServer($packet->getServerId());
+		if($server === null) return false;
+		(new DiscordServerDeleted($this->plugin, $server))->call();
+		$this->plugin->getServer()->broadcastMessage("Removed/Left discord server: ".$server->getName());
+		Storage::removeServer($packet->getServerId());
 		return true;
 	}
 
