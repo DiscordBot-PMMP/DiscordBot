@@ -26,6 +26,7 @@ use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanAdd;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanRemove;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelDelete;
@@ -82,16 +83,13 @@ class DiscordEventHandler{
 		$discord->on("INVITE_CREATE", [$this, "onInviteCreate"]);
 		$discord->on("INVITE_DELETE", [$this, "onInviteDelete"]);
 
+		$discord->on("GUILD_BAN_ADD", [$this, "onBanAdd"]);
 		$discord->on("GUILD_BAN_REMOVE", [$this, "onBanRemove"]);
 
 		/*
 		 * TODO (others planned for 2.1):
 		 * - Reactions (Probably wont store previous reactions, could be very large...)
 		 * - Pins (Note event only emits the pins for the channel not if one was added/deleted/unpinned etc.)
-		 *
-		 * TODO:
-		 * - Bans Create.
-		 * event wont receive reason, for reason freshen bans repo and get via there, for 'banner' check audit log
 		 */
 	}
 
@@ -346,6 +344,44 @@ class DiscordEventHandler{
 		$packet = new DiscordEventInviteDelete();
 		$packet->setInviteCode($invite->code);
 		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function onBanAdd(DiscordBan $ban, Discord $discord): void{
+		//No reason unless you freshen bans which is only possible with ban_members permission.
+		$g = $ban->guild;
+		/** @var DiscordMember|null $m */
+		$m = $g->members->offsetGet($discord->user->id);
+		if($m !== null and $m->getPermissions()->ban_members){
+			//Get ban reason.
+			/** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
+			$g->bans->freshen()->done(function() use ($ban, $g){
+				//Got latest bans so we can fetch reason unless it was unbanned in like 0.01s
+				/** @var DiscordBan|null $b */
+				$b = $g->bans->offsetGet($ban->user_id);
+				if($b !== null){
+					MainLogger::getLogger()->debug("Successfully fetched bans, attached reason to new ban event.");
+					$packet = new DiscordEventBanAdd();
+					$packet->setBan(ModelConverter::genModelBan($b));
+					$this->client->getThread()->writeOutboundData($packet);
+				}else{
+					MainLogger::getLogger()->debug("No ban after freshen ??? (IMPORTANT LOGIC ERROR)");
+					$packet = new DiscordEventBanAdd();
+					$packet->setBan(ModelConverter::genModelBan($ban));
+					$this->client->getThread()->writeOutboundData($packet);
+				}
+			}, function() use ($ban){
+				//Failed so just send ban with no reason.
+				MainLogger::getLogger()->debug("Failed to fetch bans even with ban_members permission, using old ban object.");
+				$packet = new DiscordEventBanAdd();
+				$packet->setBan(ModelConverter::genModelBan($ban));
+				$this->client->getThread()->writeOutboundData($packet);
+			});
+		}else{
+			MainLogger::getLogger()->debug("Bot does not have ban_members permission so no reason was attached to this ban.");
+			$packet = new DiscordEventBanAdd();
+			$packet->setBan(ModelConverter::genModelBan($ban));
+			$this->client->getThread()->writeOutboundData($packet);
+		}
 	}
 
 	public function onBanRemove(DiscordBan $ban, Discord $discord): void{

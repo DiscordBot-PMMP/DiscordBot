@@ -17,6 +17,7 @@ use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanAdd;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanRemove;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelDelete;
@@ -78,6 +79,7 @@ class BotCommunicationHandler{
 		if($packet instanceof DiscordEventRoleDelete) return $this->handleRoleDelete($packet);
 		if($packet instanceof DiscordEventInviteCreate) return $this->handleInviteCreate($packet);
 		if($packet instanceof DiscordEventInviteDelete) return $this->handleInviteDelete($packet);
+		if($packet instanceof DiscordEventBanAdd) return $this->handleBanAdd($packet);
 		if($packet instanceof DiscordEventBanRemove) return $this->handleBanRemove($packet);
 		if($packet instanceof DiscordEventServerJoin) return $this->handleServerJoin($packet);
 		if($packet instanceof DiscordEventServerLeave) return $this->handleServerLeave($packet);
@@ -200,6 +202,12 @@ class BotCommunicationHandler{
 	private function handleInviteDelete(DiscordEventInviteDelete $packet): bool{
 		Storage::removeInvite($packet->getInviteCode());
 		$this->plugin->getServer()->broadcastMessage("Invite '".$packet->getInviteCode()."' deleted/expired.");
+		return true;
+	}
+
+	private function handleBanAdd(DiscordEventBanAdd $packet): bool{
+		Storage::addBan($packet->getBan());
+		$this->plugin->getServer()->broadcastMessage("Ban '".$packet->getBan()->getId()."' has been added.");
 		return true;
 	}
 
