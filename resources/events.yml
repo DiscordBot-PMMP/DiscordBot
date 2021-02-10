@@ -3,35 +3,43 @@ version: 2
 
 message:
   toDiscord:
-    channels: []
+    channels:
+      - "0000000000000000"
     format: "[{TIME}] **{USERNAME}**: ```{MESSAGE}```"
   fromDiscord:
-    channels: []
+    channels:
+      - "0000000000000000"
     format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} : {MESSAGE}"
 
 command:
   toDiscord:
-    channels: []
+    channels:
+      - "0000000000000000"
     format: "[{TIME}] **{USERNAME}** Used command: ```{COMMAND}```"
 
 member_join:
   toDiscord:
-    channels: []
+    channels:
+      - "0000000000000000"
     format: "[{TIME}] **{USERNAME}** Has joined the minecraft server."
   fromDiscord:
-    servers: []
+    servers:
+      - "0000000000000000"
     format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} Has joined the {SERVER_NAME} discord server."
 
 member_leave:
   toDiscord:
-    channels: []
+    channels:
+      - "0000000000000000"
     format: "[{TIME}] **{USERNAME}** Has left the minecraft server."
   fromDiscord:
-    servers: []
+    servers:
+      - "0000000000000000"
     format: "[{TIME}] {USERNAME}#{USER_DISCRIMINATOR} Has left the discord server."
 
 member_transfer:
   toDiscord:
-    channels: []
+    channels:
+      - "0000000000000000"
     format: "[{TIME}] **{USERNAME}** Has been transferred to {ADDRESS}:{PORT}."
 ...
