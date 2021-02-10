@@ -49,10 +49,10 @@ class API{
 		if($bot === null) return null;
 
 		$msg = new Message();
-		$msg->setServerId($channel->getServerId())
-			->setChannelId($channel->getId())
-			->setAuthorId($bot->getId())
-			->setContent($content);
+		$msg->setServerId($channel->getServerId());
+		$msg->setChannelId($channel->getId());
+		$msg->setAuthorId($bot->getId());
+		$msg->setContent($content);
 		return $msg;
 	}
 
@@ -78,9 +78,9 @@ class API{
 	 */
 	public function createActivity(string $status, ?int $type = null, ?string $message = null): Activity{
 		$activity = new Activity();
-		$activity->setStatus($status)
-			->setType($type)
-			->setMessage($message);
+		$activity->setStatus($status);
+		$activity->setType($type);
+		$activity->setMessage($message);
 		return $activity;
 	}
 

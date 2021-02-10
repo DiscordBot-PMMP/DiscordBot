@@ -41,13 +41,6 @@ class DiscordEventServerJoin extends Packet{
 	}
 
 	/**
-	 * @param Channel[] $channels
-	 */
-	public function setChannels(array $channels): void{
-		$this->channels = $channels;
-	}
-
-	/**
 	 * @return Channel[]
 	 */
 	public function getChannels(): array{
@@ -55,10 +48,10 @@ class DiscordEventServerJoin extends Packet{
 	}
 
 	/**
-	 * @param Role[] $roles
+	 * @param Channel[] $channels
 	 */
-	public function setRoles(array $roles): void{
-		$this->roles = $roles;
+	public function setChannels(array $channels): void{
+		$this->channels = $channels;
 	}
 
 	/**
@@ -69,10 +62,10 @@ class DiscordEventServerJoin extends Packet{
 	}
 
 	/**
-	 * @param Member[] $members
+	 * @param Role[] $roles
 	 */
-	public function setMembers(array $members): void{
-		$this->members = $members;
+	public function setRoles(array $roles): void{
+		$this->roles = $roles;
 	}
 
 	/**
@@ -80,6 +73,13 @@ class DiscordEventServerJoin extends Packet{
 	 */
 	public function getMembers(): array{
 		return $this->members;
+	}
+
+	/**
+	 * @param Member[] $members
+	 */
+	public function setMembers(array $members): void{
+		$this->members = $members;
 	}
 
 	public function serialize(): ?string{

@@ -44,28 +44,25 @@ class Activity implements \Serializable{
 		return $this->message;
 	}
 
-	public function setMessage(?string $message): Activity{
+	public function setMessage(?string $message): void{
 		$this->message = $message;
-		return $this;
 	}
 
 	public function getType(): ?int{
 		return $this->type;
 	}
 
-	public function setType(?int $type): Activity{
+	public function setType(?int $type): void{
 		Utils::assert($type >= self::TYPE_PLAYING and $type <= self::TYPE_COMPETING);
 		$this->type = $type;
-		return $this;
 	}
 
 	public function getStatus(): string{
 		return $this->status;
 	}
 
-	public function setStatus(string $status): Activity{
+	public function setStatus(string $status): void{
 		$this->status = $status;
-		return $this;
 	}
 
 	//----- Serialization -----//

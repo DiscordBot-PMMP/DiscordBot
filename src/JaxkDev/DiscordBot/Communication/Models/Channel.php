@@ -12,11 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models;
 
+//TODO, abstract class and make parents, TextChannel, VoiceChannel, CategoryChannel, DmChannel...
 class Channel implements \Serializable{
-
-	const
-		TYPE_TEXT = 0,
-		TYPE_VOICE = 1;
 
 	/** @var string */
 	private $id;
@@ -27,11 +24,7 @@ class Channel implements \Serializable{
 	/** @var string|null */
 	private $category;
 
-	///** @var int */
-	//private $type = self::TYPE_TEXT;
-	//TODO, abstract class and make parents, TextChannel, VoiceChannel, CategoryChannel, DmChannel...
-
-	/** @var string|null */
+	/** @var string|null AKA Topic. */
 	private $description;
 
 	/** @var string */
@@ -41,51 +34,40 @@ class Channel implements \Serializable{
 		return $this->id;
 	}
 
-	public function setId(string $id): Channel{
+	public function setId(string $id): void{
 		$this->id = $id;
-		return $this;
 	}
 
 	public function getName(): string{
 		return $this->name;
 	}
 
-	public function setName(string $name): Channel{
+	public function setName(string $name): void{
 		$this->name = $name;
-		return $this;
-	}
-
-	// No setType, intentional.
-	/*
-	public function getType(): int{
-		return $this->type;
-	}*/
-
-	public function getDescription(): ?string{
-		return $this->description;
-	}
-
-	public function setDescription(?string $description): Channel{
-		$this->description = $description;
-		return $this;
 	}
 
 	public function getCategory(): ?string{
 		return $this->category;
 	}
 
-	public function setCategory(?string $category): Channel{
+	public function setCategory(?string $category): void{
 		$this->category = $category;
-		return $this;
+	}
+
+	public function getDescription(): ?string{
+		return $this->description;
+	}
+
+	public function setDescription(?string $description): void{
+		$this->description = $description;
 	}
 
 	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(string $server_id): Channel{
+	public function setServerId(string $server_id): void{
 		$this->server_id = $server_id;
-		return $this;
 	}
 
 	//----- Serialization -----//

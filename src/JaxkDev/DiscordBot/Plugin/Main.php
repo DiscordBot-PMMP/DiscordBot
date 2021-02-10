@@ -62,12 +62,10 @@ class Main extends PluginBase{
 
 		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
 			define("JaxkDev\DiscordBot\VERSION", "v".$this->getDescription()->getVersion());
-			define('JaxkDev\DiscordBot\COMPOSER', (Phar::running(true) !== "") ? Phar::running(true) . "/vendor/autoload.php" : dirname(__DIR__, 4) . "/DiscordBot/vendor/autoload.php");
+			define('JaxkDev\DiscordBot\COMPOSER', (Phar::running(true) !== "") ? Phar::running(true)."/vendor/autoload.php" : dirname(__DIR__, 4)."/DiscordBot/vendor/autoload.php");
 		}
 
-		if(!is_dir($this->getDataFolder().DIRECTORY_SEPARATOR."logs")){
-			mkdir($this->getDataFolder().DIRECTORY_SEPARATOR."logs");
-		}
+		if(!is_dir($this->getDataFolder().DIRECTORY_SEPARATOR."logs")) mkdir($this->getDataFolder().DIRECTORY_SEPARATOR."logs");
 
 		$this->saveResource("config.yml");
 		$this->saveResource("events.yml");
@@ -123,18 +121,18 @@ class Main extends PluginBase{
 		}
 
 		if($config['version'] !== ConfigUtils::VERSION){
-			$this->getLogger()->info("Updating your config from v{$config['version']} to v" . ConfigUtils::VERSION);
+			$this->getLogger()->info("Updating your config from v{$config['version']} to v".ConfigUtils::VERSION);
 			ConfigUtils::update($config);
-			rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
-			yaml_emit_file($this->getDataFolder() . "config.yml", $config);
+			rename($this->getDataFolder()."config.yml", $this->getDataFolder()."config.yml.old");
+			yaml_emit_file($this->getDataFolder()."config.yml", $config);
 			$this->getLogger()->info("Config updated, old config was saved to '{$this->getDataFolder()}config.yml.old'");
 		}
 
 		if($eventConfig['version'] !== ConfigUtils::EVENT_VERSION){
-			$this->getLogger()->info("Updating your event config from v{$eventConfig['version']} to v" . ConfigUtils::EVENT_VERSION);
+			$this->getLogger()->info("Updating your event config from v{$eventConfig['version']} to v".ConfigUtils::EVENT_VERSION);
 			ConfigUtils::update_event($eventConfig);
-			rename($this->getDataFolder() . "events.yml", $this->getDataFolder() . "events.yml.old");
-			yaml_emit_file($this->getDataFolder() . "events.yml", $eventConfig);
+			rename($this->getDataFolder()."events.yml", $this->getDataFolder()."events.yml.old");
+			yaml_emit_file($this->getDataFolder()."events.yml", $eventConfig);
 			$this->getLogger()->info("Event config updated, old event config was saved to '{$this->getDataFolder()}events.yml.old'");
 		}
 

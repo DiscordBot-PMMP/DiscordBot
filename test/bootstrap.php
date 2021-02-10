@@ -12,7 +12,7 @@
 
 # Constants used in the plugin, basic values defined for use with phpstan.
 
-define('JaxkDev\DiscordBot\COMPOSER', dirname(__DIR__, 4) . "/DiscordBot/vendor/autoload.php");
+define('JaxkDev\DiscordBot\COMPOSER', dirname(__DIR__, 4)."/DiscordBot/vendor/autoload.php");
 define('JaxkDev\DiscordBot\VERSION', "vX.Y.Z");
 
 define("pocketmine\VERSION", "X.Y.Z");

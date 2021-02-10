@@ -66,8 +66,8 @@ class Client{
 		gc_enable();
 
 		error_reporting(E_ALL & ~E_NOTICE);
-		set_error_handler(array($this, 'errorHandler'));
-		register_shutdown_function(array($this, 'close'));
+		set_error_handler([$this, 'errorHandler']);
+		register_shutdown_function([$this, 'close']);
 
 		// Mono logger can have issues with other timezones, for now use UTC.
 		// Note, this does not effect outside thread config.
@@ -150,7 +150,7 @@ class Client{
 		});
 
 		$this->tickTimer = $this->client->getLoop()->addPeriodicTimer(1/20, function(){
-			// Note this is not accurate to 1/20th of a second.
+			// Note this is not accurate/fixed dynamically to 1/20th of a second.
 			$this->tick();
 		});
 	}
@@ -179,7 +179,7 @@ class Client{
 		}
 
 		if(($this->tickCount % 20) === 0){
-			//Run every second.
+			//Run every second TODO Check own status before sending/checking heartbeat...
 			$this->communicationHandler->checkHeartbeat();
 			$this->communicationHandler->sendHeartbeat();
 
@@ -251,11 +251,6 @@ class Client{
 	}
 
 	public function errorHandler(int $severity, string $message, string $file, int $line): bool{
-		if(substr($message,0,51) === "stream_socket_client(): unable to connect to udp://" and $line === 130){
-			// Really nasty hack to check if connection fails,
-			// Really need to fork/fix this in DiscordPHP...
-			MainLogger::getLogger()->critical("Failed to connect to discord, please check your internet connection.");
-		}
 		MainLogger::getLogger()->logException(new ErrorException($message, 0, $severity, $file, $line));
 		$this->close();
 		return true;

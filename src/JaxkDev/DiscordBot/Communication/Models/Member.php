@@ -50,45 +50,40 @@ class Member implements \Serializable{
 		return $this->user_id;
 	}
 
-	public function setUserId(string $id): Member{
+	public function setUserId(string $id): void{
 		$this->user_id = $id;
-		return $this;
 	}
 
 	public function getNickname(): ?string{
 		return $this->nickname;
 	}
 
-	public function setNickname(?string $nickname): Member{
+	public function setNickname(?string $nickname): void{
 		$this->nickname = $nickname;
-		return $this;
 	}
 
 	public function getJoinTimestamp(): int{
 		return $this->join_timestamp;
 	}
 
-	public function setJoinTimestamp(int $join_timestamp): Member{
+	public function setJoinTimestamp(int $join_timestamp): void{
 		$this->join_timestamp = $join_timestamp;
-		return $this;
 	}
 
 	public function getBoostTimestamp(): ?int{
 		return $this->boost_timestamp;
 	}
 
-	public function setBoostTimestamp(?int $boost_timestamp): Member{
+	public function setBoostTimestamp(?int $boost_timestamp): void{
 		$this->boost_timestamp = $boost_timestamp;
-		return $this;
 	}
 
 	public function getPermissions(): RolePermissions{
 		return $this->permissions;
 	}
 
-	public function setPermissions(RolePermissions $permissions): Member{
+	public function setPermissions(RolePermissions $permissions): void{
 		$this->permissions = $permissions;
-		return $this;
 	}
 
 	/**
@@ -100,20 +95,17 @@ class Member implements \Serializable{
 
 	/**
 	 * @param string[] $roles_id
-	 * @return Member
 	 */
-	public function setRolesId(array $roles_id): Member{
+	public function setRolesId(array $roles_id): void{
 		$this->roles_id = $roles_id;
-		return $this;
 	}
 
 	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(string $server_id): Member{
+	public function setServerId(string $server_id): void{
 		$this->server_id = $server_id;
-		return $this;
 	}
 
 	//----- Serialization -----//

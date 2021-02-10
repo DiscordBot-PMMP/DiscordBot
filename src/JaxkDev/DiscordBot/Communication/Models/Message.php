@@ -12,11 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models;
 
+use JaxkDev\DiscordBot\Utils;
+
 class Message implements \Serializable{
 
 	const TYPE_NORMAL = 0;
 
-	/** @var ?string */
+	/** @var ?string Null when sending message. */
 	private $id;
 
 	/** @var int */
@@ -25,7 +27,7 @@ class Message implements \Serializable{
 	/** @var string (<=2000) */
 	private $content;
 
-	/** @var ?string MemberID */
+	/** @var ?string MemberID Null when sending or receiving webhook messages.*/
 	private $author_id;
 
 	/** @var string */
@@ -34,7 +36,7 @@ class Message implements \Serializable{
 	/** @var string */
 	private $server_id;  //This is needed for faster handling discord side.
 
-	/** @var ?float */
+	/** @var ?float Null when sending message. */
 	private $timestamp;
 
 	/** @var bool */
@@ -53,69 +55,70 @@ class Message implements \Serializable{
 		return $this->id;
 	}
 
-	public function setId(string $id): Message{
+	public function setId(string $id): void{
 		$this->id = $id;
-		return $this;
 	}
 
 	public function getType(): int{
 		return $this->type;
 	}
 
-	// No setType, intentional.
+	/**
+	 * @see Message::TYPE_NORMAL
+	 * @param int $type Message::TYPE_X Constant.
+	 */
+	public function setType(int $type): void{
+		Utils::assert($type >= self::TYPE_NORMAL and $type <= self::TYPE_NORMAL);
+		$this->type = $type;
+	}
 
 	public function getContent(): string{
 		return $this->content;
 	}
 
-	public function setContent(string $content): Message{
+	public function setContent(string $content): void{
+		Utils::assert(strlen($content) <= 2000, "Message content cannot exceed 2000 characters.");
 		$this->content = $content;
-		return $this;
 	}
 
 	public function getAuthorId(): ?string{
 		return $this->author_id;
 	}
 
-	public function setAuthorId(?string $author_id): Message{
+	public function setAuthorId(?string $author_id): void{
 		$this->author_id = $author_id;
-		return $this;
 	}
 
 	public function getChannelId(): string{
 		return $this->channel_id;
 	}
 
-	public function setChannelId(string $channel_id): Message{
+	public function setChannelId(string $channel_id): void{
 		$this->channel_id = $channel_id;
-		return $this;
 	}
 
 	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(string $server_id): Message{
+	public function setServerId(string $server_id): void{
 		$this->server_id = $server_id;
-		return $this;
 	}
 
 	public function getTimestamp(): ?float{
 		return $this->timestamp;
 	}
 
-	public function setTimestamp(?float $timestamp): Message{
+	public function setTimestamp(?float $timestamp): void{
 		$this->timestamp = $timestamp;
-		return $this;
 	}
 
 	public function isEveryoneMentioned(): bool{
 		return $this->everyone_mentioned;
 	}
 
-	public function setEveryoneMentioned(bool $everyone_mentioned): Message{
+	public function setEveryoneMentioned(bool $everyone_mentioned): void{
 		$this->everyone_mentioned = $everyone_mentioned;
-		return $this;
 	}
 
 	/**
@@ -127,11 +130,9 @@ class Message implements \Serializable{
 
 	/**
 	 * @param string[] $users_mentioned
-	 * @return Message
 	 */
-	public function setUsersMentioned(array $users_mentioned): Message{
+	public function setUsersMentioned(array $users_mentioned): void{
 		$this->users_mentioned = $users_mentioned;
-		return $this;
 	}
 
 	/**
@@ -143,11 +144,9 @@ class Message implements \Serializable{
 
 	/**
 	 * @param string[] $roles_mentioned
-	 * @return Message
 	 */
-	public function setRolesMentioned(array $roles_mentioned): Message{
+	public function setRolesMentioned(array $roles_mentioned): void{
 		$this->roles_mentioned = $roles_mentioned;
-		return $this;
 	}
 
 	/**
@@ -159,11 +158,9 @@ class Message implements \Serializable{
 
 	/**
 	 * @param string[] $channels_mentioned
-	 * @return Message
 	 */
-	public function setChannelsMentioned(array $channels_mentioned): Message{
+	public function setChannelsMentioned(array $channels_mentioned): void{
 		$this->channels_mentioned = $channels_mentioned;
-		return $this;
 	}
 
 	//----- Serialization -----//

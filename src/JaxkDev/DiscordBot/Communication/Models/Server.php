@@ -42,72 +42,64 @@ class Server implements \Serializable{
 		return $this->id;
 	}
 
-	public function setId(string $id): Server{
+	public function setId(string $id): void{
 		$this->id = $id;
-		return $this;
 	}
 
 	public function getName(): string{
 		return $this->name;
 	}
 
-	public function setName(string $name): Server{
+	public function setName(string $name): void{
 		$this->name = $name;
-		return $this;
 	}
 
 	public function getIconUrl(): ?string{
 		return $this->icon_url;
 	}
 
-	public function setIconUrl(?string $icon_url): Server{
+	public function setIconUrl(?string $icon_url): void{
 		$this->icon_url = $icon_url;
-		return $this;
 	}
 
 	public function getRegion(): string{
 		return $this->region;
 	}
 
-	public function setRegion(string $region): Server{
+	public function setRegion(string $region): void{
 		$this->region = $region;
-		return $this;
 	}
 
 	public function getOwnerId(): string{
 		return $this->owner_id;
 	}
 
-	public function setOwnerId(string $owner_id): Server{
+	public function setOwnerId(string $owner_id): void{
 		$this->owner_id = $owner_id;
-		return $this;
 	}
 
 	public function getCreationTimestamp(): float{
 		return $this->creation_timestamp;
 	}
 
-	public function setCreationTimestamp(float $creation_timestamp): Server{
+	public function setCreationTimestamp(float $creation_timestamp): void{
 		$this->creation_timestamp = $creation_timestamp;
-		return $this;
 	}
 
 	public function isLarge(): bool{
 		return $this->large;
 	}
 
-	public function setLarge(bool $large): Server{
+	public function setLarge(bool $large): void{
 		$this->large = $large;
-		return $this;
 	}
 
 	public function getMemberCount(): int{
 		return $this->member_count;
 	}
 
-	public function setMemberCount(int $member_count): Server{
+	public function setMemberCount(int $member_count): void{
 		$this->member_count = $member_count;
-		return $this;
 	}
 
 	//----- Serialization -----//

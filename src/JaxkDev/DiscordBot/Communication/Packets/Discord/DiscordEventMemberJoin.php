@@ -36,9 +36,8 @@ class DiscordEventMemberJoin extends Packet{
 		return $this->user;
 	}
 
-	public function setUser(User $user): DiscordEventMemberJoin{
+	public function setUser(User $user): void{
 		$this->user = $user;
-		return $this;
 	}
 
 	public function serialize(): ?string{

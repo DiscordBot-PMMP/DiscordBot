@@ -41,27 +41,24 @@ class Role implements \Serializable{
 		return $this->id;
 	}
 
-	public function setId(string $id): Role{
+	public function setId(string $id): void{
 		$this->id = $id;
-		return $this;
 	}
 
 	public function getName(): string{
 		return $this->name;
 	}
 
-	public function setName(string $name): Role{
+	public function setName(string $name): void{
 		$this->name = $name;
-		return $this;
 	}
 
 	public function getPermissions(): RolePermissions{
 		return $this->permissions;
 	}
 
-	public function setPermissions(RolePermissions $permissions): Role{
+	public function setPermissions(RolePermissions $permissions): void{
 		$this->permissions = $permissions;
-		return $this;
 	}
 
 	public function getColour(): int{
@@ -70,11 +67,9 @@ class Role implements \Serializable{
 
 	/**
 	 * @param int $colour [0x000000 - 0xFFFFFF]
-	 * @return self
 	 */
-	public function setColour(int $colour): Role{
+	public function setColour(int $colour): void{
 		$this->colour = $colour;
-		return $this;
 	}
 
 	/**
@@ -84,27 +79,24 @@ class Role implements \Serializable{
 		return $this->hoistedPosition;
 	}
 
-	public function setHoistedPosition(int $hoistedPosition): Role{
+	public function setHoistedPosition(int $hoistedPosition): void{
 		$this->hoistedPosition = $hoistedPosition;
-		return $this;
 	}
 
 	public function isMentionable(): bool{
 		return $this->mentionable;
 	}
 
-	public function setMentionable(bool $mentionable): Role{
+	public function setMentionable(bool $mentionable): void{
 		$this->mentionable = $mentionable;
-		return $this;
 	}
 
 	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(string $server_id): Role{
+	public function setServerId(string $server_id): void{
 		$this->server_id = $server_id;
-		return $this;
 	}
 
 	//----- Serialization -----//

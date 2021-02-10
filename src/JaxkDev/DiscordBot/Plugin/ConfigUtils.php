@@ -17,6 +17,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 use pocketmine\utils\MainLogger;
 
 abstract class ConfigUtils{
+
 	const EVENT_VERSION = 2;
 	const VERSION = 2;
 

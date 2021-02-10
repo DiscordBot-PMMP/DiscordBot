@@ -30,7 +30,7 @@ class User implements \Serializable{
 	private $creation_timestamp;
 
 	///** @var Activity */
-	//private $activity;
+	//private $activity; TODO ?
 
 	//Email, Bot, Verified, Locale etc not included yet.
 
@@ -38,45 +38,40 @@ class User implements \Serializable{
 		return $this->id;
 	}
 
-	public function setId(string $id): User{
+	public function setId(string $id): void{
 		$this->id = $id;
-		return $this;
 	}
 
 	public function getUsername(): string{
 		return $this->username;
 	}
 
-	public function setUsername(string $username): User{
+	public function setUsername(string $username): void{
 		$this->username = $username;
-		return $this;
 	}
 
 	public function getDiscriminator(): string{
 		return $this->discriminator;
 	}
 
-	public function setDiscriminator(string $discriminator): User{
+	public function setDiscriminator(string $discriminator): void{
 		$this->discriminator = $discriminator;
-		return $this;
 	}
 
 	public function getAvatarUrl(): string{
 		return $this->avatar_url;
 	}
 
-	public function setAvatarUrl(string $avatar_url): User{
+	public function setAvatarUrl(string $avatar_url): void{
 		$this->avatar_url = $avatar_url;
-		return $this;
 	}
 
 	public function getCreationTimestamp(): int{
 		return $this->creation_timestamp;
 	}
 
-	public function setCreationTimestamp(int $creation_timestamp): User{
+	public function setCreationTimestamp(int $creation_timestamp): void{
 		$this->creation_timestamp = $creation_timestamp;
-		return $this;
 	}
 
 	/*
@@ -84,9 +79,8 @@ class User implements \Serializable{
 		return $this->activity;
 	}
 
-	public function setActivity(Activity $activity): User{
+	public function setActivity(Activity $activity): void{
 		$this->activity = $activity;
-		return $this;
 	}
 	*/
 

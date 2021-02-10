@@ -45,7 +45,7 @@ class PocketMineEventHandler implements Listener{
 
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
 
-		foreach ($config['channels'] as $channel){
+		foreach($config['channels'] as $channel){
 			$msg = $this->plugin->getAPI()->createMessage($channel, $message);
 			if($msg === null) continue;
 			$this->plugin->getAPI()->sendMessage($msg);
@@ -62,7 +62,7 @@ class PocketMineEventHandler implements Listener{
 
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
 
-		foreach ($config['channels'] as $channel){
+		foreach($config['channels'] as $channel){
 			$msg = $this->plugin->getAPI()->createMessage($channel, $message);
 			if($msg === null) continue;
 			$this->plugin->getAPI()->sendMessage($msg);
@@ -76,7 +76,7 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}', '{ADDRESS}', '{PORT}'],
 			[date('G:i:s'), $event->getPlayer()->getName(), $event->getAddress(), $event->getPort()], $config['format']);
 
-		foreach ($config['channels'] as $channel){
+		foreach($config['channels'] as $channel){
 			$msg = $this->plugin->getAPI()->createMessage($channel, $message);
 			if($msg === null) continue;
 			$this->plugin->getAPI()->sendMessage($msg);
@@ -94,7 +94,7 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}', '{MESSAGE}'],
 			[date('G:i:s'), $event->getPlayer()->getName(), $event->getMessage()], $config['format']);
 
-		foreach ($config['channels'] as $channel){
+		foreach($config['channels'] as $channel){
 			$msg = $this->plugin->getAPI()->createMessage($channel, $message);
 			if($msg === null) continue;
 			$this->plugin->getAPI()->sendMessage($msg);
@@ -112,7 +112,7 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}', '{COMMAND}'],
 			[date('G:i:s'), $event->getSender()->getName(), $event->getCommand()], $config['format']);
 
-		foreach ($config['channels'] as $channel){
+		foreach($config['channels'] as $channel){
 			$msg = $this->plugin->getAPI()->createMessage($channel, $message);
 			if($msg === null) continue;
 			$this->plugin->getAPI()->sendMessage($msg);

@@ -29,7 +29,9 @@ class BotThread extends Thread{
 	private $initialConfig;
 
 	/** @var Volatile */
-	private $inboundData, $outboundData;
+	private $inboundData;
+	/** @var Volatile */
+	private $outboundData;
 
 	/** @var int */
 	private $status = Protocol::THREAD_STATUS_STARTING;
@@ -42,7 +44,9 @@ class BotThread extends Thread{
 	}
 
 	public function run(){
-		if($this->logger instanceof MainLogger) $this->logger->registerStatic();
+		if($this->logger instanceof MainLogger){
+			$this->logger->registerStatic();
+		}
 
 		$this->registerClassLoader();
 
@@ -65,6 +69,7 @@ class BotThread extends Thread{
 		$this->outboundData[] = serialize($packet);
 	}
 
+	//TODO Investigate best solution for status communication (refer to new ready packet)
 	public function setStatus(int $status): void{
 		Utils::assert($status >= 0 and $status < 10);
 		$this->status = $status;

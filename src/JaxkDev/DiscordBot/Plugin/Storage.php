@@ -22,9 +22,6 @@ use JaxkDev\DiscordBot\Communication\Models\User;
 
 /*
  * Notes:
- * Dont use array_search or foreach, way too slow on large arrays.
- * (~= 10ms to search for one user in a 30k db
- *
  * unset() on the removes doesnt destroy the objects until all references are unset....
  */
 
@@ -89,7 +86,7 @@ class Storage{
 	public static function updateServer(Server $server): void{
 		if(!isset(self::$serverMap[$server->getId()])){
 			self::addServer($server);
-		} else {
+		}else{
 			self::$serverMap[$server->getId()] = $server;
 		}
 	}
@@ -154,7 +151,7 @@ class Storage{
 	public static function updateChannel(Channel $channel): void{
 		if(!isset(self::$channelMap[$channel->getId()])){
 			self::addChannel($channel);
-		} else {
+		}else{
 			self::$channelMap[$channel->getId()] = $channel;
 		}
 	}
@@ -195,7 +192,7 @@ class Storage{
 	public static function updateMember(Member $member): void{
 		if(!isset(self::$memberMap[$member->getId()])){
 			self::addMember($member);
-		} else {
+		}else{
 			self::$memberMap[$member->getId()] = $member;
 		}
 	}
@@ -243,7 +240,9 @@ class Storage{
 		$roles = [];
 		foreach((self::$roleServerMap[$serverId] ?? []) as $id){
 			$r = self::getRole($id);
-			if($r !== null) $roles[] = $r;
+			if($r !== null){
+				$roles[] = $r;
+			}
 		}
 		return $roles;
 	}
@@ -257,7 +256,7 @@ class Storage{
 	public static function updateRole(Role $role): void{
 		if(!isset(self::$roleMap[$role->getId()])){
 			self::addRole($role);
-		} else {
+		}else{
 			self::$roleMap[$role->getId()] = $role;
 		}
 	}
@@ -331,7 +330,7 @@ class Storage{
 	public static function updateInvite(Invite $invite): void{
 		if(!isset(self::$inviteMap[$invite->getCode()])){
 			self::addinvite($invite);
-		} else {
+		}else{
 			self::$inviteMap[$invite->getCode()] = $invite;
 		}
 	}

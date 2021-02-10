@@ -85,7 +85,9 @@ class DiscordEventHandler{
 
 		//Default activity.
 		$ac = new Activity();
-		$ac->setMessage("PocketMine-MP v".\pocketmine\VERSION)->setType(Activity::TYPE_PLAYING)->setStatus(Activity::STATUS_ONLINE);
+		$ac->setMessage("PocketMine-MP v".\pocketmine\VERSION);
+		$ac->setType(Activity::TYPE_PLAYING);
+		$ac->setStatus(Activity::STATUS_ONLINE);
 		$this->client->updatePresence($ac);
 
 		// Register all other events.
@@ -123,7 +125,7 @@ class DiscordEventHandler{
 				}, function() use ($guild){
 					MainLogger::getLogger()->warning("Failed to fetch bans from server '".$guild->name."' (".$guild->id.")");
 				});
-			} else {
+			}else{
 				MainLogger::getLogger()->notice("Cannot fetch bans from server '".$guild->name."' (".$guild->id.
 					"), Bot does not have 'ban_members' permission.");
 			}
@@ -154,7 +156,7 @@ class DiscordEventHandler{
 				}, function() use ($guild){
 					MainLogger::getLogger()->warning("Failed to fetch invites from server '".$guild->name."' (".$guild->id.")");
 				});
-			} else {
+			}else{
 				MainLogger::getLogger()->notice("Cannot fetch invites from server '".$guild->name."' (".$guild->id.
 					"), Bot does not have 'manage_guild' permission.");
 			}
@@ -291,7 +293,7 @@ class DiscordEventHandler{
 	}
 
 	public function onBanRemove(DiscordBan $ban, Discord $discord): void{
-		$this->client->getCommunicationHandler()->sendBanRemoveEvent($ban->guild_id . "." . $ban->user_id);
+		$this->client->getCommunicationHandler()->sendBanRemoveEvent($ban->guild_id.".".$ban->user_id);
 	}
 
 	/**
@@ -314,6 +316,6 @@ class DiscordEventHandler{
 	}
 
 	private function checkChannel(DiscordChannel $channel): bool{
-		return (($channel->type??-1) === DiscordChannel::TYPE_TEXT);
+		return (($channel->type ?? -1) === DiscordChannel::TYPE_TEXT);
 	}
 }

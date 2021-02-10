@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Models;
 
 class Invite implements \Serializable{
 
-	/** @var string Used as ID internally. */
+	/** @var string Also used as ID internally. */
 	private $code;
 
 	/** @var string */
@@ -23,7 +23,7 @@ class Invite implements \Serializable{
 	/** @var string */
 	private $channel_id;
 
-	/** @var int How long in seconds from creation time to expire, 0 for inf. */
+	/** @var int How long in seconds from creation time to expire, 0 for never. */
 	private $max_age;
 
 	/** @var int Timestamp */
@@ -32,10 +32,10 @@ class Invite implements \Serializable{
 	/** @var bool */
 	private $temporary;
 
-	/** @var int How many times has this invite been used */
+	/** @var int How many times has this invite been used | NOTICE: This does not get updated when used */
 	private $uses;
 
-	/** @var int 0 for inf */
+	/** @var int 0 for unlimited uses */
 	private $max_uses;
 
 	/** @var string Member ID */
@@ -119,7 +119,13 @@ class Invite implements \Serializable{
 		return serialize([
 			$this->code,
 			$this->server_id,
-			$this->channel_id
+			$this->channel_id,
+			$this->max_age,
+			$this->created_at,
+			$this->temporary,
+			$this->uses,
+			$this->max_uses,
+			$this->creator
 		]);
 	}
 
@@ -127,7 +133,13 @@ class Invite implements \Serializable{
 		[
 			$this->code,
 			$this->server_id,
-			$this->channel_id
+			$this->channel_id,
+			$this->max_age,
+			$this->created_at,
+			$this->temporary,
+			$this->uses,
+			$this->max_uses,
+			$this->creator
 		] = unserialize($serialized);
 	}
 }

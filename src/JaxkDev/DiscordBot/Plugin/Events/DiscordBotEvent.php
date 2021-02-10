@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin\Events;
 use pocketmine\event\plugin\PluginEvent;
 
 /*
- * All DiscordX events are cancellable excluding DiscordReady/DiscordClosed.
+ * Some events are cancellable.
  * Cancelled events only means the plugin will NOT send if applicable messages announcing the event.
  * Cancelling these events DOES NOT cancel the cause, eg DiscordServerJoined event if cancelled the bot will still
  * remain in that server if you want to undo the cause you must do so yourself, eg DiscordServerJoined use the API to

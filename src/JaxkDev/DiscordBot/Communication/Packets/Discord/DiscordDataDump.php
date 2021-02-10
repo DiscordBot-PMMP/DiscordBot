@@ -50,11 +50,6 @@ class DiscordDataDump extends Packet{
 	/** @var int */
 	private $timestamp;
 
-	public function addServer(Server $server): DiscordDataDump{
-		$this->servers[] = $server;
-		return $this;
-	}
-
 	/**
 	 * @return Server[]
 	 */
@@ -62,9 +57,8 @@ class DiscordDataDump extends Packet{
 		return $this->servers;
 	}
 
-	public function addChannel(Channel $channel): DiscordDataDump{
-		$this->channels[] = $channel;
-		return $this;
+	public function addServer(Server $server): void{
+		$this->servers[] = $server;
 	}
 
 	/**
@@ -74,9 +68,8 @@ class DiscordDataDump extends Packet{
 		return $this->channels;
 	}
 
-	public function addRole(Role $role): DiscordDataDump{
-		$this->roles[] = $role;
-		return $this;
+	public function addChannel(Channel $channel): void{
+		$this->channels[] = $channel;
 	}
 
 	/**
@@ -86,9 +79,8 @@ class DiscordDataDump extends Packet{
 		return $this->roles;
 	}
 
-	public function addInvite(Invite $invite): DiscordDataDump{
-		$this->invites[] = $invite;
-		return $this;
+	public function addRole(Role $role): void{
+		$this->roles[] = $role;
 	}
 
 	/**
@@ -98,9 +90,8 @@ class DiscordDataDump extends Packet{
 		return $this->invites;
 	}
 
-	public function addBan(Ban $ban): DiscordDataDump{
-		$this->bans[] = $ban;
-		return $this;
+	public function addInvite(Invite $invite): void{
+		$this->invites[] = $invite;
 	}
 
 	/**
@@ -110,9 +101,8 @@ class DiscordDataDump extends Packet{
 		return $this->bans;
 	}
 
-	public function addMember(Member $member): DiscordDataDump{
-		$this->members[] = $member;
-		return $this;
+	public function addBan(Ban $ban): void{
+		$this->bans[] = $ban;
 	}
 
 	/**
@@ -122,9 +112,8 @@ class DiscordDataDump extends Packet{
 		return $this->members;
 	}
 
-	public function addUser(User $user): DiscordDataDump{
-		$this->users[] = $user;
-		return $this;
+	public function addMember(Member $member): void{
+		$this->members[] = $member;
 	}
 
 	/**
@@ -134,21 +123,24 @@ class DiscordDataDump extends Packet{
 		return $this->users;
 	}
 
-	public function setBotUser(User $bot): void{
-		$this->botUser = $bot;
+	public function addUser(User $user): void{
+		$this->users[] = $user;
 	}
 
 	public function getBotUser(): ?User{
 		return $this->botUser;
 	}
 
-	public function setTimestamp(int $timestamp): DiscordDataDump{
-		$this->timestamp = $timestamp;
-		return $this;
+	public function setBotUser(User $bot): void{
+		$this->botUser = $bot;
 	}
 
 	public function getTimestamp(): int{
 		return $this->timestamp;
+	}
+
+	public function setTimestamp(int $timestamp): void{
+		$this->timestamp = $timestamp;
 	}
 
 	public function getSize(): int{

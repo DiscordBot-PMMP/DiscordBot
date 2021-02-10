@@ -257,9 +257,15 @@ class BotCommunicationHandler{
 
 	private function handleServerJoin(DiscordEventServerJoin $packet): bool{
 		Storage::addServer($packet->getServer());
-		foreach($packet->getMembers() as $member) Storage::addMember($member);
-		foreach($packet->getRoles() as $role) Storage::addRole($role);
-		foreach($packet->getChannels() as $channel) Storage::addChannel($channel);
+		foreach($packet->getMembers() as $member){
+			Storage::addMember($member);
+		}
+		foreach($packet->getRoles() as $role){
+			Storage::addRole($role);
+		}
+		foreach($packet->getChannels() as $channel){
+			Storage::addChannel($channel);
+		}
 		(new DiscordServerJoined($this->plugin, $packet->getServer()))->call();
 		$this->plugin->getServer()->broadcastMessage("Joined discord server: ".$packet->getServer()->getName());
 		return true;
@@ -301,7 +307,9 @@ class BotCommunicationHandler{
 		foreach($packet->getUsers() as $user){
 			Storage::addUser($user);
 		}
-		if($packet->getBotUser() !== null) Storage::setBotUser($packet->getBotUser());
+		if($packet->getBotUser() !== null){
+			Storage::setBotUser($packet->getBotUser());
+		}
 		Storage::setTimestamp($packet->getTimestamp());
 		$this->plugin->getLogger()->debug("Handled data dump (".$packet->getTimestamp().") (".$packet->getSize().")");
 		return true;
