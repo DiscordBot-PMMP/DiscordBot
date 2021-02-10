@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
 use JaxkDev\DiscordBot\Communication\Models\Server;
+use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -20,7 +21,7 @@ use pocketmine\plugin\Plugin;
  * @see DiscordServerDeleted Emitted when the bot leaves a server
  * @see DiscordServerJoined Emitted when the bot joins a server.
  */
-class DiscordServerUpdated extends DiscordBotEvent{
+class DiscordServerUpdated extends DiscordBotEvent implements Cancellable{
 
 	/** @var Server */
 	private $server;

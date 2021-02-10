@@ -39,6 +39,8 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventReady;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Plugin\Events\DiscordChannelDeleted;
+use JaxkDev\DiscordBot\Plugin\Events\DiscordChannelUpdated;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordServerDeleted;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordServerJoined;
@@ -141,12 +143,18 @@ class BotCommunicationHandler{
 	}
 
 	private function handleChannelCreate(DiscordEventChannelCreate $packet): bool{
+		$e = new DiscordChannelUpdated($this->plugin, $packet->getChannel());
+		$e->call();
+		if($e->isCancelled()) return true;
 		Storage::addChannel($packet->getChannel());
 		$this->plugin->getServer()->broadcastMessage("Channel '".$packet->getChannel()->getName()."' created.");
 		return true;
 	}
 
 	private function handleChannelUpdate(DiscordEventChannelUpdate $packet): bool{
+		$e = new DiscordChannelUpdated($this->plugin, $packet->getChannel());
+		$e->call();
+		if($e->isCancelled()) return true;
 		Storage::updateChannel($packet->getChannel());
 		$this->plugin->getServer()->broadcastMessage("Channel '".$packet->getChannel()->getName()."' updated.");
 		return true;
@@ -155,7 +163,11 @@ class BotCommunicationHandler{
 	private function handleChannelDelete(DiscordEventChannelDelete $packet): bool{
 		$channel = Storage::getChannel($packet->getChannelId());
 		if($channel === null) return false;
+		$e = new DiscordChannelDeleted($this->plugin, $channel);
+		$e->call();
+		if($e->isCancelled()) return true;
 		$this->plugin->getServer()->broadcastMessage("Channel '".$channel->getName()."' deleted.");
+		Storage::removeChannel($packet->getChannelId());
 		return true;
 	}
 
@@ -222,6 +234,12 @@ class BotCommunicationHandler{
 		return true;
 	}
 
+	private function handleMemberUpdate(DiscordEventMemberUpdate $packet): bool{
+		Storage::updateMember($packet->getMember());
+		$this->plugin->getServer()->broadcastMessage("Member updated.");
+		return true;
+	}
+
 	private function handleMemberLeave(DiscordEventMemberLeave $packet): bool{
 		$config = $this->plugin->getEventsConfig()['member_leave']['fromDiscord'];
 		if(($config['format'] ?? "") === "") return true;
@@ -252,13 +270,12 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleMemberUpdate(DiscordEventMemberUpdate $packet): bool{
-		Storage::updateMember($packet->getMember());
-		$this->plugin->getServer()->broadcastMessage("Member updated.");
-		return true;
-	}
-
 	private function handleServerJoin(DiscordEventServerJoin $packet): bool{
+		$e = new DiscordServerJoined($this->plugin, $packet->getServer(), $packet->getRoles(),
+			$packet->getChannels(), $packet->getMembers());
+		$e->call();
+		if($e->isCancelled()) return true;
+
 		Storage::addServer($packet->getServer());
 		foreach($packet->getMembers() as $member){
 			Storage::addMember($member);
@@ -269,24 +286,27 @@ class BotCommunicationHandler{
 		foreach($packet->getChannels() as $channel){
 			Storage::addChannel($channel);
 		}
-		(new DiscordServerJoined($this->plugin, $packet->getServer()))->call();
 		$this->plugin->getServer()->broadcastMessage("Joined discord server: ".$packet->getServer()->getName());
+		return true;
+	}
+
+	private function handleServerUpdate(DiscordEventServerUpdate $packet): bool{
+		$e = new DiscordServerUpdated($this->plugin, $packet->getServer());
+		$e->call();
+		if($e->isCancelled()) return true;
+		Storage::updateServer($packet->getServer());
+		$this->plugin->getServer()->broadcastMessage("Updated discord server: ".$packet->getServer()->getName());
 		return true;
 	}
 
 	private function handleServerLeave(DiscordEventServerLeave $packet): bool{
 		$server = Storage::getServer($packet->getServerId());
 		if($server === null) return false;
-		(new DiscordServerDeleted($this->plugin, $server))->call();
-		$this->plugin->getServer()->broadcastMessage("Removed/Left discord server: ".$server->getName());
+		$e = new DiscordServerDeleted($this->plugin, $server);
+		$e->call();
+		if($e->isCancelled()) return true;
+		$this->plugin->getServer()->broadcastMessage("Deleted/Removed/Left discord server: ".$server->getName());
 		Storage::removeServer($packet->getServerId());
-		return true;
-	}
-
-	private function handleServerUpdate(DiscordEventServerUpdate $packet): bool{
-		Storage::updateServer($packet->getServer());
-		(new DiscordServerUpdated($this->plugin, $packet->getServer()))->call();
-		$this->plugin->getServer()->broadcastMessage("Updated discord server: ".$packet->getServer()->getName());
 		return true;
 	}
 

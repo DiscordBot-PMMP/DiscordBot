@@ -12,7 +12,11 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
+use JaxkDev\DiscordBot\Communication\Models\Channel;
+use JaxkDev\DiscordBot\Communication\Models\Member;
+use JaxkDev\DiscordBot\Communication\Models\Role;
 use JaxkDev\DiscordBot\Communication\Models\Server;
+use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -20,17 +24,57 @@ use pocketmine\plugin\Plugin;
  * @see DiscordServerDeleted Emitted when the bot leaves a server
  * @see DiscordServerUpdated Emitted when a server the bot is in has been updated.
  */
-class DiscordServerJoined extends DiscordBotEvent{
+class DiscordServerJoined extends DiscordBotEvent implements Cancellable{
 
 	/** @var Server */
 	private $server;
 
-	public function __construct(Plugin $plugin, Server $server){
+	/** @var Role[] */
+	private $roles;
+
+	/** @var Channel[] */
+	private $channels;
+
+	/** @var Member[] */
+	private $members;
+
+	/**
+	 * @param Plugin    $plugin
+	 * @param Server    $server
+	 * @param Role[]    $roles
+	 * @param Channel[] $channels
+	 * @param array     $members
+	 */
+	public function __construct(Plugin $plugin, Server $server, array $roles, array $channels, array $members){
 		parent::__construct($plugin);
 		$this->server = $server;
+		$this->roles = $roles;
+		$this->channels = $channels;
+		$this->members = $members;
 	}
 
 	public function getServer(): Server{
 		return $this->server;
+	}
+
+	/**
+	 * @return Role[]
+	 */
+	public function getRoles(): array{
+		return $this->roles;
+	}
+
+	/**
+	 * @return Channel[]
+	 */
+	public function getChannels(): array{
+		return $this->channels;
+	}
+
+	/**
+	 * @return Member[]
+	 */
+	public function getMembers(): array{
+		return $this->members;
 	}
 }
