@@ -99,10 +99,10 @@ class BotCommunicationHandler{
 	}
 
 	private function handleMessageSent(DiscordEventMessageSent $packet): bool{
-		$config = $this->plugin->getEventsConfig()['message']['fromDiscord'];
+		$config = $this->plugin->getEventsConfig()["message"]["fromDiscord"];
 		$message = $packet->getMessage();
 
-		if(!in_array($message->getChannelId(), $config['channels'])) return true;
+		if(!in_array($message->getChannelId(), $config["channels"])) return true;
 
 		//If any of these asserts fire theres a mismatch between Storage and discord.
 
@@ -122,13 +122,13 @@ class BotCommunicationHandler{
 		$user = Storage::getUser($author->getUserId());
 		Utils::assert($user instanceof User);
 
-		$formatted = str_replace(['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}',
-			'{SERVER_NAME}', '{CHANNEL_ID}', '{CHANNEL_NAME}', '{MESSAGE}'], [
-				date('G:i:s', (int)$message->getTimestamp()??0), $author->getUserId(), $user->getUsername(),
+		$formatted = str_replace(["{TIME}", "{USER_ID}", "{USERNAME}", "{USER_DISCRIMINATOR}", "{SERVER_ID}",
+			"{SERVER_NAME}", "{CHANNEL_ID}", "{CHANNEL_NAME}", "{MESSAGE}"], [
+				date("G:i:s", (int)$message->getTimestamp()??0), $author->getUserId(), $user->getUsername(),
 				$user->getDiscriminator(), $server->getId(), $server->getName(), $channel->getId(), $channel->getName(),
 				$message->getContent()
 			],
-			$config['format']);
+			$config["format"]);
 
 		$this->plugin->getServer()->broadcastMessage($formatted);
 		return true;
@@ -210,14 +210,14 @@ class BotCommunicationHandler{
 	}
 
 	private function handleMemberJoin(DiscordEventMemberJoin $packet): bool{
-		$config = $this->plugin->getEventsConfig()['member_join']['fromDiscord'];
-		if(($config['format'] ?? "") === "") return true;
+		$config = $this->plugin->getEventsConfig()["member_join"]["fromDiscord"];
+		if(($config["format"] ?? "") === "") return true;
 
 		/** @var Server $server */
 		$server = Storage::getServer($packet->getMember()->getServerId());
 		Utils::assert($server instanceof Server);
 
-		if(!in_array($server->getId(), $config['servers'])) return true;
+		if(!in_array($server->getId(), $config["servers"])) return true;
 
 		$member = $packet->getMember();
 		$user = $packet->getUser();
@@ -226,9 +226,9 @@ class BotCommunicationHandler{
 		Storage::addUser($user);
 
 		$formatted = str_replace(
-			['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
-			[date('G:i:s', $member->getJoinTimestamp()), $member->getId(), $user->getUsername(),
-				$user->getDiscriminator(), $server->getId(), $server->getName()], $config['format']);
+			["{TIME}", "{USER_ID}", "{USERNAME}", "{USER_DISCRIMINATOR}", "{SERVER_ID}", "{SERVER_NAME}"],
+			[date("G:i:s", $member->getJoinTimestamp()), $member->getId(), $user->getUsername(),
+				$user->getDiscriminator(), $server->getId(), $server->getName()], $config["format"]);
 
 		$this->plugin->getServer()->broadcastMessage($formatted);
 		return true;
@@ -241,8 +241,8 @@ class BotCommunicationHandler{
 	}
 
 	private function handleMemberLeave(DiscordEventMemberLeave $packet): bool{
-		$config = $this->plugin->getEventsConfig()['member_leave']['fromDiscord'];
-		if(($config['format'] ?? "") === "") return true;
+		$config = $this->plugin->getEventsConfig()["member_leave"]["fromDiscord"];
+		if(($config["format"] ?? "") === "") return true;
 
 		/** @var Member $member */
 		$member = Storage::getMember($packet->getMemberID());
@@ -253,7 +253,7 @@ class BotCommunicationHandler{
 		Utils::assert($server instanceof Server);
 
 		//Have to fetch member first because onLeave we dont have their data direct from discord, so use cache :)
-		if(!in_array($server->getId(), $config['servers'])) return true;
+		if(!in_array($server->getId(), $config["servers"])) return true;
 
 		/** @var User $user */
 		$user = Storage::getUser($member->getUserId());
@@ -262,9 +262,9 @@ class BotCommunicationHandler{
 		Storage::removeMember($member->getId());
 
 		$formatted = str_replace(
-			['{TIME}', '{USER_ID}', '{USERNAME}', '{USER_DISCRIMINATOR}', '{SERVER_ID}', '{SERVER_NAME}'],
-			[date('G:i:s', $member->getJoinTimestamp()), $user->getId(), $user->getUsername(),
-				$user->getDiscriminator(), $server->getId(), $server->getName()], $config['format']);
+			["{TIME}", "{USER_ID}", "{USERNAME}", "{USER_DISCRIMINATOR}", "{SERVER_ID}", "{SERVER_NAME}"],
+			[date("G:i:s", $member->getJoinTimestamp()), $user->getId(), $user->getUsername(),
+				$user->getDiscriminator(), $server->getId(), $server->getName()], $config["format"]);
 
 		$this->plugin->getServer()->broadcastMessage($formatted);
 		return true;

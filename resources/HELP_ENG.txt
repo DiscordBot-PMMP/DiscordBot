@@ -15,16 +15,13 @@ version: 2				DO NOT EVER TOUCH THIS.
 discord:
   token: "ABCD123"		DO NOT EVER SHOW THIS TOKEN TO ANYBODY !!! Paste your discord bots token into here,
   						for how to get/setup the bot and get token, see beginning of file.
+  usePluginCacert: true Leave this alone unless told specifically to disable (set to false)
 
 logging:
   debug: false|true     Log information to screen/console, all debug messages are logged to file by default.
   maxFiles: 28			How many log files to keep on disk at any one time.
   directory: "logs"		What directory to keep log files in, relative from plugin_data/DiscordBot/
 
-security:
-  disable_ssl: false|true    **WARNING** Only set to true if you have a ssl issue during connection AND you cannot
-  										 configure PHP at all (eg server hosts blocked it and will not help).
-  										 You have been warned.
 
 
 

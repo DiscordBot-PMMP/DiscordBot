@@ -79,7 +79,7 @@ class Client{
 
 		$logger = new Logger('DiscordPHP');
 		$httpLogger = new Logger('DiscordPHP.HTTP');
-		$handler = new RotatingFileHandler($config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['maxFiles'], Logger::DEBUG);
+		$handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['maxFiles'], Logger::DEBUG);
 		$handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
 		$logger->setHandlers(array($handler));
 		$httpLogger->setHandlers(array($handler));
@@ -93,9 +93,11 @@ class Client{
 		// TODO Intents.
 
 		$socket_opts = [];
-		if($config['security']['disable_ssl']){
-			MainLogger::getLogger()->warning("SSL/TLS verification has been disabled.");
-			$socket_opts['tls'] = ['verify_peer' => false, 'verify_peer_name' => false];
+		if($config["discord"]["usePluginCacert"]){
+			MainLogger::getLogger()->debug("TLS cafile set to '".\JaxkDev\DiscordBot\DATA_PATH."cacert.pem"."'");
+			$socket_opts["tls"] = [
+				"cafile" => \JaxkDev\DiscordBot\DATA_PATH."cacert.pem"
+			];
 		}
 
 		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible.

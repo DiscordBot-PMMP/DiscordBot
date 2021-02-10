@@ -23,38 +23,42 @@ abstract class ConfigUtils{
 
 	// Map all versions to a static function.
 	private const PATCH_MAP = [
-		1 => 'patch_1'
+		1 => "patch_1"
 	];
 
 	private const EVENT_PATCH_MAP = [
-		1 => 'event_patch_1'
+		1 => "event_patch_1"
 	];
 
 	static function update(array &$config): void{
-		for($i = (int)$config['version']; $i < self::VERSION; $i += 1){
+		for($i = (int)$config["version"]; $i < self::VERSION; $i += 1){
 			$f = self::PATCH_MAP[$i];
 			$config = forward_static_call([self::class, $f], $config);
 		}
 	}
 
 	static function update_event(array &$config): void{
-		for($i = (int)$config['version']; $i < self::EVENT_VERSION; $i += 1){
+		for($i = (int)$config["version"]; $i < self::EVENT_VERSION; $i += 1){
 			$f = self::EVENT_PATCH_MAP[$i];
 			$config = forward_static_call([self::class, $f], $config);
 		}
 	}
 
 	static private function patch_1(array $config): array{
-		$config['version'] = 2;
-		$config['security'] = [
-			'disable_ssl' => false
-		];
-
+		$config["version"] = 2;
+		if(!isset($config["discord"])){
+			$config["discord"] = [
+				"token" => "Long token here",
+				"usePluginCacert" => true
+			];
+		}else{
+			$config["discord"]["usePluginCacert"] = true;
+		}
 		return $config;
 	}
 
 	static private function event_patch_1(array $data): array{
-		$changeIds = function(array &$data, string $event, string $discord = 'toDiscord', string $key = 'channels'): void{
+		$changeIds = function(array &$data, string $event, string $discord = "toDiscord", string $key = "channels"): void{
 			$ids = $data[$event][$discord][$key];
 			$data[$event][$discord][$key] = [];
 			foreach($ids as $id){
@@ -69,24 +73,24 @@ abstract class ConfigUtils{
 			}
 		};
 
-		$data['version'] = 2;
+		$data["version"] = 2;
 
 		//channels[] no longer has server ID prefixed.
-		$changeIds($data, 'message');
-		$changeIds($data, 'message', 'fromDiscord');
-		$changeIds($data, 'command');
-		$changeIds($data, 'member_join');
-		$changeIds($data, 'member_leave');
+		$changeIds($data, "message");
+		$changeIds($data, "message", "fromDiscord");
+		$changeIds($data, "command");
+		$changeIds($data, "member_join");
+		$changeIds($data, "member_leave");
 
 		//Added servers option to join/leave event.
-		$data['member_leave']['fromDiscord']['servers'] = [];
-		$data['member_join']['fromDiscord']['servers'] = [];
+		$data["member_leave"]["fromDiscord"]["servers"] = [];
+		$data["member_join"]["fromDiscord"]["servers"] = [];
 
 		//Added member transfer event.
-		$data['member_transfer'] = [
-			'toDiscord' => [
-				'channels' => [],
-				'format' => "[{TIME}] **{USERNAME}** Has been transferred to {ADDRESS}:{PORT}."
+		$data["member_transfer"] = [
+			"toDiscord" => [
+				"channels" => [],
+				"format" => "[{TIME}] **{USERNAME}** Has been transferred to {ADDRESS}:{PORT}."
 			]
 		];
 
@@ -105,7 +109,7 @@ abstract class ConfigUtils{
 		if(!array_key_exists("version", $config)){
 			$result["version"] = "No 'version' key found.";
 		}else{
-			if(!is_int($config['version']) or $config['version'] <= 0 or $config['version'] > self::VERSION){
+			if(!is_int($config["version"]) or $config["version"] <= 0 or $config["version"] > self::VERSION){
 				$result["version"] = "Invalid 'version' ({$config["version"]}), you were warned not to touch it...";
 			}
 		}
@@ -116,8 +120,15 @@ abstract class ConfigUtils{
 			if(!array_key_exists("token", $config['discord'])){
 				$result["discord.token"] = "No 'discord.token' key found.";
 			}else{
-				if(!is_string($config['discord']['token']) or strlen($config['discord']['token']) < 59){
+				if(!is_string($config["discord"]["token"]) or strlen($config["discord"]["token"]) < 59){
 					$result["discord.token"] = "Invalid 'discord.token' ({$config["discord"]["token"]}), did you follow the wiki ?";
+				}
+			}
+			if(!array_key_exists("usePluginCacert", $config["discord"])){
+				$result["discord.usePluginCacert"] = "No 'discord.usePluginCacert' key found.";
+			}else{
+				if(!is_bool($config["discord"]["usePluginCacert"])){
+					$result["discord.usePluginCacert"] = "Invalid 'discord.usePluginCacert' ({$config["discord"]["usePluginCacert"]}), must be true or false";
 				}
 			}
 		}
@@ -146,18 +157,6 @@ abstract class ConfigUtils{
 			}else{
 				if(!is_string($config["logging"]["directory"]) or strlen($config["logging"]["directory"]) === 0){
 					$result["logging.directory"] = "Invalid 'logging.directory' ({$config["logging"]["directory"]}).";
-				}
-			}
-		}
-
-		if(!array_key_exists("security", $config)){
-			$result["security"] = "No security key found.";
-		}else{
-			if(!array_key_exists("disable_ssl", $config["security"])){
-				$result["security.disable_ssl"] = "No 'security.disable_ssl' key found.";
-			}else{
-				if(!is_bool($config["security"]["disable_ssl"])){
-					$result["security.disable_ssl"] = "Invalid 'security.disable_ssl' ({$config["security"]["disable_ssl"]}), should be true or false.";
 				}
 			}
 		}

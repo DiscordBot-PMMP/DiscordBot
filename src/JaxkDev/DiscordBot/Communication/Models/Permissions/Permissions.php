@@ -23,46 +23,46 @@ abstract class Permissions implements \Serializable{
 	 */
 
 	const VOICE_PERMISSIONS = [
-		'priority_speaker' => 256,
-		'stream' => 512,
-		'connect' => 1048576,
-		'speak' => 2097152,
-		'mute_members' => 4194304,
-		'deafen_members' => 8388608,
-		'move_members' => 16777216,
-		'use_vad' => 33554432,
+		"priority_speaker" => 256,
+		"stream" => 512,
+		"connect" => 1048576,
+		"speak" => 2097152,
+		"mute_members" => 4194304,
+		"deafen_members" => 8388608,
+		"move_members" => 16777216,
+		"use_vad" => 33554432,
 	];
 
 	const TEXT_PERMISSIONS = [
-		'add_reactions' => 64,
-		'send_messages' => 2048,
-		'send_tts_messages' => 4096,
-		'manage_messages' => 8192,
-		'embed_links' => 16384,
-		'attach_files' => 32768,
-		'read_message_history' => 65536,
-		'mention_everyone' => 131072,
-		'use_external_emojis' => 262144,
+		"add_reactions" => 64,
+		"send_messages" => 2048,
+		"send_tts_messages" => 4096,
+		"manage_messages" => 8192,
+		"embed_links" => 16384,
+		"attach_files" => 32768,
+		"read_message_history" => 65536,
+		"mention_everyone" => 131072,
+		"use_external_emojis" => 262144,
 	];
 
 	const ROLE_PERMISSIONS = [
-		'kick_members' => 2,
-		'ban_members' => 4,
-		'administrator' => 8,
-		'manage_guild' => 32,
-		'view_audit_log' => 128,
-		'view_guild_insights' => 524288,
-		'change_nickname' => 67108864,
-		'manage_nicknames' => 134217728,
-		'manage_emojis' => 1073741824,
+		"kick_members" => 2,
+		"ban_members" => 4,
+		"administrator" => 8,
+		"manage_guild" => 32,
+		"view_audit_log" => 128,
+		"view_guild_insights" => 524288,
+		"change_nickname" => 67108864,
+		"manage_nicknames" => 134217728,
+		"manage_emojis" => 1073741824,
 	];
 
 	const ALL_PERMISSIONS = [
-		'create_instant_invite' => 1,
-		'manage_channels' => 16,
-		'view_channel' => 1024,
-		'manage_roles' => 268435456,
-		'manage_webhooks' => 536870912,
+		"create_instant_invite" => 1,
+		"manage_channels" => 16,
+		"view_channel" => 1024,
+		"manage_roles" => 268435456,
+		"manage_webhooks" => 536870912,
 	];
 
 	/** @var int */

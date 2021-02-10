@@ -61,7 +61,7 @@ abstract class ModelConverter{
 
 		$newPermission = new RolePermissions();
 		$newPermission->setBitwise($bitwise);
-		if($newPermission->getPermission('administrator')){
+		if($newPermission->getPermission("administrator")){
 			$newPermission->setBitwise(2147483647); //All perms.
 		}
 

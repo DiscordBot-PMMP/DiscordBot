@@ -59,30 +59,30 @@ class DiscordEventHandler{
 
 	public function registerEvents(): void{
 		$discord = $this->client->getDiscordClient();
-		$discord->on('MESSAGE_CREATE', [$this, 'onMessageCreate']);
-		$discord->on('MESSAGE_DELETE', [$this, 'onMessageDelete']);
-		$discord->on('MESSAGE_UPDATE', [$this, 'onMessageUpdate']);  //AKA Edit
+		$discord->on("MESSAGE_CREATE", [$this, "onMessageCreate"]);
+		$discord->on("MESSAGE_DELETE", [$this, "onMessageDelete"]);
+		$discord->on("MESSAGE_UPDATE", [$this, "onMessageUpdate"]);  //AKA Edit
 
-		$discord->on('GUILD_MEMBER_ADD', [$this, 'onMemberJoin']);
-		$discord->on('GUILD_MEMBER_REMOVE', [$this, 'onMemberLeave']);
-		$discord->on('GUILD_MEMBER_UPDATE', [$this, 'onMemberUpdate']);   //Includes Roles,nickname etc
+		$discord->on("GUILD_MEMBER_ADD", [$this, "onMemberJoin"]);
+		$discord->on("GUILD_MEMBER_REMOVE", [$this, "onMemberLeave"]);
+		$discord->on("GUILD_MEMBER_UPDATE", [$this, "onMemberUpdate"]);   //Includes Roles,nickname etc
 
-		$discord->on('GUILD_CREATE', [$this, 'onGuildJoin']);
-		$discord->on('GUILD_UPDATE', [$this, 'onGuildUpdate']);
-		$discord->on('GUILD_DELETE', [$this, 'onGuildLeave']);
+		$discord->on("GUILD_CREATE", [$this, "onGuildJoin"]);
+		$discord->on("GUILD_UPDATE", [$this, "onGuildUpdate"]);
+		$discord->on("GUILD_DELETE", [$this, "onGuildLeave"]);
 
-		$discord->on('CHANNEL_CREATE', [$this, 'onChannelCreate']);
-		$discord->on('CHANNEL_UPDATE', [$this, 'onChannelUpdate']);
-		$discord->on('CHANNEL_DELETE', [$this, 'onChannelDelete']);
+		$discord->on("CHANNEL_CREATE", [$this, "onChannelCreate"]);
+		$discord->on("CHANNEL_UPDATE", [$this, "onChannelUpdate"]);
+		$discord->on("CHANNEL_DELETE", [$this, "onChannelDelete"]);
 
-		$discord->on('GUILD_ROLE_CREATE', [$this, 'onRoleCreate']);
-		$discord->on('GUILD_ROLE_UPDATE', [$this, 'onRoleUpdate']);
-		$discord->on('GUILD_ROLE_DELETE', [$this, 'onRoleDelete']);
+		$discord->on("GUILD_ROLE_CREATE", [$this, "onRoleCreate"]);
+		$discord->on("GUILD_ROLE_UPDATE", [$this, "onRoleUpdate"]);
+		$discord->on("GUILD_ROLE_DELETE", [$this, "onRoleDelete"]);
 
-		$discord->on('INVITE_CREATE', [$this, 'onInviteCreate']);
-		$discord->on('INVITE_DELETE', [$this, 'onInviteDelete']);
+		$discord->on("INVITE_CREATE", [$this, "onInviteCreate"]);
+		$discord->on("INVITE_DELETE", [$this, "onInviteDelete"]);
 
-		$discord->on('GUILD_BAN_REMOVE', [$this, 'onBanRemove']);
+		$discord->on("GUILD_BAN_REMOVE", [$this, "onBanRemove"]);
 
 		/*
 		 * TODO (others planned for 2.1):

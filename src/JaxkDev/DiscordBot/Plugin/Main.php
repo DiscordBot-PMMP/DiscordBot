@@ -60,16 +60,18 @@ class Main extends PluginBase{
 	public function onLoad(){
 		self::$instance = $this;
 
-		if(!defined('JaxkDev\DiscordBot\COMPOSER')){
+		if(!defined("JaxkDev\DiscordBot\COMPOSER")){
+			define("JaxkDev\DiscordBot\DATA_PATH", $this->getDataFolder());
 			define("JaxkDev\DiscordBot\VERSION", "v".$this->getDescription()->getVersion());
-			define('JaxkDev\DiscordBot\COMPOSER', (Phar::running(true) !== "") ? Phar::running(true)."/vendor/autoload.php" : dirname(__DIR__, 4)."/DiscordBot/vendor/autoload.php");
+			define("JaxkDev\DiscordBot\COMPOSER", (Phar::running(true) !== "") ? Phar::running(true)."/vendor/autoload.php" : dirname(__DIR__, 4)."/DiscordBot/vendor/autoload.php");
 		}
 
-		if(!is_dir($this->getDataFolder().DIRECTORY_SEPARATOR."logs")) mkdir($this->getDataFolder().DIRECTORY_SEPARATOR."logs");
+		if(!is_dir($this->getDataFolder()."logs")) mkdir($this->getDataFolder()."logs");
 
 		$this->saveResource("config.yml");
 		$this->saveResource("events.yml");
 		$this->saveResource("HELP_ENG.txt", true); //Always keep that up-to-date.
+		$this->saveResource("cacert.pem", true); //And this ^
 
 		$this->inboundData = new Volatile();
 		$this->outboundData = new Volatile();
@@ -104,32 +106,30 @@ class Main extends PluginBase{
 	private function loadConfig(): bool{
 		$this->getLogger()->debug("Loading initial configuration...");
 
-		$config = yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."config.yml");
+		$config = yaml_parse_file($this->getDataFolder()."config.yml");
 		if($config === false){
 			$this->getLogger()->critical("Failed to parse config.yml");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return false;
 		}
-		$config = (array)$config;
-		$config['logging']['directory'] = $this->getDataFolder().DIRECTORY_SEPARATOR.($initialConfig['logging']['directory'] ?? "logs");
 
-		$eventConfig = yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml");
+		$eventConfig = yaml_parse_file($this->getDataFolder()."events.yml");
 		if($eventConfig === false){
 			$this->getLogger()->critical("Failed to parse events.yml");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return false;
 		}
 
-		if($config['version'] !== ConfigUtils::VERSION){
-			$this->getLogger()->info("Updating your config from v{$config['version']} to v".ConfigUtils::VERSION);
+		if($config["version"] !== ConfigUtils::VERSION){
+			$this->getLogger()->info("Updating your config from v{$config["version"]} to v".ConfigUtils::VERSION);
 			ConfigUtils::update($config);
 			rename($this->getDataFolder()."config.yml", $this->getDataFolder()."config.yml.old");
 			yaml_emit_file($this->getDataFolder()."config.yml", $config);
 			$this->getLogger()->info("Config updated, old config was saved to '{$this->getDataFolder()}config.yml.old'");
 		}
 
-		if($eventConfig['version'] !== ConfigUtils::EVENT_VERSION){
-			$this->getLogger()->info("Updating your event config from v{$eventConfig['version']} to v".ConfigUtils::EVENT_VERSION);
+		if($eventConfig["version"] !== ConfigUtils::EVENT_VERSION){
+			$this->getLogger()->info("Updating your event config from v{$eventConfig["version"]} to v".ConfigUtils::EVENT_VERSION);
 			ConfigUtils::update_event($eventConfig);
 			rename($this->getDataFolder()."events.yml", $this->getDataFolder()."events.yml.old");
 			yaml_emit_file($this->getDataFolder()."events.yml", $eventConfig);
