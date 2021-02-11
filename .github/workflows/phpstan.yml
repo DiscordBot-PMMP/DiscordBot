@@ -15,17 +15,17 @@ jobs:
         php: [ 7.3, 7.4 ]
 
     steps:
-      - uses: actions/checkout@v2 #needed for build.sh
+      - uses: actions/checkout@v2
       - name: Check for PHP build cache
         id: php-build-cache
         uses: actions/cache@v2
         with:
           path: "./bin"
-          key: "php-build-generic-${{ matrix.php }}-${{ matrix.image }}-${{ hashFiles('./.github/workflows/build-php.sh') }}"
+          key: "php-build-generic-${{ matrix.php }}-${{ matrix.image }}-${{ hashFiles('./test/github/build-php.sh') }}"
 
       - name: Compile PHP
         if: steps.php-build-cache.outputs.cache-hit != 'true'
-        run: ./.github/workflows/build-php.sh "${{ matrix.php }}"
+        run: ./test/github/build-php.sh "${{ matrix.php }}"
 
   phpstan:
     name: PHPStan analysis
@@ -46,7 +46,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "./bin"
-          key: "php-build-generic-${{ matrix.php }}-${{ matrix.image }}-${{ hashFiles('./.github/workflows/build-php.sh') }}"
+          key: "php-build-generic-${{ matrix.php }}-${{ matrix.image }}-${{ hashFiles('./test/github/build-php.sh') }}"
 
       - name: Kill build on PHP build cache miss (should never happen)
         if: steps.php-build-cache.outputs.cache-hit != 'true'
