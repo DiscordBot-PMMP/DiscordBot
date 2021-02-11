@@ -146,6 +146,7 @@ class Client{
 					}
 				});
 			}else{
+				//Should never happen unless your internet speed is like 10kb/s
 				MainLogger::getLogger()->critical("Client failed to login/connect within 30 seconds, See log file for details.");
 				$this->close();
 			}
@@ -162,13 +163,16 @@ class Client{
 		// https://github.com/teamreflex/DiscordPHP/issues/433
 		// Note ready is emitted after successful connection + all servers/users loaded, so only register events
 		// After this event.
-		$this->client->on('ready', function (Discord $discord){
+		$this->client->on('ready', function(Discord $discord){
 			if($this->readyTimer !== null){
 				$this->client->getLoop()->cancelTimer($this->readyTimer);
 				$this->readyTimer = null;
 			}
 			$this->discordEventHandler->onReady();
 		});
+
+		$this->client->on('error', [$this, 'close']);
+		$this->client->on('closed', [$this, 'close']);
 	}
 
 	public function tick(): void{
@@ -253,13 +257,13 @@ class Client{
 	}
 
 	public function errorHandler(int $severity, string $message, string $file, int $line): bool{
-		MainLogger::getLogger()->logException(new ErrorException($message, 0, $severity, $file, $line));
-		$this->close();
+		$this->close(new ErrorException($message, 0, $severity, $file, $line));
 		return true;
 	}
 
-	public function close(): void{
+	public function close($error = null): void{
 		if($this->thread->getStatus() === Protocol::THREAD_STATUS_CLOSED) return;
+		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
 		if($this->client instanceof Discord){
 			try{
 				$this->client->close(true);
@@ -267,7 +271,9 @@ class Client{
 				MainLogger::getLogger()->debug("Failed to close client, probably due it not being started.");
 			}
 		}
-		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
+		if($error !== null and $error instanceof \Throwable){
+			MainLogger::getLogger()->logException($error);
+		}
 		MainLogger::getLogger()->debug("Client closed.");
 		exit(0);
 	}

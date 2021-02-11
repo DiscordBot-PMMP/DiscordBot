@@ -16,7 +16,7 @@ abstract class Protocol{
 
 	const
 		PPT = 50, 					// How many packets should be processed per tick ?   [PacketsPerTick]
-		HEARTBEAT_ALLOWANCE = 5;	// How long between last known heartbeat until declared dead. (seconds)
+		HEARTBEAT_ALLOWANCE = 10;	// How long between last known heartbeat until declared dead. (seconds)
 
 	const
 		THREAD_STATUS_STARTING = 0,
