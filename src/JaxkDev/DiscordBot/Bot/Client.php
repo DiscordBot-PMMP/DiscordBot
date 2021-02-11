@@ -31,6 +31,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
 use pocketmine\utils\MainLogger;
 use React\EventLoop\TimerInterface;
+use Throwable;
 
 class Client{
 
@@ -66,7 +67,7 @@ class Client{
 		gc_enable();
 
 		error_reporting(E_ALL & ~E_NOTICE);
-		set_error_handler([$this, 'errorHandler']);
+		set_error_handler([$this, 'sysErrorHandler']);
 		register_shutdown_function([$this, 'close']);
 
 		// Mono logger can have issues with other timezones, for now use UTC.
@@ -171,7 +172,7 @@ class Client{
 			$this->discordEventHandler->onReady();
 		});
 
-		$this->client->on('error', [$this, 'close']);
+		$this->client->on('error', [$this, 'discordErrorHandler']);
 		$this->client->on('closed', [$this, 'close']);
 	}
 
@@ -256,12 +257,17 @@ class Client{
 		);
 	}
 
-	public function errorHandler(int $severity, string $message, string $file, int $line): bool{
+	public function sysErrorHandler(int $severity, string $message, string $file, int $line): bool{
 		$this->close(new ErrorException($message, 0, $severity, $file, $line));
 		return true;
 	}
 
-	public function close($error = null): void{
+	/** @var Throwable[] $data */
+	public function discordErrorHandler(array $data): void{
+		$this->close($data[0]??null);
+	}
+
+	public function close(?Throwable $error = null): void{
 		if($this->thread->getStatus() === Protocol::THREAD_STATUS_CLOSED) return;
 		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
 		if($this->client instanceof Discord){
@@ -271,7 +277,7 @@ class Client{
 				MainLogger::getLogger()->debug("Failed to close client, probably due it not being started.");
 			}
 		}
-		if($error !== null and $error instanceof \Throwable){
+		if($error instanceof Throwable){
 			MainLogger::getLogger()->logException($error);
 		}
 		MainLogger::getLogger()->debug("Client closed.");
