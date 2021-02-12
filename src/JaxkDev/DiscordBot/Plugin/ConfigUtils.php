@@ -13,9 +13,9 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-// TODO Event data validation.
 use pocketmine\utils\MainLogger;
 
+//Probably best if you dont look at this.
 abstract class ConfigUtils{
 
 	const EVENT_VERSION = 2;
@@ -30,7 +30,7 @@ abstract class ConfigUtils{
 		1 => "event_patch_1"
 	];
 
-	static function update(array &$config): void{
+	static public function update(array &$config): void{
 		for($i = (int)$config["version"]; $i < self::VERSION; $i += 1){
 			$f = self::PATCH_MAP[$i];
 			$config = forward_static_call([self::class, $f], $config);
@@ -99,68 +99,132 @@ abstract class ConfigUtils{
 
 
 	/**
-	 * @description Verifies the config's keys and values, returning any keys and a relevant message.
+	 * Verifies the config's keys and values, returning any keys and a relevant message.
 	 * @param array $config
-	 * @return array
+	 * @return string[]
 	 */
-	static function verify(array $config): array{
+	static public function verify(array $config): array{
 		$result = [];
 
-		if(!array_key_exists("version", $config)){
-			$result["version"] = "No 'version' key found.";
+		if(!array_key_exists("version", $config) or $config["version"] === null){
+			$result[] = "No 'version' key found.";
 		}else{
 			if(!is_int($config["version"]) or $config["version"] <= 0 or $config["version"] > self::VERSION){
-				$result["version"] = "Invalid 'version' ({$config["version"]}), you were warned not to touch it...";
+				$result[] = "Invalid 'version' ({$config["version"]}), you were warned not to touch it...";
 			}
 		}
 
-		if(!array_key_exists("discord", $config)){
-			$result["discord"] = "No 'discord' key found.";
+		if(!array_key_exists("discord", $config) or $config["discord"] === null){
+			$result[] = "No 'discord' key found.";
 		}else{
-			if(!array_key_exists("token", $config['discord'])){
-				$result["discord.token"] = "No 'discord.token' key found.";
+			if(!array_key_exists("token", $config["discord"]) or $config["discord"]["token"] === null){
+				$result[] = "No 'discord.token' key found.";
 			}else{
 				if(!is_string($config["discord"]["token"]) or strlen($config["discord"]["token"]) < 59){
-					$result["discord.token"] = "Invalid 'discord.token' ({$config["discord"]["token"]}), did you follow the wiki ?";
+					$result[] = "Invalid 'discord.token' ({$config["discord"]["token"]}), did you follow the wiki ?";
 				}
 			}
-			if(!array_key_exists("usePluginCacert", $config["discord"])){
-				$result["discord.usePluginCacert"] = "No 'discord.usePluginCacert' key found.";
+			if(!array_key_exists("usePluginCacert", $config["discord"]) or $config["discord"]["usePluginCacert"] === null){
+				$result[] = "No 'discord.usePluginCacert' key found.";
 			}else{
 				if(!is_bool($config["discord"]["usePluginCacert"])){
-					$result["discord.usePluginCacert"] = "Invalid 'discord.usePluginCacert' ({$config["discord"]["usePluginCacert"]}), must be true or false";
+					$result[] = "Invalid 'discord.usePluginCacert' ({$config["discord"]["usePluginCacert"]}), must be true or false";
 				}
 			}
 		}
 
-		if(!array_key_exists("logging", $config)){
-			$result["logging"] = "No 'logging' key found.";
+		if(!array_key_exists("logging", $config) or $config["logging"] === null){
+			$result[] = "No 'logging' key found.";
 		}else{
-			if(!array_key_exists("debug", $config["logging"])){
-				$result["logging.debug"] = "No 'logging.debug' value found.";
+			if(!array_key_exists("debug", $config["logging"])  or $config["logging"]["debug"] === null){
+				$result[] = "No 'logging.debug' value found.";
 			}else{
 				if(!is_bool($config["logging"]["debug"])){
-					$result["logging.debug"] = "Invalid 'logging.debug' ({$config["logging"]["debug"]}), should be true or false.";
+					$result[] = "Invalid 'logging.debug' ({$config["logging"]["debug"]}), should be true or false.";
 				}
 			}
 
-			if(!array_key_exists("maxFiles", $config["logging"])){
-				$result["logging.maxFiles"] = "No 'logging.maxFiles' key found.";
+			if(!array_key_exists("maxFiles", $config["logging"]) or $config["logging"]["maxFiles"] === null){
+				$result[] = "No 'logging.maxFiles' key found.";
 			}else{
 				if(!is_int($config["logging"]["maxFiles"]) or $config["logging"]["maxFiles"] <= 0){
-					$result["logging.maxFiles"] = "Invalid 'logging.maxFiles' ({$config["logging"]["maxFiles"]}), should be an int > 0.";
+					$result[] = "Invalid 'logging.maxFiles' ({$config["logging"]["maxFiles"]}), should be an int > 0.";
 				}
 			}
 
-			if(!array_key_exists("directory", $config["logging"])){
-				$result["logging.directory"] = "No 'logging.directory' key found.";
+			if(!array_key_exists("directory", $config["logging"]) or $config["logging"]["directory"] === null){
+				$result[] = "No 'logging.directory' key found.";
 			}else{
 				if(!is_string($config["logging"]["directory"]) or strlen($config["logging"]["directory"]) === 0){
-					$result["logging.directory"] = "Invalid 'logging.directory' ({$config["logging"]["directory"]}).";
+					$result[] = "Invalid 'logging.directory' ({$config["logging"]["directory"]}).";
 				}
 			}
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Verifies the event config keys and values, returning any keys and a relevant message if invalid.
+	 * @param array $config
+	 * @return string[]
+	 */
+	static public function verify_event(array $config): array{
+		$result = [];
+		$checkGenerics = function(array $data, string $event, array $keys = ["toDiscord", "fromDiscord"],
+								  array $types = ["channels", "channels"]): array{
+			$r = [];
+			if(!array_key_exists($event, $data) or $data[$event] === null){
+				$r[] = "No '{$event}' key found.";
+				return $r;
+			}
+			$data = $data[$event];
+			for($i = 0; $i < sizeof($keys); $i++){
+				[$key, $type] = [$keys[$i], $types[$i]];
+				if(!array_key_exists($key, $data) or $data[$key] === null){
+					$r[] = "No '{$event}.{$key}' key found.";
+				}else{
+					if(!array_key_exists("format", $data[$key]) or $data[$key]["format"] === null){
+						$r[] = "No '{$event}.{$key}.format' key found.";
+					}else{
+						if(!is_string($data[$key]["format"])){
+							$r[] = "Invalid '{$event}.{$key}.format', value should be a string.";
+						}
+					}
+					if(!array_key_exists($type, $data[$key]) or $data[$key][$type] === null){
+						$r[] = "No '{$event}.{$key}.{$type}' key found.";
+					}else{
+						if(!is_array($data[$key][$type])){
+							$r[] = "Invalid '{$event}.{$key}.{$type}', should be an array of string ID's.";
+						}else{
+							foreach($data[$key][$type] as $v){
+								if(!is_string($v)){
+									//TODO, Is there a fixed length for Channel/Server IDs ?
+									$r[] = "Invalid value '".($v??"NULL")."' in '{$event}.{$key}.{$type}', should be a string.";
+								}
+							}
+						}
+					}
+				}
+			}
+			return $r;
+		};
+
+		if(!array_key_exists("version", $config) or $config["version"] === null){
+			$result[] = "No 'version' key found.";
+		}else{
+			if(!is_int($config["version"]) or $config["version"] <= 0 or $config["version"] > self::EVENT_VERSION){
+				$result[] = "Invalid 'version' ({$config["version"]}), you were warned not to touch it...";
+			}
+		}
+
+		return array_merge(
+			$result,
+			$checkGenerics($config, "message"),
+			$checkGenerics($config, "command", ["toDiscord"], ["channels"]),
+			$checkGenerics($config, "member_join", ["toDiscord", "fromDiscord"], ["channels", "servers"]),
+			$checkGenerics($config, "member_leave", ["toDiscord", "fromDiscord"], ["channels", "servers"]),
+			$checkGenerics($config, "member_transfer", ["toDiscord"], ["channels"])
+		);
 	}
 }

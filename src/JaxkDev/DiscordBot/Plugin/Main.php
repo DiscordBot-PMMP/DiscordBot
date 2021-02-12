@@ -107,14 +107,14 @@ class Main extends PluginBase{
 		$this->getLogger()->debug("Loading initial configuration...");
 
 		$config = yaml_parse_file($this->getDataFolder()."config.yml");
-		if($config === false){
+		if($config === false or !is_int($config["version"]??"")){
 			$this->getLogger()->critical("Failed to parse config.yml");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return false;
 		}
 
 		$eventConfig = yaml_parse_file($this->getDataFolder()."events.yml");
-		if($eventConfig === false){
+		if($eventConfig === false or !is_int($eventConfig["version"]??"")){
 			$this->getLogger()->critical("Failed to parse events.yml");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return false;
@@ -140,10 +140,20 @@ class Main extends PluginBase{
 		$result_raw = ConfigUtils::verify($config);
 		if(sizeof($result_raw) !== 0){
 			$result = TextFormat::RED."There were some problems with your config.yml, see below:\n".TextFormat::RESET;
-			foreach($result_raw as $key => $value){
-				$result .= "'{$key}' - {$value}\n";
+			foreach($result_raw as $value){
+				$result .= "{$value}\n";
 			}
-			$this->getLogger()->error($result);
+			$this->getLogger()->error(rtrim($result));
+			$this->getServer()->getPluginManager()->disablePlugin($this);
+			return false;
+		}
+		$result_raw = ConfigUtils::verify_event($eventConfig);
+		if(sizeof($result_raw) !== 0){
+			$result = TextFormat::RED."There were some problems with your events.yml, see below:\n".TextFormat::RESET;
+			foreach($result_raw as $value){
+				$result .= "{$value}\n";
+			}
+			$this->getLogger()->error(rtrim($result));
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return false;
 		}
