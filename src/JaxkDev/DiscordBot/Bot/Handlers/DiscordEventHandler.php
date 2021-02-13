@@ -129,6 +129,9 @@ class DiscordEventHandler{
 			if($permissions->ban_members){
 				/** @noinspection PhpUnhandledExceptionInspection */
 				$guild->bans->freshen()->done(function() use ($guild){
+					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->bans)." bans from server '".
+						$guild->name."' (".$guild->id.")");
+					if(sizeof($guild->bans) === 0) return;
 					$pk = new DiscordDataDump();
 					$pk->setTimestamp(time());
 					/** @var DiscordBan $ban */
@@ -136,8 +139,6 @@ class DiscordEventHandler{
 						$pk->addBan(ModelConverter::genModelBan($ban));
 					}
 					$this->client->getThread()->writeOutboundData($pk);
-					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->bans)." bans from server '".
-						$guild->name."' (".$guild->id.")");
 				}, function() use ($guild){
 					MainLogger::getLogger()->warning("Failed to fetch bans from server '".$guild->name."' (".$guild->id.")");
 				});
@@ -160,6 +161,9 @@ class DiscordEventHandler{
 			if($permissions->manage_guild){
 				/** @noinspection PhpUnhandledExceptionInspection */
 				$guild->invites->freshen()->done(function() use ($guild){
+					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->invites).
+						" invites from server '".$guild->name."' (".$guild->id.")");
+					if(sizeof($guild->invites) === 0) return;
 					$pk = new DiscordDataDump();
 					$pk->setTimestamp(time());
 					/** @var DiscordInvite $invite */
@@ -167,8 +171,6 @@ class DiscordEventHandler{
 						$pk->addInvite(ModelConverter::genModelInvite($invite));
 					}
 					$this->client->getThread()->writeOutboundData($pk);
-					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->invites).
-						" invites from server '".$guild->name."' (".$guild->id.")");
 				}, function() use ($guild){
 					MainLogger::getLogger()->warning("Failed to fetch invites from server '".$guild->name."' (".$guild->id.")");
 				});
