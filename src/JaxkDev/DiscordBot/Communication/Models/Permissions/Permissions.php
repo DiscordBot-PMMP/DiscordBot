@@ -12,8 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models\Permissions;
 
-use JaxkDev\DiscordBot\Utils;
-
 abstract class Permissions implements \Serializable{
 
 	/*
@@ -96,8 +94,9 @@ abstract class Permissions implements \Serializable{
 		$permission = strtolower($permission);
 		$posPermissions = $this->getPossiblePermissions();
 
-		Utils::assert(in_array($permission, array_keys($posPermissions)),
-			"Permission '{$permission}' cannot be set to a '".get_parent_class($this)."'");
+		if(!in_array($permission, array_keys($posPermissions))){
+			throw new \AssertionError("Invalid permission '{$permission}' for a '".get_parent_class($this)."'");
+		}
 
 		if($this->permissions[$permission] === $state) return $this;
 		$this->permissions[$permission] = $state;

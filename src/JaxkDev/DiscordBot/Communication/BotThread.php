@@ -15,7 +15,6 @@ namespace JaxkDev\DiscordBot\Communication;
 use AttachableThreadedLogger;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Utils;
 use pocketmine\Thread;
 use pocketmine\utils\MainLogger;
 use Volatile;
@@ -60,7 +59,9 @@ class BotThread extends Thread{
 		return array_map(function($data){
 			/** @var Packet $packet */
 			$packet = unserialize($data);
-			Utils::assert($packet instanceof Packet);
+			if(!$packet instanceof Packet){
+				throw new \AssertionError("Data did not unserialize to a Packet.");
+			}
 			return $packet;
 		}, $this->inboundData->chunk($count, false));
 	}
@@ -71,7 +72,9 @@ class BotThread extends Thread{
 
 	//TODO Investigate best solution for status communication (refer to new ready packet)
 	public function setStatus(int $status): void{
-		Utils::assert($status >= 0 and $status < 10);
+		if(!in_array($status, [0,1,2,8,9])){
+			throw new \AssertionError("Invalid thread status.");
+		}
 		$this->status = $status;
 	}
 

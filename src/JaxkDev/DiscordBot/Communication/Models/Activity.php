@@ -12,8 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models;
 
-use JaxkDev\DiscordBot\Utils;
-
 class Activity implements \Serializable{
 
 	const
@@ -53,7 +51,9 @@ class Activity implements \Serializable{
 	}
 
 	public function setType(?int $type): void{
-		Utils::assert($type >= self::TYPE_PLAYING and $type <= self::TYPE_COMPETING);
+		if($type !== null and ($type < self::TYPE_PLAYING or $type > self::TYPE_COMPETING)){
+			throw new \AssertionError("Invalid type '{$type}'");
+		}
 		$this->type = $type;
 	}
 

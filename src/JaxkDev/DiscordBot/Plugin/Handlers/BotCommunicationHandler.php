@@ -48,7 +48,6 @@ use JaxkDev\DiscordBot\Plugin\Events\DiscordServerJoined;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordServerUpdated;
 use JaxkDev\DiscordBot\Plugin\Main;
 use JaxkDev\DiscordBot\Plugin\Storage;
-use JaxkDev\DiscordBot\Utils;
 
 class BotCommunicationHandler{
 
@@ -110,19 +109,27 @@ class BotCommunicationHandler{
 
 		/** @var Server $server */
 		$server = Storage::getServer($message->getServerId());
-		Utils::assert($server instanceof Server);
+		if(!$server instanceof Server){
+			throw new \AssertionError("Server '{$message->getServerId()}' not found in storage.");
+		}
 
 		/** @var Channel $channel */
 		$channel = Storage::getChannel($message->getChannelId());
-		Utils::assert($channel instanceof Channel);
+		if(!$channel instanceof Channel){
+			throw new \AssertionError("Channel '{$message->getChannelId()}' not found in storage.");
+		}
 
 		/** @var Member $author */
 		$author = Storage::getMember($message->getAuthorId()??"");
-		Utils::assert($author instanceof Member);
+		if(!$author instanceof Member){
+			throw new \AssertionError("Member '{$message->getAuthorId()}' not found in storage.");
+		}
 
 		/** @var User $user */
 		$user = Storage::getUser($author->getUserId());
-		Utils::assert($user instanceof User);
+		if(!$user instanceof User){
+			throw new \AssertionError("User '{$author->getUserId()}' not found in storage.");
+		}
 
 		$formatted = str_replace(["{TIME}", "{USER_ID}", "{USERNAME}", "{USER_DISCRIMINATOR}", "{SERVER_ID}",
 			"{SERVER_NAME}", "{CHANNEL_ID}", "{CHANNEL_NAME}", "{MESSAGE}"], [
@@ -223,7 +230,9 @@ class BotCommunicationHandler{
 
 		/** @var Server $server */
 		$server = Storage::getServer($packet->getMember()->getServerId());
-		Utils::assert($server instanceof Server);
+		if(!$server instanceof Server){
+			throw new \AssertionError("Server '{$packet->getMember()->getServerId()}' not found for member '{$packet->getMember()->getId()}'");
+		}
 
 		if(!in_array($server->getId(), $config["servers"])) return true;
 
@@ -254,18 +263,24 @@ class BotCommunicationHandler{
 
 		/** @var Member $member */
 		$member = Storage::getMember($packet->getMemberID());
-		Utils::assert($member instanceof Member);
+		if(!$member instanceof Member){
+			throw new \AssertionError("Member '{$packet->getMemberID()}' not found in storage.");
+		}
 
 		/** @var Server $server */
 		$server = Storage::getServer($member->getServerId());
-		Utils::assert($server instanceof Server);
+		if(!$server instanceof Server){
+			throw new \AssertionError("Server '{$member->getServerId()}' not found for member '{$member->getId()}'");
+		}
 
 		//Have to fetch member first because onLeave we dont have their data direct from discord, so use cache :)
 		if(!in_array($server->getId(), $config["servers"])) return true;
 
 		/** @var User $user */
 		$user = Storage::getUser($member->getUserId());
-		Utils::assert($user instanceof User);
+		if(!$user instanceof User){
+			throw new \AssertionError("User '{$member->getUserId()}' not found in storage.");
+		}
 
 		Storage::removeMember($member->getId());
 

@@ -18,7 +18,6 @@ use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
 use JaxkDev\DiscordBot\Plugin\Handlers\PocketMineEventHandler;
 use JaxkDev\DiscordBot\Plugin\Handlers\BotCommunicationHandler;
-use JaxkDev\DiscordBot\Utils;
 use Phar;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
@@ -196,7 +195,9 @@ class Main extends PluginBase{
 		return array_map(function($data){
 			/** @var Packet $packet */
 			$packet = unserialize($data);
-			Utils::assert($packet instanceof Packet);
+			if(!$packet instanceof Packet){
+				throw new \AssertionError("Data did not unserialize to a Packet.");
+			}
 			return $packet;
 		}, $this->inboundData->chunk($count, false));
 	}

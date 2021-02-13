@@ -12,8 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Communication\Models;
 
-use JaxkDev\DiscordBot\Utils;
-
 class Message implements \Serializable{
 
 	const TYPE_NORMAL = 0;
@@ -68,7 +66,9 @@ class Message implements \Serializable{
 	 * @param int $type Message::TYPE_X Constant.
 	 */
 	public function setType(int $type): void{
-		Utils::assert($type >= self::TYPE_NORMAL and $type <= self::TYPE_NORMAL);
+		if($type < self::TYPE_NORMAL or $type > self::TYPE_NORMAL){
+			throw new \AssertionError("Invalid type '{$type}'");
+		}
 		$this->type = $type;
 	}
 
@@ -77,7 +77,9 @@ class Message implements \Serializable{
 	}
 
 	public function setContent(string $content): void{
-		Utils::assert(strlen($content) <= 2000, "Message content cannot exceed 2000 characters.");
+		if(strlen($content) > 2000){
+			throw new \AssertionError("Message content cannot exceed 2000 characters.");
+		}
 		$this->content = $content;
 	}
 
