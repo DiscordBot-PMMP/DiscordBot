@@ -43,7 +43,7 @@ class DiscordServerJoined extends DiscordBotEvent implements Cancellable{
 	 * @param Server    $server
 	 * @param Role[]    $roles
 	 * @param Channel[] $channels
-	 * @param array     $members
+	 * @param Member[]  $members
 	 */
 	public function __construct(Plugin $plugin, Server $server, array $roles, array $channels, array $members){
 		parent::__construct($plugin);

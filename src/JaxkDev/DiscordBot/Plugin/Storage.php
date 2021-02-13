@@ -366,17 +366,4 @@ class Storage{
 	public static function setTimestamp(int $timestamp): void{
 		self::$timestamp = $timestamp;
 	}
-
-	/*public static function reset(): void{
-		self::$serverMap = [];
-		self::$channelServerMap = [];
-		self::$channelMap = [];
-		self::$roleMap = [];
-		self::$roleServerMap = [];
-		self::$memberMap = [];
-		self::$memberServerMap = [];
-		self::$userMap = [];
-		self::$botUser = null;
-		self::$timestamp = 0;
-	}*/
 }
