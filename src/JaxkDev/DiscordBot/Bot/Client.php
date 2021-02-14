@@ -262,12 +262,12 @@ class Client{
 		return true;
 	}
 
-	/** @var Throwable[] $data */
+	/** @var array $data */
 	public function discordErrorHandler(array $data): void{
 		$this->close($data[0]??null);
 	}
 
-	public function close(?Throwable $error = null): void{
+	public function close($error = null): void{ /** @phpstan-ignore-line  */
 		if($this->thread->getStatus() === Protocol::THREAD_STATUS_CLOSED) return;
 		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
 		if($this->client instanceof Discord){

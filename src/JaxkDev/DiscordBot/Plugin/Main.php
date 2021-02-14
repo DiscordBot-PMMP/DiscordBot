@@ -15,12 +15,12 @@ namespace JaxkDev\DiscordBot\Plugin;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
-use JaxkDev\DiscordBot\Libs\React\Promise\Deferred;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
 use JaxkDev\DiscordBot\Plugin\Handlers\PocketMineEventHandler;
 use JaxkDev\DiscordBot\Plugin\Handlers\BotCommunicationHandler;
 use Phar;
 use pocketmine\plugin\PluginBase;
+use pocketmine\plugin\PluginException;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
 use pocketmine\utils\MainLogger;
@@ -56,25 +56,19 @@ class Main extends PluginBase{
 	private $eventConfig;
 	/** @var array */
 	private $config;
-	/** @var Deferred */
-	private $pd;
 
 	public function onLoad(){
 		self::$instance = $this;
-		$this->pd = new Deferred();
-		$p = $this->pd->promise();
-		$p->then(function($V){
-			var_dump("Done, {$V}");
-		}, function(\Throwable $V){
-			var_dump("rejected, {$V->getMessage()}");
-		});
+		if(Phar::running(true) === ""){
+			throw new PluginException("DiscordBot must be run as a phar plugin.");
+		}
 
 		if(!defined("JaxkDev\DiscordBot\COMPOSER")){
 			define("JaxkDev\DiscordBot\DATA_PATH", $this->getDataFolder());
 			define("JaxkDev\DiscordBot\VERSION", "v".$this->getDescription()->getVersion());
-			define("JaxkDev\DiscordBot\COMPOSER", (Phar::running(true) !== "") ? Phar::running(true)."/vendor/autoload.php" : dirname(__DIR__, 4)."/DiscordBot/vendor/autoload.php");
+			define("JaxkDev\DiscordBot\COMPOSER", Phar::running(true)."/vendor/autoload.php");
 		}
-		if (!\function_exists('JaxkDev\DiscordBot\Libs\React\Promise\resolve')) {
+		if (!function_exists('JaxkDev\DiscordBot\Libs\React\Promise\resolve')) {
 			/** @noinspection PhpIncludeInspection */
 			require Phar::running(true).'/src/JaxkDev/DiscordBot/Libs/React/Promise/functions.php';
 		}
@@ -95,9 +89,6 @@ class Main extends PluginBase{
 	}
 
 	public function onEnable(){
-
-		$this->pd->reject(new \Exception("Yeah no can do."));
-
 		if(!$this->loadConfig()) return;
 		if(extension_loaded("xdebug")){
 			$this->getLogger()->emergency("Plugin will not run with xdebug due to the performance drops.");
