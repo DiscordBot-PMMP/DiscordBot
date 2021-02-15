@@ -104,7 +104,7 @@ class DiscordEventHandler{
 		$ac->setMessage("PocketMine-MP v".\pocketmine\VERSION);
 		$ac->setType(Activity::TYPE_PLAYING);
 		$ac->setStatus(Activity::STATUS_ONLINE);
-		$this->client->updatePresence($ac);
+		//$this->client->updatePresence($ac);
 
 		// Register all other events.
 		$this->registerEvents();

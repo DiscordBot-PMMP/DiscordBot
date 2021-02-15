@@ -13,17 +13,11 @@
 namespace JaxkDev\DiscordBot\Bot;
 
 use Discord\Discord;
-use Discord\Parts\Channel\Channel as DiscordChannel;
-use Discord\Parts\Guild\Guild as DiscordGuild;
-use Discord\Parts\User\Activity as DiscordActivity;
 use Error;
 use ErrorException;
-use Exception;
 use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\Bot\Handlers\CommunicationHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
-use JaxkDev\DiscordBot\Communication\Models\Activity;
-use JaxkDev\DiscordBot\Communication\Models\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use Monolog\Logger;
@@ -212,40 +206,6 @@ class Client{
 
 	public function getCommunicationHandler(): CommunicationHandler{
 		return $this->communicationHandler;
-	}
-
-	/*
-	 * Note, It will only show warning ONCE per channel/guild that fails.
-	 * Fix on the way hopefully.
-	 */
-	public function sendMessage(Message $message): void{
-		if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY) return;
-
-		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
-		$this->client->guilds->fetch($message->getServerId())->done(function(DiscordGuild $guild) use($message){
-			$guild->channels->fetch($message->getChannelId())->done(function(DiscordChannel $channel) use($message){
-				$channel->sendMessage($message->getContent());
-				MainLogger::getLogger()->debug("Sent message(".strlen($message->getContent()).") to ({$message->getServerId()}|{$message->getChannelId()})");
-			}, function() use($message){
-				MainLogger::getLogger()->warning("Failed to fetch channel {$message->getChannelId()} in server {$message->getServerId()} while attempting to send message.");
-			});
-		}, function() use($message){
-			MainLogger::getLogger()->warning("Failed to fetch server {$message->getServerId()} while attempting to send message.");
-		});
-	}
-
-	public function updatePresence(Activity $activity): bool{
-		$presence = new DiscordActivity($this->client, [
-			'name' => $activity->getMessage(),
-			'type' => $activity->getType()
-		]);
-
-		try{
-			$this->client->updatePresence($presence, $activity->getStatus() === Activity::STATUS_IDLE, $activity->getStatus());
-			return true;
-		}catch (Exception $e){
-			return false;
-		}
 	}
 
 	public function logDebugInfo(): void{

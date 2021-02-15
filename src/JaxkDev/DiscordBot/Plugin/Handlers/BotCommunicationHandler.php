@@ -12,10 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
+use JaxkDev\DiscordBot\Communication\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Member;
 use JaxkDev\DiscordBot\Communication\Models\Server;
 use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanAdd;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanRemove;
@@ -40,6 +42,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventReady;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Plugin\ApiResolver;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordChannelDeleted;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordChannelUpdated;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
@@ -63,7 +66,15 @@ class BotCommunicationHandler{
 
 	public function handle(Packet $packet): bool{
 		// If's instances instead of ID switching due to phpstan/types.
-		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
+		if($packet instanceof Resolution){
+			ApiResolver::handleResolution($packet);
+			return true;
+		}
+		if($packet instanceof Heartbeat){
+			$this->lastHeartbeat = $packet->getHeartbeat();
+			return true;
+		}
+
 		if($packet instanceof DiscordEventMemberJoin) return $this->handleMemberJoin($packet);
 		if($packet instanceof DiscordEventMemberLeave) return $this->handleMemberLeave($packet);
 		if($packet instanceof DiscordEventMemberUpdate) return $this->handleMemberUpdate($packet);
@@ -88,14 +99,35 @@ class BotCommunicationHandler{
 		return false;
 	}
 
-	private function handleHeartbeat(Heartbeat $packet): bool{
-		$this->lastHeartbeat = $packet->getHeartbeat();
-		return true;
-	}
-
 	private function handleReady(): bool{
 		(new DiscordReady($this->plugin))->call();
 		//TODO Implement into Main's tick to verify bot is ready for heartbeats etc.
+
+		//TEST ACK resolving...
+		$act = $this->plugin->getApi()->createActivity(Activity::STATUS_DND, Activity::TYPE_PLAYING, "TestAck");
+		//Should resolve.
+		$this->plugin->getApi()->updateActivity($act)->done(function($v){
+			var_dump("Resolved norm");
+			var_dump($v);
+		}, function($v){
+			var_dump("Rejected norm");
+			var_dump($v);
+		});
+		$c = new Channel();
+		$c->setId("2313213");
+		$c->setServerId("23424324");
+		$c->setName("channel test doesnt exist.");
+		$msg = $this->plugin->getApi()->createMessage($c, "Content !");
+		if($msg !== null){
+			//Should reject, with server not found.
+			$this->plugin->getApi()->sendMessage($msg)->done(function($v){
+				var_dump("Resolved msg");
+				var_dump($v);
+			}, function($v){
+				var_dump("Rejected msg");
+				var_dump($v);
+			});
+		}
 		return true;
 	}
 

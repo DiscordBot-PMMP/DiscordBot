@@ -17,14 +17,15 @@ use JaxkDev\DiscordBot\Communication\Models\Channel;
 use JaxkDev\DiscordBot\Communication\Models\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestUpdateActivity;
+use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 
 /**
  * For internal and developers use for interacting with the discord bot.
- * @see Main::getAPI() To get instance.
+ * @see Main::getApi() To get instance.
  * @see Storage For all discord data.
  * @version 2.0.0
  */
-class API{
+class Api{
 
 	/** @var Main */
 	private $plugin;
@@ -35,10 +36,11 @@ class API{
 
 	/**
 	 * Creates the Message model ready for sending, or null if not possible to create the message at this time.
-	 * @see API::sendMessage For sending the message.
+	 *
 	 * @param Channel|string $channel Channel model or channel ID.
 	 * @param string         $content Content, <2000 in length.
 	 * @return Message|null
+	 * @see Api::sendMessage For sending the message.
 	 */
 	public function createMessage($channel, string $content): ?Message{
 		if(!$channel instanceof Channel){
@@ -58,23 +60,27 @@ class API{
 
 	/**
 	 * Sends the Message to discord.
-	 * @see API::createMessage For creating a message
+	 *
 	 * @param Message $message
+	 * @return PromiseInterface
+	 * @see Api::createMessage For creating a message
 	 */
-	public function sendMessage(Message $message): void{
+	public function sendMessage(Message $message): PromiseInterface{
 		$pk = new PluginRequestSendMessage();
 		$pk->setMessage($message);
 		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
 	}
 
 	/**
 	 * Creates the Activity model ready for sending/updating.
-	 * @see API::updateActivity For updating the activity.
-	 * @see Activity            For Status & Type constants.
+	 *
 	 * @param string      $status
 	 * @param int|null    $type
 	 * @param string|null $message
 	 * @return Activity
+	 * @see Api::updateActivity For updating the activity.
+	 * @see Activity            For Status & Type constants.
 	 */
 	public function createActivity(string $status, ?int $type = null, ?string $message = null): Activity{
 		$activity = new Activity();
@@ -86,12 +92,15 @@ class API{
 
 	/**
 	 * Sends the new activity to replace the current one the bot has.
-	 * @see API::createActivity
+	 *
 	 * @param Activity $activity
+	 * @return PromiseInterface
+	 * @see Api::createActivity
 	 */
-	public function updateActivity(Activity $activity): void{
+	public function updateActivity(Activity $activity): PromiseInterface{
 		$pk = new PluginRequestUpdateActivity();
 		$pk->setActivity($activity);
 		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
 	}
 }

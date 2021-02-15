@@ -49,7 +49,7 @@ class Main extends PluginBase{
 	/** @var PocketMineEventHandler */
 	private $pocketmineEventHandler;
 
-	/** @var API */
+	/** @var Api */
 	private $api;
 
 	/** @var array */
@@ -83,7 +83,7 @@ class Main extends PluginBase{
 		$this->inboundData = new Volatile();
 		$this->outboundData = new Volatile();
 
-		$this->api = new API($this);
+		$this->api = new Api($this);
 		$this->botCommsHandler = new BotCommunicationHandler($this);
 		$this->pocketmineEventHandler = new PocketMineEventHandler($this, yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml"));
 	}
@@ -222,7 +222,7 @@ class Main extends PluginBase{
 		return $this->eventConfig;
 	}
 
-	public function getAPI(): API{
+	public function getApi(): Api{
 		return $this->api;
 	}
 
