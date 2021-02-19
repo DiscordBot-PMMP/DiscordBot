@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Models;
+namespace JaxkDev\DiscordBot\Models;
 
 class Invite implements \Serializable{
 

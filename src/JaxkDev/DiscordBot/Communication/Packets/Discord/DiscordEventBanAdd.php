@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Communication\Models\Ban;
+use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordEventBanAdd extends Packet{

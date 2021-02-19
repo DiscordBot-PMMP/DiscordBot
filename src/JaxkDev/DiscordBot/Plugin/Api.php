@@ -12,9 +12,9 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-use JaxkDev\DiscordBot\Communication\Models\Activity;
-use JaxkDev\DiscordBot\Communication\Models\Channel;
-use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Models\Activity;
+use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestUpdateActivity;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;

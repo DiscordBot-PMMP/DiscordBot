@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Models\Permissions;
+namespace JaxkDev\DiscordBot\Models\Permissions;
 
 class RolePermissions extends Permissions{
 

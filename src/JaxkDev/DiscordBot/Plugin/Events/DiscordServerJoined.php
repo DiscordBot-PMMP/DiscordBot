@@ -12,10 +12,10 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Communication\Models\Channel;
-use JaxkDev\DiscordBot\Communication\Models\Member;
-use JaxkDev\DiscordBot\Communication\Models\Role;
-use JaxkDev\DiscordBot\Communication\Models\Server;
+use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Role;
+use JaxkDev\DiscordBot\Models\Server;
 use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 

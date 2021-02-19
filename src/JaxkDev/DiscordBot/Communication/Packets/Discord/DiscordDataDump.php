@@ -12,13 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Communication\Models\Ban;
-use JaxkDev\DiscordBot\Communication\Models\Channel;
-use JaxkDev\DiscordBot\Communication\Models\Invite;
-use JaxkDev\DiscordBot\Communication\Models\Member;
-use JaxkDev\DiscordBot\Communication\Models\Role;
-use JaxkDev\DiscordBot\Communication\Models\Server;
-use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Models\Ban;
+use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Invite;
+use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Role;
+use JaxkDev\DiscordBot\Models\Server;
+use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordDataDump extends Packet{

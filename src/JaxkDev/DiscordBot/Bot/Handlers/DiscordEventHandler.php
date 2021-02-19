@@ -24,7 +24,7 @@ use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
-use JaxkDev\DiscordBot\Communication\Models\Activity;
+use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanAdd;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanRemove;

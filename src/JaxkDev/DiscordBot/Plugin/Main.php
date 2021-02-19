@@ -82,10 +82,6 @@ class Main extends PluginBase{
 
 		$this->inboundData = new Volatile();
 		$this->outboundData = new Volatile();
-
-		$this->api = new Api($this);
-		$this->botCommsHandler = new BotCommunicationHandler($this);
-		$this->pocketmineEventHandler = new PocketMineEventHandler($this, yaml_parse_file($this->getDataFolder().DIRECTORY_SEPARATOR."events.yml"));
 	}
 
 	public function onEnable(){
@@ -94,6 +90,10 @@ class Main extends PluginBase{
 			$this->getLogger()->emergency("Plugin will not run with xdebug due to the performance drops.");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 		}
+
+		$this->api = new Api($this);
+		$this->botCommsHandler = new BotCommunicationHandler($this);
+		$this->pocketmineEventHandler = new PocketMineEventHandler($this, $this->eventConfig);
 
 		$this->getLogger()->debug("Starting DiscordBot Thread...");
 		$this->discordBot = new BotThread($this->getServer()->getLogger(), $this->config, $this->outboundData, $this->inboundData);
@@ -183,9 +183,13 @@ class Main extends PluginBase{
 
 		if(($currentTick % 20) === 0){
 			//Run every second. [Faster/More accurate over bots tick]
-			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_READY) $this->botCommsHandler->checkHeartbeat();
-			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_CLOSED) $this->stopAll();
-			$this->botCommsHandler->sendHeartbeat();
+			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_READY){
+				$this->botCommsHandler->checkHeartbeat();
+				$this->botCommsHandler->sendHeartbeat();
+			}
+			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_CLOSED){
+				$this->stopAll();
+			}
 		}
 
 		if($this->inboundData->count() > 2000){

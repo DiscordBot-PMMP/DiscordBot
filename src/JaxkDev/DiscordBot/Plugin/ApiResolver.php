@@ -17,7 +17,6 @@ use JaxkDev\DiscordBot\Libs\React\Promise\Deferred;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 
 /**
- * For internal use only, maps any API Call packets going out by their UID and then links a deferred to it.
  * @internal
  */
 abstract class ApiResolver{
@@ -46,6 +45,7 @@ abstract class ApiResolver{
 			}else{
 				$d->reject(new \Exception($packet->getRejectReason()??"No rejection reason provided."));
 			}
+			unset(self::$map[$packet->getPid()]);
 		}
 	}
 

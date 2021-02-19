@@ -198,8 +198,7 @@ abstract class ConfigUtils{
 							$r[] = "Invalid '{$event}.{$key}.{$type}', should be an array of string ID's.";
 						}else{
 							foreach($data[$key][$type] as $v){
-								if(!is_string($v)){
-									//TODO, Is there a fixed length for Channel/Server IDs ?
+								if(!is_string($v) or (strlen($v) < 16 or strlen($v) > 18)){
 									$r[] = "Invalid value '".($v??"NULL")."' in '{$event}.{$key}.{$type}', should be a string.";
 								}
 							}

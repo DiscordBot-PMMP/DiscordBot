@@ -12,11 +12,10 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
-use JaxkDev\DiscordBot\Communication\Models\Activity;
-use JaxkDev\DiscordBot\Communication\Models\Channel;
-use JaxkDev\DiscordBot\Communication\Models\Member;
-use JaxkDev\DiscordBot\Communication\Models\Server;
-use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Server;
+use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanAdd;
@@ -101,33 +100,6 @@ class BotCommunicationHandler{
 
 	private function handleReady(): bool{
 		(new DiscordReady($this->plugin))->call();
-		//TODO Implement into Main's tick to verify bot is ready for heartbeats etc.
-
-		//TEST ACK resolving...
-		$act = $this->plugin->getApi()->createActivity(Activity::STATUS_DND, Activity::TYPE_PLAYING, "TestAck");
-		//Should resolve.
-		$this->plugin->getApi()->updateActivity($act)->done(function($v){
-			var_dump("Resolved norm");
-			var_dump($v);
-		}, function($v){
-			var_dump("Rejected norm");
-			var_dump($v);
-		});
-		$c = new Channel();
-		$c->setId("2313213");
-		$c->setServerId("23424324");
-		$c->setName("channel test doesnt exist.");
-		$msg = $this->plugin->getApi()->createMessage($c, "Content !");
-		if($msg !== null){
-			//Should reject, with server not found.
-			$this->plugin->getApi()->sendMessage($msg)->done(function($v){
-				var_dump("Resolved msg");
-				var_dump($v);
-			}, function($v){
-				var_dump("Rejected msg");
-				var_dump($v);
-			});
-		}
 		return true;
 	}
 

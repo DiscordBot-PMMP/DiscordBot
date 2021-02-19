@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Communication\Models\Message;
+use JaxkDev\DiscordBot\Models\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordEventMessageUpdate extends Packet{

@@ -70,7 +70,6 @@ class BotThread extends Thread{
 		$this->outboundData[] = serialize($packet);
 	}
 
-	//TODO Investigate best solution for status communication (refer to new ready packet)
 	public function setStatus(int $status): void{
 		if(!in_array($status, [0,1,2,8,9])){
 			throw new \AssertionError("Invalid thread status.");

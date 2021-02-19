@@ -12,8 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Communication\Models\Channel;
-use JaxkDev\DiscordBot\Communication\Models\Server;
+use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Plugin\Storage;
 use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;

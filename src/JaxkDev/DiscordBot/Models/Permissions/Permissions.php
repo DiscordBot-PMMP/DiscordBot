@@ -10,15 +10,9 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Models\Permissions;
+namespace JaxkDev\DiscordBot\Models\Permissions;
 
 abstract class Permissions implements \Serializable{
-
-	/*
-	 * TODO:
-	 * - ChannelPermissions (Permissions that override either a user/role)
-	 * 						(Remember a category is classed as a channel...)
-	 */
 
 	const VOICE_PERMISSIONS = [
 		"priority_speaker" => 256,

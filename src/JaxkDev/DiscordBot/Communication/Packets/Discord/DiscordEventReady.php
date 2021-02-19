@@ -14,14 +14,13 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-//TODO, Better to just tell the plugin were ready after data dump for heartbeats etc rather then have the plugin keep
-//'guessing' through thread status.
 class DiscordEventReady extends Packet{
+
 	public function serialize(): ?string{
-		return serialize([$this->UID]);
+		return serialize($this->UID);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID] = unserialize($serialized);
+		$this->UID = unserialize($serialized);
 	}
 }

@@ -12,8 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Communication\Models\Member;
-use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordEventMemberJoin extends Packet{

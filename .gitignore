@@ -4,6 +4,5 @@
 *.phar
 *.txt
 
-/test/timings/
 TEST.php
 PHPSTAN.php

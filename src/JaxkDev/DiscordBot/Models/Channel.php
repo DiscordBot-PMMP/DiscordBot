@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Models;
+namespace JaxkDev\DiscordBot\Models;
 
 //TODO, abstract class and make parents, TextChannel, VoiceChannel, CategoryChannel, DmChannel...
 class Channel implements \Serializable{

@@ -10,9 +10,9 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Models;
+namespace JaxkDev\DiscordBot\Models;
 
-use JaxkDev\DiscordBot\Communication\Models\Permissions\RolePermissions;
+use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 
 class Role implements \Serializable{
 

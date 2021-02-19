@@ -18,7 +18,7 @@ use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\User\Activity as DiscordActivity;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
-use JaxkDev\DiscordBot\Communication\Models\Activity;
+use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;

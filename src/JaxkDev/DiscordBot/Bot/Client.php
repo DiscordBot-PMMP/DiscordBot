@@ -13,6 +13,8 @@
 namespace JaxkDev\DiscordBot\Bot;
 
 use Discord\Discord;
+use Discord\Exceptions\IntentException;
+use Discord\WebSockets\Intents;
 use Error;
 use ErrorException;
 use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
@@ -65,10 +67,10 @@ class Client{
 		register_shutdown_function([$this, 'close']);
 
 		// Mono logger can have issues with other timezones, for now use UTC.
+		// Must be set globally due to internal methods in the rotating file handler.
 		// Note, this does not effect outside thread config.
-		// TODO CDT Investigate.
 		ini_set("date.timezone", "UTC");
-		MainLogger::getLogger()->debug("Log files will be in UTC timezone.");
+		MainLogger::getLogger()->debug("DiscordBot logs will be in UTC timezone.");
 
 		Packet::$UID_COUNT = 1;
 
@@ -85,7 +87,15 @@ class Client{
 			$httpLogger->pushHandler($handler);
 		}
 
-		// TODO Intents.
+		$intents = [
+			Intents::GUILDS,
+			Intents::GUILD_MEMBERS,
+			Intents::GUILD_BANS,
+			Intents::GUILD_INVITES,
+			Intents::GUILD_PRESENCES,
+			Intents::GUILD_MESSAGES,
+			Intents::DIRECT_MESSAGES
+		];
 
 		$socket_opts = [];
 		if($config["discord"]["usePluginCacert"]){
@@ -95,14 +105,18 @@ class Client{
 			];
 		}
 
-		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
-		$this->client = new Discord([
-			'token' => $config['discord']['token'],
-			'logger' => $logger,
-			'httpLogger' => $httpLogger,
-			'socket_options' => $socket_opts,
-			'loadAllMembers' => true
-		]);
+		try{
+			$this->client = new Discord([
+				'token' => $config['discord']['token'],
+				'logger' => $logger,
+				'httpLogger' => $httpLogger,
+				'socket_options' => $socket_opts,
+				'loadAllMembers' => true,
+				'intents' => $intents
+			]);
+		}catch(IntentException $e){
+			$this->close($e);
+		}
 
 		$this->config['discord']['token'] = "REDACTED";
 
@@ -180,9 +194,10 @@ class Client{
 		}
 
 		if(($this->tickCount % 20) === 0){
-			//Run every second TODO Check own status before sending/checking heartbeat...
-			$this->communicationHandler->checkHeartbeat();
-			$this->communicationHandler->sendHeartbeat();
+			if($this->thread->getStatus() === Protocol::THREAD_STATUS_READY){
+				$this->communicationHandler->checkHeartbeat();
+				$this->communicationHandler->sendHeartbeat();
+			}
 
 			//GC Tests.
 			if(microtime(true)-$this->lastGCCollection >= 600){
@@ -230,15 +245,15 @@ class Client{
 	public function close($error = null): void{ /** @phpstan-ignore-line  */
 		if($this->thread->getStatus() === Protocol::THREAD_STATUS_CLOSED) return;
 		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
+		if($error instanceof Throwable){
+			MainLogger::getLogger()->logException($error);
+		}
 		if($this->client instanceof Discord){
 			try{
 				$this->client->close(true);
 			}catch (Error $e){
-				MainLogger::getLogger()->debug("Failed to close client, probably due it not being started.");
+				MainLogger::getLogger()->debug("Failed to close client, probably not started.");
 			}
-		}
-		if($error instanceof Throwable){
-			MainLogger::getLogger()->logException($error);
 		}
 		MainLogger::getLogger()->debug("Client closed.");
 		exit(0);

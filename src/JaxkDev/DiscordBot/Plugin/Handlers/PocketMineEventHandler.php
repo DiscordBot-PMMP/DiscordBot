@@ -39,7 +39,6 @@ class PocketMineEventHandler implements Listener{
 	 * @param PlayerJoinEvent $event
 	 */
 	public function onJoin(PlayerJoinEvent $event): void{
-		// TODO Function below.
 		$config = $this->eventConfig['member_join']['toDiscord'];
 		if(count($config['channels']) === 0) return;
 

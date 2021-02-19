@@ -22,16 +22,16 @@ use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\Guild\Guild as DiscordServer;
-use JaxkDev\DiscordBot\Communication\Models\Activity;
-use JaxkDev\DiscordBot\Communication\Models\Ban;
-use JaxkDev\DiscordBot\Communication\Models\Channel;
-use JaxkDev\DiscordBot\Communication\Models\Invite;
-use JaxkDev\DiscordBot\Communication\Models\Member;
-use JaxkDev\DiscordBot\Communication\Models\Message;
-use JaxkDev\DiscordBot\Communication\Models\Permissions\RolePermissions;
-use JaxkDev\DiscordBot\Communication\Models\Role;
-use JaxkDev\DiscordBot\Communication\Models\Server;
-use JaxkDev\DiscordBot\Communication\Models\User;
+use JaxkDev\DiscordBot\Models\Activity;
+use JaxkDev\DiscordBot\Models\Ban;
+use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Invite;
+use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Message;
+use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
+use JaxkDev\DiscordBot\Models\Role;
+use JaxkDev\DiscordBot\Models\Server;
+use JaxkDev\DiscordBot\Models\User;
 
 abstract class ModelConverter{
 
