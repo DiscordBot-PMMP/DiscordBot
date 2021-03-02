@@ -112,6 +112,7 @@ class Client{
 				'httpLogger' => $httpLogger,
 				'socket_options' => $socket_opts,
 				'loadAllMembers' => true,
+				'storeMessages' => true,
 				'intents' => $intents
 			]);
 		}catch(IntentException $e){

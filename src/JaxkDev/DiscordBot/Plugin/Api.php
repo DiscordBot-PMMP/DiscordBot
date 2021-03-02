@@ -13,7 +13,8 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Models\Activity;
-use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestUpdateActivity;
@@ -23,7 +24,6 @@ use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
  * For internal and developers use for interacting with the discord bot.
  * @see Main::getApi() To get instance.
  * @see Storage For all discord data.
- * @version 2.0.0
  */
 class Api{
 
@@ -51,7 +51,7 @@ class Api{
 		if($bot === null) return null;
 
 		$msg = new Message();
-		$msg->setServerId($channel->getServerId());
+		if($channel instanceof ServerChannel) $msg->setServerId($channel->getServerId());
 		$msg->setChannelId($channel->getId());
 		$msg->setAuthorId($bot->getId());
 		$msg->setContent($content);

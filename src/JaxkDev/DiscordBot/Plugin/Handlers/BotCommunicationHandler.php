@@ -12,7 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
-use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Models\User;
@@ -156,31 +157,33 @@ class BotCommunicationHandler{
 	}
 
 	private function handleChannelCreate(DiscordEventChannelCreate $packet): bool{
-		$e = new DiscordChannelUpdated($this->plugin, $packet->getChannel());
+		$c = $packet->getChannel();
+		$e = new DiscordChannelUpdated($this->plugin, $c);
 		$e->call();
 		if($e->isCancelled()) return true;
-		Storage::addChannel($packet->getChannel());
-		$this->plugin->getServer()->broadcastMessage("Channel '".$packet->getChannel()->getName()."' created.");
+		Storage::addChannel($c);
+		$this->plugin->getServer()->broadcastMessage("Channel '".(($c instanceof ServerChannel) ? $c->getName() : $c->getId())."' created.");
 		return true;
 	}
 
 	private function handleChannelUpdate(DiscordEventChannelUpdate $packet): bool{
-		$e = new DiscordChannelUpdated($this->plugin, $packet->getChannel());
+		$c = $packet->getChannel();
+		$e = new DiscordChannelUpdated($this->plugin, $c);
 		$e->call();
 		if($e->isCancelled()) return true;
-		Storage::updateChannel($packet->getChannel());
-		$this->plugin->getServer()->broadcastMessage("Channel '".$packet->getChannel()->getName()."' updated.");
+		Storage::updateChannel($c);
+		$this->plugin->getServer()->broadcastMessage("Channel '".(($c instanceof ServerChannel) ? $c->getName() : $c->getId())."' updated.");
 		return true;
 	}
 
 	private function handleChannelDelete(DiscordEventChannelDelete $packet): bool{
-		$channel = Storage::getChannel($packet->getChannelId());
-		if($channel === null) return false;
-		$e = new DiscordChannelDeleted($this->plugin, $channel);
+		$c = Storage::getChannel($packet->getChannelId());
+		if($c === null) return false;
+		$e = new DiscordChannelDeleted($this->plugin, $c);
 		$e->call();
 		if($e->isCancelled()) return true;
-		$this->plugin->getServer()->broadcastMessage("Channel '".$channel->getName()."' deleted.");
-		Storage::removeChannel($packet->getChannelId());
+		Storage::removeChannel($c);
+		$this->plugin->getServer()->broadcastMessage("Channel '".(($c instanceof ServerChannel) ? $c->getName() : $c->getId())."' deleted.");
 		return true;
 	}
 

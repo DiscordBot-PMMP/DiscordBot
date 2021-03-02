@@ -87,8 +87,13 @@ class Main extends PluginBase{
 	public function onEnable(){
 		if(!$this->loadConfig()) return;
 		if(extension_loaded("xdebug")){
-			$this->getLogger()->emergency("Plugin will not run with xdebug due to the performance drops.");
-			$this->getServer()->getPluginManager()->disablePlugin($this);
+			if(ini_get("xdebug.output_dir") === $this->getDataFolder()){
+				$this->getLogger()->warning("X-Debug is running, this will cause data pack to be ~3min long.");
+			}else{
+				$this->getLogger()->emergency("Plugin will not run with xdebug due to the performance drops.");
+				$this->getServer()->getPluginManager()->disablePlugin($this);
+				return;
+			}
 		}
 
 		$this->api = new Api($this);

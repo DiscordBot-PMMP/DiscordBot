@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordEventChannelCreate extends Packet{

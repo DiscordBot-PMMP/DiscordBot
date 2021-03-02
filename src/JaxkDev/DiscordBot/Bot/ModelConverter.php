@@ -12,8 +12,10 @@
 
 namespace JaxkDev\DiscordBot\Bot;
 
+use AssertionError;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
+use Discord\Parts\Channel\Overwrite;
 use Discord\Parts\Guild\Ban as DiscordBan;
 use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
@@ -24,10 +26,16 @@ use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\Guild\Guild as DiscordServer;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
-use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\DmChannel;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
+use JaxkDev\DiscordBot\Models\Channels\TextChannel;
+use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Message;
+use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Server;
@@ -46,6 +54,7 @@ abstract class ModelConverter{
 		$bitwise = $discordMember->guild->roles->offsetGet($discordMember->guild_id)->permissions->bitwise; //Everyone perms.
 		$roles = [];
 
+		//O(2n) -> O(n) by using same loop for permissions to add roles.
 		if($discordMember->guild->owner_id == $discordMember->id){
 			$bitwise |= 0x8; // Add administrator permission
 			foreach($discordMember->roles ?? [] as $role){
@@ -94,27 +103,116 @@ abstract class ModelConverter{
 		return $s;
 	}
 
-	static public function genModelChannel(DiscordChannel $discordChannel): Channel{
-		if($discordChannel->type !== DiscordChannel::TYPE_TEXT || $discordChannel->guild_id === null){
-			//Temporary.
-			throw new \AssertionError("Discord channel type must be `text` to generate model channel.");
+	static private function applyServerChannelDetails(DiscordChannel $dc, ServerChannel $c): ServerChannel{
+		$c->setId($dc->id);
+		$c->setName($dc->name);
+		$c->setPosition($dc->position);
+		$c->setServerId($dc->guild_id);
+		/** @var Overwrite $overwrite */
+		foreach($dc->overwrites as $overwrite){
+			$allowed = new ChannelPermissions();
+			$allowed->setBitwise($overwrite->allow->bitwise);
+			$denied = new ChannelPermissions();
+			$denied->setBitwise($overwrite->deny->bitwise);
+			if($overwrite->type === Overwrite::TYPE_MEMBER){
+				$c->setAllowedMemberPermissions($overwrite->id, $allowed);
+				$c->setDeniedMemberPermissions($overwrite->id, $denied);
+			}elseif($overwrite->type === Overwrite::TYPE_ROLE){
+				$c->setAllowedRolePermissions($overwrite->id, $allowed);
+				$c->setDeniedRolePermissions($overwrite->id, $denied);
+			}else{
+				throw new AssertionError("Overwrite type unknown ? ({$overwrite->type})");
+			}
 		}
-		$c = new Channel();
-		$c->setId($discordChannel->id);
-		$c->setName($discordChannel->name);
-		$c->setDescription($discordChannel->topic);
-		$c->setCategory(null); // $discordChannel->parent_id (Channel ID, Channel TYPE CATEGORY.
-		$c->setServerId($discordChannel->guild_id);
+		return $c;
+	}
+
+	/**
+	 * Generates a model based on whatever type $channel is. (Excludes game store/group type)
+	 * @param DiscordChannel $channel
+	 * @return ?Channel Null if type is invalid/unused.
+	 */
+	static public function genModelChannel(DiscordChannel $channel): ?Channel{
+		switch($channel->type){
+			case DiscordChannel::TYPE_TEXT:
+			case DiscordChannel::TYPE_NEWS:
+				return ModelConverter::genModelTextChannel($channel);
+			case DiscordChannel::TYPE_VOICE:
+				return ModelConverter::genModelVoiceChannel($channel);
+			case DiscordChannel::TYPE_CATEGORY:
+				return ModelConverter::genModelCategoryChannel($channel);
+			case DiscordChannel::TYPE_DM:
+				return ModelConverter::genModelDmChannel($channel);
+			default:
+				return null;
+		}
+	}
+
+	static public function genModelCategoryChannel(DiscordChannel $discordChannel): CategoryChannel{
+		if($discordChannel->type !== DiscordChannel::TYPE_CATEGORY){
+			throw new AssertionError("Discord channel type must be `category` to generate model category channel.");
+		}
+		$c = new CategoryChannel();
+		/** @var CategoryChannel $c */
+		$c = ModelConverter::applyServerChannelDetails($discordChannel, $c);
+		return $c;
+	}
+
+	static public function genModelVoiceChannel(DiscordChannel $discordChannel): VoiceChannel{
+		if($discordChannel->type !== DiscordChannel::TYPE_VOICE){
+			throw new AssertionError("Discord channel type must be `voice` to generate model voice channel.");
+		}
+		$c = new VoiceChannel();
+		/** @var VoiceChannel $c */
+		$c = ModelConverter::applyServerChannelDetails($discordChannel, $c);
+		$c->setBitrate($discordChannel->bitrate);
+		$c->setMemberLimit($discordChannel->user_limit);
+		$c->setMembers(array_keys($discordChannel->members->toArray()));
+		return $c;
+	}
+
+	/**
+	 * Excludes pins, that requires a fetch.
+	 * @param DiscordChannel $discordChannel
+	 * @return TextChannel
+	 */
+	static public function genModelTextChannel(DiscordChannel $discordChannel): TextChannel{
+		if($discordChannel->type !== DiscordChannel::TYPE_TEXT and $discordChannel->type !== DiscordChannel::TYPE_NEWS){
+			throw new AssertionError("Discord channel type must be `text|news` to generate model text channel.");
+		}
+		$c = new TextChannel();
+		/** @var TextChannel $c */
+		$c = ModelConverter::applyServerChannelDetails($discordChannel, $c);
+		$c->setTopic($discordChannel->topic??"");
+		$c->setNsfw($discordChannel->nsfw??false);
+		$c->setRateLimit($discordChannel->rate_limit_per_user);
+		$c->setCategoryId($discordChannel->parent_id);
+		//Pins require a fetch.
+		return $c;
+	}
+
+	/**
+	 * Excludes pins, that requires a fetch.
+	 * @param DiscordChannel $discordChannel
+	 * @return DmChannel
+	 */
+	static public function genModelDmChannel(DiscordChannel $discordChannel): DmChannel{
+		if($discordChannel->type !== DiscordChannel::TYPE_DM){
+			throw new AssertionError("Discord channel type must be `dm` to generate model dm channel.");
+		}
+		$c = new DmChannel();
+		$c->setId($discordChannel->recipient->id);
+		//Pins require a fetch.
 		return $c;
 	}
 
 	static public function genModelMessage(DiscordMessage $discordMessage): Message{
 		if($discordMessage->type !== DiscordMessage::TYPE_NORMAL){
 			//Temporary.
-			throw new \AssertionError("Discord message type must be `normal` to generate model message.");
+			throw new AssertionError("Discord message type must be `normal` to generate model message.");
 		}
 		if($discordMessage->channel->guild_id === null){
-			throw new \AssertionError("Discord message does not have a guild_id, cannot generate model message.");
+			throw new AssertionError("Discord message does not have a guild_id, cannot generate model message.");
 		}
 		$m = new Message();
 		$m->setId($discordMessage->id);

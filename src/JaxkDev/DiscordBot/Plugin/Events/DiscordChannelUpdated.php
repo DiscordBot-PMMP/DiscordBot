@@ -12,9 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Channel;
-use JaxkDev\DiscordBot\Models\Server;
-use JaxkDev\DiscordBot\Plugin\Storage;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
 use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 
@@ -28,25 +26,12 @@ class DiscordChannelUpdated extends DiscordBotEvent implements Cancellable{
 	/** @var Channel */
 	private $channel;
 
-	/** @var Server */
-	private $server;
-
 	public function __construct(Plugin $plugin, Channel $channel){
 		parent::__construct($plugin);
 		$this->channel = $channel;
-		$s = Storage::getServer($channel->getServerId());
-		if($s === null){
-			throw new \AssertionError("No server found in storage ({$channel->getServerId()}) for channel '{$channel->getId()}'");
-		}else{
-			$this->server = $s;
-		}
 	}
 
 	public function getChannel(): Channel{
 		return $this->channel;
-	}
-
-	public function getServer(): Server{
-		return $this->server;
 	}
 }

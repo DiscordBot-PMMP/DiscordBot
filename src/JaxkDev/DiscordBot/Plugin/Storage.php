@@ -13,7 +13,8 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Models\Ban;
-use JaxkDev\DiscordBot\Models\Channel;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
@@ -31,7 +32,7 @@ class Storage{
 	private static $serverMap = [];
 
 	/** @var Array<string, Channel> */
-	private static $channelMap = [];
+	public static $channelMap = [];
 
 	/** @var Array<string, string[]> */
 	private static $channelServerMap = [];
@@ -131,7 +132,7 @@ class Storage{
 
 	/**
 	 * @param string $serverId
-	 * @return Channel[]
+	 * @return ServerChannel[]
 	 */
 	public static function getChannelsByServer(string $serverId): array{
 		$channels = [];
@@ -144,7 +145,9 @@ class Storage{
 
 	public static function addChannel(Channel $channel): void{
 		if(isset(self::$channelMap[$channel->getId()])) return;
-		self::$channelServerMap[$channel->getServerId()][] = $channel->getId();
+		if($channel instanceof ServerChannel){
+			self::$channelServerMap[$channel->getServerId()][] = $channel->getId();
+		}
 		self::$channelMap[$channel->getId()] = $channel;
 	}
 
@@ -159,11 +162,13 @@ class Storage{
 	public static function removeChannel(string $channelId): void{
 		$channel = self::getChannel($channelId);
 		if($channel === null) return; //Already deleted or not added.
-		$serverId = $channel->getServerId();
 		unset(self::$channelMap[$channelId]);
-		$i = array_search($channelId, self::$channelServerMap[$serverId], true);
-		if($i === false || is_string($i)) return; //Not in this servers channel map.
-		array_splice(self::$channelServerMap[$serverId], $i, 1);
+		if($channel instanceof ServerChannel){
+			$serverId = $channel->getServerId();
+			$i = array_search($channelId, self::$channelServerMap[$serverId], true);
+			if($i === false || is_string($i)) return; //Not in this servers channel map.
+			array_splice(self::$channelServerMap[$serverId], $i, 1);
+		}
 	}
 
 	public static function getMember(string $id): ?Member{

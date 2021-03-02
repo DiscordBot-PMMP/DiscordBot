@@ -149,8 +149,8 @@ class DiscordEventHandler{
 
 			/** @var DiscordChannel $channel */
 			foreach($guild->channels as $channel){
-				if($channel->type !== DiscordChannel::TYPE_TEXT) continue;
-				$pk->addChannel(ModelConverter::genModelChannel($channel));
+				$c = ModelConverter::genModelChannel($channel);
+				if($c !== null) $pk->addChannel($c);
 			}
 
 			/** @var DiscordRole $role */
@@ -206,7 +206,6 @@ class DiscordEventHandler{
 	}
 
 	public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
-		//var_dump(microtime(true)." - create message #".$message->id);
 		if(!$this->checkMessage($message)) return;
 		//if($message->author->id === "305060807887159296") $message->react("❤️");
 		//Dont ask questions...
@@ -217,7 +216,6 @@ class DiscordEventHandler{
 
 
 	public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
-		//var_dump(microtime(true)." - update message #".$message->id);
 		if(!$this->checkMessage($message)) return;
 		$packet = new DiscordEventMessageUpdate();
 		$packet->setMessage(ModelConverter::genModelMessage($message));
@@ -229,7 +227,6 @@ class DiscordEventHandler{
 	 * @param Discord                  $discord
 	 */
 	public function onMessageDelete($message, Discord $discord): void{
-		//var_dump(microtime(true)." - delete message #".$message->id);
 		$packet = new DiscordEventMessageDelete();
 		$packet->setMessageId($message->id);
 		$this->client->getThread()->writeOutboundData($packet);
@@ -257,19 +254,18 @@ class DiscordEventHandler{
 	public function onGuildJoin(DiscordGuild $guild, Discord $discord): void{
 		$channels = [];
 		/** @var DiscordChannel $channel */
-		foreach($guild->channels->toArray() as $channel){
-			if($channel->type === DiscordChannel::TYPE_TEXT){
-				$channels[] = ModelConverter::genModelChannel($channel);
-			}
+		foreach($guild->channels as $channel){
+			$c = ModelConverter::genModelChannel($channel);
+			if($c !== null) $channels[] = $c;
 		}
 		$roles = [];
 		/** @var DiscordRole $role */
-		foreach($guild->roles->toArray() as $role){
+		foreach($guild->roles as $role){
 			$roles[] = ModelConverter::genModelRole($role);
 		}
 		$members = [];
 		/** @var DiscordMember $member */
-		foreach($guild->members->toArray() as $member){
+		foreach($guild->members as $member){
 			$members[] = ModelConverter::genModelMember($member);
 		}
 
@@ -294,21 +290,24 @@ class DiscordEventHandler{
 	}
 
 	public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
-		if(!$this->checkChannel($channel)) return;
 		$packet = new DiscordEventChannelCreate();
-		$packet->setChannel(ModelConverter::genModelChannel($channel));
+		$c = ModelConverter::genModelChannel($channel);
+		if($c !== null){
+			$packet->setChannel($c);
+		}
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
-		if(!$this->checkChannel($channel)) return;
 		$packet = new DiscordEventChannelUpdate();
-		$packet->setChannel(ModelConverter::genModelChannel($channel));
+		$c = ModelConverter::genModelChannel($channel);
+		if($c !== null){
+			$packet->setChannel($c);
+		}
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
-		if(!$this->checkChannel($channel)) return;
 		$packet = new DiscordEventChannelDelete();
 		$packet->setChannelId($channel->id);
 		$this->client->getThread()->writeOutboundData($packet);
@@ -399,7 +398,7 @@ class DiscordEventHandler{
 	 */
 	private function checkMessage(DiscordMessage $message): bool{
 		// Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
-		if($message->author === null) return false; //Investigating specific case.
+		if($message->author === null) return false; //"Shouldn't" happen now...
 		if($message->author instanceof DiscordMember ? $message->author->user->bot : (isset($message->author) ? $message->author->bot : true)) return false;
 
 		// Other types of messages not used right now.
@@ -409,9 +408,5 @@ class DiscordEventHandler{
 		if($message->channel->guild_id === null) return false;
 
 		return true;
-	}
-
-	private function checkChannel(DiscordChannel $channel): bool{
-		return (($channel->type ?? -1) === DiscordChannel::TYPE_TEXT);
 	}
 }
