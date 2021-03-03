@@ -113,6 +113,7 @@ class Client{
 				'socket_options' => $socket_opts,
 				'loadAllMembers' => true,
 				'storeMessages' => true,
+				'pmChannels' => true,
 				'intents' => $intents
 			]);
 		}catch(IntentException $e){

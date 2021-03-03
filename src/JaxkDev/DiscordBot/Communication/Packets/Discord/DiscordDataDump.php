@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Models\Ban;
-use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
@@ -26,7 +26,7 @@ class DiscordDataDump extends Packet{
 	/** @var Server[] */
 	private $servers = [];
 
-	/** @var Channel[] */
+	/** @var ServerChannel[] */
 	private $channels = [];
 
 	/** @var Role[] */
@@ -62,13 +62,13 @@ class DiscordDataDump extends Packet{
 	}
 
 	/**
-	 * @return Channel[]
+	 * @return ServerChannel[]
 	 */
 	public function getChannels(): array{
 		return $this->channels;
 	}
 
-	public function addChannel(Channel $channel): void{
+	public function addChannel(ServerChannel $channel): void{
 		$this->channels[] = $channel;
 	}
 

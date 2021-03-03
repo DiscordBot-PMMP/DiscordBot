@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Server;
@@ -23,7 +23,7 @@ class DiscordEventServerJoin extends Packet{
 	/** @var Server */
 	private $server;
 
-	/** @var Channel[] */
+	/** @var ServerChannel[] */
 	private $channels;
 
 	/** @var Member[] */
@@ -41,14 +41,14 @@ class DiscordEventServerJoin extends Packet{
 	}
 
 	/**
-	 * @return Channel[]
+	 * @return ServerChannel[]
 	 */
 	public function getChannels(): array{
 		return $this->channels;
 	}
 
 	/**
-	 * @param Channel[] $channels
+	 * @param ServerChannel[] $channels
 	 */
 	public function setChannels(array $channels): void{
 		$this->channels = $channels;

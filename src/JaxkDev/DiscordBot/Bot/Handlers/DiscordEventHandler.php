@@ -290,20 +290,18 @@ class DiscordEventHandler{
 	}
 
 	public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
-		$packet = new DiscordEventChannelCreate();
 		$c = ModelConverter::genModelChannel($channel);
-		if($c !== null){
-			$packet->setChannel($c);
-		}
+		if($c === null) return;
+		$packet = new DiscordEventChannelCreate();
+		$packet->setChannel($c);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
-		$packet = new DiscordEventChannelUpdate();
 		$c = ModelConverter::genModelChannel($channel);
-		if($c !== null){
-			$packet->setChannel($c);
-		}
+		if($c === null) return;
+		$packet = new DiscordEventChannelUpdate();
+		$packet->setChannel($c);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
@@ -403,9 +401,9 @@ class DiscordEventHandler{
 
 		// Other types of messages not used right now.
 		if($message->type !== DiscordMessage::TYPE_NORMAL) return false;
-		if($message->channel->type !== DiscordChannel::TYPE_TEXT) return false;
+		//if($message->channel->type !== DiscordChannel::TYPE_TEXT) return false;
 		if(($message->content ?? "") === "") return false; //Images/Files, can be empty strings or just null in other cases.
-		if($message->channel->guild_id === null) return false;
+		//if($message->channel->guild_id === null) return false;
 
 		return true;
 	}

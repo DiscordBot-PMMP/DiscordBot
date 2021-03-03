@@ -27,8 +27,6 @@ use Discord\Parts\Guild\Guild as DiscordServer;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
-use JaxkDev\DiscordBot\Models\Channels\Channel;
-use JaxkDev\DiscordBot\Models\Channels\DmChannel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
@@ -104,6 +102,9 @@ abstract class ModelConverter{
 	}
 
 	static private function applyServerChannelDetails(DiscordChannel $dc, ServerChannel $c): ServerChannel{
+		if($dc->guild_id === null){
+			throw new AssertionError("Guild ID must be present here.");
+		}
 		$c->setId($dc->id);
 		$c->setName($dc->name);
 		$c->setPosition($dc->position);
@@ -130,9 +131,9 @@ abstract class ModelConverter{
 	/**
 	 * Generates a model based on whatever type $channel is. (Excludes game store/group type)
 	 * @param DiscordChannel $channel
-	 * @return ?Channel Null if type is invalid/unused.
+	 * @return ?ServerChannel Null if type is invalid/unused.
 	 */
-	static public function genModelChannel(DiscordChannel $channel): ?Channel{
+	static public function genModelChannel(DiscordChannel $channel): ?ServerChannel{
 		switch($channel->type){
 			case DiscordChannel::TYPE_TEXT:
 			case DiscordChannel::TYPE_NEWS:
@@ -141,8 +142,6 @@ abstract class ModelConverter{
 				return ModelConverter::genModelVoiceChannel($channel);
 			case DiscordChannel::TYPE_CATEGORY:
 				return ModelConverter::genModelCategoryChannel($channel);
-			case DiscordChannel::TYPE_DM:
-				return ModelConverter::genModelDmChannel($channel);
 			default:
 				return null;
 		}
@@ -187,21 +186,6 @@ abstract class ModelConverter{
 		$c->setNsfw($discordChannel->nsfw??false);
 		$c->setRateLimit($discordChannel->rate_limit_per_user);
 		$c->setCategoryId($discordChannel->parent_id);
-		//Pins require a fetch.
-		return $c;
-	}
-
-	/**
-	 * Excludes pins, that requires a fetch.
-	 * @param DiscordChannel $discordChannel
-	 * @return DmChannel
-	 */
-	static public function genModelDmChannel(DiscordChannel $discordChannel): DmChannel{
-		if($discordChannel->type !== DiscordChannel::TYPE_DM){
-			throw new AssertionError("Discord channel type must be `dm` to generate model dm channel.");
-		}
-		$c = new DmChannel();
-		$c->setId($discordChannel->recipient->id);
 		//Pins require a fetch.
 		return $c;
 	}

@@ -13,7 +13,6 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Models\Ban;
-use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
@@ -31,7 +30,7 @@ class Storage{
 	/** @var Array<string, Server> */
 	private static $serverMap = [];
 
-	/** @var Array<string, Channel> */
+	/** @var Array<string, ServerChannel> */
 	public static $channelMap = [];
 
 	/** @var Array<string, string[]> */
@@ -126,7 +125,7 @@ class Storage{
 		unset(self::$banServerMap[$serverId]);
 	}
 
-	public static function getChannel(string $id): ?Channel{
+	public static function getChannel(string $id): ?ServerChannel{
 		return self::$channelMap[$id] ?? null;
 	}
 
@@ -143,15 +142,13 @@ class Storage{
 		return $channels;
 	}
 
-	public static function addChannel(Channel $channel): void{
+	public static function addChannel(ServerChannel $channel): void{
 		if(isset(self::$channelMap[$channel->getId()])) return;
-		if($channel instanceof ServerChannel){
-			self::$channelServerMap[$channel->getServerId()][] = $channel->getId();
-		}
+		self::$channelServerMap[$channel->getServerId()][] = $channel->getId();
 		self::$channelMap[$channel->getId()] = $channel;
 	}
 
-	public static function updateChannel(Channel $channel): void{
+	public static function updateChannel(ServerChannel $channel): void{
 		if(!isset(self::$channelMap[$channel->getId()])){
 			self::addChannel($channel);
 		}else{

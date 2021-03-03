@@ -139,8 +139,8 @@ class BotCommunicationHandler{
 		$formatted = str_replace(["{TIME}", "{USER_ID}", "{USERNAME}", "{USER_DISCRIMINATOR}", "{SERVER_ID}",
 			"{SERVER_NAME}", "{CHANNEL_ID}", "{CHANNEL_NAME}", "{MESSAGE}"], [
 				date("G:i:s", (int)$message->getTimestamp()??0), $author->getUserId(), $user->getUsername(),
-				$user->getDiscriminator(), $server->getId(), $server->getName(), $channel->getId(), $channel->getName(),
-				$message->getContent()
+				$user->getDiscriminator(), $server->getId(), $server->getName(), $channel->getId(),
+				(($channel instanceof ServerChannel) ? $channel->getName() : $channel->getId()), $message->getContent()
 			],
 			$config["format"]);
 
@@ -162,7 +162,7 @@ class BotCommunicationHandler{
 		$e->call();
 		if($e->isCancelled()) return true;
 		Storage::addChannel($c);
-		$this->plugin->getServer()->broadcastMessage("Channel '".(($c instanceof ServerChannel) ? $c->getName() : $c->getId())."' created.");
+		$this->plugin->getServer()->broadcastMessage("Channel '".$c->getName()."' created.");
 		return true;
 	}
 
@@ -172,7 +172,7 @@ class BotCommunicationHandler{
 		$e->call();
 		if($e->isCancelled()) return true;
 		Storage::updateChannel($c);
-		$this->plugin->getServer()->broadcastMessage("Channel '".(($c instanceof ServerChannel) ? $c->getName() : $c->getId())."' updated.");
+		$this->plugin->getServer()->broadcastMessage("Channel '".$c->getName()."' updated.");
 		return true;
 	}
 
@@ -182,8 +182,8 @@ class BotCommunicationHandler{
 		$e = new DiscordChannelDeleted($this->plugin, $c);
 		$e->call();
 		if($e->isCancelled()) return true;
-		Storage::removeChannel($c);
-		$this->plugin->getServer()->broadcastMessage("Channel '".(($c instanceof ServerChannel) ? $c->getName() : $c->getId())."' deleted.");
+		Storage::removeChannel($c->getId());
+		$this->plugin->getServer()->broadcastMessage("Channel '".$c->getName()."' deleted.");
 		return true;
 	}
 

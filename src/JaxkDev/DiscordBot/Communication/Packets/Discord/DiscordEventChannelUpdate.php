@@ -12,19 +12,19 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 
 class DiscordEventChannelUpdate extends Packet{
 
-	/** @var Channel */
+	/** @var ServerChannel */
 	private $channel;
 
-	public function getChannel(): Channel{
+	public function getChannel(): ServerChannel{
 		return $this->channel;
 	}
 
-	public function setChannel(Channel $channel): void{
+	public function setChannel(ServerChannel $channel): void{
 		$this->channel = $channel;
 	}
 

@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 
@@ -23,15 +23,15 @@ use pocketmine\plugin\Plugin;
  */
 class DiscordChannelDeleted extends DiscordBotEvent implements Cancellable{
 
-	/** @var Channel */
+	/** @var ServerChannel */
 	private $channel;
 
-	public function __construct(Plugin $plugin, Channel $channel){
+	public function __construct(Plugin $plugin, ServerChannel $channel){
 		parent::__construct($plugin);
 		$this->channel = $channel;
 	}
 
-	public function getChannel(): Channel{
+	public function getChannel(): ServerChannel{
 		return $this->channel;
 	}
 }

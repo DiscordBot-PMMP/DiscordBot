@@ -12,10 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Models\Channels;
 
+//This is a big mess in terms of events, any update causes it to be a channel create event.
+//So this is not stored/sent in terms of events/dumps its only use is outbound message requests.
 class DmChannel extends Channel{
 
-	/** @var string[] Message ID's */
-	private $pins = [];
+	//** @var string[] Message ID's */
+	//private $pins = [];
 
 	/**
 	 * Get recipient of DM channel.
@@ -36,29 +38,29 @@ class DmChannel extends Channel{
 		$this->setId($user_id);
 	}
 
-	/** @return string[] Message ID's */
+	/*/** @return string[] Message ID's *
 	public function getPins(): array{
 		return $this->pins;
 	}
 
-	/** @param string[] $pins Message ID's */
+	/** @param string[] $pins Message ID's *
 	public function setPins(array $pins): void{
 		$this->pins = $pins;
-	}
+	}*/
 
 	//----- Serialization -----//
 
 	public function serialize(): ?string{
 		return serialize([
 			$this->id,
-			$this->pins
+			//$this->pins
 		]);
 	}
 
 	public function unserialize($serialized): void{
 		[
 			$this->id,
-			$this->pins
+			//$this->pins
 		] = unserialize($serialized);
 	}
 }
