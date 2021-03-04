@@ -16,7 +16,7 @@ use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventMemberJoin extends Packet{
+class EventMemberJoin extends Packet{
 
 	/** @var Member */
 	private $member;

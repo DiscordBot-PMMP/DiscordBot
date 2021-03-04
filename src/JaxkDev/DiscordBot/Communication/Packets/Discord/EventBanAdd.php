@@ -12,26 +12,27 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventRoleDelete extends Packet{
+class EventBanAdd extends Packet{
 
-	/** @var string */
-	private $role_id;
+	/** @var Ban */
+	private $ban;
 
-	public function getRoleId(): string{
-		return $this->role_id;
+	public function getBan(): Ban{
+		return $this->ban;
 	}
 
-	public function setRoleId(string $role_id): void{
-		$this->role_id = $role_id;
+	public function setBan(Ban $ban): void{
+		$this->ban = $ban;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->role_id]);
+		return serialize([$this->UID, $this->ban]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->role_id] = unserialize($serialized);
+		[$this->UID, $this->ban] = unserialize($serialized);
 	}
 }

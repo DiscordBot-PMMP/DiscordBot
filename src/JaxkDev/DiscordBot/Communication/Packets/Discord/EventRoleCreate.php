@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventRoleUpdate extends Packet{
+class EventRoleCreate extends Packet{
 
 	/** @var Role */
 	private $role;

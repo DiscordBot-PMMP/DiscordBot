@@ -12,27 +12,27 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventMemberUpdate extends Packet{
+class EventInviteCreate extends Packet{
 
-	/** @var Member */
-	private $member;
+	/** @var Invite */
+	private $invite;
 
-	public function getMember(): Member{
-		return $this->member;
+	public function getInvite(): Invite{
+		return $this->invite;
 	}
 
-	public function setMember(Member $member): void{
-		$this->member = $member;
+	public function setInvite(Invite $invite): void{
+		$this->invite = $invite;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->member]);
+		return serialize([$this->UID, $this->invite]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->member] = unserialize($serialized);
+		[$this->UID, $this->invite] = unserialize($serialized);
 	}
 }

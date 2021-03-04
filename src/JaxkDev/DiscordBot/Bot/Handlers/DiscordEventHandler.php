@@ -25,28 +25,28 @@ use Discord\Parts\User\User as DiscordUser;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Models\Activity;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanAdd;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanRemove;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelCreate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelDelete;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventInviteCreate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventInviteDelete;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberJoin;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberLeave;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMessageDelete;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMessageSent;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMessageUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventRoleCreate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventRoleDelete;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventRoleUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerJoin;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerLeave;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DataDump;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventBanAdd;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventBanRemove;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventChannelCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventChannelDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventChannelUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventInviteCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventInviteDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMemberJoin;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMemberLeave;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMemberUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMessageDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMessageSent;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMessageUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventRoleCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventRoleDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventRoleUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventServerJoin;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventServerLeave;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventServerUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventReady;
 use JaxkDev\DiscordBot\Communication\Protocol;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventReady;
 use pocketmine\utils\MainLogger;
 
 class DiscordEventHandler{
@@ -110,7 +110,7 @@ class DiscordEventHandler{
 		$this->registerEvents();
 
 		// Dump all discord data.
-		$pk = new DiscordDataDump();
+		$pk = new DataDump();
 		$pk->setTimestamp(time());
 
 		MainLogger::getLogger()->debug("Starting the data pack, please be patient.");
@@ -132,7 +132,7 @@ class DiscordEventHandler{
 					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->bans)." bans from server '".
 						$guild->name."' (".$guild->id.")");
 					if(sizeof($guild->bans) === 0) return;
-					$pk = new DiscordDataDump();
+					$pk = new DataDump();
 					$pk->setTimestamp(time());
 					/** @var DiscordBan $ban */
 					foreach($guild->bans as $ban){
@@ -164,7 +164,7 @@ class DiscordEventHandler{
 					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->invites).
 						" invites from server '".$guild->name."' (".$guild->id.")");
 					if(sizeof($guild->invites) === 0) return;
-					$pk = new DiscordDataDump();
+					$pk = new DataDump();
 					$pk->setTimestamp(time());
 					/** @var DiscordInvite $invite */
 					foreach($guild->invites as $invite){
@@ -197,10 +197,16 @@ class DiscordEventHandler{
 		MainLogger::getLogger()->debug("Data pack Took: ".round(microtime(true)-$t, 5)."s & ".
 			round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
 
+		//Very important to check status before overwriting, can cause dangerous behaviour.
+		if($this->client->getThread()->getStatus() !== Protocol::THREAD_STATUS_STARTED){
+			MainLogger::getLogger()->warning("Closing thread, unexpected state change.");
+			$this->client->close();
+		}
+
 		$this->client->getThread()->setStatus(Protocol::THREAD_STATUS_READY);
 		MainLogger::getLogger()->info("Client ready.");
 
-		$this->client->getThread()->writeOutboundData(new DiscordEventReady());
+		$this->client->getThread()->writeOutboundData(new EventReady());
 		$this->client->getCommunicationHandler()->sendHeartbeat();
 		$this->client->logDebugInfo();
 	}
@@ -209,7 +215,7 @@ class DiscordEventHandler{
 		if(!$this->checkMessage($message)) return;
 		//if($message->author->id === "305060807887159296") $message->react("❤️");
 		//Dont ask questions...
-		$packet = new DiscordEventMessageSent();
+		$packet = new EventMessageSent();
 		$packet->setMessage(ModelConverter::genModelMessage($message));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
@@ -217,7 +223,7 @@ class DiscordEventHandler{
 
 	public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
 		if(!$this->checkMessage($message)) return;
-		$packet = new DiscordEventMessageUpdate();
+		$packet = new EventMessageUpdate();
 		$packet->setMessage(ModelConverter::genModelMessage($message));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
@@ -227,26 +233,26 @@ class DiscordEventHandler{
 	 * @param Discord                  $discord
 	 */
 	public function onMessageDelete($message, Discord $discord): void{
-		$packet = new DiscordEventMessageDelete();
+		$packet = new EventMessageDelete();
 		$packet->setMessageId($message->id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onMemberJoin(DiscordMember $member, Discord $discord): void{
-		$packet = new DiscordEventMemberJoin();
+		$packet = new EventMemberJoin();
 		$packet->setMember(ModelConverter::genModelMember($member));
 		$packet->setUser(ModelConverter::genModelUser($member->user));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onMemberUpdate(DiscordMember $member, Discord $discord): void{
-		$packet = new DiscordEventMemberUpdate();
+		$packet = new EventMemberUpdate();
 		$packet->setMember(ModelConverter::genModelMember($member));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onMemberLeave(DiscordMember $member, Discord $discord): void{
-		$packet = new DiscordEventMemberLeave();
+		$packet = new EventMemberLeave();
 		$packet->setMemberID($member->guild_id.".".$member->id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
@@ -269,7 +275,7 @@ class DiscordEventHandler{
 			$members[] = ModelConverter::genModelMember($member);
 		}
 
-		$packet = new DiscordEventServerJoin();
+		$packet = new EventServerJoin();
 		$packet->setServer(ModelConverter::genModelServer($guild));
 		$packet->setChannels($channels);
 		$packet->setMembers($members);
@@ -278,13 +284,13 @@ class DiscordEventHandler{
 	}
 
 	public function onGuildUpdate(DiscordGuild $guild, Discord $discord): void{
-		$packet = new DiscordEventServerUpdate();
+		$packet = new EventServerUpdate();
 		$packet->setServer(ModelConverter::genModelServer($guild));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onGuildLeave(DiscordGuild $guild, Discord $discord): void{
-		$packet = new DiscordEventServerLeave();
+		$packet = new EventServerLeave();
 		$packet->setServerId($guild->id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
@@ -292,7 +298,7 @@ class DiscordEventHandler{
 	public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
 		$c = ModelConverter::genModelChannel($channel);
 		if($c === null) return;
-		$packet = new DiscordEventChannelCreate();
+		$packet = new EventChannelCreate();
 		$packet->setChannel($c);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
@@ -300,37 +306,37 @@ class DiscordEventHandler{
 	public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
 		$c = ModelConverter::genModelChannel($channel);
 		if($c === null) return;
-		$packet = new DiscordEventChannelUpdate();
+		$packet = new EventChannelUpdate();
 		$packet->setChannel($c);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
-		$packet = new DiscordEventChannelDelete();
+		$packet = new EventChannelDelete();
 		$packet->setChannelId($channel->id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onRoleCreate(DiscordRole $role, Discord $discord): void{
-		$packet = new DiscordEventRoleCreate();
+		$packet = new EventRoleCreate();
 		$packet->setRole(ModelConverter::genModelRole($role));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onRoleUpdate(DiscordRole $role, Discord $discord): void{
-		$packet = new DiscordEventRoleUpdate();
+		$packet = new EventRoleUpdate();
 		$packet->setRole(ModelConverter::genModelRole($role));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onRoleDelete(DiscordRole $role, Discord $discord): void{
-		$packet = new DiscordEventRoleDelete();
+		$packet = new EventRoleDelete();
 		$packet->setRoleId($role->id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onInviteCreate(DiscordInvite $invite, Discord $discord): void{
-		$packet = new DiscordEventInviteCreate();
+		$packet = new EventInviteCreate();
 		$packet->setInvite(ModelConverter::genModelInvite($invite));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
@@ -340,7 +346,7 @@ class DiscordEventHandler{
 	 * @param Discord   $discord
 	 */
 	public function onInviteDelete(\stdClass $invite, Discord $discord): void{
-		$packet = new DiscordEventInviteDelete();
+		$packet = new EventInviteDelete();
 		$packet->setInviteCode($invite->code);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
@@ -359,32 +365,32 @@ class DiscordEventHandler{
 				$b = $g->bans->offsetGet($ban->user_id);
 				if($b !== null){
 					MainLogger::getLogger()->debug("Successfully fetched bans, attached reason to new ban event.");
-					$packet = new DiscordEventBanAdd();
+					$packet = new EventBanAdd();
 					$packet->setBan(ModelConverter::genModelBan($b));
 					$this->client->getThread()->writeOutboundData($packet);
 				}else{
 					MainLogger::getLogger()->debug("No ban after freshen ??? (IMPORTANT LOGIC ERROR)");
-					$packet = new DiscordEventBanAdd();
+					$packet = new EventBanAdd();
 					$packet->setBan(ModelConverter::genModelBan($ban));
 					$this->client->getThread()->writeOutboundData($packet);
 				}
 			}, function() use ($ban){
 				//Failed so just send ban with no reason.
 				MainLogger::getLogger()->debug("Failed to fetch bans even with ban_members permission, using old ban object.");
-				$packet = new DiscordEventBanAdd();
+				$packet = new EventBanAdd();
 				$packet->setBan(ModelConverter::genModelBan($ban));
 				$this->client->getThread()->writeOutboundData($packet);
 			});
 		}else{
 			MainLogger::getLogger()->debug("Bot does not have ban_members permission so no reason was attached to this ban.");
-			$packet = new DiscordEventBanAdd();
+			$packet = new EventBanAdd();
 			$packet->setBan(ModelConverter::genModelBan($ban));
 			$this->client->getThread()->writeOutboundData($packet);
 		}
 	}
 
 	public function onBanRemove(DiscordBan $ban, Discord $discord): void{
-		$packet = new DiscordEventBanRemove();
+		$packet = new EventBanRemove();
 		$packet->setId($ban->guild_id.".".$ban->user_id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
@@ -402,7 +408,7 @@ class DiscordEventHandler{
 		// Other types of messages not used right now.
 		if($message->type !== DiscordMessage::TYPE_NORMAL) return false;
 		//if($message->channel->type !== DiscordChannel::TYPE_TEXT) return false;
-		if(($message->content ?? "") === "") return false; //Images/Files, can be empty strings or just null in other cases.
+		if(($message->content??"") === "") return false; //Images/Files, can be empty strings or just null in other cases.
 		//if($message->channel->guild_id === null) return false;
 
 		return true;

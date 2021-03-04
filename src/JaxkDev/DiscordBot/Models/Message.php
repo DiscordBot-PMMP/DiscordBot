@@ -31,7 +31,7 @@ class Message implements \Serializable{
 	/** @var string */
 	private $channel_id;
 
-	/** @var string */
+	/** @var ?string Null if DM Channel. */
 	private $server_id;  //This is needed for faster handling discord side.
 
 	/** @var ?float Null when sending message. */
@@ -99,11 +99,11 @@ class Message implements \Serializable{
 		$this->channel_id = $channel_id;
 	}
 
-	public function getServerId(): string{
+	public function getServerId(): ?string{
 		return $this->server_id;
 	}
 
-	public function setServerId(string $server_id): void{
+	public function setServerId(?string $server_id): void{
 		$this->server_id = $server_id;
 	}
 

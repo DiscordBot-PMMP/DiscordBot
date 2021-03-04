@@ -12,26 +12,27 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventChannelDelete extends Packet{
+class EventMemberUpdate extends Packet{
 
-	/** @var string */
-	private $channel_id;
+	/** @var Member */
+	private $member;
 
-	public function getChannelId(): string{
-		return $this->channel_id;
+	public function getMember(): Member{
+		return $this->member;
 	}
 
-	public function setChannelId(string $channel_id): void{
-		$this->channel_id = $channel_id;
+	public function setMember(Member $member): void{
+		$this->member = $member;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->channel_id]);
+		return serialize([$this->UID, $this->member]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->channel_id] = unserialize($serialized);
+		[$this->UID, $this->member] = unserialize($serialized);
 	}
 }

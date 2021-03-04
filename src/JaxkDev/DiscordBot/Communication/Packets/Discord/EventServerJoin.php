@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventServerJoin extends Packet{
+class EventServerJoin extends Packet{
 
 	/** @var Server */
 	private $server;

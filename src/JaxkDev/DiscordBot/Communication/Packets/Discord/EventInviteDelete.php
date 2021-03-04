@@ -14,24 +14,24 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventServerLeave extends Packet{
+class EventInviteDelete extends Packet{
 
 	/** @var string */
-	private $server_id;
+	private $invite_code;
 
-	public function getServerId(): string{
-		return $this->server_id;
+	public function getInviteCode(): string{
+		return $this->invite_code;
 	}
 
-	public function setServerId(string $server_id): void{
-		$this->server_id = $server_id;
+	public function setInviteCode(string $invite_code): void{
+		$this->invite_code = $invite_code;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->server_id]);
+		return serialize([$this->UID, $this->invite_code]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->server_id] = unserialize($serialized);
+		[$this->UID, $this->invite_code] = unserialize($serialized);
 	}
 }

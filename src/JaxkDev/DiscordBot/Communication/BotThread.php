@@ -21,6 +21,7 @@ use Volatile;
 
 class BotThread extends Thread{
 
+	// TODO Use this logger instance instead of singletons everywhere.
 	/** @var AttachableThreadedLogger */
 	private $logger;
 

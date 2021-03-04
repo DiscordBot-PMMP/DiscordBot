@@ -12,27 +12,27 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 
-class DiscordEventServerUpdate extends Packet{
+class EventChannelCreate extends Packet{
 
-	/** @var Server */
-	private $server;
+	/** @var ServerChannel */
+	private $channel;
 
-	public function getServer(): Server{
-		return $this->server;
+	public function getChannel(): ServerChannel{
+		return $this->channel;
 	}
 
-	public function setServer(Server $server): void{
-		$this->server = $server;
+	public function setChannel(ServerChannel $channel): void{
+		$this->channel = $channel;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->server]);
+		return serialize([$this->UID, $this->channel]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->server] = unserialize($serialized);
+		[$this->UID, $this->channel] = unserialize($serialized);
 	}
 }

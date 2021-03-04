@@ -16,14 +16,15 @@ use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\User\Activity as DiscordActivity;
+use Discord\Parts\User\User as DiscordUser;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestSendMessage;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestUpdateActivity;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use pocketmine\utils\MainLogger;
 
@@ -42,74 +43,90 @@ class CommunicationHandler{
 	//--- Handlers:
 
 	public function handle(Packet $packet): bool{
-		if($packet instanceof Heartbeat) return $this->handleHeartbeat($packet);
-		if($packet instanceof PluginRequestUpdateActivity) return $this->handleUpdateActivity($packet);
-		if($packet instanceof PluginRequestSendMessage) return $this->handleSendMessage($packet);
+		if($packet instanceof Heartbeat){
+			$this->lastHeartbeat = $packet->getHeartbeat();
+			return true;
+		}
+
+		//API:
+		if($this->client->getThread()->getStatus() !== Protocol::THREAD_STATUS_READY){
+			$this->resolveRequest($packet->getUID(), false, "Thread not ready for API Requests.");
+			return false;
+		}
+		if($packet instanceof RequestUpdateActivity) return $this->handleUpdateActivity($packet);
+		if($packet instanceof RequestSendMessage) return $this->handleSendMessage($packet);
 		return false;
 	}
 
-	private function handleSendMessage(PluginRequestSendMessage $packet): bool{
-		$ack = new Resolution();
-		$ack->setPid($packet->getUID());
-		if($this->client->getThread()->getStatus() !== Protocol::THREAD_STATUS_READY){
-			$ack->setRejectReason("Thread not ready for API Requests.");
-			$ack->setSuccessful(false);
-			$this->client->getThread()->writeOutboundData($ack);
-			return true;
-		}
-		$message = $packet->getMessage();
-
-		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
-		$this->client->getDiscordClient()->guilds->fetch($message->getServerId())->done(function(DiscordGuild $guild) use($ack, $message){
-			$guild->channels->fetch($message->getChannelId())->done(function(DiscordChannel $channel) use($ack, $message){
-				$channel->sendMessage($message->getContent())->then(function(DiscordMessage $msg) use($ack){
-					$ack->setSuccessData([ModelConverter::genModelMessage($msg)]);
-					$this->client->getThread()->writeOutboundData($ack);
-					MainLogger::getLogger()->debug("Sent message(".strlen($msg->content).") to ({$msg->channel_id})");
-				}, function(\Throwable $e) use($ack){
-					$ack->setSuccessful(false);
-					$ack->setRejectReason("Failed to send message (generic, Error: {$e->getMessage()})");
-					$this->client->getThread()->writeOutboundData($ack);
-				});
-			}, function(\Throwable $e) use($ack, $message){
-				$ack->setSuccessful(false);
-				$ack->setRejectReason("Failed to fetch channel {$message->getChannelId()} in server {$message->getServerId()}. (Error: {$e->getMessage()})");
-				$this->client->getThread()->writeOutboundData($ack);
-			});
-		}, function(\Throwable $e) use($ack, $message){
-			$ack->setSuccessful(false);
-			$ack->setRejectReason("Failed to fetch server {$message->getServerId()}. (Error: {$e->getMessage()})");
-			$this->client->getThread()->writeOutboundData($ack);
-		});
-		return true;
-	}
-
-	private function handleUpdateActivity(PluginRequestUpdateActivity $packet): bool{
+	private function handleUpdateActivity(RequestUpdateActivity $packet): bool{
 		$activity = $packet->getActivity();
 		$presence = new DiscordActivity($this->client->getDiscordClient(), [
 			'name' => $activity->getMessage(),
 			'type' => $activity->getType()
 		]);
 
-		$ack = new Resolution();
-		$ack->setPid($packet->getUID());
 		try{
 			$this->client->getDiscordClient()->updatePresence($presence, $activity->getStatus() === Activity::STATUS_IDLE, $activity->getStatus());
-			$this->client->getThread()->writeOutboundData($ack);
+			$this->resolveRequest($packet->getUID());
 		}catch (\Throwable $e){
-			$ack->setRejectReason($e->getMessage());
-			$ack->setSuccessful(false);
-			$this->client->getThread()->writeOutboundData($ack);
+			$this->resolveRequest($packet->getUID(), false, $e->getMessage());
 		}
 		return true;
 	}
 
-	private function handleHeartbeat(Heartbeat $packet): bool{
-		$this->lastHeartbeat = $packet->getHeartbeat();
+	private function handleSendMessage(RequestSendMessage $packet): bool{
+		$pid = $packet->getUID();
+		$message = $packet->getMessage();
+
+		// DM.
+		if($message->getServerId() === null){
+			/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
+			$this->client->getDiscordClient()->users->fetch($message->getChannelId())->done(function(DiscordUser $user) use($pid, $message){
+				//User::sendMessage handles getting DM channel.
+				$user->sendMessage($message->getContent())->done(function(DiscordMessage $message) use($pid){
+					$this->resolveRequest($pid, true, "Sent DM.", [ModelConverter::genModelMessage($message)]);
+				}, function(\Throwable $e) use($pid){
+					$this->resolveRequest($pid, false, "Failed to send.");
+					MainLogger::getLogger()->debug("Failed to send dm ({$pid}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pid){
+				$this->resolveRequest($pid, false, "Failed to fetch user.");
+				MainLogger::getLogger()->debug("Failed to send dm ({$pid}) - user error: {$e->getMessage()}");
+			});
+			return true;
+		}
+
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
+		$this->client->getDiscordClient()->guilds->fetch($message->getServerId())->done(function(DiscordGuild $guild) use($pid, $message){
+			$guild->channels->fetch($message->getChannelId())->done(function(DiscordChannel $channel) use($pid, $message){
+				$channel->sendMessage($message->getContent())->done(function(DiscordMessage $msg) use($pid){
+					$this->resolveRequest($pid, true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
+					MainLogger::getLogger()->debug("Sent message ({$pid})");
+				}, function(\Throwable $e) use($pid){
+					$this->resolveRequest($pid, false, "Failed to send.");
+					MainLogger::getLogger()->debug("Failed to send message ({$pid}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pid){
+				$this->resolveRequest($pid, false, "Failed to fetch channel.");
+				MainLogger::getLogger()->debug("Failed to send message ({$pid}) - channel error: {$e->getMessage()}");
+			});
+		}, function(\Throwable $e) use($pid){
+			$this->resolveRequest($pid, false, "Failed to fetch server.");
+			MainLogger::getLogger()->debug("Failed to send message ({$pid}) - server error: {$e->getMessage()}");
+		});
 		return true;
 	}
 
 	//---------------------------------------------------
+
+	private function resolveRequest(int $pid, bool $successful = true, string $response = "Success.", array $data = []): void{
+		$pk = new Resolution();
+		$pk->setPid($pid);
+		$pk->setSuccessful($successful);
+		$pk->setResponse($response);
+		$pk->setData($data);
+		$this->client->getThread()->writeOutboundData($pk);
+	}
 
 	public function sendHeartbeat(): void{
 		$packet = new Heartbeat();

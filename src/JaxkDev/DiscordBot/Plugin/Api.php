@@ -14,11 +14,28 @@ namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\DmChannel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Message;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestSendMessage;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\PluginRequestUpdateActivity;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
+use JaxkDev\DiscordBot\Models\User;
+
+/*
+ * TODO:
+ * - Kick member
+ * - Ban member
+ * - Give role
+ * - Take role
+ * - Send message (rework)
+ * - Delete channel
+ * - Create channel
+ * - Update permissions (channel,role,member)
+ * - Update channel
+ * - Create invite
+ * - Delete invite
+ */
 
 /**
  * For internal and developers use for interacting with the discord bot.
@@ -44,9 +61,19 @@ class Api{
 	 */
 	public function createMessage($channel, string $content): ?Message{
 		if(!$channel instanceof Channel){
-			$channel = Storage::getChannel($channel);
-			if(!$channel instanceof Channel) return null;
+			$c = Storage::getChannel($channel);
+			if(!$c instanceof ServerChannel){
+				$u = Storage::getUser($channel); //check user for dm channel.
+				//Now you could in theory try to send a message to any user but its almost certain to be
+				//rejected if its not in storage.
+				if(!$u instanceof User) return null;
+				$channel = new DmChannel();
+				$channel->setId($u->getId());
+			}else{
+				$channel = $c;
+			}
 		}
+
 		$bot = Storage::getBotUser();
 		if($bot === null) return null;
 
@@ -66,7 +93,7 @@ class Api{
 	 * @see Api::createMessage For creating a message
 	 */
 	public function sendMessage(Message $message): PromiseInterface{
-		$pk = new PluginRequestSendMessage();
+		$pk = new RequestSendMessage();
 		$pk->setMessage($message);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
@@ -98,7 +125,7 @@ class Api{
 	 * @see Api::createActivity
 	 */
 	public function updateActivity(Activity $activity): PromiseInterface{
-		$pk = new PluginRequestUpdateActivity();
+		$pk = new RequestUpdateActivity();
 		$pk->setActivity($activity);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());

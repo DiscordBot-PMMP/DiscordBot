@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class PluginRequestUpdateActivity extends Packet{
+class RequestUpdateActivity extends Packet{
 
 	/** @var Activity */
 	private $activity;

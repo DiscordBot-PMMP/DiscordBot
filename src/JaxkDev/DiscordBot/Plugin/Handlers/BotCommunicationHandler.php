@@ -18,27 +18,27 @@ use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanAdd;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventBanRemove;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelCreate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelDelete;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventChannelUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventInviteCreate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventInviteDelete;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberJoin;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberLeave;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMemberUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMessageDelete;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMessageSent;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventMessageUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventRoleCreate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventRoleDelete;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventRoleUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerJoin;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerLeave;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventServerUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordEventReady;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DataDump;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventBanAdd;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventBanRemove;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventChannelCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventChannelDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventChannelUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventInviteCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventInviteDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMemberJoin;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMemberLeave;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMemberUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMessageDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMessageSent;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventMessageUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventRoleCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventRoleDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventRoleUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventServerJoin;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventServerLeave;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventServerUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\EventReady;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
@@ -75,27 +75,27 @@ class BotCommunicationHandler{
 			return true;
 		}
 
-		if($packet instanceof DiscordEventMemberJoin) return $this->handleMemberJoin($packet);
-		if($packet instanceof DiscordEventMemberLeave) return $this->handleMemberLeave($packet);
-		if($packet instanceof DiscordEventMemberUpdate) return $this->handleMemberUpdate($packet);
-		if($packet instanceof DiscordEventMessageSent) return $this->handleMessageSent($packet);
-		if($packet instanceof DiscordEventMessageUpdate) return $this->handleMessageUpdate($packet);
-		if($packet instanceof DiscordEventMessageDelete) return $this->handleMessageDelete($packet);
-		if($packet instanceof DiscordEventChannelCreate) return $this->handleChannelCreate($packet);
-		if($packet instanceof DiscordEventChannelUpdate) return $this->handleChannelUpdate($packet);
-		if($packet instanceof DiscordEventChannelDelete) return $this->handleChannelDelete($packet);
-		if($packet instanceof DiscordEventRoleCreate) return $this->handleRoleCreate($packet);
-		if($packet instanceof DiscordEventRoleUpdate) return $this->handleRoleUpdate($packet);
-		if($packet instanceof DiscordEventRoleDelete) return $this->handleRoleDelete($packet);
-		if($packet instanceof DiscordEventInviteCreate) return $this->handleInviteCreate($packet);
-		if($packet instanceof DiscordEventInviteDelete) return $this->handleInviteDelete($packet);
-		if($packet instanceof DiscordEventBanAdd) return $this->handleBanAdd($packet);
-		if($packet instanceof DiscordEventBanRemove) return $this->handleBanRemove($packet);
-		if($packet instanceof DiscordEventServerJoin) return $this->handleServerJoin($packet);
-		if($packet instanceof DiscordEventServerLeave) return $this->handleServerLeave($packet);
-		if($packet instanceof DiscordEventServerUpdate) return $this->handleServerUpdate($packet);
-		if($packet instanceof DiscordDataDump) return $this->handleDataDump($packet);
-		if($packet instanceof DiscordEventReady) return $this->handleReady();
+		if($packet instanceof EventMemberJoin) return $this->handleMemberJoin($packet);
+		if($packet instanceof EventMemberLeave) return $this->handleMemberLeave($packet);
+		if($packet instanceof EventMemberUpdate) return $this->handleMemberUpdate($packet);
+		if($packet instanceof EventMessageSent) return $this->handleMessageSent($packet);
+		if($packet instanceof EventMessageUpdate) return $this->handleMessageUpdate($packet);
+		if($packet instanceof EventMessageDelete) return $this->handleMessageDelete($packet);
+		if($packet instanceof EventChannelCreate) return $this->handleChannelCreate($packet);
+		if($packet instanceof EventChannelUpdate) return $this->handleChannelUpdate($packet);
+		if($packet instanceof EventChannelDelete) return $this->handleChannelDelete($packet);
+		if($packet instanceof EventRoleCreate) return $this->handleRoleCreate($packet);
+		if($packet instanceof EventRoleUpdate) return $this->handleRoleUpdate($packet);
+		if($packet instanceof EventRoleDelete) return $this->handleRoleDelete($packet);
+		if($packet instanceof EventInviteCreate) return $this->handleInviteCreate($packet);
+		if($packet instanceof EventInviteDelete) return $this->handleInviteDelete($packet);
+		if($packet instanceof EventBanAdd) return $this->handleBanAdd($packet);
+		if($packet instanceof EventBanRemove) return $this->handleBanRemove($packet);
+		if($packet instanceof EventServerJoin) return $this->handleServerJoin($packet);
+		if($packet instanceof EventServerLeave) return $this->handleServerLeave($packet);
+		if($packet instanceof EventServerUpdate) return $this->handleServerUpdate($packet);
+		if($packet instanceof DataDump) return $this->handleDataDump($packet);
+		if($packet instanceof EventReady) return $this->handleReady();
 		return false;
 	}
 
@@ -104,7 +104,7 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleMessageSent(DiscordEventMessageSent $packet): bool{
+	private function handleMessageSent(EventMessageSent $packet): bool{
 		$config = $this->plugin->getEventsConfig()["message"]["fromDiscord"];
 		$message = $packet->getMessage();
 
@@ -113,7 +113,7 @@ class BotCommunicationHandler{
 		//If any of these asserts fire theres a mismatch between Storage and discord.
 
 		/** @var Server $server */
-		$server = Storage::getServer($message->getServerId());
+		$server = Storage::getServer($message->getServerId()??"");
 		if(!$server instanceof Server){
 			throw new \AssertionError("Server '{$message->getServerId()}' not found in storage.");
 		}
@@ -148,15 +148,15 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleMessageUpdate(DiscordEventMessageUpdate $packet): bool{
+	private function handleMessageUpdate(EventMessageUpdate $packet): bool{
 		return false;
 	}
 
-	private function handleMessageDelete(DiscordEventMessageDelete $packet): bool{
+	private function handleMessageDelete(EventMessageDelete $packet): bool{
 		return false;
 	}
 
-	private function handleChannelCreate(DiscordEventChannelCreate $packet): bool{
+	private function handleChannelCreate(EventChannelCreate $packet): bool{
 		$c = $packet->getChannel();
 		$e = new DiscordChannelUpdated($this->plugin, $c);
 		$e->call();
@@ -166,7 +166,7 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleChannelUpdate(DiscordEventChannelUpdate $packet): bool{
+	private function handleChannelUpdate(EventChannelUpdate $packet): bool{
 		$c = $packet->getChannel();
 		$e = new DiscordChannelUpdated($this->plugin, $c);
 		$e->call();
@@ -176,7 +176,7 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleChannelDelete(DiscordEventChannelDelete $packet): bool{
+	private function handleChannelDelete(EventChannelDelete $packet): bool{
 		$c = Storage::getChannel($packet->getChannelId());
 		if($c === null) return false;
 		$e = new DiscordChannelDeleted($this->plugin, $c);
@@ -187,19 +187,19 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleRoleCreate(DiscordEventRoleCreate $packet): bool{
+	private function handleRoleCreate(EventRoleCreate $packet): bool{
 		Storage::addRole($packet->getRole());
 		$this->plugin->getServer()->broadcastMessage("Role '".$packet->getRole()->getName()."' created.");
 		return true;
 	}
 
-	private function handleRoleUpdate(DiscordEventRoleUpdate $packet): bool{
+	private function handleRoleUpdate(EventRoleUpdate $packet): bool{
 		Storage::updateRole($packet->getRole());
 		$this->plugin->getServer()->broadcastMessage("Role '".$packet->getRole()->getName()."' updated.");
 		return true;
 	}
 
-	private function handleRoleDelete(DiscordEventRoleDelete $packet): bool{
+	private function handleRoleDelete(EventRoleDelete $packet): bool{
 		$role = Storage::getRole($packet->getRoleId());
 		if($role === null) return false;
 		$this->plugin->getServer()->broadcastMessage("Role '".$role->getName()."' deleted.");
@@ -207,31 +207,31 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleInviteCreate(DiscordEventInviteCreate $packet): bool{
+	private function handleInviteCreate(EventInviteCreate $packet): bool{
 		Storage::addInvite($packet->getInvite());
 		$this->plugin->getServer()->broadcastMessage("Invite '".$packet->getInvite()->getCode()."' created.");
 		return true;
 	}
 
-	private function handleInviteDelete(DiscordEventInviteDelete $packet): bool{
+	private function handleInviteDelete(EventInviteDelete $packet): bool{
 		Storage::removeInvite($packet->getInviteCode());
 		$this->plugin->getServer()->broadcastMessage("Invite '".$packet->getInviteCode()."' deleted/expired.");
 		return true;
 	}
 
-	private function handleBanAdd(DiscordEventBanAdd $packet): bool{
+	private function handleBanAdd(EventBanAdd $packet): bool{
 		Storage::addBan($packet->getBan());
 		$this->plugin->getServer()->broadcastMessage("Ban '".$packet->getBan()->getId()."' has been added.");
 		return true;
 	}
 
-	private function handleBanRemove(DiscordEventBanRemove $packet): bool{
+	private function handleBanRemove(EventBanRemove $packet): bool{
 		Storage::removeBan($packet->getId());
 		$this->plugin->getServer()->broadcastMessage("Ban '".$packet->getId()."' has been removed.");
 		return true;
 	}
 
-	private function handleMemberJoin(DiscordEventMemberJoin $packet): bool{
+	private function handleMemberJoin(EventMemberJoin $packet): bool{
 		$config = $this->plugin->getEventsConfig()["member_join"]["fromDiscord"];
 		if(($config["format"] ?? "") === "") return true;
 
@@ -258,13 +258,13 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleMemberUpdate(DiscordEventMemberUpdate $packet): bool{
+	private function handleMemberUpdate(EventMemberUpdate $packet): bool{
 		Storage::updateMember($packet->getMember());
 		$this->plugin->getServer()->broadcastMessage("Member updated.");
 		return true;
 	}
 
-	private function handleMemberLeave(DiscordEventMemberLeave $packet): bool{
+	private function handleMemberLeave(EventMemberLeave $packet): bool{
 		$config = $this->plugin->getEventsConfig()["member_leave"]["fromDiscord"];
 		if(($config["format"] ?? "") === "") return true;
 
@@ -300,7 +300,7 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleServerJoin(DiscordEventServerJoin $packet): bool{
+	private function handleServerJoin(EventServerJoin $packet): bool{
 		$e = new DiscordServerJoined($this->plugin, $packet->getServer(), $packet->getRoles(),
 			$packet->getChannels(), $packet->getMembers());
 		$e->call();
@@ -320,7 +320,7 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleServerUpdate(DiscordEventServerUpdate $packet): bool{
+	private function handleServerUpdate(EventServerUpdate $packet): bool{
 		$e = new DiscordServerUpdated($this->plugin, $packet->getServer());
 		$e->call();
 		if($e->isCancelled()) return true;
@@ -329,7 +329,7 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleServerLeave(DiscordEventServerLeave $packet): bool{
+	private function handleServerLeave(EventServerLeave $packet): bool{
 		$server = Storage::getServer($packet->getServerId());
 		if($server === null) return false;
 		$e = new DiscordServerDeleted($this->plugin, $server);
@@ -340,7 +340,7 @@ class BotCommunicationHandler{
 		return true;
 	}
 
-	private function handleDataDump(DiscordDataDump $packet): bool{
+	private function handleDataDump(DataDump $packet): bool{
 		foreach($packet->getServers() as $server){
 			Storage::addServer($server);
 		}

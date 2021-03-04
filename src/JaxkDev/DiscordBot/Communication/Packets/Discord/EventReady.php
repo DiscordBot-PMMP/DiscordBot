@@ -12,27 +12,15 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventRoleCreate extends Packet{
-
-	/** @var Role */
-	private $role;
-
-	public function getRole(): Role{
-		return $this->role;
-	}
-
-	public function setRole(Role $role): void{
-		$this->role = $role;
-	}
+class EventReady extends Packet{
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->role]);
+		return serialize($this->UID);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->role] = unserialize($serialized);
+		$this->UID = unserialize($serialized);
 	}
 }

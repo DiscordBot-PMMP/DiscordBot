@@ -12,27 +12,26 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventMessageUpdate extends Packet{
+class EventMemberLeave extends Packet{
 
-	/** @var Message */
-	private $message;
+	/** @var string */
+	private $member_id;
 
-	public function getMessage(): Message{
-		return $this->message;
+	public function getMemberID(): string{
+		return $this->member_id;
 	}
 
-	public function setMessage(Message $message): void{
-		$this->message = $message;
+	public function setMemberID(string $id): void{
+		$this->member_id = $id;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->message]);
+		return serialize([$this->UID, $this->member_id]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->message] = unserialize($serialized);
+		[$this->UID, $this->member_id] = unserialize($serialized);
 	}
 }

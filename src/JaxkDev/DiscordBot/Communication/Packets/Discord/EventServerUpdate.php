@@ -12,26 +12,27 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventBanRemove extends Packet{
+class EventServerUpdate extends Packet{
 
-	/** @var string */
-	private $id;
+	/** @var Server */
+	private $server;
 
-	public function getId(): string{
-		return $this->id;
+	public function getServer(): Server{
+		return $this->server;
 	}
 
-	public function setId(string $id): void{
-		$this->id = $id;
+	public function setServer(Server $server): void{
+		$this->server = $server;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->id]);
+		return serialize([$this->UID, $this->server]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->id] = unserialize($serialized);
+		[$this->UID, $this->server] = unserialize($serialized);
 	}
 }

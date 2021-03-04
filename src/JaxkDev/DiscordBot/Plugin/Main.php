@@ -29,9 +29,6 @@ use Volatile;
 
 class Main extends PluginBase{
 
-	/** @var Main */
-	static private $instance;
-
 	/** @var BotThread */
 	private $discordBot;
 
@@ -58,7 +55,6 @@ class Main extends PluginBase{
 	private $config;
 
 	public function onLoad(){
-		self::$instance = $this;
 		if(Phar::running(true) === ""){
 			throw new PluginException("Cannot be run from source.");
 		}
@@ -239,10 +235,6 @@ class Main extends PluginBase{
 		return $this->api;
 	}
 
-	public static function getInstance(): Main{
-		return self::$instance;
-	}
-
 	public function stopAll(bool $stopPlugin = true): void{
 		if($this->tickTask !== null){
 			if(!$this->tickTask->isCancelled()){
@@ -252,7 +244,9 @@ class Main extends PluginBase{
 		if($this->discordBot !== null){
 			//Stopping while bot is not ready (midway through data dump) causes it to wait.
 			$this->discordBot->setStatus(Protocol::THREAD_STATUS_CLOSING);
+			$this->getLogger()->warning("Closing the thread, if doing a data pack or heavy duty tasks this can take a few moments.");
 			$this->discordBot->quit();  // Joins thread (<-- beware) (Right now this forces bot to close)
+			$this->getLogger()->info("Thread closed.");
 			(new DiscordClosed($this))->call();
 		}
 		if($stopPlugin){

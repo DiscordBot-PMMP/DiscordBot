@@ -18,13 +18,13 @@ class Resolution extends Packet{
 	private $pid;
 
 	/** @var bool */
-	private $successful = true;
+	private $successful;
 
-	/** @var string|null */
-	private $rejectReason = null;
+	/** @var string */
+	private $response;
 
 	/** @var array */
-	private $successData = [];
+	private $data = [];
 
 	public function getPid(): int{
 		return $this->pid;
@@ -43,27 +43,37 @@ class Resolution extends Packet{
 	}
 
 
-	public function getRejectReason(): ?string{
-		return $this->rejectReason;
+	public function getResponse(): string{
+		return $this->response;
 	}
 
-	public function setRejectReason(?string $rejectReason): void{
-		$this->rejectReason = $rejectReason;
+	public function setResponse(string $response): void{
+		$this->response = $response;
 	}
 
-	public function getSuccessData(): array{
-		return $this->successData;
+	public function getData(): array{
+		return $this->data;
 	}
 
-	public function setSuccessData(array $successData): void{
-		$this->successData = $successData;
+	public function setData(array $data): void{
+		$this->data = $data;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->pid, $this->successful, $this->rejectReason, $this->successData]);
+		return serialize([
+			$this->pid,
+			$this->successful,
+			$this->response,
+			$this->data
+		]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->pid, $this->successful, $this->rejectReason, $this->successData] = unserialize($serialized);
+		[
+			$this->pid,
+			$this->successful,
+			$this->response,
+			$this->data
+		] = unserialize($serialized);
 	}
 }

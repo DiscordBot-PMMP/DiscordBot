@@ -12,27 +12,26 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventInviteCreate extends Packet{
+class EventRoleDelete extends Packet{
 
-	/** @var Invite */
-	private $invite;
+	/** @var string */
+	private $role_id;
 
-	public function getInvite(): Invite{
-		return $this->invite;
+	public function getRoleId(): string{
+		return $this->role_id;
 	}
 
-	public function setInvite(Invite $invite): void{
-		$this->invite = $invite;
+	public function setRoleId(string $role_id): void{
+		$this->role_id = $role_id;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->invite]);
+		return serialize([$this->UID, $this->role_id]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->invite] = unserialize($serialized);
+		[$this->UID, $this->role_id] = unserialize($serialized);
 	}
 }

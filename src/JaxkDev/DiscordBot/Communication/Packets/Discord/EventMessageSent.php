@@ -12,27 +12,27 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Ban;
+use JaxkDev\DiscordBot\Models\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventBanAdd extends Packet{
+class EventMessageSent extends Packet{
 
-	/** @var Ban */
-	private $ban;
+	/** @var Message */
+	private $message;
 
-	public function getBan(): Ban{
-		return $this->ban;
+	public function getMessage(): Message{
+		return $this->message;
 	}
 
-	public function setBan(Ban $ban): void{
-		$this->ban = $ban;
+	public function setMessage(Message $message): void{
+		$this->message = $message;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->ban]);
+		return serialize([$this->UID, $this->message]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->ban] = unserialize($serialized);
+		[$this->UID, $this->message] = unserialize($serialized);
 	}
 }

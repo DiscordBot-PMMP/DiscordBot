@@ -12,27 +12,26 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordEventMessageSent extends Packet{
+class EventServerLeave extends Packet{
 
-	/** @var Message */
-	private $message;
+	/** @var string */
+	private $server_id;
 
-	public function getMessage(): Message{
-		return $this->message;
+	public function getServerId(): string{
+		return $this->server_id;
 	}
 
-	public function setMessage(Message $message): void{
-		$this->message = $message;
+	public function setServerId(string $server_id): void{
+		$this->server_id = $server_id;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->message]);
+		return serialize([$this->UID, $this->server_id]);
 	}
 
 	public function unserialize($serialized): void{
-		[$this->UID, $this->message] = unserialize($serialized);
+		[$this->UID, $this->server_id] = unserialize($serialized);
 	}
 }

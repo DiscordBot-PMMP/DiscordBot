@@ -41,27 +41,11 @@ abstract class ApiResolver{
 		if(isset(self::$map[$packet->getPid()])){
 			$d = self::$map[$packet->getPid()];
 			if($packet->wasSuccessful()){
-				$d->resolve(...$packet->getSuccessData());
+				$d->resolve([$packet->getResponse(), ...$packet->getData()]);
 			}else{
-				$d->reject(new \Exception($packet->getRejectReason()??"No rejection reason provided."));
+				$d->reject(new \Exception($packet->getResponse()));
 			}
 			unset(self::$map[$packet->getPid()]);
 		}
 	}
-
-	/*static public function resolve(int $uid, ...$data): void{
-		if(!isset(self::$map[$uid])){
-			throw new \AssertionError("Packet {$uid} already resolved or no promise created.");
-		}
-		self::$map[$uid]->resolve(...$data);
-		unset(self::$map[$uid]);
-	}
-
-	static public function reject(int $uid, ?string $reason = null): void{
-		if(!isset(self::$map[$uid])){
-			throw new \AssertionError("Packet {$uid} already resolved or no promise created.");
-		}
-		self::$map[$uid]->reject(new \Exception($reason));
-		unset(self::$map[$uid]);
-	}*/
 }

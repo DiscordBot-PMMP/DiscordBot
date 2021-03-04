@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1e9ea73c88d58ab769a6bb64c5dc74a8",
+    "content-hash": "ea6fbc28d58b5adeed3f5466590bd998",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -1520,16 +1520,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.22.0",
+            "version": "v1.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "f377a3dd1fde44d37b9831d68dc8dea3ffd28e13"
+                "reference": "5232de97ee3b75b0360528dae24e73db49566ab1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/f377a3dd1fde44d37b9831d68dc8dea3ffd28e13",
-                "reference": "f377a3dd1fde44d37b9831d68dc8dea3ffd28e13",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/5232de97ee3b75b0360528dae24e73db49566ab1",
+                "reference": "5232de97ee3b75b0360528dae24e73db49566ab1",
                 "shasum": ""
             },
             "require": {
@@ -1580,7 +1580,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.22.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.22.1"
             },
             "funding": [
                 {
@@ -1596,11 +1596,11 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-07T16:49:33+00:00"
+            "time": "2021-01-22T09:19:47+00:00"
         },
         {
             "name": "symfony/polyfill-php73",
-            "version": "v1.22.0",
+            "version": "v1.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php73.git",
@@ -1659,7 +1659,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php73/tree/v1.22.0"
+                "source": "https://github.com/symfony/polyfill-php73/tree/v1.22.1"
             },
             "funding": [
                 {
@@ -1679,7 +1679,7 @@
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "v1.22.0",
+            "version": "v1.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
@@ -1742,7 +1742,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/v1.22.0"
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.22.1"
             },
             "funding": [
                 {
@@ -1937,12 +1937,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/discord-php/DiscordPHP.git",
-                "reference": "6dec6e2"
+                "reference": "8b3eb0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/6dec6e2",
-                "reference": "6dec6e2",
+                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/8b3eb0e",
+                "reference": "8b3eb0e",
                 "shasum": ""
             },
             "require": {
@@ -2007,7 +2007,7 @@
                 "source": "https://github.com/discord-php/DiscordPHP/tree/master",
                 "issues": "https://github.com/discord-php/DiscordPHP/issues"
             },
-            "time": "2021-02-13T09:20:06+00:00"
+            "time": "2021-03-03T11:47:29+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",
@@ -2109,16 +2109,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.75",
+            "version": "0.12.80",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "2e4738cd67e0163861a065180eff7eb5c8417d6e"
+                "reference": "c6a1b17f22ecf708d434d6bee05092647ec7e686"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/2e4738cd67e0163861a065180eff7eb5c8417d6e",
-                "reference": "2e4738cd67e0163861a065180eff7eb5c8417d6e",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/c6a1b17f22ecf708d434d6bee05092647ec7e686",
+                "reference": "c6a1b17f22ecf708d434d6bee05092647ec7e686",
                 "shasum": ""
             },
             "require": {
@@ -2149,7 +2149,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.75"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.80"
             },
             "funding": [
                 {
@@ -2165,7 +2165,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-11T13:58:47+00:00"
+            "time": "2021-02-28T20:22:43+00:00"
         },
         {
             "name": "pocketmine/binaryutils",
@@ -2471,16 +2471,16 @@
         },
         {
             "name": "pocketmine/pocketmine-mp",
-            "version": "3.17.4",
+            "version": "3.17.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "2e9117d102b1b5c734292ff0bcdcbc49e3748a89"
+                "reference": "3a0c8dd5942c5e479a1a46421a6a6bcf31a2da84"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/2e9117d102b1b5c734292ff0bcdcbc49e3748a89",
-                "reference": "2e9117d102b1b5c734292ff0bcdcbc49e3748a89",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/3a0c8dd5942c5e479a1a46421a6a6bcf31a2da84",
+                "reference": "3a0c8dd5942c5e479a1a46421a6a6bcf31a2da84",
                 "shasum": ""
             },
             "require": {
@@ -2502,7 +2502,7 @@
                 "ext-yaml": ">=2.0.0",
                 "ext-zip": "*",
                 "ext-zlib": ">=1.2.11",
-                "php": ">=7.3.0",
+                "php": "^7.3 || ^8.0",
                 "php-64bit": "*",
                 "pocketmine/binaryutils": "^0.1.9",
                 "pocketmine/callback-validator": "^1.0.2",
@@ -2516,7 +2516,7 @@
                 "pocketmine/spl": "^0.4.0"
             },
             "require-dev": {
-                "phpstan/phpstan": "0.12.71",
+                "phpstan/phpstan": "0.12.76",
                 "phpstan/phpstan-phpunit": "^0.12.6",
                 "phpstan/phpstan-strict-rules": "^0.12.2",
                 "phpunit/phpunit": "^9.2"
@@ -2542,7 +2542,7 @@
             "homepage": "https://pmmp.io",
             "support": {
                 "issues": "https://github.com/pmmp/PocketMine-MP/issues",
-                "source": "https://github.com/pmmp/PocketMine-MP/tree/3.17.4"
+                "source": "https://github.com/pmmp/PocketMine-MP/tree/3.17.5"
             },
             "funding": [
                 {
@@ -2554,20 +2554,20 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-02-02T14:04:50+00:00"
+            "time": "2021-02-16T22:13:05+00:00"
         },
         {
             "name": "pocketmine/raklib",
-            "version": "0.12.10",
+            "version": "0.12.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/RakLib.git",
-                "reference": "48e70551cca6f2409115d3468bed94c2edd08f31"
+                "reference": "9cce458b8bfde3e4dfdbf70c659fc7b7fe26b5c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/RakLib/zipball/48e70551cca6f2409115d3468bed94c2edd08f31",
-                "reference": "48e70551cca6f2409115d3468bed94c2edd08f31",
+                "url": "https://api.github.com/repos/pmmp/RakLib/zipball/9cce458b8bfde3e4dfdbf70c659fc7b7fe26b5c4",
+                "reference": "9cce458b8bfde3e4dfdbf70c659fc7b7fe26b5c4",
                 "shasum": ""
             },
             "require": {
@@ -2582,7 +2582,7 @@
                 "pocketmine/snooze": "^0.1.0"
             },
             "require-dev": {
-                "phpstan/phpstan": "0.12.67",
+                "phpstan/phpstan": "0.12.76",
                 "phpstan/phpstan-strict-rules": "^0.12.2"
             },
             "type": "library",
@@ -2598,22 +2598,22 @@
             "description": "A RakNet server implementation written in PHP",
             "support": {
                 "issues": "https://github.com/pmmp/RakLib/issues",
-                "source": "https://github.com/pmmp/RakLib/tree/0.12.10"
+                "source": "https://github.com/pmmp/RakLib/tree/0.12.11"
             },
-            "time": "2021-01-15T16:19:15+00:00"
+            "time": "2021-02-15T11:21:05+00:00"
         },
         {
             "name": "pocketmine/snooze",
-            "version": "0.1.4",
+            "version": "0.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/Snooze.git",
-                "reference": "382ab149f01ecca0a57f999ff5d7fc9e271c3268"
+                "reference": "70b5e7937a06878dd321a3182ceb76d56298f2cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/Snooze/zipball/382ab149f01ecca0a57f999ff5d7fc9e271c3268",
-                "reference": "382ab149f01ecca0a57f999ff5d7fc9e271c3268",
+                "url": "https://api.github.com/repos/pmmp/Snooze/zipball/70b5e7937a06878dd321a3182ceb76d56298f2cd",
+                "reference": "70b5e7937a06878dd321a3182ceb76d56298f2cd",
                 "shasum": ""
             },
             "require": {
@@ -2622,7 +2622,7 @@
             },
             "require-dev": {
                 "phpstan/extension-installer": "^1.0",
-                "phpstan/phpstan": "0.12.67",
+                "phpstan/phpstan": "0.12.76",
                 "phpstan/phpstan-strict-rules": "^0.12.4"
             },
             "type": "library",
@@ -2638,9 +2638,9 @@
             "description": "Thread notification management library for code using the pthreads extension",
             "support": {
                 "issues": "https://github.com/pmmp/Snooze/issues",
-                "source": "https://github.com/pmmp/Snooze/tree/0.1.4"
+                "source": "https://github.com/pmmp/Snooze/tree/0.1.5"
             },
-            "time": "2021-01-15T14:44:16+00:00"
+            "time": "2021-02-22T16:16:12+00:00"
         },
         {
             "name": "pocketmine/spl",
