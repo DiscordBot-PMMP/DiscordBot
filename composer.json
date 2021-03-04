@@ -21,12 +21,11 @@
         }
     ],
     "require": {
-        "php": "^7.3",
-        "composer-runtime-api": "^2.0",
+        "php": "^7.4",
         "team-reflex/discord-php": "dev-master#f61603d"
     },
     "require-dev": {
-        "phpstan/phpstan": "^0.12.74",
+        "phpstan/phpstan": "^0.12.80",
         "pocketmine/pocketmine-mp": "^3"
     }
 }

@@ -60,7 +60,11 @@ class Main extends PluginBase{
 	public function onLoad(){
 		self::$instance = $this;
 		if(Phar::running(true) === ""){
-			throw new PluginException("DiscordBot must be run as a phar plugin.");
+			throw new PluginException("Cannot be run from source.");
+		}
+		if(PHP_VERSION_ID < 70400){
+			//Hopefully temporary, https://github.com/pmmp/PocketMine-MP/pull/3960
+			throw new PluginException("Must be run with PHP 7.4+ or 8.0.3+");
 		}
 
 		if(!defined("JaxkDev\DiscordBot\COMPOSER")){
