@@ -28,7 +28,8 @@ use JaxkDev\DiscordBot\Models\User;
  * - Ban member
  * - Give role
  * - Take role
- * - Send message (rework)
+ * - Edit message
+ * - Delete message
  * - Delete channel
  * - Create channel
  * - Update permissions (channel,role,member)
@@ -60,6 +61,8 @@ class Api{
 	 * @see Api::sendMessage For sending the message.
 	 */
 	public function createMessage($channel, string $content): ?Message{
+		if(strlen($content) > 2000) return null;
+
 		if(!$channel instanceof Channel){
 			$c = Storage::getChannel($channel);
 			if(!$c instanceof ServerChannel){
