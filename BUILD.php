@@ -22,6 +22,7 @@ $includedPaths = array_map(function($path) : string{
 $excludedPaths = [
 	".md",  // Nobody will look at readme's etc in a phar...
 	"carbon\\lang\\",  // More useless crap not needed and wasting ridiculous amount of space.
+	"discord-php\\bin\\",  // VC Binaries, not needed.
 	"vendor\\bin"
 ];
 
