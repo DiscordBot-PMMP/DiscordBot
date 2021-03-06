@@ -246,6 +246,7 @@ class Main extends PluginBase{
 			$this->discordBot->setStatus(Protocol::THREAD_STATUS_CLOSING);
 			$this->getLogger()->warning("Closing the thread, if doing a data pack or heavy duty tasks this can take a few moments.");
 			$this->discordBot->quit();  // Joins thread (<-- beware) (Right now this forces bot to close)
+			$this->discordBot = null;
 			$this->getLogger()->info("Thread closed.");
 			(new DiscordClosed($this))->call();
 		}
