@@ -16,9 +16,12 @@ use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\User\Activity as DiscordActivity;
+use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
@@ -55,6 +58,8 @@ class CommunicationHandler{
 		}
 		if($packet instanceof RequestUpdateActivity) return $this->handleUpdateActivity($packet);
 		if($packet instanceof RequestSendMessage) return $this->handleSendMessage($packet);
+		if($packet instanceof RequestKickMember) return $this->handleKickMember($packet);
+		if($packet instanceof RequestBanMember) return $this->handleBanMember($packet);
 		return false;
 	}
 
@@ -86,11 +91,11 @@ class CommunicationHandler{
 				$user->sendMessage($message->getContent())->done(function(DiscordMessage $message) use($pid){
 					$this->resolveRequest($pid, true, "Sent DM.", [ModelConverter::genModelMessage($message)]);
 				}, function(\Throwable $e) use($pid){
-					$this->resolveRequest($pid, false, "Failed to send.");
+					$this->resolveRequest($pid, false, "Failed to send.", [$e->getMessage(), $e->getTraceAsString()]);
 					MainLogger::getLogger()->debug("Failed to send dm ({$pid}) - {$e->getMessage()}");
 				});
 			}, function(\Throwable $e) use($pid){
-				$this->resolveRequest($pid, false, "Failed to fetch user.");
+				$this->resolveRequest($pid, false, "Failed to fetch user.", [$e->getMessage(), $e->getTraceAsString()]);
 				MainLogger::getLogger()->debug("Failed to send dm ({$pid}) - user error: {$e->getMessage()}");
 			});
 			return true;
@@ -103,16 +108,53 @@ class CommunicationHandler{
 					$this->resolveRequest($pid, true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
 					MainLogger::getLogger()->debug("Sent message ({$pid})");
 				}, function(\Throwable $e) use($pid){
-					$this->resolveRequest($pid, false, "Failed to send.");
+					$this->resolveRequest($pid, false, "Failed to send.", [$e->getMessage(), $e->getTraceAsString()]);
 					MainLogger::getLogger()->debug("Failed to send message ({$pid}) - {$e->getMessage()}");
 				});
 			}, function(\Throwable $e) use($pid){
-				$this->resolveRequest($pid, false, "Failed to fetch channel.");
+				$this->resolveRequest($pid, false, "Failed to fetch channel.", [$e->getMessage(), $e->getTraceAsString()]);
 				MainLogger::getLogger()->debug("Failed to send message ({$pid}) - channel error: {$e->getMessage()}");
 			});
 		}, function(\Throwable $e) use($pid){
-			$this->resolveRequest($pid, false, "Failed to fetch server.");
+			$this->resolveRequest($pid, false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
 			MainLogger::getLogger()->debug("Failed to send message ({$pid}) - server error: {$e->getMessage()}");
+		});
+		return true;
+	}
+
+	private function handleKickMember(RequestKickMember $packet): bool{
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
+		$this->client->getDiscordClient()->guilds->fetch($packet->getMember()->getServerId())->then(function(DiscordGuild $guild) use($packet){
+			$guild->members->fetch($packet->getMember()->getUserId())->then(function(DiscordMember $member) use($packet, $guild){
+				$guild->members->kick($member)->then(function() use($packet){
+					$this->resolveRequest($packet->getUID(), true, "Member kicked.");
+				}, function(\Throwable $e) use($packet){
+					$this->resolveRequest($packet->getUID(), false, "Failed to kick member.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to kick member ({$packet->getUID()}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($packet){
+				$this->resolveRequest($packet->getUID(), false, "Failed to fetch member.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to kick member ({$packet->getUID()}) - member error: {$e->getMessage()}");
+			});
+		}, function(\Throwable $e) use($packet){
+			$this->resolveRequest($packet->getUID(), false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
+			MainLogger::getLogger()->debug("Failed to kick member ({$packet->getUID()}) - server error: {$e->getMessage()}");
+		});
+		return true;
+	}
+
+	private function handleBanMember(RequestBanMember $packet): bool{
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
+		$this->client->getDiscordClient()->guilds->fetch($packet->getBan()->getServerId())->then(function(DiscordGuild $guild) use($packet){
+			$guild->bans->ban($packet->getBan()->getUserId())->then(function() use($packet){
+				$this->resolveRequest($packet->getUID(), true, "Member banned.");
+			}, function(\Throwable $e) use($packet){
+				$this->resolveRequest($packet->getUID(), false, "Failed to ban member.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to ban member ({$packet->getUID()}) - {$e->getMessage()}");
+			});
+		}, function(\Throwable $e) use($packet){
+			$this->resolveRequest($packet->getUID(), false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
+			MainLogger::getLogger()->debug("Failed to ban member ({$packet->getUID()}) - server error: {$e->getMessage()}");
 		});
 		return true;
 	}

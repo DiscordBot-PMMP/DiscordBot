@@ -1,6 +1,8 @@
 # DiscordBot API
 
-#### Version 2.0.x documentation.
+Would love to have this as a github site, However i don't have the time.
+
+**Version 2.0.x documentation.**
 
 ---
 
@@ -47,7 +49,7 @@ when the request is `resolved` or `rejected`.
 if its `resolved` it means the request was handled successfully, in this scenario it means message was sent successfully.
 
 if its `rejected` it means something happened, and it failed to finish the request successfully, in this scenario it means
-the message did not get sent, and a Throwable exception will be passed back.
+the message did not get sent, and a `ApiRejection` (exception) will be passed back.
 
 #### API Promise example:
 
@@ -65,7 +67,7 @@ $promise->then(function($resolvedData){
     echo "Resolved !";
     //Yay, it worked and the message was sent successfully.
     //See API Documentation for potential resolvedData.
-}, function(\Throwable $rejectedError){
+}, function(\JaxkDev\DiscordBot\Plugin\ApiRejection $rejectedError){
     echo "Rejected :(";
     //Oh no, It failed and $rejectedError can tell you why.
 });
@@ -78,12 +80,12 @@ $promise->then(function($resolvedData){
 });
 
 //Or handle just rejected:
-$promise->otherwise(function(\Throwable $rejectedError){
+$promise->otherwise(function(\JaxkDev\DiscordBot\Plugin\ApiRejection $rejectedError){
     echo "Rejected :(";
     //Oh no, It failed and $rejectedError can tell you why.
 });
 //same as:
-$promise->then(null, function(\Throwable $rejectedError){
+$promise->then(null, function(\JaxkDev\DiscordBot\Plugin\ApiRejection $rejectedError){
     echo "Rejected :(";
     //Oh no, It failed and $rejectedError can tell you why.
 });
@@ -106,21 +108,81 @@ For information on the argument types for `$resolvedData` and `$rejectedError` s
 
 This section documents every API method, and the possible input, return/resolution, and behaviour.
 
-`JaxkDev\DiscordBot\Plugin\Api.php`
 
-#### createMessage
-+ **Signature** - `createMessage(Channel|string $channel, string $content): ?Message`
-+ **Input** - A Channel model,channel ID or user ID(DM Message) along with the content to send (max 2000 characters).
-+ **Output** - A Message model or null if channel/user cannot be found by ID.
+Notes:
++ `ResolvedData`
+    + ResolvedData is an array `[string $message, documented data after]`
+    + A message regarding the request is **ALWAYS** at index 0, then any documented data below will start at index 1.
 
 
-#### sendMessage
++ `RejectedError`
+    + RejectedError is always an instance of `JaxkDev\DiscordBot\Plugin\ApiRejection`
+      where details about the rejection as well as the raw DiscordPHP rejection can be found.
+
+
++ All API methods documented below can be found in `JaxkDev\DiscordBot\Plugin\Api.php`
+
+--- 
+
+#### Create a message
++ **Signature** - `createMessage(TextChannel|User $channel, string $content): ?Message`
++ **Input**
+    + `$channel` - A TextChannel model or User model (for DM Message)
+    + `$content` - (Text only right now) Content to send.
+        + Min length = 1
+        + Max length = 2000
++ **Output** - Message model or null.
+
+---
+
+#### Send message
 + **Signature** - `sendMessage(Message $message): PromiseInterface`
-+ **Input** - Message model, see `createMessage`.
++ **Input**
+    + `$message` - Message model, see `createMessage`.
 + **Output** - PromiseInterface
     + **ResolvedData** - Model message with updated values like ID, timestamp etc.
-    + **RejectedError** - Throwable error (Exception).
+    + **RejectedError** - ApiRejection, rejected when:
+        + Message model is invalid.
+        + Cannot fetch the server(excluding DM's) or channel.
+        + Bot does not have permission to send messages to that channel.
 
+---
+
+#### Kick member
++ **Signature** - `kickMember(Member $member): PromiseInterface`
++ **Input**
+    + `$member` - Member model.
++ **Output** - PromiseInterface or null if member cannot be found with ID provided.
+    + **ResolvedData** - *N/A*
+    + **RejectedError** - ApiRejection, Possible rejections:
+        + Member model is invalid.
+        + Cannot fetch the server.
+        + Member cannot be kicked (bot may not have permission)
+
+---
+
+#### Create a ban
++ **Signature** - `createBan(Member $member, ?string $reason = null, ?int $daysToDelete = null): ?Ban`
++ **Input**
+    + `$member` - A Member model
+    + `$reason` - (Optional) Reason for the ban, note this is not sent to the member only used for audit log.
+    + `$daysToDelete` - (Optional) Amount of days worth of messages to be deleted that were sent by this member.
+        + Min value = 0
+        + Max value = 7 (inclusive)
++ **Output** - Ban model or null.
+
+---
+
+#### Ban member
++ **Signature** - `banMember(Ban $ban): PromiseInterface`
++ **Input**
+    + `$ban` - Ban model, see `createBan()`.
++ **Output** - PromiseInterface.   
+    + **ResolvedData** - *N/A*
+    + **RejectedError** - ApiRejection, Possible rejections:
+        + Member model is invalid.
+        + Cannot fetch the server.
+        + Member cannot be kicked (bot may not have permission)
 
 TODO More.
 

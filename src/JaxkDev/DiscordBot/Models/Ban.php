@@ -23,6 +23,9 @@ class Ban implements \Serializable{
 	/** @var null|string */
 	private $reason;
 
+	/** @var int|null Only present on banRequest. */
+	private $daysToDelete = null;
+
 	public function getId(): string{
 		return $this->server_id.".".$this->user_id;
 	}
@@ -51,13 +54,22 @@ class Ban implements \Serializable{
 		$this->reason = $reason;
 	}
 
+	public function getDaysToDelete(): ?int{
+		return $this->daysToDelete;
+	}
+
+	public function setDaysToDelete(?int $daysToDelete): void{
+		$this->daysToDelete = $daysToDelete;
+	}
+
 	//----- Serialization -----//
 
 	public function serialize(): ?string{
 		return serialize([
 			$this->server_id,
 			$this->user_id,
-			$this->reason
+			$this->reason,
+			$this->daysToDelete
 		]);
 	}
 
@@ -65,7 +77,8 @@ class Ban implements \Serializable{
 		[
 			$this->server_id,
 			$this->user_id,
-			$this->reason
+			$this->reason,
+			$this->daysToDelete
 		] = unserialize($serialized);
 	}
 }
