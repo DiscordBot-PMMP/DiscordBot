@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea6fbc28d58b5adeed3f5466590bd998",
+    "content-hash": "ac7d9ac730be7c74df8ca42c527efb7e",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -273,16 +273,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.45.1",
+            "version": "2.46.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "528783b188bdb853eb21239b1722831e0f000a8d"
+                "reference": "2fd2c4a77d58a4e95234c8a61c5df1f157a91bf4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/528783b188bdb853eb21239b1722831e0f000a8d",
-                "reference": "528783b188bdb853eb21239b1722831e0f000a8d",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/2fd2c4a77d58a4e95234c8a61c5df1f157a91bf4",
+                "reference": "2fd2c4a77d58a4e95234c8a61c5df1f157a91bf4",
                 "shasum": ""
             },
             "require": {
@@ -362,7 +362,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-11T18:30:17+00:00"
+            "time": "2021-02-24T17:30:44+00:00"
         },
         {
             "name": "psr/http-message",
@@ -758,16 +758,16 @@
         },
         {
             "name": "react/dns",
-            "version": "v1.4.0",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/dns.git",
-                "reference": "665260757171e2ab17485b44e7ffffa7acb6ca1f"
+                "reference": "b22b0b20278e8535e633ab71a52472c5bf620aa1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/dns/zipball/665260757171e2ab17485b44e7ffffa7acb6ca1f",
-                "reference": "665260757171e2ab17485b44e7ffffa7acb6ca1f",
+                "url": "https://api.github.com/repos/reactphp/dns/zipball/b22b0b20278e8535e633ab71a52472c5bf620aa1",
+                "reference": "b22b0b20278e8535e633ab71a52472c5bf620aa1",
                 "shasum": ""
             },
             "require": {
@@ -822,7 +822,7 @@
             ],
             "support": {
                 "issues": "https://github.com/reactphp/dns/issues",
-                "source": "https://github.com/reactphp/dns/tree/v1.4.0"
+                "source": "https://github.com/reactphp/dns/tree/v1.5.0"
             },
             "funding": [
                 {
@@ -834,7 +834,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-09-18T12:12:55+00:00"
+            "time": "2021-03-05T12:16:50+00:00"
         },
         {
             "name": "react/event-loop",
@@ -1451,7 +1451,7 @@
         },
         {
             "name": "symfony/options-resolver",
-            "version": "v5.2.3",
+            "version": "v5.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/options-resolver.git",
@@ -1500,7 +1500,7 @@
                 "options"
             ],
             "support": {
-                "source": "https://github.com/symfony/options-resolver/tree/v5.2.3"
+                "source": "https://github.com/symfony/options-resolver/tree/v5.2.4"
             },
             "funding": [
                 {
@@ -1762,16 +1762,16 @@
         },
         {
             "name": "symfony/translation",
-            "version": "v5.2.3",
+            "version": "v5.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation.git",
-                "reference": "c021864d4354ee55160ddcfd31dc477a1bc77949"
+                "reference": "0947ab1e3aabd22a6bef393874b2555d2bb976da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/c021864d4354ee55160ddcfd31dc477a1bc77949",
-                "reference": "c021864d4354ee55160ddcfd31dc477a1bc77949",
+                "url": "https://api.github.com/repos/symfony/translation/zipball/0947ab1e3aabd22a6bef393874b2555d2bb976da",
+                "reference": "0947ab1e3aabd22a6bef393874b2555d2bb976da",
                 "shasum": ""
             },
             "require": {
@@ -1788,7 +1788,7 @@
                 "symfony/yaml": "<4.4"
             },
             "provide": {
-                "symfony/translation-implementation": "2.0"
+                "symfony/translation-implementation": "2.3"
             },
             "require-dev": {
                 "psr/log": "~1.0",
@@ -1835,7 +1835,7 @@
             "description": "Provides tools to internationalize your application",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/translation/tree/v5.2.3"
+                "source": "https://github.com/symfony/translation/tree/v5.2.5"
             },
             "funding": [
                 {
@@ -1851,7 +1851,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-27T10:15:41+00:00"
+            "time": "2021-03-06T07:59:01+00:00"
         },
         {
             "name": "symfony/translation-contracts",
@@ -2109,16 +2109,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.80",
+            "version": "0.12.81",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "c6a1b17f22ecf708d434d6bee05092647ec7e686"
+                "reference": "0dd5b0ebeff568f7000022ea5f04aa86ad3124b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/c6a1b17f22ecf708d434d6bee05092647ec7e686",
-                "reference": "c6a1b17f22ecf708d434d6bee05092647ec7e686",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/0dd5b0ebeff568f7000022ea5f04aa86ad3124b8",
+                "reference": "0dd5b0ebeff568f7000022ea5f04aa86ad3124b8",
                 "shasum": ""
             },
             "require": {
@@ -2149,7 +2149,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.80"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.81"
             },
             "funding": [
                 {
@@ -2165,7 +2165,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-28T20:22:43+00:00"
+            "time": "2021-03-08T22:03:02+00:00"
         },
         {
             "name": "pocketmine/binaryutils",
@@ -2428,16 +2428,16 @@
         },
         {
             "name": "pocketmine/nbt",
-            "version": "0.2.16",
+            "version": "0.2.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/NBT.git",
-                "reference": "be6d54a8a314967d938b501eee49d4641e2ab07d"
+                "reference": "9f82ca4d7f97fcd9a566e44b63c4f18a7657ae82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/NBT/zipball/be6d54a8a314967d938b501eee49d4641e2ab07d",
-                "reference": "be6d54a8a314967d938b501eee49d4641e2ab07d",
+                "url": "https://api.github.com/repos/pmmp/NBT/zipball/9f82ca4d7f97fcd9a566e44b63c4f18a7657ae82",
+                "reference": "9f82ca4d7f97fcd9a566e44b63c4f18a7657ae82",
                 "shasum": ""
             },
             "require": {
@@ -2449,7 +2449,7 @@
             "require-dev": {
                 "irstea/phpunit-shim": "^7.5 || ^8.0",
                 "phpstan/extension-installer": "^1.0",
-                "phpstan/phpstan": "0.12.67",
+                "phpstan/phpstan": "0.12.80",
                 "phpstan/phpstan-strict-rules": "^0.12.4"
             },
             "type": "library",
@@ -2465,22 +2465,22 @@
             "description": "PHP library for working with Named Binary Tags",
             "support": {
                 "issues": "https://github.com/pmmp/NBT/issues",
-                "source": "https://github.com/pmmp/NBT/tree/0.2.16"
+                "source": "https://github.com/pmmp/NBT/tree/0.2.18"
             },
-            "time": "2021-01-15T15:27:28+00:00"
+            "time": "2021-03-11T00:09:04+00:00"
         },
         {
             "name": "pocketmine/pocketmine-mp",
-            "version": "3.17.5",
+            "version": "3.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "3a0c8dd5942c5e479a1a46421a6a6bcf31a2da84"
+                "reference": "3f6490626319152dca07a5c61a1e94f8d5793d56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/3a0c8dd5942c5e479a1a46421a6a6bcf31a2da84",
-                "reference": "3a0c8dd5942c5e479a1a46421a6a6bcf31a2da84",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/3f6490626319152dca07a5c61a1e94f8d5793d56",
+                "reference": "3f6490626319152dca07a5c61a1e94f8d5793d56",
                 "shasum": ""
             },
             "require": {
@@ -2510,13 +2510,13 @@
                 "pocketmine/log": "^0.2.0",
                 "pocketmine/log-pthreads": "^0.1.0",
                 "pocketmine/math": "^0.2.0",
-                "pocketmine/nbt": "^0.2.10",
+                "pocketmine/nbt": "^0.2.18",
                 "pocketmine/raklib": "^0.12.7",
                 "pocketmine/snooze": "^0.1.0",
                 "pocketmine/spl": "^0.4.0"
             },
             "require-dev": {
-                "phpstan/phpstan": "0.12.76",
+                "phpstan/phpstan": "0.12.80",
                 "phpstan/phpstan-phpunit": "^0.12.6",
                 "phpstan/phpstan-strict-rules": "^0.12.2",
                 "phpunit/phpunit": "^9.2"
@@ -2542,7 +2542,7 @@
             "homepage": "https://pmmp.io",
             "support": {
                 "issues": "https://github.com/pmmp/PocketMine-MP/issues",
-                "source": "https://github.com/pmmp/PocketMine-MP/tree/3.17.5"
+                "source": "https://github.com/pmmp/PocketMine-MP/tree/3.18.0"
             },
             "funding": [
                 {
@@ -2554,7 +2554,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-02-16T22:13:05+00:00"
+            "time": "2021-03-12T22:07:01+00:00"
         },
         {
             "name": "pocketmine/raklib",
@@ -2688,8 +2688,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.3",
-        "composer-runtime-api": "^2.0"
+        "php": "^7.4"
     },
     "platform-dev": [],
     "plugin-api-version": "2.0.0"

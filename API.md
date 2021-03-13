@@ -55,7 +55,7 @@ the message did not get sent, and a `ApiRejection` (exception) will be passed ba
 
 ```php
 /** @var $api \JaxkDev\DiscordBot\Plugin\Api */
-$api = $DiscordBotPlugin->getApi();
+$api = $DiscordBotPluginInstance->getApi();
 /** @var $promise \JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface */
 $promise = $api->sendMessage(/*Message model from $api->createMessage()*/);
 
@@ -117,7 +117,7 @@ Notes:
 
 + `RejectedError`
     + RejectedError is always an instance of `JaxkDev\DiscordBot\Plugin\ApiRejection`
-      where details about the rejection as well as the raw DiscordPHP rejection can be found.
+      where details about the rejection as well as the raw DiscordPHP rejection (if applicable) can be found.
 
 
 + All API methods documented below can be found in `JaxkDev\DiscordBot\Plugin\Api.php`
@@ -125,7 +125,7 @@ Notes:
 --- 
 
 #### Create a message
-+ **Signature** - `createMessage(TextChannel|User $channel, string $content): ?Message`
++ **Signature** - `createMessageModel(TextChannel|User $channel, string $content): ?Message`
 + **Input**
     + `$channel` - A TextChannel model or User model (for DM Message)
     + `$content` - (Text only right now) Content to send.
@@ -138,7 +138,7 @@ Notes:
 #### Send message
 + **Signature** - `sendMessage(Message $message): PromiseInterface`
 + **Input**
-    + `$message` - Message model, see `createMessage`.
+    + `$message` - Message model, see `createMessageModel`.
 + **Output** - PromiseInterface
     + **ResolvedData** - Model message with updated values like ID, timestamp etc.
     + **RejectedError** - ApiRejection, rejected when:
@@ -162,7 +162,7 @@ Notes:
 ---
 
 #### Create a ban
-+ **Signature** - `createBan(Member $member, ?string $reason = null, ?int $daysToDelete = null): ?Ban`
++ **Signature** - `createBanModel(Member $member, ?string $reason = null, ?int $daysToDelete = null): ?Ban`
 + **Input**
     + `$member` - A Member model
     + `$reason` - (Optional) Reason for the ban, note this is not sent to the member only used for audit log.
@@ -180,9 +180,22 @@ Notes:
 + **Output** - PromiseInterface.   
     + **ResolvedData** - *N/A*
     + **RejectedError** - ApiRejection, Possible rejections:
-        + Member model is invalid.
+        + Ban model is invalid.
         + Cannot fetch the server.
-        + Member cannot be kicked (bot may not have permission)
+        + Member cannot be banned (bot may not have permission)
+
+---
+
+#### Unban member
++ **Signature** - `unbanMember(Ban $ban): PromiseInterface`
++ **Input**
+    + `$ban` - Ban model, can be fetched from storage.
++ **Output** - PromiseInterface.
+    + **ResolvedData** - *N/A*
+    + **RejectedError** - ApiRejection, Possible rejections:
+        + Ban model is invalid.
+        + Cannot fetch the server.
+        + Bot does not have permission to unban members.
 
 TODO More.
 

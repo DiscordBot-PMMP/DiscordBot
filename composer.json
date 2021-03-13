@@ -22,7 +22,7 @@
     ],
     "require": {
         "php": "^7.4",
-        "team-reflex/discord-php": "dev-master#f61603d"
+        "team-reflex/discord-php": "dev-master#8b3eb0e"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.12.80",

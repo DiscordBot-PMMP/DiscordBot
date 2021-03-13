@@ -20,8 +20,8 @@ class Ban implements \Serializable{
 	/** @var string */
 	private $user_id;
 
-	/** @var null|string */
-	private $reason;
+	/** @var string|null */
+	private $reason = null;
 
 	/** @var int|null Only present on banRequest. */
 	private $daysToDelete = null;

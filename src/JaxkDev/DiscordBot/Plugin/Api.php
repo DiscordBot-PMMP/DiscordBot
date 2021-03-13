@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Activity;
@@ -29,7 +30,6 @@ use JaxkDev\DiscordBot\Models\User;
 
 /*
  * TODO:
- * - Unban member
  * - Give role
  * - Take role
  * - Edit message
@@ -40,6 +40,12 @@ use JaxkDev\DiscordBot\Models\User;
  * - Update channel
  * - Create invite
  * - Delete invite
+ *
+ * Test:
+ * - create ban
+ * - ban
+ * - unban
+ * - kick
  */
 
 /**
@@ -56,6 +62,39 @@ class Api{
 		$this->plugin = $plugin;
 	}
 
+
+	/**
+	 * Creates the Activity model ready for sending/updating.
+	 *
+	 * @param string      $status
+	 * @param int|null    $type
+	 * @param string|null $message
+	 * @return Activity
+	 * @see Api::updateActivity For updating the activity.
+	 * @see Activity            For Status & Type constants.
+	 */
+	public function createActivityModel(string $status, ?int $type = null, ?string $message = null): Activity{
+		$activity = new Activity();
+		$activity->setStatus($status);
+		$activity->setType($type);
+		$activity->setMessage($message);
+		return $activity;
+	}
+
+	/**
+	 * Sends the new activity to replace the current one the bot has.
+	 *
+	 * @param Activity $activity
+	 * @return PromiseInterface
+	 * @see Api::createActivityModel
+	 */
+	public function updateActivity(Activity $activity): PromiseInterface{
+		$pk = new RequestUpdateActivity();
+		$pk->setActivity($activity);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
 	/**
 	 * Create a ban model ready for use or null if days is out of range.
 	 *
@@ -65,7 +104,7 @@ class Api{
 	 * @return Ban|null
 	 * @see Api::banMember() To actually ban the member.
 	 */
-	public function createBan(Member $member, ?string $reason = null, ?int $daysToDelete = null): ?Ban{
+	public function createBanModel(Member $member, ?string $reason = null, ?int $daysToDelete = null): ?Ban{
 		if($daysToDelete !== null and ($daysToDelete < 0 or $daysToDelete > 7)) return null;
 		$ban = new Ban();
 		$ban->setServerId($member->getServerId());
@@ -80,10 +119,23 @@ class Api{
 	 *
 	 * @param Ban $ban
 	 * @return PromiseInterface
-	 * @see Api::createBan() For getting Ban model.
+	 * @see Api::createBanModel() For getting Ban model.
 	 */
 	public function banMember(Ban $ban): PromiseInterface{
 		$pk = new RequestBanMember();
+		$pk->setBan($ban);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Attempt to unban a member.
+	 *
+	 * @param Ban $ban
+	 * @return PromiseInterface
+	 */
+	public function unbanMember(Ban $ban): PromiseInterface{
+		$pk = new RequestUnbanMember();
 		$pk->setBan($ban);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
@@ -111,7 +163,7 @@ class Api{
 	 * @return Message|null
 	 * @see Api::sendMessage For sending the message.
 	 */
-	public function createMessage($channel, string $content): ?Message{
+	public function createMessageModel($channel, string $content): ?Message{
 		if(strlen($content) > 2000) return null;
 		if($channel instanceof User){
 			$id = $channel->getId();
@@ -132,43 +184,11 @@ class Api{
 	 *
 	 * @param Message $message
 	 * @return PromiseInterface
-	 * @see Api::createMessage For creating a message
+	 * @see Api::createMessageModel For creating a message
 	 */
 	public function sendMessage(Message $message): PromiseInterface{
 		$pk = new RequestSendMessage();
 		$pk->setMessage($message);
-		$this->plugin->writeOutboundData($pk);
-		return ApiResolver::create($pk->getUID());
-	}
-
-	/**
-	 * Creates the Activity model ready for sending/updating.
-	 *
-	 * @param string      $status
-	 * @param int|null    $type
-	 * @param string|null $message
-	 * @return Activity
-	 * @see Api::updateActivity For updating the activity.
-	 * @see Activity            For Status & Type constants.
-	 */
-	public function createActivity(string $status, ?int $type = null, ?string $message = null): Activity{
-		$activity = new Activity();
-		$activity->setStatus($status);
-		$activity->setType($type);
-		$activity->setMessage($message);
-		return $activity;
-	}
-
-	/**
-	 * Sends the new activity to replace the current one the bot has.
-	 *
-	 * @param Activity $activity
-	 * @return PromiseInterface
-	 * @see Api::createActivity
-	 */
-	public function updateActivity(Activity $activity): PromiseInterface{
-		$pk = new RequestUpdateActivity();
-		$pk->setActivity($activity);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}

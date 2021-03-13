@@ -22,6 +22,7 @@ use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
@@ -60,6 +61,7 @@ class CommunicationHandler{
 		if($packet instanceof RequestSendMessage) return $this->handleSendMessage($packet);
 		if($packet instanceof RequestKickMember) return $this->handleKickMember($packet);
 		if($packet instanceof RequestBanMember) return $this->handleBanMember($packet);
+		if($packet instanceof RequestUnbanMember) return $this->handleUnbanMember($packet);
 		return false;
 	}
 
@@ -155,6 +157,22 @@ class CommunicationHandler{
 		}, function(\Throwable $e) use($packet){
 			$this->resolveRequest($packet->getUID(), false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
 			MainLogger::getLogger()->debug("Failed to ban member ({$packet->getUID()}) - server error: {$e->getMessage()}");
+		});
+		return true;
+	}
+
+	private function handleUnbanMember(RequestUnbanMember $packet): bool{
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
+		$this->client->getDiscordClient()->guilds->fetch($packet->getBan()->getServerId())->then(function(DiscordGuild $guild) use($packet){
+			$guild->unban($packet->getBan()->getUserId())->then(function() use($packet){
+				$this->resolveRequest($packet->getUID(), true, "Member unbanned.");
+			}, function(\Throwable $e) use($packet){
+				$this->resolveRequest($packet->getUID(), false, "Failed to unban member.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to unban member ({$packet->getUID()}) - {$e->getMessage()}");
+			});
+		}, function(\Throwable $e) use($packet){
+			$this->resolveRequest($packet->getUID(), false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
+			MainLogger::getLogger()->debug("Failed to unban member ({$packet->getUID()}) - server error: {$e->getMessage()}");
 		});
 		return true;
 	}
