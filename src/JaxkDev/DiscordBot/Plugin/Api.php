@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
@@ -24,14 +25,17 @@ use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Channels\DmChannel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
+use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Message;
 use JaxkDev\DiscordBot\Models\User;
 
 /*
  * TODO:
+ * - Create role
  * - Give role
  * - Take role
+ * - Delete role
  * - Edit message
  * - Delete message
  * - Delete channel
@@ -40,6 +44,7 @@ use JaxkDev\DiscordBot\Models\User;
  * - Update channel
  * - Create invite
  * - Delete invite
+ * - Update nickname
  *
  * Test:
  * - create ban
@@ -158,8 +163,8 @@ class Api{
 	/**
 	 * Creates the Message model ready for sending, or null if user couldn't be found in storage.
 	 *
-	 * @param TextChannel|User	$channel TextChannel model or User Model for DMs
-	 * @param string			$content Content, <2000 in length.
+	 * @param TextChannel|DmChannel|User	$channel TextChannel model or User Model for DMs
+	 * @param string						$content Content, <2000 in length.
 	 * @return Message|null
 	 * @see Api::sendMessage For sending the message.
 	 */
@@ -189,6 +194,41 @@ class Api{
 	public function sendMessage(Message $message): PromiseInterface{
 		$pk = new RequestSendMessage();
 		$pk->setMessage($message);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Create a model invite, must be initialised before use !
+	 *
+	 * @param ServerChannel $channel
+	 * @param int     $maxAge		max age in seconds from initialise time until expiration, 0 for forever.
+	 * @param int     $maxUses		max amount of uses before expiration, 0 for unlimited.
+	 * @param bool    $temporary
+	 * @return Invite|null
+	 * @see Api::initialiseInvite() To actually create the invite through discord.
+	 */
+	public function createInviteModel(ServerChannel $channel, int $maxAge, int $maxUses, bool $temporary = false): ?Invite{
+		if(($maxAge > 604800 || $maxAge < 0) || ($maxUses > 100 || $maxUses < 0)) return null;
+		$invite = new Invite();
+		$invite->setServerId($channel->getServerId());
+		$invite->setChannelId($channel->getId());
+		$invite->setMaxAge($maxAge);
+		$invite->setMaxUses($maxUses);
+		$invite->setTemporary($temporary);
+		return $invite;
+	}
+
+	/**
+	 * Initialise if possible the given invite.
+	 *
+	 * @param Invite $invite
+	 * @return PromiseInterface
+	 * @see Api::createInviteModel() For creating a invite.
+	 */
+	public function initialiseInvite(Invite $invite): PromiseInterface{
+		$pk = new RequestInitialiseInvite();
+		$pk->setInvite($invite);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}

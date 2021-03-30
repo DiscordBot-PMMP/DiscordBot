@@ -14,8 +14,8 @@ namespace JaxkDev\DiscordBot\Models;
 
 class Invite implements \Serializable{
 
-	/** @var string Also used as ID internally. */
-	private $code;
+	/** @var string|null Also used as ID internally, null when creating model. */
+	private $code = null;
 
 	/** @var string */
 	private $server_id;
@@ -26,22 +26,22 @@ class Invite implements \Serializable{
 	/** @var int How long in seconds from creation time to expire, 0 for never. */
 	private $max_age;
 
-	/** @var int Timestamp */
-	private $created_at;
+	/** @var int|null Timestamp null when creating model. */
+	private $created_at = null;
 
 	/** @var bool */
 	private $temporary;
 
 	/** @var int How many times has this invite been used | NOTICE: This does not get updated when used */
-	private $uses;
+	private $uses = 0;
 
 	/** @var int 0 for unlimited uses */
 	private $max_uses;
 
-	/** @var string Member ID */
-	private $creator;
+	/** @var string|null Member ID, null when creating model. */
+	private $creator = null;
 
-	public function getCode(): string{
+	public function getCode(): ?string{
 		return $this->code;
 	}
 
@@ -73,7 +73,7 @@ class Invite implements \Serializable{
 		$this->max_age = $max_age;
 	}
 
-	public function getCreatedAt(): int{
+	public function getCreatedAt(): ?int{
 		return $this->created_at;
 	}
 
@@ -105,7 +105,7 @@ class Invite implements \Serializable{
 		$this->max_uses = $max_uses;
 	}
 
-	public function getCreator(): string{
+	public function getCreator(): ?string{
 		return $this->creator;
 	}
 
