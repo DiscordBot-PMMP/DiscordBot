@@ -86,7 +86,7 @@ class EventServerJoin extends Packet{
 		return serialize([$this->UID, $this->server, $this->roles, $this->channels, $this->members]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->server, $this->roles, $this->channels, $this->members] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->server, $this->roles, $this->channels, $this->members] = unserialize($data);
 	}
 }

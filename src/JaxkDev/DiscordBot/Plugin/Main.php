@@ -58,10 +58,6 @@ class Main extends PluginBase{
 		if(Phar::running(true) === ""){
 			throw new PluginException("Cannot be run from source.");
 		}
-		if(PHP_VERSION_ID < 70400){
-			//Hopefully temporary, https://github.com/pmmp/PocketMine-MP/pull/3960
-			throw new PluginException("Must be run with PHP 7.4+ or 8.0.3+");
-		}
 
 		if(!defined("JaxkDev\DiscordBot\COMPOSER")){
 			define("JaxkDev\DiscordBot\DATA_PATH", $this->getDataFolder());
@@ -78,7 +74,7 @@ class Main extends PluginBase{
 		$this->saveResource("config.yml");
 		$this->saveResource("events.yml");
 		$this->saveResource("HELP_ENG.txt", true); //Always keep that up-to-date.
-		$this->saveResource("cacert.pem", true); //And this ^
+		$this->saveResource("cacert.pem", true);   //And this.
 
 		$this->inboundData = new Volatile();
 		$this->outboundData = new Volatile();
@@ -106,7 +102,7 @@ class Main extends PluginBase{
 		unset($this->config);
 
 		$this->getServer()->getPluginManager()->registerEvents($this->pocketmineEventHandler, $this);
-		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void{
+		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(int $currentTick): void{
 			$this->tick($currentTick);
 		}), 1);
 	}

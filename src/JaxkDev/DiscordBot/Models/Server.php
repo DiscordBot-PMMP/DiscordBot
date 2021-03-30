@@ -117,7 +117,7 @@ class Server implements \Serializable{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->id,
 			$this->name,
@@ -127,6 +127,6 @@ class Server implements \Serializable{
 			$this->creation_timestamp,
 			$this->large,
 			$this->member_count
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

@@ -73,12 +73,12 @@ class Ban implements \Serializable{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->server_id,
 			$this->user_id,
 			$this->reason,
 			$this->daysToDelete
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

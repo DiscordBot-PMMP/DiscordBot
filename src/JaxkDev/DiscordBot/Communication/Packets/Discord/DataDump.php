@@ -163,7 +163,7 @@ class DataDump extends Packet{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->UID,
 			$this->servers,
@@ -175,6 +175,6 @@ class DataDump extends Packet{
 			$this->users,
 			$this->botUser,
 			$this->timestamp
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

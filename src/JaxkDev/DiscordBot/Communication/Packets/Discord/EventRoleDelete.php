@@ -31,7 +31,7 @@ class EventRoleDelete extends Packet{
 		return serialize([$this->UID, $this->role_id]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->role_id] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->role_id] = unserialize($data);
 	}
 }

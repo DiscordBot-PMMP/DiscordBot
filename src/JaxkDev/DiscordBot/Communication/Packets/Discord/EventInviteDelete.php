@@ -31,7 +31,7 @@ class EventInviteDelete extends Packet{
 		return serialize([$this->UID, $this->invite_code]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->invite_code] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->invite_code] = unserialize($data);
 	}
 }

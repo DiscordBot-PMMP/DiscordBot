@@ -32,7 +32,7 @@ class EventInviteCreate extends Packet{
 		return serialize([$this->UID, $this->invite]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->invite] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->invite] = unserialize($data);
 	}
 }

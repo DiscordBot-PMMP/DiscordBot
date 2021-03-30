@@ -32,7 +32,7 @@ class EventRoleCreate extends Packet{
 		return serialize([$this->UID, $this->role]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->role] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->role] = unserialize($data);
 	}
 }

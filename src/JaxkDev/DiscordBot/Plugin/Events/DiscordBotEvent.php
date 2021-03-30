@@ -18,12 +18,13 @@ use pocketmine\event\plugin\PluginEvent;
  * All events are cancellable [Excluding Ready/Closed event].
  *
  * Cancelling events will result in NO changes to Storage and NO messages sent.
- * We assume if cancelled another plugin is handling it
+ * We assume if cancelled the responsible plugin is handling it
  *
- * Do note that if the change is not reflected to `Storage` it may result in unforeseen consequences.
+ * Do note that if the change is not reflected to `Storage` it may result in unforeseen consequences,
+ * YOU HAVE BEEN WARNED.
  *
  * Also note cancelling the event DOES NOT cancel the cause, eg `DiscordServerJoined` event if cancelled
  * the bot will still remain in that server, if you want to undo the cause you must do so yourself
- * eg on the `DiscordServerJoined` event you can use the API to leave the server straight away.
+ * eg on the `DiscordServerJoined` event you can use the API to leave the server.
  */
 class DiscordBotEvent extends PluginEvent{}

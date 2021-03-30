@@ -27,10 +27,8 @@ in the relevant file.
 + All the actual discord data such as servers, roles members can be found in plugin storage anywhere from 
 5seconds to 500seconds after the plugin enables.
 
-    + To see if the initial data has been received you can check the `timestamp` through `JaxkDev\DiscordBot\Plugin\Storage.php`
-if it is null, no data has been received yet, otherwise it will have the timestamp of when that initial data dump came in.
-    + An alternative is to listen to `JaxkDev\DiscordBot\Plugin\Events\DiscordReady.php` this is emitted when bot is connected
-**and** initial data has been received.
+    + Listen to `JaxkDev\DiscordBot\Plugin\Events\DiscordReady.php` this is emitted when bot is connected
+**and** initial data has been received, only use the API and Storage after this event.
 
 ---
 

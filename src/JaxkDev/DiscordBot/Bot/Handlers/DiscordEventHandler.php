@@ -99,7 +99,7 @@ class DiscordEventHandler{
 			$this->client->close();
 		}
 
-		//Default activity.
+		//Default activity. TODO Move to plugin side initial packet data from config.yml (new default presence)
 		$ac = new Activity();
 		$ac->setMessage("PocketMine-MP v".\pocketmine\VERSION);
 		$ac->setType(Activity::TYPE_PLAYING);

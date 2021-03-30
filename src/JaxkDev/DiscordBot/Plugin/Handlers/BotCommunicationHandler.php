@@ -376,8 +376,7 @@ class BotCommunicationHandler{
 	public function checkHeartbeat(): void{
 		if($this->lastHeartbeat === null) return;
 		if(($diff = microtime(true) - $this->lastHeartbeat) > Protocol::HEARTBEAT_ALLOWANCE){
-			$this->plugin->getLogger()->emergency("DiscordBot has not responded for ".
-				Protocol::HEARTBEAT_ALLOWANCE." seconds, disabling plugin + bot.");
+			$this->plugin->getLogger()->emergency("DiscordBot has not responded for {$diff} seconds, disabling plugin.");
 			$this->plugin->stopAll();
 		}
 	}

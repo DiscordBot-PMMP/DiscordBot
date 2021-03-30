@@ -120,8 +120,8 @@ abstract class Permissions implements \Serializable{
 		return serialize($this->bitwise);
 	}
 
-	public function unserialize($serialized): void{
-		$this->bitwise = unserialize($serialized);
+	public function unserialize($data): void{
+		$this->bitwise = unserialize($data);
 		$this->updatePermissions();
 	}
 }

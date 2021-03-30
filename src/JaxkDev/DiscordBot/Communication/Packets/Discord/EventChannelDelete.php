@@ -31,7 +31,7 @@ class EventChannelDelete extends Packet{
 		return serialize([$this->UID, $this->channel_id]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->channel_id] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->channel_id] = unserialize($data);
 	}
 }

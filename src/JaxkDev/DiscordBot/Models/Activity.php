@@ -75,11 +75,11 @@ class Activity implements \Serializable{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->message,
 			$this->type,
 			$this->status
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

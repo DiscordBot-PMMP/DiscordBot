@@ -32,5 +32,5 @@ abstract class Packet implements \Serializable{
 
 	public abstract function serialize(): ?string;
 
-	public abstract function unserialize($serialized): void;
+	public abstract function unserialize($data): void;
 }

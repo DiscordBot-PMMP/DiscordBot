@@ -31,7 +31,7 @@ class EventMessageDelete extends Packet{
 		return serialize([$this->UID, $this->messageId]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->messageId] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->messageId] = unserialize($data);
 	}
 }

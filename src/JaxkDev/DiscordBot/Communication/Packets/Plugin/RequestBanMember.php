@@ -32,7 +32,7 @@ class RequestBanMember extends Packet{
 		return serialize([$this->UID, $this->ban]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->ban] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->ban] = unserialize($data);
 	}
 }

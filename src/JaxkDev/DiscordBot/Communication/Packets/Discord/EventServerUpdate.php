@@ -32,7 +32,7 @@ class EventServerUpdate extends Packet{
 		return serialize([$this->UID, $this->server]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->server] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->server] = unserialize($data);
 	}
 }

@@ -65,7 +65,7 @@ class VoiceChannel extends ServerChannel{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->id,
 			$this->name,
@@ -76,6 +76,6 @@ class VoiceChannel extends ServerChannel{
 			$this->bitrate,
 			$this->member_limit,
 			$this->members
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

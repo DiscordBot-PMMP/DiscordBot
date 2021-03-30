@@ -82,6 +82,7 @@ class Client{
 		$httpLogger->setHandlers(array($handler));
 
 		if($config['logging']['debug']){
+			//Note not thread safe on the output could mix and match between servers synced output and this debug output.
 			$handler = new StreamHandler(($r = fopen('php://stdout', 'w')) === false ? "" : $r);
 			$logger->pushHandler($handler);
 			$httpLogger->pushHandler($handler);

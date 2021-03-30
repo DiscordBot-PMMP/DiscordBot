@@ -31,7 +31,7 @@ class EventBanRemove extends Packet{
 		return serialize([$this->UID, $this->id]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->id] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->id] = unserialize($data);
 	}
 }

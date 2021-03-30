@@ -31,7 +31,7 @@ class EventServerLeave extends Packet{
 		return serialize([$this->UID, $this->server_id]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->server_id] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->server_id] = unserialize($data);
 	}
 }

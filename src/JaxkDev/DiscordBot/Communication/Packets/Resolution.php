@@ -68,12 +68,12 @@ class Resolution extends Packet{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->pid,
 			$this->successful,
 			$this->response,
 			$this->data
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

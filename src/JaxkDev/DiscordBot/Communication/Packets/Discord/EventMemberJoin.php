@@ -44,7 +44,7 @@ class EventMemberJoin extends Packet{
 		return serialize([$this->UID, $this->member, $this->user]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->member, $this->user] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->member, $this->user] = unserialize($data);
 	}
 }

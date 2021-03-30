@@ -20,7 +20,7 @@ class EventReady extends Packet{
 		return serialize($this->UID);
 	}
 
-	public function unserialize($serialized): void{
-		$this->UID = unserialize($serialized);
+	public function unserialize($data): void{
+		$this->UID = unserialize($data);
 	}
 }

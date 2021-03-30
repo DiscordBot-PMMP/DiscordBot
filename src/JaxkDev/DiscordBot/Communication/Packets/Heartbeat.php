@@ -29,7 +29,7 @@ class Heartbeat extends Packet{
 		return serialize([$this->UID, $this->heartbeat]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->heartbeat] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->heartbeat] = unserialize($data);
 	}
 }

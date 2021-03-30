@@ -91,7 +91,7 @@ class TextChannel extends ServerChannel{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->id,
 			$this->name,
@@ -104,6 +104,6 @@ class TextChannel extends ServerChannel{
 			$this->rate_limit,
 			$this->category_id,
 			$this->pins
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

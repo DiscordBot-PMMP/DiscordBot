@@ -32,7 +32,7 @@ class EventMessageSent extends Packet{
 		return serialize([$this->UID, $this->message]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->message] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->message] = unserialize($data);
 	}
 }

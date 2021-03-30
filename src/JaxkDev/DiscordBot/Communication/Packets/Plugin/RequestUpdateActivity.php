@@ -32,7 +32,7 @@ class RequestUpdateActivity extends Packet{
 		return serialize([$this->UID, $this->activity]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->activity] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->activity] = unserialize($data);
 	}
 }

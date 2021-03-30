@@ -129,7 +129,7 @@ class Invite implements \Serializable{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->code,
 			$this->server_id,
@@ -140,6 +140,6 @@ class Invite implements \Serializable{
 			$this->uses,
 			$this->max_uses,
 			$this->creator
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

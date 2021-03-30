@@ -97,7 +97,7 @@ class User implements \Serializable{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->id,
 			$this->username,
@@ -105,6 +105,6 @@ class User implements \Serializable{
 			$this->avatar_url,
 			$this->creation_timestamp
 			//$this->activity
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

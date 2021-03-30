@@ -113,7 +113,7 @@ class Role implements \Serializable{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->id,
 			$this->name,
@@ -122,6 +122,6 @@ class Role implements \Serializable{
 			$this->mentionable,
 			$this->hoistedPosition,
 			$this->server_id
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

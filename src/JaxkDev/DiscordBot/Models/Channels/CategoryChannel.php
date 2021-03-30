@@ -27,7 +27,7 @@ class CategoryChannel extends ServerChannel{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->id,
 			$this->name,
@@ -35,6 +35,6 @@ class CategoryChannel extends ServerChannel{
 			$this->member_permissions,
 			$this->role_permissions,
 			$this->server_id
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

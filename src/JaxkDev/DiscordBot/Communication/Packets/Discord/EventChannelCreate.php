@@ -32,7 +32,7 @@ class EventChannelCreate extends Packet{
 		return serialize([$this->UID, $this->channel]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->channel] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->channel] = unserialize($data);
 	}
 }

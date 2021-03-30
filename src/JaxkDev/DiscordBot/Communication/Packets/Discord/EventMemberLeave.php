@@ -31,7 +31,7 @@ class EventMemberLeave extends Packet{
 		return serialize([$this->UID, $this->member_id]);
 	}
 
-	public function unserialize($serialized): void{
-		[$this->UID, $this->member_id] = unserialize($serialized);
+	public function unserialize($data): void{
+		[$this->UID, $this->member_id] = unserialize($data);
 	}
 }

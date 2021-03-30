@@ -122,7 +122,7 @@ class Member implements \Serializable{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->user_id,
 			$this->nickname,
@@ -131,6 +131,6 @@ class Member implements \Serializable{
 			$this->permissions,
 			$this->roles_id,
 			$this->server_id
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

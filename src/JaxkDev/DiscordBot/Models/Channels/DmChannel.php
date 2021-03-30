@@ -57,10 +57,10 @@ class DmChannel extends Channel{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->id,
 			//$this->pins
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }

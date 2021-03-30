@@ -183,7 +183,7 @@ class Message implements \Serializable{
 		]);
 	}
 
-	public function unserialize($serialized): void{
+	public function unserialize($data): void{
 		[
 			$this->id,
 			$this->type,
@@ -196,6 +196,6 @@ class Message implements \Serializable{
 			$this->users_mentioned,
 			$this->roles_mentioned,
 			$this->channels_mentioned
-		] = unserialize($serialized);
+		] = unserialize($data);
 	}
 }
