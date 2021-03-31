@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestUnbanMember extends Packet{
+class RequestRevokeBan extends Packet{
 
 	/** @var Ban */
 	private $ban;

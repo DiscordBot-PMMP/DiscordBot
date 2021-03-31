@@ -12,11 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Activity;
@@ -42,8 +43,6 @@ use JaxkDev\DiscordBot\Models\User;
  * - Create channel
  * - Update permissions (channel,role,member)
  * - Update channel
- * - Create invite
- * - Delete invite
  * - Update nickname
  *
  * Test:
@@ -51,6 +50,10 @@ use JaxkDev\DiscordBot\Models\User;
  * - ban
  * - unban
  * - kick
+ *
+ * Tested:
+ * - Create invite
+ * - Delete invite
  */
 
 /**
@@ -78,7 +81,7 @@ class Api{
 	 * @see Api::updateActivity For updating the activity.
 	 * @see Activity            For Status & Type constants.
 	 */
-	public function createActivityModel(string $status, ?int $type = null, ?string $message = null): Activity{
+	public static function createActivityModel(string $status, ?int $type = null, ?string $message = null): Activity{
 		$activity = new Activity();
 		$activity->setStatus($status);
 		$activity->setType($type);
@@ -107,9 +110,9 @@ class Api{
 	 * @param string|null $reason		Reason for banning them, *will not be sent to member, just for audit log*
 	 * @param int|null    $daysToDelete How many days worth of messages to delete, maximum 7 days.
 	 * @return Ban|null
-	 * @see Api::banMember() To actually ban the member.
+	 * @see Api::initialiseBan() To actually initialise the ban.
 	 */
-	public function createBanModel(Member $member, ?string $reason = null, ?int $daysToDelete = null): ?Ban{
+	public static function createBanModel(Member $member, ?string $reason = null, ?int $daysToDelete = null): ?Ban{
 		if($daysToDelete !== null and ($daysToDelete < 0 or $daysToDelete > 7)) return null;
 		$ban = new Ban();
 		$ban->setServerId($member->getServerId());
@@ -126,21 +129,21 @@ class Api{
 	 * @return PromiseInterface
 	 * @see Api::createBanModel() For getting Ban model.
 	 */
-	public function banMember(Ban $ban): PromiseInterface{
-		$pk = new RequestBanMember();
+	public function initialiseBan(Ban $ban): PromiseInterface{
+		$pk = new RequestInitialiseBan();
 		$pk->setBan($ban);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
 
 	/**
-	 * Attempt to unban a member.
+	 * Attempt to revoke a ban.
 	 *
 	 * @param Ban $ban
 	 * @return PromiseInterface
 	 */
-	public function unbanMember(Ban $ban): PromiseInterface{
-		$pk = new RequestUnbanMember();
+	public function revokeBan(Ban $ban): PromiseInterface{
+		$pk = new RequestRevokeBan();
 		$pk->setBan($ban);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
@@ -168,7 +171,7 @@ class Api{
 	 * @return Message|null
 	 * @see Api::sendMessage For sending the message.
 	 */
-	public function createMessageModel($channel, string $content): ?Message{
+	public static function createMessageModel($channel, string $content): ?Message{
 		if(strlen($content) > 2000) return null;
 		if($channel instanceof User){
 			$id = $channel->getId();
@@ -208,7 +211,7 @@ class Api{
 	 * @return Invite|null
 	 * @see Api::initialiseInvite() To actually create the invite through discord.
 	 */
-	public function createInviteModel(ServerChannel $channel, int $maxAge, int $maxUses, bool $temporary = false): ?Invite{
+	public static function createInviteModel(ServerChannel $channel, int $maxAge, int $maxUses, bool $temporary = false): ?Invite{
 		if(($maxAge > 604800 || $maxAge < 0) || ($maxUses > 100 || $maxUses < 0)) return null;
 		$invite = new Invite();
 		$invite->setServerId($channel->getServerId());
@@ -225,9 +228,23 @@ class Api{
 	 * @param Invite $invite
 	 * @return PromiseInterface
 	 * @see Api::createInviteModel() For creating a invite.
+	 * @see Api::revokeInvite() For revoking an initialised invite.
 	 */
 	public function initialiseInvite(Invite $invite): PromiseInterface{
 		$pk = new RequestInitialiseInvite();
+		$pk->setInvite($invite);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Revoke an initialised invite.
+	 *
+	 * @param Invite $invite
+	 * @return PromiseInterface
+	 */
+	public function revokeInvite(Invite $invite): PromiseInterface{
+		$pk = new RequestRevokeInvite();
 		$pk->setInvite($invite);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());

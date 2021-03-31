@@ -19,12 +19,14 @@ use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
+use Discord\Repository\Guild\InviteRepository as DiscordInviteRepository;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
@@ -62,9 +64,10 @@ class CommunicationHandler{
 		if($packet instanceof RequestUpdateActivity) return $this->handleUpdateActivity($packet);
 		if($packet instanceof RequestSendMessage) return $this->handleSendMessage($packet);
 		if($packet instanceof RequestKickMember) return $this->handleKickMember($packet);
-		if($packet instanceof RequestBanMember) return $this->handleBanMember($packet);
-		if($packet instanceof RequestUnbanMember) return $this->handleUnbanMember($packet);
+		if($packet instanceof RequestInitialiseBan) return $this->handleInitialiseBan($packet);
+		if($packet instanceof RequestRevokeBan) return $this->handleRevokeBan($packet);
 		if($packet instanceof RequestInitialiseInvite) return $this->handleInitialiseInvite($packet);
+		if($packet instanceof RequestRevokeInvite) return $this->handleRevokeInvite($packet);
 		return false;
 	}
 
@@ -148,7 +151,7 @@ class CommunicationHandler{
 		return true;
 	}
 
-	private function handleBanMember(RequestBanMember $packet): bool{
+	private function handleInitialiseBan(RequestInitialiseBan $packet): bool{
 		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
 		$this->client->getDiscordClient()->guilds->fetch($packet->getBan()->getServerId())->then(function(DiscordGuild $guild) use($packet){
 			$guild->bans->ban($packet->getBan()->getUserId())->then(function() use($packet){
@@ -164,7 +167,7 @@ class CommunicationHandler{
 		return true;
 	}
 
-	private function handleUnbanMember(RequestUnbanMember $packet): bool{
+	private function handleRevokeBan(RequestRevokeBan $packet): bool{
 		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
 		$this->client->getDiscordClient()->guilds->fetch($packet->getBan()->getServerId())->then(function(DiscordGuild $guild) use($packet){
 			$guild->unban($packet->getBan()->getUserId())->then(function() use($packet){
@@ -189,7 +192,7 @@ class CommunicationHandler{
 			$guild->channels->fetch($invite->getChannelId())->done(function(DiscordChannel $channel) use($pid, $invite){
 				/** @phpstan-ignore-next-line Poorly documented function on discord.php's side. */
 				$channel->createInvite([
-					"max_age" => $invite->getMaxAge(), "max_uses" => $invite->getMaxUses(), "temporary" => $invite->isTemporary()
+					"max_age" => $invite->getMaxAge(), "max_uses" => $invite->getMaxUses(), "temporary" => $invite->isTemporary(), "unique" => true
 				])->done(function(DiscordInvite $dInvite) use($pid){
 					$this->resolveRequest($pid, true, "Invite initialised.", [ModelConverter::genModelInvite($dInvite)]);
 					MainLogger::getLogger()->debug("Invite initialised ({$pid})");
@@ -204,6 +207,33 @@ class CommunicationHandler{
 		}, function(\Throwable $e) use($pid){
 			$this->resolveRequest($pid, false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
 			MainLogger::getLogger()->debug("Failed to initialise invite ({$pid}) - server error: {$e->getMessage()}");
+		});
+		return true;
+	}
+
+	private function handleRevokeInvite(RequestRevokeInvite $pk): bool{
+		$pid = $pk->getUID();
+		$invite = $pk->getInvite();
+
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible. TODO Function getting channel.
+		$this->client->getDiscordClient()->guilds->fetch($invite->getServerId())->done(function(DiscordGuild $guild) use($pid, $invite){
+			$guild->invites->freshen()->done(function(DiscordInviteRepository $invites) use($pid, $invite){
+				/** @var DiscordInvite $dInvite */
+				$dInvite = $invites->offsetGet($invite->getCode());
+				$invites->delete($dInvite)->done(function(DiscordInvite $dInvite) use($pid){
+					$this->resolveRequest($pid, true, "Invite revoked.", [ModelConverter::genModelInvite($dInvite)]);
+					MainLogger::getLogger()->debug("Invite revoked ({$pid})");
+				}, function(\Throwable $e) use($pid){
+					$this->resolveRequest($pid, false, "Failed to revoke.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to revoke invite ({$pid}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pid){
+				$this->resolveRequest($pid, false, "Failed to freshen invites.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to revoke invite ({$pid}) - invite freshen error: {$e->getMessage()}");
+			});
+		}, function(\Throwable $e) use($pid){
+			$this->resolveRequest($pid, false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
+			MainLogger::getLogger()->debug("Failed to revoke invite ({$pid}) - server error: {$e->getMessage()}");
 		});
 		return true;
 	}
