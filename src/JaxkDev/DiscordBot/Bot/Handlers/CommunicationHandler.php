@@ -29,6 +29,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
@@ -63,6 +64,7 @@ class CommunicationHandler{
 			$this->resolveRequest($packet->getUID(), false, "Thread not ready for API Requests.");
 			return false;
 		}
+		if($packet instanceof RequestUpdateNickname) return $this->handleUpdateNickname($packet);
 		if($packet instanceof RequestUpdateActivity) return $this->handleUpdateActivity($packet);
 		if($packet instanceof RequestSendMessage) return $this->handleSendMessage($packet);
 		if($packet instanceof RequestEditMessage) return $this->handleEditMessage($packet);
@@ -73,6 +75,30 @@ class CommunicationHandler{
 		if($packet instanceof RequestInitialiseInvite) return $this->handleInitialiseInvite($packet);
 		if($packet instanceof RequestRevokeInvite) return $this->handleRevokeInvite($packet);
 		return false;
+	}
+
+	private function handleUpdateNickname(RequestUpdateNickname $packet): bool{
+		$pid = $packet->getUID();
+		$member = $packet->getMember();
+
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
+		$this->client->getDiscordClient()->guilds->fetch($member->getServerId())->then(function(DiscordGuild $guild) use($pid, $member){
+			$guild->members->fetch($member->getUserId())->then(function(DiscordMember $dMember) use($pid, $member){
+				$dMember->setNickname($member->getNickname())->done(function() use($pid){
+					$this->resolveRequest($pid, true, "Updated nickname.");
+				}, function(\Throwable $e) use($pid){
+					$this->resolveRequest($pid, false, "Failed to update nickname.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to update nickname ({$pid}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pid){
+				$this->resolveRequest($pid, false, "Failed to fetch member.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to update nickname ({$pid}) - member error: {$e->getMessage()}");
+			});
+		}, function(\Throwable $e) use($pid){
+			$this->resolveRequest($pid, false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
+			MainLogger::getLogger()->debug("Failed to update nickname ({$pid}) - server error: {$e->getMessage()}");
+		});
+		return true;
 	}
 
 	private function handleUpdateActivity(RequestUpdateActivity $packet): bool{
@@ -137,9 +163,18 @@ class CommunicationHandler{
 	private function handleEditMessage(RequestEditMessage $packet): bool{
 		$pid = $packet->getUID();
 		$message = $packet->getMessage();
+		$id = $message->getId();
 		$channel = $this->client->getDiscordClient()->getChannel($message->getChannelId());
+		if($channel === null){
+			$this->resolveRequest($pid, false, "Failed to fetch channel.");
+			return true;
+		}
+		if($id === null){
+			$this->resolveRequest($pid, false, "No message ID provided.");
+			return true;
+		}
 		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
-		$channel->messages->fetch($message->getId())->done(function(DiscordMessage $dMessage) use($pid, $message){
+		$channel->messages->fetch($id)->done(function(DiscordMessage $dMessage) use($pid, $message){
 			$dMessage->content = $message->getContent();
 			//$dMessage->embeds = x.y.z;
 			$dMessage->channel->messages->save($dMessage)->done(function(DiscordMessage $dMessage) use($pid){
@@ -154,10 +189,18 @@ class CommunicationHandler{
 
 	private function handleDeleteMessage(RequestDeleteMessage $packet): bool{
 		$pid = $packet->getUID();
-		$message = $packet->getMessage();
+		$message = $packet->getMessage();$id = $message->getId();
 		$channel = $this->client->getDiscordClient()->getChannel($message->getChannelId());
+		if($channel === null){
+			$this->resolveRequest($pid, false, "Failed to fetch channel.");
+			return true;
+		}
+		if($id === null){
+			$this->resolveRequest($pid, false, "No message ID provided.");
+			return true;
+		}
 		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
-		$channel->messages->fetch($message->getId())->done(function(DiscordMessage $dMessage) use($pid, $message){
+		$channel->messages->fetch($id)->done(function(DiscordMessage $dMessage) use($pid){
 			$dMessage->delete()->done(function() use($pid){
 				$this->resolveRequest($pid);
 			}, function(\ThreadException $e) use($pid){

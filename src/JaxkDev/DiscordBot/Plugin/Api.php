@@ -21,6 +21,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
@@ -43,7 +44,8 @@ use JaxkDev\DiscordBot\Models\User;
  * - Create channel
  * - Update permissions (channel,role,member)
  * - Update channel
- * - Update nickname
+ * - Add Reaction
+ * - Remove Reaction (advanced)
  *
  * - Assert all fields are valid before sending packet.
  *
@@ -59,6 +61,7 @@ use JaxkDev\DiscordBot\Models\User;
  * - Delete message
  * - Create invite
  * - Delete invite
+ * - Update nickname
  */
 
 /**
@@ -209,6 +212,7 @@ class Api{
 
 	/**
 	 * Edit a sent message.
+	 * @see Message::setContent() Set new content (aka edit) then call editMessage.
 	 *
 	 * @param Message $message
 	 * @return PromiseInterface
@@ -281,6 +285,20 @@ class Api{
 	public function revokeInvite(Invite $invite): PromiseInterface{
 		$pk = new RequestRevokeInvite();
 		$pk->setInvite($invite);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Update a members nickname (set to null to remove)
+	 * @see Member::setNickname() Set nickname then call updateNickname.
+	 *
+	 * @param Member $member
+	 * @return PromiseInterface
+	 */
+	public function updateNickname(Member $member): PromiseInterface{
+		$pk = new RequestUpdateNickname();
+		$pk->setMember($member);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
