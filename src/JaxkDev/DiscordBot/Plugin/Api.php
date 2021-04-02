@@ -52,6 +52,7 @@ use JaxkDev\DiscordBot\Models\User;
  * - kick
  *
  * Tested:
+ * - Send message
  * - Create invite
  * - Delete invite
  */

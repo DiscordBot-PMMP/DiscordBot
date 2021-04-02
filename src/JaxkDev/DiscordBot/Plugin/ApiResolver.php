@@ -41,7 +41,7 @@ abstract class ApiResolver{
 		if(isset(self::$map[$packet->getPid()])){
 			$d = self::$map[$packet->getPid()];
 			if($packet->wasSuccessful()){
-				$d->resolve([$packet->getResponse(), ...$packet->getData()]);
+				$d->resolve(new ApiResolution([$packet->getResponse(), ...$packet->getData()]));
 			}else{
 				$d->reject(new ApiRejection($packet->getResponse(), $packet->getData()));
 			}

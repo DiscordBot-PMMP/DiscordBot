@@ -44,7 +44,8 @@ another thread (discord bot) and then receive the result which is naturally abou
 So using a promise we can return an interface that allows you the person sending the request to attach a callback for
 when the request is `resolved` or `rejected`.
 
-if its `resolved` it means the request was handled successfully, in this scenario it means message was sent successfully.
+if its `resolved` it means the request was handled successfully, in this scenario it means message was sent successfully
+and a `ApiResolution` will be passed back.
 
 if its `rejected` it means something happened, and it failed to finish the request successfully, in this scenario it means
 the message did not get sent, and a `ApiRejection` (exception) will be passed back.
@@ -61,20 +62,18 @@ $promise = $api->sendMessage(/*Message model from $api->createMessage()*/);
 // but be sure to register your callbacks before finishing.
 
 //To handle both resolved and rejected:
-$promise->then(function($resolvedData){
+$promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResultion $resolution){
     echo "Resolved !";
     //Yay, it worked and the message was sent successfully.
-    //See API Documentation for potential resolvedData.
 }, function(\JaxkDev\DiscordBot\Plugin\ApiRejection $rejectedError){
     echo "Rejected :(";
     //Oh no, It failed and $rejectedError can tell you why.
 });
 
 //Or handle just resolved:
-$promise->then(function($resolvedData){
+$promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResultion $resolution){
     echo "Resolved !";
     //Yay, it worked and the message was sent successfully.
-    //See API Documentation for potential resolvedData.
 });
 
 //Or handle just rejected:
@@ -98,7 +97,7 @@ Please note the order of execution:
 
 For more in depth details about the promise interface see `JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface.php`
 
-For information on the argument types for `$resolvedData` and `$rejectedError` see below.
+For information on the argument types for `$resolution` and `$rejectedError` see below.
 
 ---
 
@@ -108,9 +107,10 @@ This section documents every API method, and the possible input, return/resoluti
 
 
 Notes:
-+ `ResolvedData`
-    + ResolvedData is an array `[string $message, documented data after]`
-    + A message regarding the request is **ALWAYS** at index 0, then any documented data below will start at index 1.
++ `Resolution`
+    + Resolution is always a instance of `JaxkDev\DiscordBot\Plugin\ApiResolution`
+    + A message (Resolution::getMessage()) is always present.
+    + Any optional data (Resolution::getData()) is documented below.
 
 
 + `RejectedError`
@@ -138,7 +138,7 @@ Notes:
 + **Input**
     + `$message` - Message model, see `createMessageModel`.
 + **Output** - PromiseInterface
-    + **ResolvedData** - Model message with updated values like ID, timestamp etc.
+    + **Resolution::getData()** - Model message with updated values like ID, timestamp etc.
     + **RejectedError** - ApiRejection, rejected when:
         + Message model is invalid.
         + Cannot fetch the server(excluding DM's) or channel.
@@ -151,7 +151,7 @@ Notes:
 + **Input**
     + `$member` - Member model.
 + **Output** - PromiseInterface or null if member cannot be found with ID provided.
-    + **ResolvedData** - *N/A*
+    + **Resolution::getData()** - *N/A*
     + **RejectedError** - ApiRejection, Possible rejections:
         + Member model is invalid.
         + Cannot fetch the server.
@@ -176,7 +176,7 @@ Notes:
 + **Input**
     + `$ban` - Ban model, see `createBan()`.
 + **Output** - PromiseInterface.   
-    + **ResolvedData** - *N/A*
+    + **Resolution::getData()** - *N/A*
     + **RejectedError** - ApiRejection, Possible rejections:
         + Ban model is invalid.
         + Cannot fetch the server.
@@ -189,7 +189,7 @@ Notes:
 + **Input**
     + `$ban` - Ban model, can be fetched from storage.
 + **Output** - PromiseInterface.
-    + **ResolvedData** - *N/A*
+    + **Resolution::getData()** - *N/A*
     + **RejectedError** - ApiRejection, Possible rejections:
         + Ban model is invalid.
         + Cannot fetch the server.
