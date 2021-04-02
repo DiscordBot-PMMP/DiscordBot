@@ -22,7 +22,7 @@ class Role implements \Serializable{
 	/** @var string */
 	private $name;
 
-	/** @var RolePermissions */
+	/** @var RolePermissions TODO: Investigate no denied permissions?? */
 	private $permissions;
 
 	/** @var int */
@@ -66,7 +66,7 @@ class Role implements \Serializable{
 	}
 
 	/**
-	 * @param int $colour [0x000000 - 0xFFFFFF]
+	 * @param int $colour Hex [0x000000 - 0xFFFFFF]
 	 */
 	public function setColour(int $colour): void{
 		$this->colour = $colour;

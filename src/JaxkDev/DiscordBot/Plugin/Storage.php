@@ -36,6 +36,8 @@ class Storage{
 	/** @var Array<string, string[]> */
 	private static $channelServerMap = [];
 
+	//todo channel category map
+
 	/** @var Array<string, Member> */
 	private static $memberMap = [];
 

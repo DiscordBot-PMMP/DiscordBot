@@ -21,11 +21,11 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": "^7.4||^8.0.3",
         "team-reflex/discord-php": "dev-master#8b3eb0e"
     },
     "require-dev": {
-        "phpstan/phpstan": "^0.12.80",
+        "phpstan/phpstan": "^0.12.82",
         "pocketmine/pocketmine-mp": "^3"
     }
 }
