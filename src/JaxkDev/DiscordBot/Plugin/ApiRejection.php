@@ -12,7 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-// TODO, Similar standard for resolved data?
 class ApiRejection extends \Exception{
 
 	/** @var string[] */

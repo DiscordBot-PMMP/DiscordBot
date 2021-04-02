@@ -22,6 +22,8 @@ use Discord\Parts\User\User as DiscordUser;
 use Discord\Repository\Guild\InviteRepository as DiscordInviteRepository;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -63,6 +65,8 @@ class CommunicationHandler{
 		}
 		if($packet instanceof RequestUpdateActivity) return $this->handleUpdateActivity($packet);
 		if($packet instanceof RequestSendMessage) return $this->handleSendMessage($packet);
+		if($packet instanceof RequestEditMessage) return $this->handleEditMessage($packet);
+		if($packet instanceof RequestDeleteMessage) return $this->handleDeleteMessage($packet);
 		if($packet instanceof RequestKickMember) return $this->handleKickMember($packet);
 		if($packet instanceof RequestInitialiseBan) return $this->handleInitialiseBan($packet);
 		if($packet instanceof RequestRevokeBan) return $this->handleRevokeBan($packet);
@@ -126,6 +130,40 @@ class CommunicationHandler{
 		}, function(\Throwable $e) use($pid){
 			$this->resolveRequest($pid, false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
 			MainLogger::getLogger()->debug("Failed to send message ({$pid}) - server error: {$e->getMessage()}");
+		});
+		return true;
+	}
+
+	private function handleEditMessage(RequestEditMessage $packet): bool{
+		$pid = $packet->getUID();
+		$message = $packet->getMessage();
+		$channel = $this->client->getDiscordClient()->getChannel($message->getChannelId());
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
+		$channel->messages->fetch($message->getId())->done(function(DiscordMessage $dMessage) use($pid, $message){
+			$dMessage->content = $message->getContent();
+			//$dMessage->embeds = x.y.z;
+			$dMessage->channel->messages->save($dMessage)->done(function(DiscordMessage $dMessage) use($pid){
+				$this->resolveRequest($pid, true, "Message edited.", [ModelConverter::genModelMessage($dMessage)]);
+			}, function(\ThreadException $e) use($pid){
+				$this->resolveRequest($pid, false, "Failed to edit message.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to edit message ({$pid}) - {$e->getMessage()}");
+			});
+		});
+		return true;
+	}
+
+	private function handleDeleteMessage(RequestDeleteMessage $packet): bool{
+		$pid = $packet->getUID();
+		$message = $packet->getMessage();
+		$channel = $this->client->getDiscordClient()->getChannel($message->getChannelId());
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible
+		$channel->messages->fetch($message->getId())->done(function(DiscordMessage $dMessage) use($pid, $message){
+			$dMessage->delete()->done(function() use($pid){
+				$this->resolveRequest($pid);
+			}, function(\ThreadException $e) use($pid){
+				$this->resolveRequest($pid, false, "Failed to delete message.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to delete message ({$pid}) - {$e->getMessage()}");
+			});
 		});
 		return true;
 	}

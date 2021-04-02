@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -37,13 +39,13 @@ use JaxkDev\DiscordBot\Models\User;
  * - Give role
  * - Take role
  * - Delete role
- * - Edit message
- * - Delete message
  * - Delete channel
  * - Create channel
  * - Update permissions (channel,role,member)
  * - Update channel
  * - Update nickname
+ *
+ * - Assert all fields are valid before sending packet.
  *
  * Test:
  * - create ban
@@ -53,12 +55,15 @@ use JaxkDev\DiscordBot\Models\User;
  *
  * Tested:
  * - Send message
+ * - Edit message
+ * - Delete message
  * - Create invite
  * - Delete invite
  */
 
 /**
  * For internal and developers use for interacting with the discord bot.
+ * Model creation methods are static.
  * @see Main::getApi() To get instance.
  * @see Storage For all discord data.
  */
@@ -75,8 +80,8 @@ class Api{
 	/**
 	 * Creates the Activity model ready for sending/updating.
 	 *
-	 * @param string      $status
-	 * @param int|null    $type
+	 * @param string      $status	Constant, see JaxkDev\DiscordBot\Models\Activity class.
+	 * @param int|null    $type		Constant, see JaxkDev\DiscordBot\Models\Activity class.
 	 * @param string|null $message
 	 * @return Activity
 	 * @see Api::updateActivity For updating the activity.
@@ -197,6 +202,35 @@ class Api{
 	 */
 	public function sendMessage(Message $message): PromiseInterface{
 		$pk = new RequestSendMessage();
+		$pk->setMessage($message);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Edit a sent message.
+	 *
+	 * @param Message $message
+	 * @return PromiseInterface
+	 * @see Api::createMessageModel For creating a message
+	 * @see Api::sendMessage For sending a message.
+	 * @see Api::deleteMessage For deleting a sent message.
+	 */
+	public function editMessage(Message $message): PromiseInterface{
+		$pk = new RequestEditMessage();
+		$pk->setMessage($message);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Delete a sent message.
+	 *
+	 * @param Message $message
+	 * @return PromiseInterface
+	 */
+	public function deleteMessage(Message $message): PromiseInterface{
+		$pk = new RequestDeleteMessage();
 		$pk->setMessage($message);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
