@@ -81,4 +81,8 @@ class BotThread extends Thread{
 	public function getStatus(): int{
 		return $this->status;
 	}
+
+	public function getThreadName() : string{
+		return "Discord";
+	}
 }
