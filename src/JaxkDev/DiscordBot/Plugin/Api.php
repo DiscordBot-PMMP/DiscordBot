@@ -66,7 +66,11 @@ use JaxkDev\DiscordBot\Models\User;
 
 /**
  * For internal and developers use for interacting with the discord bot.
- * Model creation methods are static.
+ *
+ * Model creation methods are static, note you can initialise your own models but
+ * these functions ensure the required fields are present & valid for creation.
+ *
+ *
  * @see Main::getApi() To get instance.
  * @see Storage For all discord data.
  */

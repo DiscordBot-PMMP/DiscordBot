@@ -87,8 +87,10 @@ class DiscordEventHandler{
 		$discord->on("GUILD_BAN_REMOVE", [$this, "onBanRemove"]);
 
 		/*
-		 * TODO (others planned for 2.1):
+		 * TODO:
 		 * - Reactions (Probably wont store previous reactions, could be very large...)
+		 *
+		 * TODO (TBD):
 		 * - Pins (Note event only emits the pins for the channel not if one was added/deleted/unpinned etc.)
 		 */
 	}
@@ -407,7 +409,6 @@ class DiscordEventHandler{
 
 		// Other types of messages not used right now.
 		if($message->type !== DiscordMessage::TYPE_NORMAL) return false;
-		//if($message->channel->type !== DiscordChannel::TYPE_TEXT) return false;
 		if(($message->content??"") === "") return false; //Images/Files, can be empty strings or just null in other cases.
 		//if($message->channel->guild_id === null) return false;
 
