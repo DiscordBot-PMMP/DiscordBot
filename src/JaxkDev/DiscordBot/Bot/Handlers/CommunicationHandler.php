@@ -158,7 +158,6 @@ class CommunicationHandler{
 			}
 			//Todo replies.
 			$channel->sendMessage($pk->getMessage()->getContent(), false, $de)->done(function(DiscordMessage $msg) use($pk){
-				var_dump(true);
 				$this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
 				MainLogger::getLogger()->debug("Sent message ({$pk->getUID()})");
 			}, function(\Throwable $e) use($pk){

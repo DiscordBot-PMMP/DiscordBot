@@ -33,8 +33,8 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
  * TODO:
- * - Send message (Embed/Reply)
- * - Edit message (Embed/Reply)
+ * - Send message (Reply)
+ * - Edit message (Reply)
  * - Give role
  * - Take role
  * - Delete role
@@ -54,9 +54,11 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Ban
  * - Unban
  * - Kick
+ * - Edit Message(+Embed)
  * - Pre packet tests.
  *
  * Tested:
+ * - Send Message(+Embed)
  * - Delete Channel
  * - Delete message
  * - Delete invite

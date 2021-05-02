@@ -15,10 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin\Handlers;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
-use JaxkDev\DiscordBot\Models\Embed\Author;
 use JaxkDev\DiscordBot\Models\Embed\Embed;
-use JaxkDev\DiscordBot\Models\Embed\Field;
-use JaxkDev\DiscordBot\Models\Embed\Footer;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Webhook;
@@ -123,29 +120,8 @@ class BotCommunicationHandler{
 		$m = new Message();
 		$m->setChannelId("778914498609283102");
 		$e = new Embed();
-		//$e->setTimestamp(time());
 		$e->setTitle("Server Started");
-		//$e->setDescription("Server Started");
-		//$e->setType(Embed::TYPE_RICH);
-		//$e->setUrl("https://test.url");
 		$e->setColour(0x10ff10);
-		//$f = new Footer();
-		//$f->setText("Test Footer");
-		//$f->setIconUrl("https://test.footer.icon");
-		//$e->setFooter($f);
-		//$a = new Author();
-		//$a->setName("Test Author");
-		//$a->setUrl("https://test.author");
-		//$a->setIconUrl("https://test.author.icon");
-		//$e->setAuthor($a);
-		$f = [];
-		for($i = 0; $i < 5; $i++){
-			$ff = new Field();
-			$ff->setName("Test Field $i");
-			$ff->setValue("Test Field Value $i");
-			//$f[] = $ff;
-		}
-		$e->setFields($f);
 		$m->setEmbed($e);
 		$this->plugin->getApi()->sendMessage($m)->otherwise(function(ApiRejection $d){
 			MainLogger::getLogger()->logException($d);

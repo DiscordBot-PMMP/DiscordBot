@@ -181,7 +181,6 @@ class Main extends PluginBase{
 
 		/** @var Packet $d */
 		foreach($data as $d){
-			//if(!$d instanceof Heartbeat) var_dump($d);
 			$this->botCommsHandler->handle($d);
 		}
 
