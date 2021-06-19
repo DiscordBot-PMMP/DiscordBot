@@ -44,10 +44,14 @@ use JaxkDev\DiscordBot\Models\User;
  * - Create channel
  * - Update permissions (channel,role,member)
  * - Update channel
+ * - update role
  * - Add Reaction
  * - Remove Reaction (advanced)
- *
  * - Assert all fields are valid before sending packet.
+ *
+ * V3.x or v2.1+ (depending on BC):
+ * - Register listener (messages, reactions etc)
+ * - Unregister listener
  *
  * Test:
  * - create ban
@@ -68,7 +72,7 @@ use JaxkDev\DiscordBot\Models\User;
  * For internal and developers use for interacting with the discord bot.
  *
  * Model creation methods are static, note you can initialise your own models but
- * these functions ensure the required fields are present & valid for creation.
+ * these functions ensure the required fields are present & valid for creation and use..
  *
  *
  * @see Main::getApi() To get instance.

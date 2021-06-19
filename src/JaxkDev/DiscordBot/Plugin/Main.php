@@ -23,9 +23,11 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginException;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
-use pocketmine\utils\MainLogger;
 use pocketmine\utils\TextFormat;
 use Volatile;
+
+// TODO:
+// Is it worth having a third logger to point to plugin_data/DiscordBot/logs like the thread's one ?
 
 class Main extends PluginBase{
 
@@ -173,13 +175,11 @@ class Main extends PluginBase{
 	}
 
 	private function tick(int $currentTick): void{
-		$data = $this->readInboundData(Protocol::PPT);
+		$data = $this->readInboundData(Protocol::PACKETS_PER_TICK);
 
 		/** @var Packet $d */
 		foreach($data as $d){
-			if(!$this->botCommsHandler->handle($d)){
-				MainLogger::getLogger()->debug("Packet ".get_class($d)." [".$d->getUID()."] not handled.");
-			}
+			$this->botCommsHandler->handle($d);
 		}
 
 		if(($currentTick % 20) === 0){

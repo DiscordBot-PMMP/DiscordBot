@@ -194,8 +194,6 @@ class DiscordEventHandler{
 
 		$pk->setBotUser(ModelConverter::genModelUser($client->user));
 
-		$this->client->getThread()->writeOutboundData($pk);
-
 		MainLogger::getLogger()->debug("Data pack Took: ".round(microtime(true)-$t, 5)."s & ".
 			round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
 
@@ -205,12 +203,13 @@ class DiscordEventHandler{
 			$this->client->close();
 		}
 
+		$this->client->getThread()->writeOutboundData($pk);
+
 		$this->client->getThread()->setStatus(Protocol::THREAD_STATUS_READY);
-		MainLogger::getLogger()->info("Client ready.");
+		MainLogger::getLogger()->info("Client '".$client->username."#".$client->discriminator."' ready.");
 
 		$this->client->getThread()->writeOutboundData(new EventReady());
 		$this->client->getCommunicationHandler()->sendHeartbeat();
-		$this->client->logDebugInfo();
 	}
 
 	public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
@@ -384,7 +383,7 @@ class DiscordEventHandler{
 				$this->client->getThread()->writeOutboundData($packet);
 			});
 		}else{
-			MainLogger::getLogger()->debug("Bot does not have ban_members permission so no reason was attached to this ban.");
+			MainLogger::getLogger()->debug("Bot does not have ban_members permission so no reason could be attached to this ban.");
 			$packet = new EventBanAdd();
 			$packet->setBan(ModelConverter::genModelBan($ban));
 			$this->client->getThread()->writeOutboundData($packet);

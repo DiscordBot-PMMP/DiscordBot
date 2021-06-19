@@ -15,13 +15,13 @@ namespace JaxkDev\DiscordBot\Communication;
 abstract class Protocol{
 
 	const
-		PPT = 50, 					// How many packets should be processed per tick ?   [PacketsPerTick]
+		PACKETS_PER_TICK 	= 50, 	// How many packets should be processed per tick ?
 		HEARTBEAT_ALLOWANCE = 10;	// How long between last known heartbeat until declared dead. (seconds)
 
 	const
-		THREAD_STATUS_STARTING = 0,
-		THREAD_STATUS_STARTED = 1,
-		THREAD_STATUS_READY = 2,
-		THREAD_STATUS_CLOSING = 8,
-		THREAD_STATUS_CLOSED = 9;
+		THREAD_STATUS_STARTING 	= 0,
+		THREAD_STATUS_STARTED 	= 1,
+		THREAD_STATUS_READY 	= 2,
+		THREAD_STATUS_CLOSING 	= 8,
+		THREAD_STATUS_CLOSED 	= 9;
 }

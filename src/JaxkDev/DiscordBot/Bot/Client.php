@@ -157,7 +157,7 @@ class Client{
 					}
 				});
 			}else{
-				//Should never happen unless your internet speed is like 10kb/s
+				//Should never happen unless your internet speed is like <10kb/s
 				MainLogger::getLogger()->critical("Client failed to login/connect within 30 seconds, See log file for details.");
 				$this->close();
 			}
@@ -187,12 +187,10 @@ class Client{
 	}
 
 	public function tick(): void{
-		$data = $this->thread->readInboundData(Protocol::PPT);
+		$data = $this->thread->readInboundData(Protocol::PACKETS_PER_TICK);
 
 		foreach($data as $d){
-			if(!$this->communicationHandler->handle($d)){
-				MainLogger::getLogger()->debug("Packet ".get_class($d)." [".$d->getUID()."] not handled.");
-			}
+			$this->communicationHandler->handle($d);
 		}
 
 		if(($this->tickCount % 20) === 0){
@@ -223,15 +221,6 @@ class Client{
 
 	public function getCommunicationHandler(): CommunicationHandler{
 		return $this->communicationHandler;
-	}
-
-	public function logDebugInfo(): void{
-		MainLogger::getLogger()->debug("Debug Information:\n".
-			"> Username: {$this->client->username}#{$this->client->discriminator}\n".
-			"> ID: {$this->client->id}\n".
-			"> Servers: {$this->client->guilds->count()}\n".
-			"> Users: {$this->client->users->count()}"
-		);
 	}
 
 	public function sysErrorHandler(int $severity, string $message, string $file, int $line): bool{
