@@ -28,6 +28,8 @@ use Volatile;
 
 // TODO:
 // Is it worth having a third logger to point to plugin_data/DiscordBot/logs like the thread's one ?
+// Potentially use the logger passed to dphp everywhere in the thread (exceptions being shutdown notices)
+//   would much prefer a single log for all of plugin but two threads this sounds the best its gonna get.
 
 class Main extends PluginBase{
 
@@ -179,6 +181,7 @@ class Main extends PluginBase{
 
 		/** @var Packet $d */
 		foreach($data as $d){
+			//if(!$d instanceof Heartbeat) var_dump($d);
 			$this->botCommsHandler->handle($d);
 		}
 

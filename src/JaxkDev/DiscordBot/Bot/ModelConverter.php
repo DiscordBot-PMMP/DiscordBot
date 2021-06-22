@@ -101,7 +101,13 @@ abstract class ModelConverter{
 		return $s;
 	}
 
-	static private function applyServerChannelDetails(DiscordChannel $dc, ServerChannel $c): ServerChannel{
+	/**
+	 * @template T of ServerChannel
+	 * @param DiscordChannel $dc
+	 * @param T $c
+	 * @return T
+	 */
+	static private function applyServerChannelDetails(DiscordChannel $dc, $c){
 		if($dc->guild_id === null){
 			throw new AssertionError("Guild ID must be present here.");
 		}
@@ -151,19 +157,14 @@ abstract class ModelConverter{
 		if($discordChannel->type !== DiscordChannel::TYPE_CATEGORY){
 			throw new AssertionError("Discord channel type must be `category` to generate model category channel.");
 		}
-		$c = new CategoryChannel();
-		/** @var CategoryChannel $c */
-		$c = ModelConverter::applyServerChannelDetails($discordChannel, $c);
-		return $c;
+		return ModelConverter::applyServerChannelDetails($discordChannel, new CategoryChannel());
 	}
 
 	static public function genModelVoiceChannel(DiscordChannel $discordChannel): VoiceChannel{
 		if($discordChannel->type !== DiscordChannel::TYPE_VOICE){
 			throw new AssertionError("Discord channel type must be `voice` to generate model voice channel.");
 		}
-		$c = new VoiceChannel();
-		/** @var VoiceChannel $c */
-		$c = ModelConverter::applyServerChannelDetails($discordChannel, $c);
+		$c = ModelConverter::applyServerChannelDetails($discordChannel, new VoiceChannel());
 		$c->setBitrate($discordChannel->bitrate);
 		$c->setMemberLimit($discordChannel->user_limit);
 		$c->setMembers(array_keys($discordChannel->members->toArray()));
@@ -179,9 +180,7 @@ abstract class ModelConverter{
 		if($discordChannel->type !== DiscordChannel::TYPE_TEXT and $discordChannel->type !== DiscordChannel::TYPE_NEWS){
 			throw new AssertionError("Discord channel type must be `text|news` to generate model text channel.");
 		}
-		$c = new TextChannel();
-		/** @var TextChannel $c */
-		$c = ModelConverter::applyServerChannelDetails($discordChannel, $c);
+		$c = ModelConverter::applyServerChannelDetails($discordChannel, new TextChannel());
 		$c->setTopic($discordChannel->topic??"");
 		$c->setNsfw($discordChannel->nsfw??false);
 		$c->setRateLimit($discordChannel->rate_limit_per_user);
@@ -197,6 +196,9 @@ abstract class ModelConverter{
 		}
 		if($discordMessage->channel->guild_id === null){
 			throw new AssertionError("Discord message does not have a guild_id, cannot generate model message.");
+		}
+		if($discordMessage->author === null){
+			throw new AssertionError("Discord message does not have a author, cannot generate model message.");
 		}
 		$m = new Message();
 		$m->setId($discordMessage->id);

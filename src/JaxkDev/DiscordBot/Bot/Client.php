@@ -75,17 +75,14 @@ class Client{
 		Packet::$UID_COUNT = 1;
 
 		$logger = new Logger('DiscordPHP');
-		$httpLogger = new Logger('DiscordPHP.HTTP');
 		$handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['maxFiles'], Logger::DEBUG);
 		$handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
 		$logger->setHandlers(array($handler));
-		$httpLogger->setHandlers(array($handler));
 
 		if($config['logging']['debug']){
 			//Note not thread safe on the output could mix and match between servers synced output and this debug output.
 			$handler = new StreamHandler(($r = fopen('php://stdout', 'w')) === false ? "" : $r);
 			$logger->pushHandler($handler);
-			$httpLogger->pushHandler($handler);
 		}
 
 		$intents = [
@@ -110,7 +107,6 @@ class Client{
 			$this->client = new Discord([
 				'token' => $config['discord']['token'],
 				'logger' => $logger,
-				'httpLogger' => $httpLogger,
 				'socket_options' => $socket_opts,
 				'loadAllMembers' => true,
 				'storeMessages' => true,
