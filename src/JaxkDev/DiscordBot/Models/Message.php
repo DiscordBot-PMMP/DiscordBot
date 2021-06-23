@@ -207,7 +207,7 @@ class Message implements \Serializable{
 			$this->id,
 			$this->type,
 			$this->content,
-			$this->embed,
+			$this->embeds,
 			$this->author_id,
 			$this->channel_id,
 			$this->server_id,
