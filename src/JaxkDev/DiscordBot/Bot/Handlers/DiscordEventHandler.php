@@ -406,10 +406,10 @@ class DiscordEventHandler{
 		if($message->author === null) return false; //"Shouldn't" happen now...
 		if($message->author instanceof DiscordMember ? $message->author->user->bot : (isset($message->author) ? $message->author->bot : true)) return false;
 
-		// Other types of messages not used right now. (Most notably 'replies')
-		if($message->type !== DiscordMessage::TYPE_NORMAL) return false;
-		if(($message->content??"") === "" and $message->embeds->count() === 0) return false; //Images/Files, can be empty strings or just null in other cases.
-		//if($message->channel->guild_id === null) return false;
+		// Other types of messages not used right now.
+		if($message->type !== DiscordMessage::TYPE_NORMAL and $message->type !== DiscordMessage::TYPE_REPLY) return false;
+		if(($message->content??"") === "" and $message->embeds->count() === 0) return false;
+		// ^ Images/Files/Spotify/Games etc
 
 		return true;
 	}

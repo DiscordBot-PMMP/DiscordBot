@@ -203,9 +203,9 @@ abstract class ModelConverter{
 	}
 
 	static public function genModelMessage(DiscordMessage $discordMessage): Message{
-		if($discordMessage->type !== DiscordMessage::TYPE_NORMAL){
+		if($discordMessage->type !== DiscordMessage::TYPE_NORMAL and $discordMessage->type !== DiscordMessage::TYPE_REPLY){
 			//Temporary.
-			throw new AssertionError("Discord message type must be `normal` to generate model message.");
+			throw new AssertionError("Discord message type must be `normal` or `reply` to generate model message.");
 		}
 		if($discordMessage->channel->guild_id === null){
 			throw new AssertionError("Discord message does not have a guild_id, cannot generate model message.");
@@ -219,6 +219,9 @@ abstract class ModelConverter{
 		$m->setAuthorId(($discordMessage->channel->guild_id.".".$discordMessage->author->id));
 		$m->setChannelId($discordMessage->channel_id);
 		$m->setServerId($discordMessage->channel->guild_id);
+		if($discordMessage->type === DiscordMessage::TYPE_REPLY and $discordMessage->referenced_message !== null){
+			$m->setReferencedMessageId($discordMessage->referenced_message->id);
+		}
 		$m->setEveryoneMentioned($discordMessage->mention_everyone);
 		$m->setContent($discordMessage->content??"");
 		$embeds = [];

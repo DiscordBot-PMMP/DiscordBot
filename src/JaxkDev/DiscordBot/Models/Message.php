@@ -17,6 +17,7 @@ use JaxkDev\DiscordBot\Models\Embed\Embed;
 class Message implements \Serializable{
 
 	const TYPE_NORMAL = 0;
+	const TYPE_REPLY = 19;
 
 	/** @var ?string Null when sending message. */
 	private $id;
@@ -38,6 +39,9 @@ class Message implements \Serializable{
 
 	/** @var ?string Null if DM Channel. */
 	private $server_id;  //This is needed for faster handling discord side.
+
+	/** @var ?string ID of referenced message if type is reply. */
+	private $referenced_message_id;
 
 	/** @var ?float Null when sending message. */
 	private $timestamp;
@@ -125,6 +129,17 @@ class Message implements \Serializable{
 		$this->server_id = $server_id;
 	}
 
+	public function getReferencedMessageId(): ?string{
+		return $this->referenced_message_id;
+	}
+
+	public function setReferencedMessageId(?string $referenced_message_id): void{
+		if($this->type !== self::TYPE_REPLY){
+			throw new \AssertionError("A message can only have 'referenced_message_id' when its type is 'REPLY'");
+		}
+		$this->referenced_message_id = $referenced_message_id;
+	}
+
 	public function getTimestamp(): ?float{
 		return $this->timestamp;
 	}
@@ -194,6 +209,7 @@ class Message implements \Serializable{
 			$this->author_id,
 			$this->channel_id,
 			$this->server_id,
+			$this->referenced_message_id,
 			$this->timestamp,
 			$this->everyone_mentioned,
 			$this->users_mentioned,
@@ -211,6 +227,7 @@ class Message implements \Serializable{
 			$this->author_id,
 			$this->channel_id,
 			$this->server_id,
+			$this->referenced_message_id,
 			$this->timestamp,
 			$this->everyone_mentioned,
 			$this->users_mentioned,

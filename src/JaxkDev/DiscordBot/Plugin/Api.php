@@ -36,6 +36,8 @@ use JaxkDev\DiscordBot\Models\User;
 
 /*
  * TODO:
+ * - Send message (Embed/Reply)
+ * - Edit message (Embed/Reply)
  * - Create role
  * - Give role
  * - Take role
@@ -60,8 +62,6 @@ use JaxkDev\DiscordBot\Models\User;
  * - kick
  *
  * Tested:
- * - Send message
- * - Edit message
  * - Delete message
  * - Create invite
  * - Delete invite
