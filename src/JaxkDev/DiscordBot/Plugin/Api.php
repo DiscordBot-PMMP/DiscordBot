@@ -182,6 +182,7 @@ class Api{
 
 	/**
 	 * Creates the Message model ready for sending, or null if user couldn't be found in storage.
+	 * You can manually create an embed and attach with $message->setEmbeds([$embed]);
 	 *
 	 * @param TextChannel|DmChannel|User	$channel TextChannel model or User Model for DMs
 	 * @param string						$content Content, <2000 in length.

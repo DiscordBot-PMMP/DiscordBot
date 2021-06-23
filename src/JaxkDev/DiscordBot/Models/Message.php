@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Models\Embed\Embed;
+
 class Message implements \Serializable{
 
 	const TYPE_NORMAL = 0;
@@ -24,6 +26,9 @@ class Message implements \Serializable{
 
 	/** @var string (<=2000) */
 	private $content;
+
+	/** @var Embed[] Max 10 in webhook message, one in normal message. */
+	private $embeds = [];
 
 	/** @var ?string MemberID Null when sending or receiving webhook messages.*/
 	private $author_id;
@@ -81,6 +86,19 @@ class Message implements \Serializable{
 			throw new \AssertionError("Message content cannot exceed 2000 characters.");
 		}
 		$this->content = $content;
+	}
+
+	/** @return Embed[] */
+	public function getEmbeds(): array{
+		return $this->embeds;
+	}
+
+	/** @param Embed[] $embeds */
+	public function setEmbeds(array $embeds): void{
+		if($this->type === self::TYPE_NORMAL and sizeof($embeds) > 1){
+			throw new \AssertionError("A 'normal' message can only have one embed.");
+		}
+		$this->embeds = $embeds;
 	}
 
 	public function getAuthorId(): ?string{
@@ -172,6 +190,7 @@ class Message implements \Serializable{
 			$this->id,
 			$this->type,
 			$this->content,
+			$this->embeds,
 			$this->author_id,
 			$this->channel_id,
 			$this->server_id,
@@ -188,6 +207,7 @@ class Message implements \Serializable{
 			$this->id,
 			$this->type,
 			$this->content,
+			$this->embed,
 			$this->author_id,
 			$this->channel_id,
 			$this->server_id,

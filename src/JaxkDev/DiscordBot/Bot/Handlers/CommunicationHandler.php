@@ -117,6 +117,7 @@ class CommunicationHandler{
 		}
 	}
 
+	//TODO Embeds / Model->DiscordModel.
 	private function handleSendMessage(RequestSendMessage $pk): void{
 		$pid = $pk->getUID();
 		$message = $pk->getMessage();

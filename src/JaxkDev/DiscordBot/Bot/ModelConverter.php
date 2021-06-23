@@ -13,9 +13,16 @@
 namespace JaxkDev\DiscordBot\Bot;
 
 use AssertionError;
+use Carbon\Carbon;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Channel\Overwrite;
+use Discord\Parts\Embed\Author as DiscordAuthor;
+use Discord\Parts\Embed\Embed as DiscordEmbed;
+use Discord\Parts\Embed\Field as DiscordField;
+use Discord\Parts\Embed\Footer as DiscordFooter;
+use Discord\Parts\Embed\Image as DiscordImage;
+use Discord\Parts\Embed\Video as DiscordVideo;
 use Discord\Parts\Guild\Ban as DiscordBan;
 use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
@@ -30,6 +37,12 @@ use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
+use JaxkDev\DiscordBot\Models\Embed\Author;
+use JaxkDev\DiscordBot\Models\Embed\Embed;
+use JaxkDev\DiscordBot\Models\Embed\Field;
+use JaxkDev\DiscordBot\Models\Embed\Footer;
+use JaxkDev\DiscordBot\Models\Embed\Image;
+use JaxkDev\DiscordBot\Models\Embed\Video;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Message;
@@ -207,11 +220,80 @@ abstract class ModelConverter{
 		$m->setChannelId($discordMessage->channel_id);
 		$m->setServerId($discordMessage->channel->guild_id);
 		$m->setEveryoneMentioned($discordMessage->mention_everyone);
-		$m->setContent($discordMessage->content);
+		$m->setContent($discordMessage->content??"");
+		$embeds = [];
+		foreach($discordMessage->embeds as $embed){
+			$embeds[] = self::genModelEmbed($embed);
+		}
+		$m->setEmbeds($embeds);
 		$m->setChannelsMentioned(array_keys($discordMessage->mention_channels->toArray()));
 		$m->setRolesMentioned(array_keys($discordMessage->mention_roles->toArray()));
 		$m->setUsersMentioned(array_keys($discordMessage->mentions->toArray()));
 		return $m;
+	}
+
+	static public function genModelEmbed(DiscordEmbed $discordEmbed): Embed{
+		$types = [DiscordEmbed::TYPE_RICH => Embed::TYPE_RICH, DiscordEmbed::TYPE_IMAGE => Embed::TYPE_IMAGE,
+			DiscordEmbed::TYPE_VIDEO => Embed::TYPE_VIDEO, DiscordEmbed::TYPE_GIFV => Embed::TYPE_GIF,
+			DiscordEmbed::TYPE_ARTICLE => Embed::TYPE_ARTICLE, DiscordEmbed::TYPE_LINK => Embed::TYPE_LINK];
+
+		$e = new Embed();
+		$e->setTitle($discordEmbed->title);
+		$e->setType($discordEmbed->type !== null ? $types[$discordEmbed->type] : null);
+		$e->setColour($discordEmbed->color);
+		$e->setDescription($discordEmbed->description);
+		$e->setUrl($discordEmbed->url);
+		$e->setTimestamp($discordEmbed->timestamp instanceof Carbon ? $discordEmbed->timestamp->getTimestamp() : (int)$discordEmbed->timestamp);
+		$e->setFooter($discordEmbed->footer === null ? new Footer() : self::genModelEmbedFooter($discordEmbed->footer));
+		$e->setImage($discordEmbed->image === null ? new Image() : self::genModelEmbedImage($discordEmbed->image));
+		$e->setThumbnail($discordEmbed->thumbnail === null ? new Image() : self::genModelEmbedImage($discordEmbed->thumbnail));
+		$e->setVideo($discordEmbed->video === null ? new Video() : self::genModelEmbedVideo($discordEmbed->video));
+		$e->setAuthor($discordEmbed->author === null ? new Author() : self::genModelEmbedAuthor($discordEmbed->author));
+		$fields = [];
+		foreach(array_values($discordEmbed->fields->toArray()) as $field){
+			$fields[] = self::genModelEmbedField($field);
+		}
+		$e->setFields($fields);
+		return $e;
+	}
+
+	static public function genModelEmbedFooter(DiscordFooter $footer): Footer{
+		$f = new Footer();
+		$f->setText($footer->text);
+		$f->setIconUrl($footer->icon_url);
+		return $f;
+	}
+
+	static public function genModelEmbedImage(DiscordImage $image): Image{
+		$i = new Image();
+		$i->setUrl($image->url);
+		$i->setWidth($image->width);
+		$i->setHeight($image->height);
+		return $i;
+	}
+
+	static public function genModelEmbedVideo(DiscordVideo $video): Video{
+		$v = new Video();
+		$v->setUrl($video->url);
+		$v->setWidth($video->width);
+		$v->setHeight($video->height);
+		return $v;
+	}
+
+	static public function genModelEmbedAuthor(DiscordAuthor $author): Author{
+		$a = new Author();
+		$a->setName($author->name);
+		$a->setUrl($author->url);
+		$a->setIconUrl($author->icon_url);
+		return $a;
+	}
+
+	static public function genModelEmbedField(DiscordField $field): Field{
+		$f = new Field();
+		$f->setName($field->name);
+		$f->setValue($field->value);
+		$f->setInline($field->inline??false);
+		return $f;
 	}
 
 	static public function genModelRolePermission(DiscordRolePermission $rolePermission): RolePermissions{
