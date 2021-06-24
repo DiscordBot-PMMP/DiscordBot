@@ -32,7 +32,7 @@ class Storage{
 	private static $serverMap = [];
 
 	/** @var Array<string, ServerChannel> */
-	public static $channelMap = [];
+	private static $channelMap = [];
 
 	/** @var Array<string, string[]> */
 	private static $channelServerMap = [];

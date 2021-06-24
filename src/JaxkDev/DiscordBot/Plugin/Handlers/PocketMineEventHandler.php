@@ -13,7 +13,10 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
+use JaxkDev\DiscordBot\Models\Channels\TextChannel;
+use JaxkDev\DiscordBot\Models\Message;
 use JaxkDev\DiscordBot\Plugin\Main;
+use JaxkDev\DiscordBot\Plugin\Storage;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -45,8 +48,13 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
 
 		foreach($config['channels'] as $channel){
-			$msg = $this->plugin->getAPI()->createMessageModel($channel, $message);
-			if($msg === null) continue;
+			$channel = Storage::getChannel($channel);
+			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
+			$msg = new Message();
+			$msg->setType(Message::TYPE_NORMAL);
+			$msg->setChannelId($channel->getId());
+			$msg->setServerId($channel->getServerId());
+			$msg->setContent($message);
 			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
@@ -62,8 +70,13 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
 
 		foreach($config['channels'] as $channel){
-			$msg = $this->plugin->getAPI()->createMessageModel($channel, $message);
-			if($msg === null) continue;
+			$channel = Storage::getChannel($channel);
+			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
+			$msg = new Message();
+			$msg->setType(Message::TYPE_NORMAL);
+			$msg->setChannelId($channel->getId());
+			$msg->setServerId($channel->getServerId());
+			$msg->setContent($message);
 			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
@@ -76,8 +89,13 @@ class PocketMineEventHandler implements Listener{
 			[date('G:i:s'), $event->getPlayer()->getName(), $event->getAddress(), $event->getPort()], $config['format']);
 
 		foreach($config['channels'] as $channel){
-			$msg = $this->plugin->getAPI()->createMessageModel($channel, $message);
-			if($msg === null) continue;
+			$channel = Storage::getChannel($channel);
+			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
+			$msg = new Message();
+			$msg->setType(Message::TYPE_NORMAL);
+			$msg->setChannelId($channel->getId());
+			$msg->setServerId($channel->getServerId());
+			$msg->setContent($message);
 			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
@@ -94,8 +112,13 @@ class PocketMineEventHandler implements Listener{
 			[date('G:i:s'), $event->getPlayer()->getName(), $event->getMessage()], $config['format']);
 
 		foreach($config['channels'] as $channel){
-			$msg = $this->plugin->getAPI()->createMessageModel($channel, $message);
-			if($msg === null) continue;
+			$channel = Storage::getChannel($channel);
+			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
+			$msg = new Message();
+			$msg->setType(Message::TYPE_NORMAL);
+			$msg->setChannelId($channel->getId());
+			$msg->setServerId($channel->getServerId());
+			$msg->setContent($message);
 			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
@@ -112,8 +135,13 @@ class PocketMineEventHandler implements Listener{
 			[date('G:i:s'), $event->getSender()->getName(), $event->getCommand()], $config['format']);
 
 		foreach($config['channels'] as $channel){
-			$msg = $this->plugin->getAPI()->createMessageModel($channel, $message);
-			if($msg === null) continue;
+			$channel = Storage::getChannel($channel);
+			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
+			$msg = new Message();
+			$msg->setType(Message::TYPE_NORMAL);
+			$msg->setChannelId($channel->getId());
+			$msg->setServerId($channel->getServerId());
+			$msg->setContent($message);
 			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
