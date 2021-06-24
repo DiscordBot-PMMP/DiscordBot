@@ -14,6 +14,26 @@ namespace JaxkDev\DiscordBot\Models;
 
 class User implements \Serializable{
 
+	//https://github.com/Delitefully/DiscordLists/blob/master/flags.md
+	const FLAGS = [
+		"STAFF" => 1,
+		"PARTNER" => 2,
+		"HYPESQUAD" => 4,
+		"BUG_HUNTER_LEVEL_1" => 8,
+		"PREMIUM_PROMO_DISMISSED" => 32,
+		"HYPESQUAD_ONLINE_HOUSE_1" => 64, //Bravery
+		"HYPESQUAD_ONLINE_HOUSE_2" => 128, //Brilliance
+		"HYPESQUAD_ONLINE_HOUSE_3" => 256, //Balance
+		"PREMIUM_EARLY_SUPPORTER" => 512,
+		"TEAM_USER" => 1024,
+		"SYSTEM" => 4096,
+		"BUG_HUNTER_LEVEL_2" => 16384,
+		"UNDERAGE_DELETED" => 32768,
+		"VERIFIED_BOT" => 65536,
+		"VERIFIED_DEVELOPER" => 131072,
+		"CERTIFIED_MODERATOR" => 262144
+	];
+
 	/** @var string */
 	private $id;
 
@@ -29,10 +49,14 @@ class User implements \Serializable{
 	/** @var int */
 	private $creation_timestamp;
 
-	///** @var Activity */
-	//private $activity; TODO ?
+	/** @var bool */
+	private $bot = false;
 
-	//Email, Bot, Verified, Locale etc not included yet.
+	/** @var int */
+	private $flags_bitwise = 0;
+
+	/** @var Array<string, bool> */
+	private $flags = [];
 
 	public function getId(): string{
 		return $this->id;
@@ -74,15 +98,55 @@ class User implements \Serializable{
 		$this->creation_timestamp = $creation_timestamp;
 	}
 
-	/*
-	public function getActivity(): Activity{
-		return $this->activity;
+	public function isBot(): bool{
+		return $this->bot;
 	}
 
-	public function setActivity(Activity $activity): void{
-		$this->activity = $activity;
+	public function setBot(bool $bot): void{
+		$this->bot = $bot;
 	}
-	*/
+
+	public function getFlagsBitwise(): int{
+		return $this->flags_bitwise;
+	}
+
+	public function setFlagsBitwise(int $flags_bitwise, bool $recalculate = true): void{
+		$this->flags_bitwise = $flags_bitwise;
+		if($recalculate) $this->updateFlags();
+	}
+
+	/**
+	 * Returns all the flags possible and the current state, or an empty array if not initialised.
+	 * @return Array<string, bool>
+	 */
+	public function getFlags(): array{
+		return $this->flags;
+	}
+
+	public function getFlag(string $flag): ?bool{
+		return $this->flags[$flag] ?? null;
+	}
+
+	public function setFlag(string $flag, bool $state = true): void{
+		if(!in_array($flag, array_keys(self::FLAGS))){
+			throw new \AssertionError("Invalid flag '{$flag}' for a 'user'");
+		}
+
+		if($this->flags[$flag] === $state) return;
+		$this->flags[$flag] = $state;
+		$this->flags_bitwise ^= self::FLAGS[$flag];
+		return;
+	}
+
+	/**
+	 * @internal Using current flags_bitwise update flags to correct state.
+	 */
+	private function updateFlags(): void{
+		$this->flags = [];
+		foreach(self::FLAGS as $name => $v){
+			$this->flags[$name] = (($this->flags_bitwise & $v) !== 0);
+		}
+	}
 
 	//----- Serialization -----//
 
@@ -92,8 +156,9 @@ class User implements \Serializable{
 			$this->username,
 			$this->discriminator,
 			$this->avatar_url,
-			$this->creation_timestamp
-			//$this->activity
+			$this->creation_timestamp,
+			$this->bot,
+			$this->flags_bitwise
 		]);
 	}
 
@@ -103,8 +168,10 @@ class User implements \Serializable{
 			$this->username,
 			$this->discriminator,
 			$this->avatar_url,
-			$this->creation_timestamp
-			//$this->activity
+			$this->creation_timestamp,
+			$this->bot,
+			$this->flags_bitwise
 		] = unserialize($data);
+		$this->updateFlags();
 	}
 }

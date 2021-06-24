@@ -80,13 +80,15 @@ abstract class ModelConverter{
 		}
 
 		$newPermission = new RolePermissions();
-		$newPermission->setBitwise($bitwise);
-		if($newPermission->getPermission("administrator")){
-			$newPermission->setBitwise(2147483647); //All perms.
+		if(($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0){
+			$newPermission->setBitwise(2147483647, false); //All perms.
+		}else{
+			$newPermission->setBitwise($bitwise, false);
 		}
 
 		$m->setPermissions($newPermission);
 		$m->setRolesId($roles);
+		//todo activities.
 		return $m;
 	}
 
@@ -97,7 +99,8 @@ abstract class ModelConverter{
 		$u->setUsername($user->username);
 		$u->setDiscriminator($user->discriminator);
 		$u->setAvatarUrl($user->avatar);
-		//Many more attributes to come.
+		$u->setBot($user->bot??false);
+		$u->setFlagsBitwise($user->public_flags??0, false); //Dont calculate flags, not needed in this side.
 		return $u;
 	}
 

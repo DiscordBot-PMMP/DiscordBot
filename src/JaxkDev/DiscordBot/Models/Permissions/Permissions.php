@@ -67,9 +67,9 @@ abstract class Permissions implements \Serializable{
 		return $this->bitwise;
 	}
 
-	public function setBitwise(int $bitwise): void{
+	public function setBitwise(int $bitwise, bool $update = true): void{
 		$this->bitwise = $bitwise;
-		$this->updatePermissions();
+		if($update) $this->updatePermissions();
 	}
 
 	/**

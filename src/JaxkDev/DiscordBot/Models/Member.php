@@ -37,6 +37,9 @@ class Member implements \Serializable{
 	/** @var string */
 	private $server_id;
 
+	///** @var Activity */
+	//private $activity; Activities are actually from member :/
+
 	/**
 	 * @description Composite key guild_id.user_id
 	 * @see Member::getServerId()

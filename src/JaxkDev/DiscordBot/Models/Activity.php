@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+//TODO Newer features, emoji's, links, timestamps, multiple activities etc.
 class Activity implements \Serializable{
 
 	const
