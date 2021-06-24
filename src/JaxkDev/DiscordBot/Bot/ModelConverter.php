@@ -181,6 +181,7 @@ abstract class ModelConverter{
 		$c->setBitrate($discordChannel->bitrate);
 		$c->setMemberLimit($discordChannel->user_limit);
 		$c->setMembers(array_keys($discordChannel->members->toArray()));
+		$c->setCategoryId($discordChannel->parent_id);
 		return $c;
 	}
 

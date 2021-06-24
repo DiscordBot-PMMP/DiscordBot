@@ -23,9 +23,6 @@ class TextChannel extends ServerChannel{
 	/** @var ?int In seconds | null when disabled. */
 	private $rate_limit = null;
 
-	/** @var ?string Category ID | null when not categorised. */
-	private $category_id = null;
-
 	/** @var string[] Message ID's */
 	private $pins = [];
 
@@ -53,14 +50,6 @@ class TextChannel extends ServerChannel{
 
 	public function setRateLimit(?int $rate_limit): void{
 		$this->rate_limit = $rate_limit;
-	}
-
-	public function getCategoryId(): ?string{
-		return $this->category_id;
-	}
-
-	public function setCategoryId(?string $category_id): void{
-		$this->category_id = $category_id;
 	}
 
 	/** @return string[] Message ID's */

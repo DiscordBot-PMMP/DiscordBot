@@ -106,6 +106,8 @@ class BotCommunicationHandler{
 		$config = $this->plugin->getEventsConfig()["message"]["fromDiscord"];
 		$message = $packet->getMessage();
 
+		//TODO Event
+
 		if(!in_array($message->getChannelId(), $config["channels"])) return;
 
 		//If any of these asserts fire theres a mismatch between Storage and discord.
@@ -184,16 +186,19 @@ class BotCommunicationHandler{
 	}
 
 	private function handleRoleCreate(EventRoleCreate $packet): void{
+		//TODO Event
 		Storage::addRole($packet->getRole());
 		//$this->plugin->getServer()->broadcastMessage("Role '".$packet->getRole()->getName()."' created.");
 	}
 
 	private function handleRoleUpdate(EventRoleUpdate $packet): void{
+		//TODO Event
 		Storage::updateRole($packet->getRole());
 		//$this->plugin->getServer()->broadcastMessage("Role '".$packet->getRole()->getName()."' updated.");
 	}
 
 	private function handleRoleDelete(EventRoleDelete $packet): void{
+		//TODO Event
 		$role = Storage::getRole($packet->getRoleId());
 		if($role === null) return;
 		Storage::removeRole($packet->getRoleId());
@@ -201,26 +206,31 @@ class BotCommunicationHandler{
 	}
 
 	private function handleInviteCreate(EventInviteCreate $packet): void{
+		//TODO Event
 		Storage::addInvite($packet->getInvite());
 		//$this->plugin->getServer()->broadcastMessage("Invite '".$packet->getInvite()->getCode()."' created.");
 	}
 
 	private function handleInviteDelete(EventInviteDelete $packet): void{
+		//TODO Event
 		Storage::removeInvite($packet->getInviteCode());
 		//$this->plugin->getServer()->broadcastMessage("Invite '".$packet->getInviteCode()."' deleted/expired.");
 	}
 
 	private function handleBanAdd(EventBanAdd $packet): void{
+		//TODO Event
 		Storage::addBan($packet->getBan());
 		//$this->plugin->getServer()->broadcastMessage("Ban '".$packet->getBan()->getId()."' has been added.");
 	}
 
 	private function handleBanRemove(EventBanRemove $packet): void{
+		//TODO Event
 		Storage::removeBan($packet->getId());
 		//$this->plugin->getServer()->broadcastMessage("Ban '".$packet->getId()."' has been removed.");
 	}
 
 	private function handleMemberJoin(EventMemberJoin $packet): void{
+		//TODO Event
 		$config = $this->plugin->getEventsConfig()["member_join"]["fromDiscord"];
 		if(($config["format"] ?? "") === "") return;
 
@@ -247,11 +257,13 @@ class BotCommunicationHandler{
 	}
 
 	private function handleMemberUpdate(EventMemberUpdate $packet): void{
+		//TODO Event
 		Storage::updateMember($packet->getMember());
 		//$this->plugin->getServer()->broadcastMessage("Member updated.");
 	}
 
 	private function handleMemberLeave(EventMemberLeave $packet): void{
+		//TODO Event
 		$config = $this->plugin->getEventsConfig()["member_leave"]["fromDiscord"];
 		if(($config["format"] ?? "") === "") return;
 

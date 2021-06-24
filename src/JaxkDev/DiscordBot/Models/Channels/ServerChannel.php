@@ -36,6 +36,9 @@ abstract class ServerChannel extends Channel{
 	/** @var string */
 	protected $server_id;
 
+	/** @var ?string Category ID | null when not categorised. */
+	protected $category_id = null;
+
 	public function getName(): string{
 		return $this->name;
 	}
@@ -120,5 +123,13 @@ abstract class ServerChannel extends Channel{
 
 	public function setServerId(string $server_id): void{
 		$this->server_id = $server_id;
+	}
+
+	public function getCategoryId(): ?string{
+		return $this->category_id;
+	}
+
+	public function setCategoryId(?string $category_id): void{
+		$this->category_id = $category_id;
 	}
 }

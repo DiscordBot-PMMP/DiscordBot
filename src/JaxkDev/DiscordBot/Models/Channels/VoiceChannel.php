@@ -61,7 +61,8 @@ class VoiceChannel extends ServerChannel{
 			$this->server_id,
 			$this->bitrate,
 			$this->member_limit,
-			$this->members
+			$this->members,
+			$this->category_id
 		]);
 	}
 
@@ -75,7 +76,8 @@ class VoiceChannel extends ServerChannel{
 			$this->server_id,
 			$this->bitrate,
 			$this->member_limit,
-			$this->members
+			$this->members,
+			$this->category_id
 		] = unserialize($data);
 	}
 }

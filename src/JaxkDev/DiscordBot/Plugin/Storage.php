@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Models\Ban;
+use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
@@ -36,7 +37,11 @@ class Storage{
 	/** @var Array<string, string[]> */
 	private static $channelServerMap = [];
 
-	//todo channel category map
+	/** @var Array<string, string[]> */
+	public static $channelCategoryMap = [];
+
+	/** @var Array<string, string[]> */
+	public static $categoryServerMap = [];
 
 	/** @var Array<string, Member> */
 	private static $memberMap = [];
@@ -79,6 +84,7 @@ class Storage{
 		if(isset(self::$serverMap[($id = $server->getId())])) return; //Already added.
 		self::$serverMap[$id] = $server;
 		self::$channelServerMap[$id] = [];
+		self::$categoryServerMap[$id] = [];
 		self::$memberServerMap[$id] = [];
 		self::$roleServerMap[$id] = [];
 		self::$inviteServerMap[$id] = [];
@@ -103,6 +109,11 @@ class Storage{
 		//Remove servers channels.
 		foreach(self::$channelServerMap[$serverId] as $cid){
 			unset(self::$channelMap[$cid]);
+		}
+		unset(self::$channelServerMap[$serverId]);
+		//Remove servers category's.
+		foreach(self::$categoryServerMap[$serverId] as $cid){
+			unset(self::$channelMap[$cid]); //Category's are channels.
 		}
 		unset(self::$channelServerMap[$serverId]);
 		//Remove servers members.
@@ -144,9 +155,52 @@ class Storage{
 		return $channels;
 	}
 
+	/**
+	 * @param string $categoryId
+	 * @return ServerChannel[]
+	 */
+	public static function getChannelsByCategory(string $categoryId): array{
+		$channels = [];
+		foreach((self::$channelCategoryMap[$categoryId] ?? []) as $id){
+			$c = self::getChannel($id);
+			if($c !== null){
+				if($c instanceof CategoryChannel){
+					throw new \AssertionError("Channel '".$c->getId()."' error 0x0002 (Report this on github if you see this)");
+				}else{
+					$channels[] = $c;
+				}
+			}
+		}
+		return $channels;
+	}
+
+	/**
+	 * @param string $serverId
+	 * @return CategoryChannel[]
+	 */
+	public static function getCategoriesByServer(string $serverId): array{
+		$channels = [];
+		foreach((self::$categoryServerMap[$serverId] ?? []) as $id){
+			$c = self::getChannel($id);
+			if($c !== null){
+				if(!$c instanceof CategoryChannel){
+					throw new \AssertionError("Channel '".$c->getId()."' error 0x0001 (Report this on github if you see this)");
+				}else{
+					$channels[] = $c;
+				}
+			}
+		}
+		return $channels;
+	}
+
 	public static function addChannel(ServerChannel $channel): void{
 		if(isset(self::$channelMap[$channel->getId()])) return;
-		self::$channelServerMap[$channel->getServerId()][] = $channel->getId();
+		if($channel instanceof CategoryChannel){
+			self::$categoryServerMap[$channel->getServerId()][] = $channel->getId();
+		}else{
+			self::$channelServerMap[$channel->getServerId()][] = $channel->getId();
+			self::$channelCategoryMap[$channel->getCategoryId()][] = $channel->getId();
+		}
 		self::$channelMap[$channel->getId()] = $channel;
 	}
 
@@ -162,8 +216,13 @@ class Storage{
 		$channel = self::getChannel($channelId);
 		if($channel === null) return; //Already deleted or not added.
 		unset(self::$channelMap[$channelId]);
-		if($channel instanceof ServerChannel){
-			$serverId = $channel->getServerId();
+		$serverId = $channel->getServerId();
+		if($channel instanceof CategoryChannel){
+			if(isset(self::$channelCategoryMap[$channelId])) unset(self::$channelCategoryMap[$channelId]);
+			$i = array_search($channelId, self::$categoryServerMap[$serverId], true);
+			if($i === false || is_string($i)) return; //Not in this servers category map.
+			array_splice(self::$categoryServerMap[$serverId], $i, 1);
+		}elseif($channel instanceof ServerChannel){
 			$i = array_search($channelId, self::$channelServerMap[$serverId], true);
 			if($i === false || is_string($i)) return; //Not in this servers channel map.
 			array_splice(self::$channelServerMap[$serverId], $i, 1);

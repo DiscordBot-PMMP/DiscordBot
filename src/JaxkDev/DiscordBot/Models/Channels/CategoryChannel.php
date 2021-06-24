@@ -14,6 +14,14 @@ namespace JaxkDev\DiscordBot\Models\Channels;
 
 class CategoryChannel extends ServerChannel{
 
+	public function getCategoryId(): ?string{
+		return null;
+	}
+
+	public function setCategoryId(?string $category_id): void{
+		throw new \AssertionError("Category channels cannot have categories");
+	}
+
 	//----- Serialization -----//
 
 	public function serialize(): ?string{
