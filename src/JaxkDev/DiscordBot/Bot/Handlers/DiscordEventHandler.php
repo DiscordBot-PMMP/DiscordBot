@@ -230,6 +230,7 @@ class DiscordEventHandler{
 	}
 
 	/**
+	 * TODO, Linked to DiscordMessageDeleted.php todo.
 	 * @param DiscordMessage|\stdClass $message
 	 * @param Discord                  $discord
 	 */
