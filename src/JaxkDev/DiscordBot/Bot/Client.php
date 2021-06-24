@@ -196,7 +196,7 @@ class Client{
 			}
 
 			//GC Tests.
-			if(microtime(true)-$this->lastGCCollection >= 600){
+			if(microtime(true)-$this->lastGCCollection >= 6000){
 				$cycles = gc_collect_cycles();
 				$mem = round(gc_mem_caches()/1024, 3);
 				MainLogger::getLogger()->debug("[GC] Claimed {$mem}kb and {$cycles} cycles.");
