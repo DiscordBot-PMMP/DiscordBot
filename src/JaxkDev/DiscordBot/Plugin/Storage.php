@@ -38,10 +38,10 @@ class Storage{
 	private static $channelServerMap = [];
 
 	/** @var Array<string, string[]> */
-	public static $channelCategoryMap = [];
+	private static $channelCategoryMap = [];
 
 	/** @var Array<string, string[]> */
-	public static $categoryServerMap = [];
+	private static $categoryServerMap = [];
 
 	/** @var Array<string, Member> */
 	private static $memberMap = [];
