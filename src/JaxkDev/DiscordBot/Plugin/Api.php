@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
@@ -56,6 +57,7 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
  * - Delete message
  * - Delete invite
  * - Update nickname
+ * - Broadcast typing
  */
 
 /**
@@ -77,9 +79,24 @@ class Api{
 		$this->plugin = $plugin;
 	}
 
-	/*public function broadcastTyping(string $server_id, string $channel_id): PromiseInterface{
-
-	}*/
+	/**
+	 * "Generally bots should not implement this. However, if a bot is responding to a command and expects the computation
+	 * to take a few seconds, this endpoint may be called to let the user know that the bot is processing their message."
+	 * The 'typing' effect will last for 10s
+	 *
+	 * DO NOT ABUSE THIS.
+	 *
+	 * @param string $server_id
+	 * @param string $channel_id
+	 * @return PromiseInterface
+	 */
+	public function broadcastTyping(string $server_id, string $channel_id): PromiseInterface{
+		$pk = new RequestBroadcastTyping();
+		$pk->setServerId($server_id);
+		$pk->setChannelId($channel_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
 
 	/**
 	 * Sends the new activity to replace the current one the bot has.

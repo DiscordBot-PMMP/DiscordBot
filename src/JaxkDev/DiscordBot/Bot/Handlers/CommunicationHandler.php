@@ -22,6 +22,7 @@ use Discord\Parts\User\User as DiscordUser;
 use Discord\Repository\Guild\InviteRepository as DiscordInviteRepository;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
@@ -77,6 +78,28 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
 		elseif($pk instanceof RequestInitialiseInvite) $this->handleInitialiseInvite($pk);
 		elseif($pk instanceof RequestRevokeInvite) $this->handleRevokeInvite($pk);
+		elseif($pk instanceof RequestBroadcastTyping) $this->handleBroadcastTyping($pk);
+	}
+
+	private function handleBroadcastTyping(RequestBroadcastTyping $pk): void{
+		/** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
+		$this->client->getDiscordClient()->guilds->fetch($pk->getServerId())->done(function(DiscordGuild $guild) use($pk){
+			$guild->channels->fetch($pk->getChannelId())->done(function(DiscordChannel $channel) use($pk){
+				$channel->broadcastTyping()->done(function() use($pk){
+					$this->resolveRequest($pk->getUID());
+					MainLogger::getLogger()->debug("BroadcastTyping - success ({$pk->getUID()})");
+				}, function(\Throwable $e) use($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to broadcast typing.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to broadcast typing ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to fetch channel.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to send message ({$pk->getUID()}) - channel error: {$e->getMessage()}");
+			});
+		}, function(\Throwable $e) use($pk){
+			$this->resolveRequest($pk->getUID(), false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
+			MainLogger::getLogger()->debug("Failed to send message ({$pk->getUID()}) - server error: {$e->getMessage()}");
+		});
 	}
 
 	private function handleUpdateNickname(RequestUpdateNickname $pk): void{
