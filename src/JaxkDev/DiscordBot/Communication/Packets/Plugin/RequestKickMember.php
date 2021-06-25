@@ -12,27 +12,45 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
-use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestKickMember extends Packet{
 
-	/** @var Member */
-	private $member;
+	/** @var string */
+	private $server_id;
 
-	public function getMember(): Member{
-		return $this->member;
+	/** @var string */
+	private $user_id;
+
+	public function getServerId(): string{
+		return $this->server_id;
 	}
 
-	public function setMember(Member $member): void{
-		$this->member = $member;
+	public function setServerId(string $server_id): void{
+		$this->server_id = $server_id;
+	}
+
+	public function getUserId(): string{
+		return $this->user_id;
+	}
+
+	public function setUserId(string $user_id): void{
+		$this->user_id = $user_id;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->member]);
+		return serialize([
+			$this->UID,
+			$this->server_id,
+			$this->user_id
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->member] = unserialize($data);
+		[
+			$this->UID,
+			$this->server_id,
+			$this->user_id
+		] = unserialize($data);
 	}
 }

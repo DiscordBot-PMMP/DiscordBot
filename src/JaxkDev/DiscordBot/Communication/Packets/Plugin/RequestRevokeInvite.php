@@ -13,26 +13,44 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Models\Invite;
 
 class RequestRevokeInvite extends Packet{
 
-	/** @var Invite */
-	private $invite;
+	/** @var string */
+	private $server_id;
 
-	public function getInvite(): Invite{
-		return $this->invite;
+	/** @var string */
+	private $invite_code;
+
+	public function getServerId(): string{
+		return $this->server_id;
 	}
 
-	public function setInvite(Invite $invite): void{
-		$this->invite = $invite;
+	public function setServerId(string $server_id): void{
+		$this->server_id = $server_id;
+	}
+
+	public function getInviteCode(): string{
+		return $this->invite_code;
+	}
+
+	public function setInviteCode(string $invite_code): void{
+		$this->invite_code = $invite_code;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->invite]);
+		return serialize([
+			$this->UID,
+			$this->server_id,
+			$this->invite_code
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->invite] = unserialize($data);
+		[
+			$this->UID,
+			$this->server_id,
+			$this->invite_code
+		] = unserialize($data);
 	}
 }

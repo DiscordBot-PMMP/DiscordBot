@@ -161,11 +161,11 @@ abstract class ModelConverter{
 		switch($channel->type){
 			case DiscordChannel::TYPE_TEXT:
 			case DiscordChannel::TYPE_NEWS:
-				return ModelConverter::genModelTextChannel($channel);
+				return self::genModelTextChannel($channel);
 			case DiscordChannel::TYPE_VOICE:
-				return ModelConverter::genModelVoiceChannel($channel);
+				return self::genModelVoiceChannel($channel);
 			case DiscordChannel::TYPE_CATEGORY:
-				return ModelConverter::genModelCategoryChannel($channel);
+				return self::genModelCategoryChannel($channel);
 			default:
 				return null;
 		}
@@ -175,14 +175,14 @@ abstract class ModelConverter{
 		if($discordChannel->type !== DiscordChannel::TYPE_CATEGORY){
 			throw new AssertionError("Discord channel type must be `category` to generate model category channel.");
 		}
-		return ModelConverter::applyServerChannelDetails($discordChannel, new CategoryChannel());
+		return self::applyServerChannelDetails($discordChannel, new CategoryChannel());
 	}
 
 	static public function genModelVoiceChannel(DiscordChannel $discordChannel): VoiceChannel{
 		if($discordChannel->type !== DiscordChannel::TYPE_VOICE){
 			throw new AssertionError("Discord channel type must be `voice` to generate model voice channel.");
 		}
-		$c = ModelConverter::applyServerChannelDetails($discordChannel, new VoiceChannel());
+		$c = self::applyServerChannelDetails($discordChannel, new VoiceChannel());
 		$c->setBitrate($discordChannel->bitrate);
 		$c->setMemberLimit($discordChannel->user_limit);
 		$c->setMembers(array_keys($discordChannel->members->toArray()));
@@ -199,7 +199,7 @@ abstract class ModelConverter{
 		if($discordChannel->type !== DiscordChannel::TYPE_TEXT and $discordChannel->type !== DiscordChannel::TYPE_NEWS){
 			throw new AssertionError("Discord channel type must be `text|news` to generate model text channel.");
 		}
-		$c = ModelConverter::applyServerChannelDetails($discordChannel, new TextChannel());
+		$c = self::applyServerChannelDetails($discordChannel, new TextChannel());
 		$c->setTopic($discordChannel->topic??"");
 		$c->setNsfw($discordChannel->nsfw??false);
 		$c->setRateLimit($discordChannel->rate_limit_per_user);
@@ -220,7 +220,7 @@ abstract class ModelConverter{
 				$m = new Message();
 				$e = $discordMessage->embeds->first();
 				if($e !== null){
-					$m->setEmbed(ModelConverter::genModelEmbed($e));
+					$m->setEmbed(self::genModelEmbed($e));
 				}
 			}else{
 				$m = new Webhook();
@@ -239,7 +239,7 @@ abstract class ModelConverter{
 			$m->setReferencedMessageId($discordMessage->referenced_message->id);
 			$e = $discordMessage->embeds->first();
 			if($e !== null){
-				$m->setEmbed(ModelConverter::genModelEmbed($e));
+				$m->setEmbed(self::genModelEmbed($e));
 			}
 		}else{
 			throw new AssertionError("Discord message type not supported.");

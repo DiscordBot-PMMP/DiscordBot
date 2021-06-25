@@ -26,7 +26,6 @@ use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Invite;
-use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 
 /*
@@ -78,6 +77,10 @@ class Api{
 		$this->plugin = $plugin;
 	}
 
+	/*public function broadcastTyping(string $server_id, string $channel_id): PromiseInterface{
+
+	}*/
+
 	/**
 	 * Sends the new activity to replace the current one the bot has.
 	 *
@@ -111,12 +114,14 @@ class Api{
 	/**
 	 * Attempt to revoke a ban.
 	 *
-	 * @param Ban $ban
+	 * @param string $server_id
+	 * @param string $user_id
 	 * @return PromiseInterface
 	 */
-	public function revokeBan(Ban $ban): PromiseInterface{
+	public function revokeBan(string $server_id, string $user_id): PromiseInterface{
 		$pk = new RequestRevokeBan();
-		$pk->setBan($ban);
+		$pk->setServerId($server_id);
+		$pk->setUserId($user_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -124,13 +129,14 @@ class Api{
 	/**
 	 * Attempt to kick a member.
 	 *
-	 * @param Member $member
+	 * @param string $member_id
 	 * @return PromiseInterface
-	 * @see Storage::getMember() For getting Member model.
 	 */
-	public function kickMember(Member $member): PromiseInterface{
+	public function kickMember(string $member_id): PromiseInterface{
+		[$sid, $uid] = explode(".", $member_id);
 		$pk = new RequestKickMember();
-		$pk->setMember($member);
+		$pk->setServerId($sid);
+		$pk->setUserId($uid);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -202,26 +208,31 @@ class Api{
 	/**
 	 * Revoke an initialised invite.
 	 *
-	 * @param Invite $invite
+	 * @param string $server_id
+	 * @param string $invite_code
 	 * @return PromiseInterface
 	 */
-	public function revokeInvite(Invite $invite): PromiseInterface{
+	public function revokeInvite(string $server_id, string $invite_code): PromiseInterface{
 		$pk = new RequestRevokeInvite();
-		$pk->setInvite($invite);
+		$pk->setServerId($server_id);
+		$pk->setInviteCode($invite_code);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
 
 	/**
 	 * Update a members nickname (set to null to remove)
-	 * @see Member::setNickname() Set nickname then call updateNickname.
 	 *
-	 * @param Member $member
+	 * @param string $member_id
+	 * @param null|string $nickname Null to remove nickname.
 	 * @return PromiseInterface
 	 */
-	public function updateNickname(Member $member): PromiseInterface{
+	public function updateNickname(string $member_id, ?string $nickname = null): PromiseInterface{
+		[$sid, $uid] = explode(".", $member_id);
 		$pk = new RequestUpdateNickname();
-		$pk->setMember($member);
+		$pk->setServerId($sid);
+		$pk->setUserId($uid);
+		$pk->setNickname($nickname);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}

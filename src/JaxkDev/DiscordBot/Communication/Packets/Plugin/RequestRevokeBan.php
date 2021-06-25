@@ -12,27 +12,45 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
-use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestRevokeBan extends Packet{
 
-	/** @var Ban */
-	private $ban;
+	/** @var string */
+	private $server_id;
 
-	public function getBan(): Ban{
-		return $this->ban;
+	/** @var string */
+	private $user_id;
+
+	public function getServerId(): string{
+		return $this->server_id;
 	}
 
-	public function setBan(Ban $ban): void{
-		$this->ban = $ban;
+	public function setServerId(string $server_id): void{
+		$this->server_id = $server_id;
+	}
+
+	public function getUserId(): string{
+		return $this->user_id;
+	}
+
+	public function setUserId(string $user_id): void{
+		$this->user_id = $user_id;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->ban]);
+		return serialize([
+			$this->UID,
+			$this->server_id,
+			$this->user_id
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->ban] = unserialize($data);
+		[
+			$this->UID,
+			$this->server_id,
+			$this->user_id
+		] = unserialize($data);
 	}
 }
