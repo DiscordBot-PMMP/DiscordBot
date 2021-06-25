@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
@@ -36,10 +37,11 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
  * - Give role
  * - Take role
  * - Delete role
- * - Delete channel
  * - Update permissions (channel,role,member)
  * - Update channel
- * - update role
+ * - Update role
+ * - Create role
+ * - Create channel
  * - Add Reaction
  * - Remove Reaction (advanced)
  * - Assert all fields are valid before sending packet.
@@ -54,6 +56,7 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
  * - kick
  *
  * Tested:
+ * - Delete Channel
  * - Delete message
  * - Delete invite
  * - Update nickname
@@ -198,6 +201,21 @@ class Api{
 	public function deleteMessage(Message $message): PromiseInterface{
 		$pk = new RequestDeleteMessage();
 		$pk->setMessage($message);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Delete a channel in a server, you cannot delete private channels (DM's)
+	 *
+	 * @param string $server_id
+	 * @param string $channel_id
+	 * @return PromiseInterface
+	 */
+	public function deleteChannel(string $server_id, string $channel_id): PromiseInterface{
+		$pk = new RequestDeleteChannel();
+		$pk->setServerId($server_id);
+		$pk->setChannelId($channel_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}

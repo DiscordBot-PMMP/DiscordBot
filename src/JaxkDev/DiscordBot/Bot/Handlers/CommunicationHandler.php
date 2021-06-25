@@ -24,6 +24,7 @@ use Discord\Repository\Guild\InviteRepository as DiscordInviteRepository;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
@@ -80,6 +81,20 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestInitialiseInvite) $this->handleInitialiseInvite($pk);
 		elseif($pk instanceof RequestRevokeInvite) $this->handleRevokeInvite($pk);
 		elseif($pk instanceof RequestBroadcastTyping) $this->handleBroadcastTyping($pk);
+		elseif($pk instanceof RequestDeleteChannel) $this->handleDeleteChannel($pk);
+	}
+
+	private function handleDeleteChannel(RequestDeleteChannel $pk): void{
+		$this->getServer($pk, $pk->getServerId(), function(DiscordGuild $guild) use($pk){
+			$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($guild, $pk){
+				$guild->channels->delete($channel)->then(function() use($pk){
+					$this->resolveRequest($pk->getUID(), true, "Channel deleted.");
+				}, function(\Throwable $e) use($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to delete channel.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to delete channel ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			});
+		});
 	}
 
 	private function handleBroadcastTyping(RequestBroadcastTyping $pk): void{
