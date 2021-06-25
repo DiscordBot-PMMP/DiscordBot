@@ -14,18 +14,18 @@ namespace JaxkDev\DiscordBot\Models\Embed;
 
 class Footer implements \Serializable{
 
-	/** @var string 2048 characters */
+	/** @var null|string 2048 characters */
 	private $text;
 
 	/** @var null|string Must be prefixed with `https` */
 	private $icon_url;
 
-	public function getText(): string{
+	public function getText(): ?string{
 		return $this->text;
 	}
 
-	public function setText(string $text): void{
-		if(strlen($text) > 2048){
+	public function setText(?string $text): void{
+		if($text !== null and strlen($text) > 2048){
 			throw new \AssertionError("Embed footer text can only have up to 2048 characters.");
 		}
 		$this->text = $text;

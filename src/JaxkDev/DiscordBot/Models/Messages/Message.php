@@ -10,53 +10,44 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Models;
+namespace JaxkDev\DiscordBot\Models\Messages;
 
 use JaxkDev\DiscordBot\Models\Embed\Embed;
 
 class Message implements \Serializable{
 
-	const TYPE_NORMAL = 0;
-	const TYPE_REPLY = 19;
-
 	/** @var ?string Null when sending message. */
-	private $id;
+	protected $id;
 
-	/** @var int */
-	private $type = self::TYPE_NORMAL; //Not supporting others right now.
+	/** @var string (<=2000) Possibly empty with attachments/embeds. */
+	protected $content = "";
 
-	/** @var string (<=2000) */
-	private $content;
-
-	/** @var Embed[] Max 10 in webhook message, one in normal message. */
-	private $embeds = [];
+	/** @var ?Embed */
+	protected $embed;
 
 	/** @var ?string MemberID Null when sending or receiving webhook messages.*/
-	private $author_id;
+	protected $author_id;
 
 	/** @var string */
-	private $channel_id;
+	protected $channel_id;
 
 	/** @var ?string Null if DM Channel. */
-	private $server_id;  //This is needed for faster handling discord side.
-
-	/** @var ?string ID of referenced message if type is reply. */
-	private $referenced_message_id;
+	protected $server_id;  //This is needed for faster handling discord side.
 
 	/** @var ?float Null when sending message. */
-	private $timestamp;
+	protected $timestamp;
 
 	/** @var bool */
-	private $everyone_mentioned = false;
+	protected $everyone_mentioned = false;
 
 	/** @var string[] */
-	private $users_mentioned = [];
+	protected $users_mentioned = [];
 
 	/** @var string[] */
-	private $roles_mentioned = [];
+	protected $roles_mentioned = [];
 
 	/** @var string[] */
-	private $channels_mentioned = [];
+	protected $channels_mentioned = [];
 
 	public function getId(): ?string{
 		return $this->id;
@@ -64,21 +55,6 @@ class Message implements \Serializable{
 
 	public function setId(string $id): void{
 		$this->id = $id;
-	}
-
-	public function getType(): int{
-		return $this->type;
-	}
-
-	/**
-	 * @see Message::TYPE_NORMAL
-	 * @param int $type Message::TYPE_X Constant.
-	 */
-	public function setType(int $type): void{
-		if($type < self::TYPE_NORMAL or $type > self::TYPE_NORMAL){
-			throw new \AssertionError("Invalid type '{$type}'");
-		}
-		$this->type = $type;
 	}
 
 	public function getContent(): string{
@@ -92,21 +68,13 @@ class Message implements \Serializable{
 		$this->content = $content;
 	}
 
-	/** @return Embed[] */
-	public function getEmbeds(): array{
-		return $this->embeds;
+	//TODO think about this...
+	public function getEmbed(): ?Embed{
+		return $this->embed;
 	}
 
-	/** @param Embed[] $embeds */
-	public function setEmbeds(array $embeds): void{
-		if(($this->type === self::TYPE_NORMAL or $this->type === self::TYPE_REPLY) and sizeof($embeds) > 1){
-			throw new \AssertionError("A 'normal/reply' message can only have one embed.");
-		}/*elseif($this->type === self::TYPE_WEBHOOK and sizeof($embeds) > 10){
-			throw new \AssertionError("A 'webhook' message can only have up to 10 embeds.");
-		}*/elseif(sizeof($embeds) > 0){
-			throw new \AssertionError("This type of message cannot have any embeds.");
-		}
-		$this->embeds = $embeds;
+	public function setEmbed(Embed $embed): void{
+		$this->embed = $embed;
 	}
 
 	public function getAuthorId(): ?string{
@@ -131,17 +99,6 @@ class Message implements \Serializable{
 
 	public function setServerId(?string $server_id): void{
 		$this->server_id = $server_id;
-	}
-
-	public function getReferencedMessageId(): ?string{
-		return $this->referenced_message_id;
-	}
-
-	public function setReferencedMessageId(?string $referenced_message_id): void{
-		if($this->type !== self::TYPE_REPLY){
-			throw new \AssertionError("A message can only have 'referenced_message_id' when its type is 'REPLY'");
-		}
-		$this->referenced_message_id = $referenced_message_id;
 	}
 
 	public function getTimestamp(): ?float{
@@ -207,13 +164,11 @@ class Message implements \Serializable{
 	public function serialize(): ?string{
 		return serialize([
 			$this->id,
-			$this->type,
 			$this->content,
-			$this->embeds,
+			$this->embed,
 			$this->author_id,
 			$this->channel_id,
 			$this->server_id,
-			$this->referenced_message_id,
 			$this->timestamp,
 			$this->everyone_mentioned,
 			$this->users_mentioned,
@@ -225,13 +180,11 @@ class Message implements \Serializable{
 	public function unserialize($data): void{
 		[
 			$this->id,
-			$this->type,
 			$this->content,
-			$this->embeds,
+			$this->embed,
 			$this->author_id,
 			$this->channel_id,
 			$this->server_id,
-			$this->referenced_message_id,
 			$this->timestamp,
 			$this->everyone_mentioned,
 			$this->users_mentioned,

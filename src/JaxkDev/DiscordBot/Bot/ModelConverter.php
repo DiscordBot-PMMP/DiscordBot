@@ -45,7 +45,9 @@ use JaxkDev\DiscordBot\Models\Embed\Image;
 use JaxkDev\DiscordBot\Models\Embed\Video;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
-use JaxkDev\DiscordBot\Models\Message;
+use JaxkDev\DiscordBot\Models\Messages\Message;
+use JaxkDev\DiscordBot\Models\Messages\Reply;
+use JaxkDev\DiscordBot\Models\Messages\Webhook;
 use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Role;
@@ -207,32 +209,48 @@ abstract class ModelConverter{
 	}
 
 	static public function genModelMessage(DiscordMessage $discordMessage): Message{
-		if($discordMessage->type !== DiscordMessage::TYPE_NORMAL and $discordMessage->type !== DiscordMessage::TYPE_REPLY){
-			//Temporary.
-			throw new AssertionError("Discord message type must be `normal` or `reply` to generate model message.");
-		}
 		if($discordMessage->channel->guild_id === null){
 			throw new AssertionError("Discord message does not have a guild_id, cannot generate model message.");
 		}
 		if($discordMessage->author === null){
 			throw new AssertionError("Discord message does not have a author, cannot generate model message.");
 		}
-		$m = new Message();
+		if($discordMessage->type === DiscordMessage::TYPE_NORMAL){
+			if($discordMessage->webhook_id === null){
+				$m = new Message();
+				$e = $discordMessage->embeds->first();
+				if($e !== null){
+					$m->setEmbed(ModelConverter::genModelEmbed($e));
+				}
+			}else{
+				$m = new Webhook();
+				$m->setWebhookId($discordMessage->webhook_id);
+				$embeds = [];
+				foreach($discordMessage->embeds as $embed){
+					$embeds[] = self::genModelEmbed($embed);
+				}
+				$m->setEmbeds($embeds);
+			}
+		}elseif($discordMessage->type === DiscordMessage::TYPE_REPLY){
+			if($discordMessage->referenced_message === null){
+				throw new AssertionError("Error code 0x003 no ref on reply message, if your seeing this please report it on github.");
+			}
+			$m = new Reply();
+			$m->setReferencedMessageId($discordMessage->referenced_message->id);
+			$e = $discordMessage->embeds->first();
+			if($e !== null){
+				$m->setEmbed(ModelConverter::genModelEmbed($e));
+			}
+		}else{
+			throw new AssertionError("Discord message type not supported.");
+		}
 		$m->setId($discordMessage->id);
 		$m->setTimestamp($discordMessage->timestamp->getTimestamp());
 		$m->setAuthorId(($discordMessage->channel->guild_id.".".$discordMessage->author->id));
 		$m->setChannelId($discordMessage->channel_id);
 		$m->setServerId($discordMessage->channel->guild_id);
-		if($discordMessage->type === DiscordMessage::TYPE_REPLY and $discordMessage->referenced_message !== null){
-			$m->setReferencedMessageId($discordMessage->referenced_message->id);
-		}
 		$m->setEveryoneMentioned($discordMessage->mention_everyone);
 		$m->setContent($discordMessage->content??"");
-		$embeds = [];
-		foreach($discordMessage->embeds as $embed){
-			$embeds[] = self::genModelEmbed($embed);
-		}
-		$m->setEmbeds($embeds);
 		$m->setChannelsMentioned(array_keys($discordMessage->mention_channels->toArray()));
 		$m->setRolesMentioned(array_keys($discordMessage->mention_roles->toArray()));
 		$m->setUsersMentioned(array_keys($discordMessage->mentions->toArray()));

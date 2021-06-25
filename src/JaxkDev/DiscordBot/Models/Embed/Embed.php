@@ -167,7 +167,7 @@ class Embed implements \Serializable{
 	/** @param Field[] $fields */
 	public function setFields(array $fields): void{
 		if(sizeof($fields) > 25){
-			throw new \AssertionError("Embeds can only have up to 25 fields.");
+			throw new \AssertionError("Embed can only have up to 25 fields.");
 		}
 		$this->fields = $fields;
 	}

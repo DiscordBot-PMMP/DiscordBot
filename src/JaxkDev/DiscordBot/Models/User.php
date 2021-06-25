@@ -40,7 +40,7 @@ class User implements \Serializable{
 	/** @var string */
 	private $username;
 
-	/** @var string */
+	/** @var string 0000 when user is webhook/system etc. */
 	private $discriminator;
 
 	/** @var string */

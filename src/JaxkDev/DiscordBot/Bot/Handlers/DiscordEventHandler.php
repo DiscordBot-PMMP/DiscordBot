@@ -405,7 +405,7 @@ class DiscordEventHandler{
 	private function checkMessage(DiscordMessage $message): bool{
 		// Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
 		if($message->author === null) return false; //"Shouldn't" happen now...
-		if($message->author instanceof DiscordMember ? $message->author->user->bot : (isset($message->author) ? $message->author->bot : true)) return false;
+		if($message->author->id === $this->client->getDiscordClient()->id) return false;
 
 		// Other types of messages not used right now.
 		if($message->type !== DiscordMessage::TYPE_NORMAL and $message->type !== DiscordMessage::TYPE_REPLY) return false;

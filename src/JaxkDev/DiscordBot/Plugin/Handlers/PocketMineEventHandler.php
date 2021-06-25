@@ -14,7 +14,7 @@
 namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
-use JaxkDev\DiscordBot\Models\Message;
+use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Plugin\Main;
 use JaxkDev\DiscordBot\Plugin\Storage;
 use pocketmine\event\Listener;
@@ -51,7 +51,6 @@ class PocketMineEventHandler implements Listener{
 			$channel = Storage::getChannel($channel);
 			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
 			$msg = new Message();
-			$msg->setType(Message::TYPE_NORMAL);
 			$msg->setChannelId($channel->getId());
 			$msg->setServerId($channel->getServerId());
 			$msg->setContent($message);
@@ -73,7 +72,6 @@ class PocketMineEventHandler implements Listener{
 			$channel = Storage::getChannel($channel);
 			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
 			$msg = new Message();
-			$msg->setType(Message::TYPE_NORMAL);
 			$msg->setChannelId($channel->getId());
 			$msg->setServerId($channel->getServerId());
 			$msg->setContent($message);
@@ -92,7 +90,6 @@ class PocketMineEventHandler implements Listener{
 			$channel = Storage::getChannel($channel);
 			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
 			$msg = new Message();
-			$msg->setType(Message::TYPE_NORMAL);
 			$msg->setChannelId($channel->getId());
 			$msg->setServerId($channel->getServerId());
 			$msg->setContent($message);
@@ -115,7 +112,6 @@ class PocketMineEventHandler implements Listener{
 			$channel = Storage::getChannel($channel);
 			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
 			$msg = new Message();
-			$msg->setType(Message::TYPE_NORMAL);
 			$msg->setChannelId($channel->getId());
 			$msg->setServerId($channel->getServerId());
 			$msg->setContent($message);
@@ -138,7 +134,6 @@ class PocketMineEventHandler implements Listener{
 			$channel = Storage::getChannel($channel);
 			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
 			$msg = new Message();
-			$msg->setType(Message::TYPE_NORMAL);
 			$msg->setChannelId($channel->getId());
 			$msg->setServerId($channel->getServerId());
 			$msg->setContent($message);

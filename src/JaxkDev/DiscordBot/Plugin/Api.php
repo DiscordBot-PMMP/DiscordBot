@@ -27,7 +27,7 @@ use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
-use JaxkDev\DiscordBot\Models\Message;
+use JaxkDev\DiscordBot\Models\Messages\Message;
 
 /*
  * TODO:

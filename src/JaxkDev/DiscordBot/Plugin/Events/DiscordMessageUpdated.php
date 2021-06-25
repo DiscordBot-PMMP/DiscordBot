@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Message;
+use JaxkDev\DiscordBot\Models\Messages\Message;
 use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 

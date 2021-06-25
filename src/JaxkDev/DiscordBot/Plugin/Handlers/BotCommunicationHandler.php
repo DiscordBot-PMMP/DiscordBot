@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin\Handlers;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Messages\Webhook;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
@@ -111,6 +112,7 @@ class BotCommunicationHandler{
 		$e = new DiscordMessageSent($this->plugin, $message);
 		$e->call();
 		if($e->isCancelled()) return;
+		if($message instanceof Webhook) return;
 
 		$config = $this->plugin->getEventsConfig()["message"]["fromDiscord"];
 		if(!in_array($message->getChannelId(), $config["channels"])) return;
