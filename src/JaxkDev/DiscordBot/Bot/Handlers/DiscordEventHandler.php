@@ -24,7 +24,6 @@ use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
-use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DataDump;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\EventBanAdd;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\EventBanRemove;
@@ -100,13 +99,6 @@ class DiscordEventHandler{
 			MainLogger::getLogger()->warning("Closing thread, unexpected state change.");
 			$this->client->close();
 		}
-
-		//Default activity. TODO Move to plugin side initial packet data from config.yml (new default presence)
-		$ac = new Activity();
-		$ac->setMessage("PocketMine-MP v".\pocketmine\VERSION);
-		$ac->setType(Activity::TYPE_PLAYING);
-		$ac->setStatus(Activity::STATUS_ONLINE);
-		//$this->client->updatePresence($ac);
 
 		// Register all other events.
 		$this->registerEvents();
@@ -220,7 +212,6 @@ class DiscordEventHandler{
 		$packet->setMessage(ModelConverter::genModelMessage($message));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
-
 
 	public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
 		if(!$this->checkMessage($message)) return;

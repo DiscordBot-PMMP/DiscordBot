@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Handlers;
 
+use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Member;
@@ -103,6 +104,13 @@ class BotCommunicationHandler{
 	}
 
 	private function handleReady(): void{
+		//Default activity, Feel free to change activity after ReadyEvent.
+		$ac = new Activity();
+		$ac->setMessage("PocketMine-MP v".\pocketmine\VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION);
+		$ac->setType(Activity::TYPE_PLAYING);
+		$ac->setStatus(Activity::STATUS_IDLE);
+		$this->plugin->getApi()->updateActivity($ac);
+
 		(new DiscordReady($this->plugin))->call();
 	}
 
