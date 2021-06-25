@@ -86,13 +86,11 @@ class Api{
 	 *
 	 * DO NOT ABUSE THIS.
 	 *
-	 * @param string $server_id
 	 * @param string $channel_id
 	 * @return PromiseInterface
 	 */
-	public function broadcastTyping(string $server_id, string $channel_id): PromiseInterface{
+	public function broadcastTyping(string $channel_id): PromiseInterface{
 		$pk = new RequestBroadcastTyping();
-		$pk->setServerId($server_id);
 		$pk->setChannelId($channel_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());

@@ -17,18 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 class RequestBroadcastTyping extends Packet{
 
 	/** @var string */
-	private $server_id;
-
-	/** @var string */
 	private $channel_id;
-
-	public function getServerId(): string{
-		return $this->server_id;
-	}
-
-	public function setServerId(string $server_id): void{
-		$this->server_id = $server_id;
-	}
 
 	public function getChannelId(): string{
 		return $this->channel_id;
@@ -41,7 +30,6 @@ class RequestBroadcastTyping extends Packet{
 	public function serialize(): ?string{
 		return serialize([
 			$this->UID,
-			$this->server_id,
 			$this->channel_id
 		]);
 	}
@@ -49,7 +37,6 @@ class RequestBroadcastTyping extends Packet{
 	public function unserialize($data): void{
 		[
 			$this->UID,
-			$this->server_id,
 			$this->channel_id
 		] = unserialize($data);
 	}
