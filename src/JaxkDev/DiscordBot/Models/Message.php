@@ -99,8 +99,12 @@ class Message implements \Serializable{
 
 	/** @param Embed[] $embeds */
 	public function setEmbeds(array $embeds): void{
-		if($this->type === self::TYPE_NORMAL and sizeof($embeds) > 1){
-			throw new \AssertionError("A 'normal' message can only have one embed.");
+		if(($this->type === self::TYPE_NORMAL or $this->type === self::TYPE_REPLY) and sizeof($embeds) > 1){
+			throw new \AssertionError("A 'normal/reply' message can only have one embed.");
+		}/*elseif($this->type === self::TYPE_WEBHOOK and sizeof($embeds) > 10){
+			throw new \AssertionError("A 'webhook' message can only have up to 10 embeds.");
+		}*/elseif(sizeof($embeds) > 0){
+			throw new \AssertionError("This type of message cannot have any embeds.");
 		}
 		$this->embeds = $embeds;
 	}
