@@ -124,7 +124,7 @@ class BotCommunicationHandler{
 		$e = new DiscordMessageSent($this->plugin, $message);
 		$e->call();
 		if($e->isCancelled()) return;
-		if($message instanceof Webhook) return;
+		if($message instanceof Webhook or trim($message->getContent()) === "") return;
 
 		$config = $this->plugin->getEventsConfig()["message"]["fromDiscord"];
 		if(!in_array($message->getChannelId(), $config["channels"])) return;
