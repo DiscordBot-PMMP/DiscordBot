@@ -12,27 +12,45 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
-use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestDeleteMessage extends Packet{
 
-	/** @var Message */
-	private $message;
+	/** @var string */
+	private $message_id;
 
-	public function getMessage(): Message{
-		return $this->message;
+	/** @var string */
+	private $channel_id;
+
+	public function getMessageId(): string{
+		return $this->message_id;
 	}
 
-	public function setMessage(Message $message): void{
-		$this->message = $message;
+	public function setMessageId(string $message_id): void{
+		$this->message_id = $message_id;
+	}
+
+	public function getChannelId(): string{
+		return $this->channel_id;
+	}
+
+	public function setChannelId(string $channel_id): void{
+		$this->channel_id = $channel_id;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->message]);
+		return serialize([
+			$this->UID,
+			$this->message_id,
+			$this->channel_id
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->message] = unserialize($data);
+		[
+			$this->UID,
+			$this->message_id,
+			$this->channel_id
+		] = unserialize($data);
 	}
 }

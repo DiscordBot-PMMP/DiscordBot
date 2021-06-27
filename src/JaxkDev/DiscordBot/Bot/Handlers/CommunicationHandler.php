@@ -172,13 +172,8 @@ class CommunicationHandler{
 	}
 
 	private function handleDeleteMessage(RequestDeleteMessage $pk): void{
-		$message = $pk->getMessage();
-		if($message->getId() === null){
-			$this->resolveRequest($pk->getUID(), false, "No message ID provided.");
-			return;
-		}
-		$this->getChannel($pk, $message->getChannelId(), function(DiscordChannel $channel) use($pk, $message){
-			$channel->messages->fetch($message->getId())->done(function(DiscordMessage $dMessage) use ($pk){
+		$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+			$channel->messages->fetch($pk->getMessageId())->done(function(DiscordMessage $dMessage) use ($pk){
 				$dMessage->delete()->done(function() use ($pk){
 					$this->resolveRequest($pk->getUID());
 				}, function(\ThreadException $e) use ($pk){

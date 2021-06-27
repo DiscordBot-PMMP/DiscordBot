@@ -29,6 +29,7 @@ use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Messages\Message;
+use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
  * TODO:
@@ -44,16 +45,16 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
  * - Create channel
  * - Add Reaction
  * - Remove Reaction (advanced)
- * - Assert all fields are valid before sending packet.
  *
  * V3.x or v2.1+ (depending on BC):
  * - Register listener (messages, reactions etc)
  * - Unregister listener
  *
  * Test:
- * - ban
- * - unban
- * - kick
+ * - Ban
+ * - Unban
+ * - Kick
+ * - Pre packet tests.
  *
  * Tested:
  * - Delete Channel
@@ -93,6 +94,9 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function broadcastTyping(string $channel_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
 		$pk = new RequestBroadcastTyping();
 		$pk->setChannelId($channel_id);
 		$this->plugin->writeOutboundData($pk);
@@ -106,15 +110,18 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function updateActivity(Activity $activity): PromiseInterface{
+		//Dont know the activity message requirements.
+		if(!in_array($activity->getStatus(), [Activity::STATUS_IDLE, Activity::STATUS_DND, Activity::STATUS_INVISIBLE, Activity::STATUS_OFFLINE, Activity::STATUS_ONLINE])){
+			return rejectPromise(new ApiRejection("Invalid activity, status '{$activity->getStatus()}' is invalid."));
+		}
+		if(($t = $activity->getType()) !== null and !in_array($t, [Activity::TYPE_PLAYING, Activity::TYPE_STREAMING, Activity::TYPE_LISTENING, Activity::TYPE_WATCHING, Activity::TYPE_CUSTOM, Activity::TYPE_COMPETING])){
+			return rejectPromise(new ApiRejection("Invalid activity, type '$t' is invalid."));
+		}
 		$pk = new RequestUpdateActivity();
 		$pk->setActivity($activity);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
-
-	/*public static function createBanModel(Member $member, ?string $reason = null, ?int $daysToDelete = null): ?Ban{
-		if($daysToDelete !== null and ($daysToDelete < 0 or $daysToDelete > 7)) return null;
-	}*/
 
 	/**
 	 * Attempt to ban a member.
@@ -123,6 +130,15 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function initialiseBan(Ban $ban): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($ban->getServerId())){
+			return rejectPromise(new ApiRejection("Invalid ban, server ID '{$ban->getServerId()}' is invalid."));
+		}
+		if(!Utils::validDiscordSnowflake($ban->getUserId())){
+			return rejectPromise(new ApiRejection("Invalid ban, user ID '{$ban->getUserId()}' is invalid."));
+		}
+		if(($d = $ban->getDaysToDelete()) !== null and ($d < 0 or $d > 7)){
+			return rejectPromise(new ApiRejection("Invalid ban, days to delete '$d' must be 0-7."));
+		}
 		$pk = new RequestInitialiseBan();
 		$pk->setBan($ban);
 		$this->plugin->writeOutboundData($pk);
@@ -137,6 +153,12 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function revokeBan(string $server_id, string $user_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($server_id)){
+			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($user_id)){
+			return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
+		}
 		$pk = new RequestRevokeBan();
 		$pk->setServerId($server_id);
 		$pk->setUserId($user_id);
@@ -152,16 +174,15 @@ class Api{
 	 */
 	public function kickMember(string $member_id): PromiseInterface{
 		[$sid, $uid] = explode(".", $member_id);
+		if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
+			return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
+		}
 		$pk = new RequestKickMember();
 		$pk->setServerId($sid);
 		$pk->setUserId($uid);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
-
-	/*public static function createMessageModel($channel, string $content): ?Message{
-		if(strlen($content) > 2000) return null;
-	}*/
 
 	/**
 	 * Sends the Message to discord.
@@ -170,6 +191,28 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function sendMessage(Message $message): PromiseInterface{
+		if(($s = strlen($message->getContent())) > 2000){
+			return rejectPromise(new ApiRejection("Invalid content size '$s', max 2000."));
+		}
+		if(!Utils::validDiscordSnowflake($message->getChannelId())){
+			return rejectPromise(new ApiRejection("Invalid message, channel_id '{$message->getChannelId()}' is invalid"));
+		}
+		foreach($message->getChannelsMentioned() as $cid){
+			if(!Utils::validDiscordSnowflake($cid)){
+				return rejectPromise(new ApiRejection("Invalid message, channels mentioned ID '$cid' is invalid."));
+			}
+		}
+		foreach($message->getRolesMentioned() as $rid){
+			if(!Utils::validDiscordSnowflake($rid)){
+				return rejectPromise(new ApiRejection("Invalid message, roles mentioned ID '$rid' is invalid."));
+			}
+		}
+		foreach($message->getUsersMentioned() as $uid){
+			if(!Utils::validDiscordSnowflake($uid)){
+				return rejectPromise(new ApiRejection("Invalid message, users mentioned ID '$uid' is invalid."));
+			}
+		}
+		//TODO Embed checks.
 		$pk = new RequestSendMessage();
 		$pk->setMessage($message);
 		$this->plugin->writeOutboundData($pk);
@@ -186,6 +229,7 @@ class Api{
 	 * @see Api::deleteMessage For deleting a sent message.
 	 */
 	public function editMessage(Message $message): PromiseInterface{
+		//TODO Checks.
 		$pk = new RequestEditMessage();
 		$pk->setMessage($message);
 		$this->plugin->writeOutboundData($pk);
@@ -195,12 +239,20 @@ class Api{
 	/**
 	 * Delete a sent message.
 	 *
-	 * @param Message $message
+	 * @param string $message_id
+	 * @param string $channel_id
 	 * @return PromiseInterface
 	 */
-	public function deleteMessage(Message $message): PromiseInterface{
+	public function deleteMessage(string $message_id, string $channel_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($message_id)){
+			return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
+		}
 		$pk = new RequestDeleteMessage();
-		$pk->setMessage($message);
+		$pk->setMessageId($message_id);
+		$pk->setChannelId($channel_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -213,16 +265,18 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function deleteChannel(string $server_id, string $channel_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($server_id)){
+			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
 		$pk = new RequestDeleteChannel();
 		$pk->setServerId($server_id);
 		$pk->setChannelId($channel_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
-
-	//public static function createInviteModel(ServerChannel $channel, int $maxAge, int $maxUses, bool $temporary = false): ?Invite{
-		//if(($maxAge > 604800 || $maxAge < 0) || ($maxUses > 100 || $maxUses < 0)) return null;
-	//}
 
 	/**
 	 * Initialise if possible the given invite.
@@ -232,6 +286,18 @@ class Api{
 	 * @see Api::revokeInvite() For revoking an initialised invite.
 	 */
 	public function initialiseInvite(Invite $invite): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($invite->getServerId())){
+			return rejectPromise(new ApiRejection("Invalid server ID '{$invite->getServerId()}' in Invite."));
+		}
+		if(!Utils::validDiscordSnowflake($invite->getChannelId())){
+			return rejectPromise(new ApiRejection("Invalid channel ID '{$invite->getChannelId()}' in Invite."));
+		}
+		if(($u = $invite->getMaxUses()) > 100 or $u < 0){
+			return rejectPromise(new ApiRejection("Invalid max uses '$u' in Invite, max uses must be 0-100."));
+		}
+		if(($a = $invite->getMaxAge()) > 604800 or $a < 0){
+			return rejectPromise(new ApiRejection("Invalid max age '$a' in Invite, max age must be 0-604800"));
+		}
 		$pk = new RequestInitialiseInvite();
 		$pk->setInvite($invite);
 		$this->plugin->writeOutboundData($pk);
@@ -246,6 +312,9 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function revokeInvite(string $server_id, string $invite_code): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($server_id)){
+			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
+		}
 		$pk = new RequestRevokeInvite();
 		$pk->setServerId($server_id);
 		$pk->setInviteCode($invite_code);
@@ -262,6 +331,9 @@ class Api{
 	 */
 	public function updateNickname(string $member_id, ?string $nickname = null): PromiseInterface{
 		[$sid, $uid] = explode(".", $member_id);
+		if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
+			return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
+		}
 		$pk = new RequestUpdateNickname();
 		$pk->setServerId($sid);
 		$pk->setUserId($uid);
