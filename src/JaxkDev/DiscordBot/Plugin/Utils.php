@@ -18,8 +18,8 @@ abstract class Utils{
 	public static function validDiscordSnowflake(string $snowflake): bool{
 		$len = strlen($snowflake);
 		if($len < 17 or $len > 18) return false;
-		$timestamp = (intval($snowflake) >> 22) + 1420070400000;
-		if($timestamp > time() or $timestamp <= 1420070400000) return false;
+		$timestamp = floor(((intval($snowflake) >> 22) + 1420070400000) / 1000);
+		if($timestamp > time() or $timestamp <= 1420070400) return false;
 		return true;
 	}
 }
