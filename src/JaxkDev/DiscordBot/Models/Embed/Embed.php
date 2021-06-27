@@ -17,17 +17,17 @@ class Embed implements \Serializable{
 
 	// https://discord.com/developers/docs/resources/channel#embed-object-embed-types
 	const
-		TYPE_RICH = 0,
-		TYPE_IMAGE = 1,
-		TYPE_VIDEO = 2,
-		TYPE_GIF = 3,
-		TYPE_ARTICLE = 4,
-		TYPE_LINK = 5;
+		TYPE_RICH = 'rich',
+		TYPE_IMAGE = 'image',
+		TYPE_VIDEO = 'video',
+		TYPE_GIFV = 'gifv',
+		TYPE_ARTICLE = 'article',
+		TYPE_LINK = 'link';
 
 	/** @var null|string 2048 characters */
 	private $title;
 
-	/** @var null|int */
+	/** @var null|string */
 	private $type;
 
 	/** @var null|string 2048 characters */
@@ -62,6 +62,14 @@ class Embed implements \Serializable{
 	/** @var Field[] 25 max */
 	private $fields = [];
 
+	public function __construct(){
+		$this->footer = new Footer();
+		$this->image = new Image();
+		$this->thumbnail = new Image();
+		$this->video = new Video();
+		$this->author = new Author();
+	}
+
 	public function getTitle(): ?string{
 		return $this->title;
 	}
@@ -73,12 +81,12 @@ class Embed implements \Serializable{
 		$this->title = $title;
 	}
 
-	public function getType(): ?int{
+	public function getType(): ?string{
 		return $this->type;
 	}
 
-	public function setType(?int $type): void{
-		if($type !== null and ($type < self::TYPE_RICH or $type > self::TYPE_LINK)){
+	public function setType(?string $type): void{
+		if($type !== null and (!in_array($type, [self::TYPE_LINK, self::TYPE_ARTICLE, self::TYPE_GIFV, self::TYPE_VIDEO, self::TYPE_IMAGE, self::TYPE_RICH]))){
 			throw new \AssertionError("Invalid embed type '{$type}' provided.");
 		}
 		$this->type = $type;

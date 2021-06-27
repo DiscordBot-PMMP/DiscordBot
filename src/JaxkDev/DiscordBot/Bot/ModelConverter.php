@@ -258,13 +258,9 @@ abstract class ModelConverter{
 	}
 
 	static public function genModelEmbed(DiscordEmbed $discordEmbed): Embed{
-		$types = [DiscordEmbed::TYPE_RICH => Embed::TYPE_RICH, DiscordEmbed::TYPE_IMAGE => Embed::TYPE_IMAGE,
-			DiscordEmbed::TYPE_VIDEO => Embed::TYPE_VIDEO, DiscordEmbed::TYPE_GIFV => Embed::TYPE_GIF,
-			DiscordEmbed::TYPE_ARTICLE => Embed::TYPE_ARTICLE, DiscordEmbed::TYPE_LINK => Embed::TYPE_LINK];
-
 		$e = new Embed();
 		$e->setTitle($discordEmbed->title);
-		$e->setType($discordEmbed->type !== null ? $types[$discordEmbed->type] : null);
+		$e->setType($discordEmbed->type);
 		$e->setColour($discordEmbed->color);
 		$e->setDescription($discordEmbed->description);
 		$e->setUrl($discordEmbed->url);

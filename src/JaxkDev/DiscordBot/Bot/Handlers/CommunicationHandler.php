@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Bot\Handlers;
 
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
+use Discord\Parts\Embed\Embed as DiscordEmbed;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\User\Activity as DiscordActivity;
@@ -137,8 +138,27 @@ class CommunicationHandler{
 
 	private function handleSendMessage(RequestSendMessage $pk): void{
 		$this->getChannel($pk, $pk->getMessage()->getChannelId(), function(DiscordChannel $channel) use($pk){
-			//TODO Embeds / Model->DiscordModel.
-			$channel->sendMessage($pk->getMessage()->getContent())->done(function(DiscordMessage $msg) use($pk){
+			$e = $pk->getMessage()->getEmbed();
+			$de = null;
+			if($e !== null){
+				$de = new DiscordEmbed($this->client->getDiscordClient());
+				if($e->getType() !== null) $de->setType($e->getType());
+				if($e->getTitle() !== null) $de->setTitle($e->getTitle());
+				if($e->getUrl() !== null) $de->setURL($e->getUrl());
+				if($e->getColour() !== null) $de->setColor($e->getColour());
+				if($e->getAuthor()->getName() !== null) $de->setAuthor($e->getAuthor()->getName(), $e->getAuthor()->getIconUrl()??"", $e->getAuthor()->getUrl()??"");
+				if($e->getThumbnail()->getUrl() !== null) $de->setThumbnail($e->getThumbnail()->getUrl());
+				if($e->getImage()->getUrl() !== null) $de->setImage($e->getImage()->getUrl());
+				if($e->getDescription() !== null) $de->setDescription($e->getDescription());
+				if($e->getFooter()->getText() !== null) $de->setFooter($e->getFooter()->getText(), $e->getFooter()->getIconUrl()??"");
+				if($e->getTimestamp() !== null) $de->setTimestamp($e->getTimestamp());
+				foreach($e->getFields() as $f){
+					$de->addFieldValues($f->getName(), $f->getValue(), $f->isInline());
+				}
+			}
+			//Todo replies.
+			$channel->sendMessage($pk->getMessage()->getContent(), false, $de)->done(function(DiscordMessage $msg) use($pk){
+				var_dump(true);
 				$this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
 				MainLogger::getLogger()->debug("Sent message ({$pk->getUID()})");
 			}, function(\Throwable $e) use($pk){
@@ -156,8 +176,29 @@ class CommunicationHandler{
 		}
 		$this->getChannel($pk, $message->getChannelId(), function(DiscordChannel $channel) use($pk, $message){
 			$channel->messages->fetch($message->getId())->done(function(DiscordMessage $dMessage) use ($pk, $message){
+				$e = $pk->getMessage()->getEmbed();
+				$de = null;
+				if($e !== null){
+					$de = new DiscordEmbed($this->client->getDiscordClient());
+					if($e->getType() !== null) $de->setType($e->getType());
+					if($e->getTitle() !== null) $de->setTitle($e->getTitle());
+					if($e->getUrl() !== null) $de->setURL($e->getUrl());
+					if($e->getColour() !== null) $de->setColor($e->getColour());
+					if($e->getAuthor()->getName() !== null) $de->setAuthor($e->getAuthor()->getName(), $e->getAuthor()->getIconUrl()??"", $e->getAuthor()->getUrl()??"");
+					if($e->getThumbnail()->getUrl() !== null) $de->setThumbnail($e->getThumbnail()->getUrl());
+					if($e->getImage()->getUrl() !== null) $de->setImage($e->getImage()->getUrl());
+					if($e->getDescription() !== null) $de->setDescription($e->getDescription());
+					if($e->getFooter()->getText() !== null) $de->setFooter($e->getFooter()->getText(), $e->getFooter()->getIconUrl()??"");
+					if($e->getTimestamp() !== null) $de->setTimestamp($e->getTimestamp());
+					foreach($e->getFields() as $f){
+						$de->addFieldValues($f->getName(), $f->getValue(), $f->isInline());
+					}
+				}
 				$dMessage->content = $message->getContent();
-				//$dMessage->embeds = x.y.z;
+				if($de !== null){
+					$dMessage->embeds->clear();
+					$dMessage->addEmbed($de);
+				}
 				$dMessage->channel->messages->save($dMessage)->done(function(DiscordMessage $dMessage) use ($pk){
 					$this->resolveRequest($pk->getUID(), true, "Message edited.", [ModelConverter::genModelMessage($dMessage)]);
 				}, function(\ThreadException $e) use ($pk){

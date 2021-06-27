@@ -21,8 +21,8 @@ class Field implements \Serializable{
 	/** @var string 2048 characters */
 	private $value;
 
-	/** @var null|bool */
-	private $inline;
+	/** @var bool */
+	private $inline = false;
 
 	public function getName(): string{
 		return $this->name;
@@ -46,11 +46,11 @@ class Field implements \Serializable{
 		$this->value = $value;
 	}
 
-	public function isInline(): ?bool{
+	public function isInline(): bool{
 		return $this->inline;
 	}
 
-	public function setInline(?bool $inline): void{
+	public function setInline(bool $inline): void{
 		$this->inline = $inline;
 	}
 
