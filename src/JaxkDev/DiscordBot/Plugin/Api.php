@@ -16,11 +16,14 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
@@ -35,16 +38,13 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
  * TODO:
- * - Send message (Reply)
- * - Edit message (Reply)
- * - Give role
- * - Take role
- * - Delete role
- * - Update permissions (channel,role,member)
- * - Update channel
- * - Update role
- * - Create role
- * - Create channel
+ * - Send Message (Reply)
+ * - Edit Message (Reply)
+ * - Update Permissions (channel,role,member)
+ * - Update Channel
+ * - Update Role
+ * - Create Role
+ * - Create Channel
  * - Remove Reaction (user/individual)
  *
  * V3.x or v2.1+ (depending on BC):
@@ -59,14 +59,17 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Pre packet tests.
  *
  * Tested:
+ * - Delete Role
+ * - Remove Role
+ * - Add Role
  * - Remove Reactions(bulk)
  * - Add Reaction
  * - Send Message(+Embed)
  * - Delete Channel
- * - Delete message
- * - Delete invite
- * - Update nickname
- * - Broadcast typing
+ * - Delete Message
+ * - Delete Invite
+ * - Update Nickname
+ * - Broadcast Typing
  */
 
 /**
@@ -86,6 +89,73 @@ class Api{
 
 	public function __construct(Main $plugin){
 		$this->plugin = $plugin;
+	}
+
+	/**
+	 * Delete a role.
+	 *
+	 * @param string $server_id
+	 * @param string $role_id
+	 * @return PromiseInterface
+	 */
+	public function deleteRole(string $server_id, string $role_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($server_id)){
+			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($role_id)){
+			return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
+		}
+		$pk = new RequestDeleteRole();
+		$pk->setServerId($server_id);
+		$pk->setRoleId($role_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Remove a role from a member.
+	 *
+	 * @param string $member_id
+	 * @param string $role_id
+	 * @return PromiseInterface
+	 */
+	public function removeRole(string $member_id, string $role_id): PromiseInterface{
+		[$sid, $uid] = explode(".", $member_id);
+		if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
+			return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($role_id)){
+			return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
+		}
+		$pk = new RequestRemoveRole();
+		$pk->setServerId($sid);
+		$pk->setUserId($uid);
+		$pk->setRoleId($role_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Give the member a role.
+	 *
+	 * @param string $member_id
+	 * @param string $role_id
+	 * @return PromiseInterface
+	 */
+	public function addRole(string $member_id, string $role_id): PromiseInterface{
+		[$sid, $uid] = explode(".", $member_id);
+		if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
+			return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($role_id)){
+			return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
+		}
+		$pk = new RequestAddRole();
+		$pk->setServerId($sid);
+		$pk->setUserId($uid);
+		$pk->setRoleId($role_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
 	}
 
 	/**

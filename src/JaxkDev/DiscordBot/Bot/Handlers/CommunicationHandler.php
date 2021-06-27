@@ -18,6 +18,7 @@ use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Embed\Embed as DiscordEmbed;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Invite as DiscordInvite;
+use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
@@ -28,11 +29,14 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
@@ -81,12 +85,53 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestAddReaction) $this->handleAddReaction($pk);
 		elseif($pk instanceof RequestRemoveAllReactions) $this->handleRemoveAllReactions($pk);
 		elseif($pk instanceof RequestDeleteMessage) $this->handleDeleteMessage($pk);
+		elseif($pk instanceof RequestAddRole) $this->handleAddRole($pk);
+		elseif($pk instanceof RequestRemoveRole) $this->handleRemoveRole($pk);
+		elseif($pk instanceof RequestDeleteRole) $this->handleDeleteRole($pk);
 		elseif($pk instanceof RequestKickMember) $this->handleKickMember($pk);
 		elseif($pk instanceof RequestInitialiseInvite) $this->handleInitialiseInvite($pk);
 		elseif($pk instanceof RequestRevokeInvite) $this->handleRevokeInvite($pk);
 		elseif($pk instanceof RequestDeleteChannel) $this->handleDeleteChannel($pk);
 		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
+	}
+
+	private function handleDeleteRole(RequestDeleteRole $pk): void{
+		$this->getServer($pk, $pk->getServerId(), function(DiscordGuild $guild) use($pk){
+			$guild->roles->fetch($pk->getRoleId())->then(function(DiscordRole $role) use($pk, $guild){
+				$guild->roles->delete($role)->then(function() use($pk){
+					$this->resolveRequest($pk->getUID(), true, "Deleted role.");
+				}, function(\Throwable $e) use($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to delete role.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to delete role ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to fetch role.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to delete role ({$pk->getUID()}) - fetch role: {$e->getMessage()}");
+			});
+		});
+	}
+
+	private function handleRemoveRole(RequestRemoveRole $pk): void{
+		$this->getMember($pk, $pk->getServerId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
+			$dMember->removeRole($pk->getRoleId())->done(function() use($pk){
+				$this->resolveRequest($pk->getUID(), true, "Removed role.");
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to remove role.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to remove role ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
+	}
+
+	private function handleAddRole(RequestAddRole $pk): void{
+		$this->getMember($pk, $pk->getServerId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
+			$dMember->addRole($pk->getRoleId())->done(function() use($pk){
+				$this->resolveRequest($pk->getUID(), true, "Added role.");
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to add role.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to add role ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
 	}
 
 	private function handleRemoveAllReactions(RequestRemoveAllReactions $pk): void{

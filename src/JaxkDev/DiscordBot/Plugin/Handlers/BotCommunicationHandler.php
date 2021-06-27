@@ -15,9 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin\Handlers;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
-use JaxkDev\DiscordBot\Models\Embed\Embed;
 use JaxkDev\DiscordBot\Models\Member;
-use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Webhook;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Models\User;
@@ -115,16 +113,6 @@ class BotCommunicationHandler{
 		$ac->setStatus(Activity::STATUS_IDLE);
 		$this->plugin->getApi()->updateActivity($ac)->otherwise(function(ApiRejection $a){
 			MainLogger::getLogger()->logException($a);
-		});
-
-		$m = new Message();
-		$m->setChannelId("778914498609283102");
-		$e = new Embed();
-		$e->setTitle("Server Started");
-		$e->setColour(0x10ff10);
-		$m->setEmbed($e);
-		$this->plugin->getApi()->sendMessage($m)->otherwise(function(ApiRejection $d){
-			MainLogger::getLogger()->logException($d);
 		});
 
 		(new DiscordReady($this->plugin))->call();
