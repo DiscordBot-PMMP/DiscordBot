@@ -34,12 +34,12 @@ use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Messages\Message;
+use JaxkDev\DiscordBot\Models\Messages\Reply;
+use JaxkDev\DiscordBot\Models\Messages\Webhook;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
  * TODO:
- * - Send Message (Reply)
- * - Edit Message (Reply)
  * - Update Permissions (channel,role,member)
  * - Update Channel
  * - Update Role
@@ -55,8 +55,6 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Ban
  * - Unban
  * - Kick
- * - Edit Message(+Embed)
- * - Pre packet tests.
  *
  * Tested:
  * - Delete Role
@@ -64,7 +62,8 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Add Role
  * - Remove Reactions(bulk)
  * - Add Reaction
- * - Send Message(+Embed)
+ * - Send Message(+Embed/+Reply)
+ * - Edit Message(+Embed/+Reply)
  * - Delete Channel
  * - Delete Message
  * - Delete Invite
@@ -320,6 +319,9 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function sendMessage(Message $message): PromiseInterface{
+		if($message instanceof Webhook){
+			return rejectPromise(new ApiRejection("Webhook messages cannot be sent, only received."));
+		}
 		if(($s = strlen($message->getContent())) > 2000){
 			return rejectPromise(new ApiRejection("Invalid content size '$s', max 2000."));
 		}
@@ -341,6 +343,11 @@ class Api{
 				return rejectPromise(new ApiRejection("Invalid message, users mentioned ID '$uid' is invalid."));
 			}
 		}
+		if($message instanceof Reply){
+			if($message->getReferencedMessageId() === null or !Utils::validDiscordSnowflake($message->getReferencedMessageId())){
+				return rejectPromise(new ApiRejection("Invalid message, referenced message ID '{$message->getReferencedMessageId()}' is invalid."));
+			}
+		}
 		//TODO Embed checks.
 		$pk = new RequestSendMessage();
 		$pk->setMessage($message);
@@ -350,7 +357,8 @@ class Api{
 
 	/**
 	 * Edit a sent message.
-	 * @see Message::setContent() Set new content (aka edit) then call editMessage.
+	 *
+	 * Note you can't convert a 'REPLY' message to a normal 'MESSAGE'.
 	 *
 	 * @param Message $message
 	 * @return PromiseInterface

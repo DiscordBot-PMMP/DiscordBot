@@ -47,6 +47,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Models\Messages\Reply;
 use pocketmine\utils\MainLogger;
 
 class CommunicationHandler{
@@ -209,7 +210,8 @@ class CommunicationHandler{
 
 	private function handleSendMessage(RequestSendMessage $pk): void{
 		$this->getChannel($pk, $pk->getMessage()->getChannelId(), function(DiscordChannel $channel) use($pk){
-			$e = $pk->getMessage()->getEmbed();
+			$m = $pk->getMessage();
+			$e = $m->getEmbed();
 			$de = null;
 			if($e !== null){
 				$de = new DiscordEmbed($this->client->getDiscordClient());
@@ -227,14 +229,30 @@ class CommunicationHandler{
 					$de->addFieldValues($f->getName(), $f->getValue(), $f->isInline());
 				}
 			}
-			//Todo replies.
-			$channel->sendMessage($pk->getMessage()->getContent(), false, $de)->done(function(DiscordMessage $msg) use($pk){
-				$this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
-				MainLogger::getLogger()->debug("Sent message ({$pk->getUID()})");
-			}, function(\Throwable $e) use($pk){
-				$this->resolveRequest($pk->getUID(), false, "Failed to send.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to send message ({$pk->getUID()}) - {$e->getMessage()}");
-			});
+			if($m instanceof Reply){
+				if($m->getReferencedMessageId() === null){
+					$this->resolveRequest($pk->getUID(), false, "Failed to send.", ["Reply message has no referenced message ID."]);
+					MainLogger::getLogger()->debug("Failed to send message ({$pk->getUID()}) - Reply message has no referenced message ID.");
+					return;
+				}
+				$this->getMessage($pk, $m->getChannelId(), $m->getReferencedMessageId(), function(DiscordMessage $msg) use($channel, $pk, $de){
+					$channel->sendMessage($pk->getMessage()->getContent(), false, $de, null, $msg)->done(function(DiscordMessage $msg) use($pk){
+						$this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
+						MainLogger::getLogger()->debug("Sent message ({$pk->getUID()})");
+					}, function(\Throwable $e) use($pk){
+						$this->resolveRequest($pk->getUID(), false, "Failed to send.", [$e->getMessage(), $e->getTraceAsString()]);
+						MainLogger::getLogger()->debug("Failed to send message ({$pk->getUID()}) - {$e->getMessage()}");
+					});
+				});
+			}else{
+				$channel->sendMessage($m->getContent(), false, $de)->done(function(DiscordMessage $msg) use ($pk){
+					$this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
+					MainLogger::getLogger()->debug("Sent message ({$pk->getUID()})");
+				}, function(\Throwable $e) use ($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to send.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to send message ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			}
 		});
 	}
 
