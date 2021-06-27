@@ -32,6 +32,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
@@ -78,6 +79,7 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestSendMessage) $this->handleSendMessage($pk);
 		elseif($pk instanceof RequestEditMessage) $this->handleEditMessage($pk);
 		elseif($pk instanceof RequestAddReaction) $this->handleAddReaction($pk);
+		elseif($pk instanceof RequestRemoveAllReactions) $this->handleRemoveAllReactions($pk);
 		elseif($pk instanceof RequestDeleteMessage) $this->handleDeleteMessage($pk);
 		elseif($pk instanceof RequestKickMember) $this->handleKickMember($pk);
 		elseif($pk instanceof RequestInitialiseInvite) $this->handleInitialiseInvite($pk);
@@ -87,18 +89,24 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
 	}
 
-	private function handleAddReaction(RequestAddReaction $pk): void{
-		$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
-			$channel->getMessage($pk->getMessageId())->then(function(DiscordMessage $msg) use($pk){
-				$msg->react($pk->getEmoji())->then(function() use($pk){
-					$this->resolveRequest($pk->getUID(), true, "Reaction added.");
-				}, function(\Throwable $e) use($pk){
-					$this->resolveRequest($pk->getUID(), false, "Failed to react to message.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to react to message ({$pk->getUID()}) - {$e->getMessage()}");
-				});
+	private function handleRemoveAllReactions(RequestRemoveAllReactions $pk): void{
+		$this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $msg) use($pk){
+			$msg->deleteReaction(($e = $pk->getEmoji()) === null ? DiscordMessage::REACT_DELETE_ALL : DiscordMessage::REACT_DELETE_EMOJI, $e)->then(function() use($pk, $e){
+				$this->resolveRequest($pk->getUID(), true, "Successfully bulk removed all ".($e === null ? "" : "'$e' ")."reactions");
 			}, function(\Throwable $e) use($pk){
-				$this->resolveRequest($pk->getUID(), false, "Failed to fetch message.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to fetch message ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->resolveRequest($pk->getUID(), false, "Failed to bulk remove reactions.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to bulk remove reactions ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
+	}
+
+	private function handleAddReaction(RequestAddReaction $pk): void{
+		$this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $msg) use($pk){
+			$msg->react($pk->getEmoji())->then(function() use($pk){
+				$this->resolveRequest($pk->getUID(), true, "Reaction added.");
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to react to message.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to react to message ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -191,56 +199,46 @@ class CommunicationHandler{
 			$this->resolveRequest($pk->getUID(), false, "No message ID provided.");
 			return;
 		}
-		$this->getChannel($pk, $message->getChannelId(), function(DiscordChannel $channel) use($pk, $message){
-			$channel->messages->fetch($message->getId())->done(function(DiscordMessage $dMessage) use ($pk, $message){
-				$e = $pk->getMessage()->getEmbed();
-				$de = null;
-				if($e !== null){
-					$de = new DiscordEmbed($this->client->getDiscordClient());
-					if($e->getType() !== null) $de->setType($e->getType());
-					if($e->getTitle() !== null) $de->setTitle($e->getTitle());
-					if($e->getUrl() !== null) $de->setURL($e->getUrl());
-					if($e->getColour() !== null) $de->setColor($e->getColour());
-					if($e->getAuthor()->getName() !== null) $de->setAuthor($e->getAuthor()->getName(), $e->getAuthor()->getIconUrl()??"", $e->getAuthor()->getUrl()??"");
-					if($e->getThumbnail()->getUrl() !== null) $de->setThumbnail($e->getThumbnail()->getUrl());
-					if($e->getImage()->getUrl() !== null) $de->setImage($e->getImage()->getUrl());
-					if($e->getDescription() !== null) $de->setDescription($e->getDescription());
-					if($e->getFooter()->getText() !== null) $de->setFooter($e->getFooter()->getText(), $e->getFooter()->getIconUrl()??"");
-					if($e->getTimestamp() !== null) $de->setTimestamp($e->getTimestamp());
-					foreach($e->getFields() as $f){
-						$de->addFieldValues($f->getName(), $f->getValue(), $f->isInline());
-					}
+		$this->getMessage($pk, $message->getChannelId(), $message->getId(), function(DiscordMessage $dMessage) use($pk, $message){
+			$e = $pk->getMessage()->getEmbed();
+			$de = null;
+			if($e !== null){
+				$de = new DiscordEmbed($this->client->getDiscordClient());
+				if($e->getType() !== null) $de->setType($e->getType());
+				if($e->getTitle() !== null) $de->setTitle($e->getTitle());
+				if($e->getUrl() !== null) $de->setURL($e->getUrl());
+				if($e->getColour() !== null) $de->setColor($e->getColour());
+				if($e->getAuthor()->getName() !== null) $de->setAuthor($e->getAuthor()->getName(), $e->getAuthor()->getIconUrl()??"", $e->getAuthor()->getUrl()??"");
+				if($e->getThumbnail()->getUrl() !== null) $de->setThumbnail($e->getThumbnail()->getUrl());
+				if($e->getImage()->getUrl() !== null) $de->setImage($e->getImage()->getUrl());
+				if($e->getDescription() !== null) $de->setDescription($e->getDescription());
+				if($e->getFooter()->getText() !== null) $de->setFooter($e->getFooter()->getText(), $e->getFooter()->getIconUrl()??"");
+				if($e->getTimestamp() !== null) $de->setTimestamp($e->getTimestamp());
+				foreach($e->getFields() as $f){
+					$de->addFieldValues($f->getName(), $f->getValue(), $f->isInline());
 				}
-				$dMessage->content = $message->getContent();
-				if($de !== null){
-					$dMessage->embeds->clear();
-					$dMessage->addEmbed($de);
-				}
-				$dMessage->channel->messages->save($dMessage)->done(function(DiscordMessage $dMessage) use ($pk){
-					$this->resolveRequest($pk->getUID(), true, "Message edited.", [ModelConverter::genModelMessage($dMessage)]);
-				}, function(\ThreadException $e) use ($pk){
-					$this->resolveRequest($pk->getUID(), false, "Failed to edit message.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to edit message ({$pk->getUID()}) - {$e->getMessage()}");
-				});
-			}, function(\Throwable $e) use($pk){
+			}
+			$dMessage->content = $message->getContent();
+			if($de !== null){
+				$dMessage->embeds->clear();
+				$dMessage->addEmbed($de);
+			}
+			$dMessage->channel->messages->save($dMessage)->done(function(DiscordMessage $dMessage) use($pk){
+				$this->resolveRequest($pk->getUID(), true, "Message edited.", [ModelConverter::genModelMessage($dMessage)]);
+			}, function(\ThreadException $e) use ($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to edit message.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to edit message ({$pk->getUID()}) - message error: {$e->getMessage()}");
+				MainLogger::getLogger()->debug("Failed to edit message ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
 
 	private function handleDeleteMessage(RequestDeleteMessage $pk): void{
-		$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
-			$channel->messages->fetch($pk->getMessageId())->done(function(DiscordMessage $dMessage) use ($pk){
-				$dMessage->delete()->done(function() use ($pk){
-					$this->resolveRequest($pk->getUID());
-				}, function(\ThreadException $e) use ($pk){
-					$this->resolveRequest($pk->getUID(), false, "Failed to delete message.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to delete message ({$pk->getUID()}) - {$e->getMessage()}");
-				});
-			}, function(\Throwable $e) use($pk){
+		$this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $dMessage) use($pk){
+			$dMessage->delete()->done(function() use ($pk){
+				$this->resolveRequest($pk->getUID());
+			}, function(\ThreadException $e) use ($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to delete message.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to delete message ({$pk->getUID()}) - message error: {$e->getMessage()}");
+				MainLogger::getLogger()->debug("Failed to delete message ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -344,6 +342,17 @@ class CommunicationHandler{
 		}else{
 			$cb($c);
 		}
+	}
+
+	private function getMessage(Packet $pk, string $channel_id, string $message_id, callable $cb): void{
+		$this->getChannel($pk, $channel_id, function(DiscordChannel $channel) use($pk, $message_id, $cb){
+			$channel->messages->fetch($message_id)->done(function(DiscordMessage $dMessage) use ($cb){
+				$cb($dMessage);
+			}, function(\Throwable $e) use ($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to fetch message.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - message error: {$e->getMessage()}");
+			});
+		});
 	}
 
 	private function getMember(Packet $pk, string $server_id, string $user_id, callable $cb): void{

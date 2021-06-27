@@ -20,6 +20,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
@@ -44,7 +45,7 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Update role
  * - Create role
  * - Create channel
- * - Remove Reaction (advanced)
+ * - Remove Reaction (user/individual)
  *
  * V3.x or v2.1+ (depending on BC):
  * - Register listener (messages, reactions etc)
@@ -58,6 +59,7 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Pre packet tests.
  *
  * Tested:
+ * - Remove Reactions(bulk)
  * - Add Reaction
  * - Send Message(+Embed)
  * - Delete Channel
@@ -84,6 +86,35 @@ class Api{
 
 	public function __construct(Main $plugin){
 		$this->plugin = $plugin;
+	}
+
+	/**
+	 * Remove all reactions on a message.
+	 *
+	 * TODO HIGH PRIORITY, Investigate when emoji present it fails (Bad request) on PHP7 but works fine with PHP8
+	 *
+	 * @param string      $channel_id
+	 * @param string      $message_id
+	 * @param string|null $emoji If no emoji specified ALL reactions by EVERYONE will be deleted,
+	 *                           if specified everyone's reaction with that emoji will be removed.
+	 * @return PromiseInterface
+	 */
+	public function removeAllReactions(string $channel_id, string $message_id, ?string $emoji = null): PromiseInterface{
+		if($emoji !== null and PHP_VERSION_ID < 80000){
+			return rejectPromise(new ApiRejection("removeAllReactions with emoji does not currently work on PHP7 :("));
+		}
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($message_id)){
+			return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
+		}
+		$pk = new RequestRemoveAllReactions();
+		$pk->setChannelId($channel_id);
+		$pk->setMessageId($message_id);
+		$pk->setEmoji($emoji);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
 	}
 
 	/**
