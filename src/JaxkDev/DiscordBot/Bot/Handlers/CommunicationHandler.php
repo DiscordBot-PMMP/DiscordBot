@@ -24,6 +24,7 @@ use Discord\Parts\User\User as DiscordUser;
 use Discord\Repository\Guild\InviteRepository as DiscordInviteRepository;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
@@ -73,16 +74,33 @@ class CommunicationHandler{
 		//API Packets:
 		if($pk instanceof RequestUpdateNickname) $this->handleUpdateNickname($pk);
 		elseif($pk instanceof RequestUpdateActivity) $this->handleUpdateActivity($pk);
+		elseif($pk instanceof RequestBroadcastTyping) $this->handleBroadcastTyping($pk);
 		elseif($pk instanceof RequestSendMessage) $this->handleSendMessage($pk);
 		elseif($pk instanceof RequestEditMessage) $this->handleEditMessage($pk);
+		elseif($pk instanceof RequestAddReaction) $this->handleAddReaction($pk);
 		elseif($pk instanceof RequestDeleteMessage) $this->handleDeleteMessage($pk);
 		elseif($pk instanceof RequestKickMember) $this->handleKickMember($pk);
-		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
-		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
 		elseif($pk instanceof RequestInitialiseInvite) $this->handleInitialiseInvite($pk);
 		elseif($pk instanceof RequestRevokeInvite) $this->handleRevokeInvite($pk);
-		elseif($pk instanceof RequestBroadcastTyping) $this->handleBroadcastTyping($pk);
 		elseif($pk instanceof RequestDeleteChannel) $this->handleDeleteChannel($pk);
+		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
+		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
+	}
+
+	private function handleAddReaction(RequestAddReaction $pk): void{
+		$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+			$channel->getMessage($pk->getMessageId())->then(function(DiscordMessage $msg) use($pk){
+				$msg->react($pk->getEmoji())->then(function() use($pk){
+					$this->resolveRequest($pk->getUID(), true, "Reaction added.");
+				}, function(\Throwable $e) use($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to react to message.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to react to message ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to fetch message.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to fetch message ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
 	}
 
 	private function handleDeleteChannel(RequestDeleteChannel $pk): void{

@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
@@ -43,7 +44,6 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Update role
  * - Create role
  * - Create channel
- * - Add Reaction
  * - Remove Reaction (advanced)
  *
  * V3.x or v2.1+ (depending on BC):
@@ -58,6 +58,7 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Pre packet tests.
  *
  * Tested:
+ * - Add Reaction
  * - Send Message(+Embed)
  * - Delete Channel
  * - Delete message
@@ -83,6 +84,31 @@ class Api{
 
 	public function __construct(Main $plugin){
 		$this->plugin = $plugin;
+	}
+
+	/**
+	 * Add a reaction to a message.
+	 *
+	 * Note, If you have already reacted with the emoji provided it will still respond with a successful promise resolution.
+	 *
+	 * @param string $channel_id
+	 * @param string $message_id
+	 * @param string $emoji			MUST BE THE ACTUAL EMOJI CHARACTER, (Custom/Private emoji's not yet supported) eg '👍'
+	 * @return PromiseInterface
+	 */
+	public function addReaction(string $channel_id, string $message_id, string $emoji): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($message_id)){
+			return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
+		}
+		$pk = new RequestAddReaction();
+		$pk->setChannelId($channel_id);
+		$pk->setMessageId($message_id);
+		$pk->setEmoji($emoji);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
 	}
 
 	/**
