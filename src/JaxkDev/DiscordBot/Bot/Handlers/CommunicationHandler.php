@@ -36,6 +36,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
@@ -84,6 +85,7 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestSendMessage) $this->handleSendMessage($pk);
 		elseif($pk instanceof RequestEditMessage) $this->handleEditMessage($pk);
 		elseif($pk instanceof RequestAddReaction) $this->handleAddReaction($pk);
+		elseif($pk instanceof RequestRemoveReaction) $this->handleRemoveReaction($pk);
 		elseif($pk instanceof RequestRemoveAllReactions) $this->handleRemoveAllReactions($pk);
 		elseif($pk instanceof RequestDeleteMessage) $this->handleDeleteMessage($pk);
 		elseif($pk instanceof RequestAddRole) $this->handleAddRole($pk);
@@ -131,6 +133,17 @@ class CommunicationHandler{
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to add role.", [$e->getMessage(), $e->getTraceAsString()]);
 				MainLogger::getLogger()->debug("Failed to add role ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
+	}
+
+	private function handleRemoveReaction(RequestRemoveReaction $pk): void{
+		$this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $msg) use($pk){
+			$msg->deleteReaction($pk->getUserId() === $this->client->getDiscordClient()->id ? DiscordMessage::REACT_DELETE_ME : DiscordMessage::REACT_DELETE_ID, $pk->getEmoji(), $pk->getUserId())->then(function() use($pk){
+				$this->resolveRequest($pk->getUID(), true, "Successfully removed reaction.");
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to remove reaction.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to remove reaction ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}

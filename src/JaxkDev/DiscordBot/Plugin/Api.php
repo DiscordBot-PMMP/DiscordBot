@@ -23,6 +23,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
@@ -45,22 +46,20 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Update Role
  * - Create Role
  * - Create Channel
- * - Remove Reaction (user/individual)
  *
  * V3.x or v2.1+ (depending on BC):
  * - Register listener (messages, reactions etc)
  * - Unregister listener
  *
- * Test:
+ * Tested:
  * - Ban
  * - Unban
  * - Kick
- *
- * Tested:
  * - Delete Role
  * - Remove Role
  * - Add Role
- * - Remove Reactions(bulk)
+ * - Remove Reactions(bulk/user)
+ * - Remove Reaction(individual)
  * - Add Reaction
  * - Send Message(+Embed/+Reply)
  * - Edit Message(+Embed/+Reply)
@@ -153,6 +152,34 @@ class Api{
 		$pk->setServerId($sid);
 		$pk->setUserId($uid);
 		$pk->setRoleId($role_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Remove a single reaction.
+	 *
+	 * @param string $channel_id
+	 * @param string $message_id
+	 * @param string $user_id
+	 * @param string $emoji Raw emoji eg '👍'
+	 * @return PromiseInterface
+	 */
+	public function removeReaction(string $channel_id, string $message_id, string $user_id, string $emoji): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($message_id)){
+			return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($user_id)){
+			return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
+		}
+		$pk = new RequestRemoveReaction();
+		$pk->setChannelId($channel_id);
+		$pk->setUserId($user_id);
+		$pk->setMessageId($message_id);
+		$pk->setEmoji($emoji);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
