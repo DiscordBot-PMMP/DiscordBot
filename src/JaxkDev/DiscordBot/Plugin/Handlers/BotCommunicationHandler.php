@@ -44,6 +44,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\EventReady;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Plugin\ApiRejection;
 use JaxkDev\DiscordBot\Plugin\ApiResolver;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordChannelDeleted;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordChannelUpdated;
@@ -56,6 +57,7 @@ use JaxkDev\DiscordBot\Plugin\Events\DiscordServerJoined;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordServerUpdated;
 use JaxkDev\DiscordBot\Plugin\Main;
 use JaxkDev\DiscordBot\Plugin\Storage;
+use pocketmine\utils\MainLogger;
 
 class BotCommunicationHandler{
 
@@ -109,7 +111,9 @@ class BotCommunicationHandler{
 		$ac->setMessage("PocketMine-MP v".\pocketmine\VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION);
 		$ac->setType(Activity::TYPE_PLAYING);
 		$ac->setStatus(Activity::STATUS_IDLE);
-		$this->plugin->getApi()->updateActivity($ac);
+		$this->plugin->getApi()->updateActivity($ac)->otherwise(function(ApiRejection $a){
+			MainLogger::getLogger()->logException($a);
+		});
 
 		(new DiscordReady($this->plugin))->call();
 	}
