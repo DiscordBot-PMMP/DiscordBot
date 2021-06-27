@@ -115,6 +115,12 @@ class BotCommunicationHandler{
 			MainLogger::getLogger()->logException($a);
 		});
 
+		$this->plugin->getApi()->leaveServer("819219430663913562")->then(function($a){
+			var_dump($a);
+		}, function($a){
+			var_dump($a);
+		});
+
 		(new DiscordReady($this->plugin))->call();
 	}
 
@@ -270,6 +276,9 @@ class BotCommunicationHandler{
 	}
 
 	private function handleMemberLeave(EventMemberLeave $packet): void{
+		//When leaving server this is emitted.
+		if(($u = Storage::getBotUser()) !== null and $u->getId() === explode(".", $packet->getMemberID())[1]) return;
+
 		//TODO Event
 		$config = $this->plugin->getEventsConfig()["member_leave"]["fromDiscord"];
 		if(($config["format"] ?? "") === "") return;

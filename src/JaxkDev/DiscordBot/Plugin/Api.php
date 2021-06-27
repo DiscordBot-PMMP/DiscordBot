@@ -22,6 +22,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveServer;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
@@ -87,6 +88,24 @@ class Api{
 
 	public function __construct(Main $plugin){
 		$this->plugin = $plugin;
+	}
+
+	//Technically we could make our own servers but that would mean bot with owner permissions and that could get dodgy.
+
+	/**
+	 * Leave a discord server.
+	 *
+	 * @param string $server_id
+	 * @return PromiseInterface
+	 */
+	public function leaveServer(string $server_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($server_id)){
+			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
+		}
+		$pk = new RequestLeaveServer();
+		$pk->setServerId($server_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
 	}
 
 	/**

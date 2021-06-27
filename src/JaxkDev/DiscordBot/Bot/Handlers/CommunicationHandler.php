@@ -35,6 +35,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveServer;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
@@ -97,6 +98,18 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestDeleteChannel) $this->handleDeleteChannel($pk);
 		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
+		elseif($pk instanceof RequestLeaveServer) $this->handleLeaveServer($pk);
+	}
+
+	private function handleLeaveServer(RequestLeaveServer $pk): void{
+		/** @noinspection PhpParamsInspection */
+		$this->client->getDiscordClient()->guilds->leave($pk->getServerId())->then(function() use($pk){
+				$this->resolveRequest($pk->getUID());
+		}, function(\Throwable $e) use($pk){
+			//Shouldn't happen unless not in server/connection issues.
+			$this->resolveRequest($pk->getUID(), false, "Failed to leave server.", [$e->getMessage(), $e->getTraceAsString()]);
+			MainLogger::getLogger()->debug("Failed to leave server? ({$pk->getUID()}) - {$e->getMessage()}");
+		});
 	}
 
 	private function handleDeleteRole(RequestDeleteRole $pk): void{
