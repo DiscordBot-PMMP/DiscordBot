@@ -95,28 +95,13 @@ abstract class ModelConverter{
 	}
 
 	static public function genModelUser(DiscordUser $user): User{
-		$u = new User();
-		$u->setId($user->id);
-		$u->setCreationTimestamp((int)$user->createdTimestamp());
-		$u->setUsername($user->username);
-		$u->setDiscriminator($user->discriminator);
-		$u->setAvatarUrl($user->avatar);
-		$u->setBot($user->bot??false);
-		$u->setFlagsBitwise($user->public_flags??0, false); //Dont calculate flags, not needed in this side.
-		return $u;
+		return new User($user->id, $user->username, $user->discriminator, $user->avatar, (int)$user->createdTimestamp(),
+			$user->bot??false, $user->public_flags??0, false);
 	}
 
 	static public function genModelServer(DiscordServer $discordServer): Server{
-		$s = new Server();
-		$s->setId($discordServer->id);
-		$s->setName($discordServer->name);
-		$s->setRegion($discordServer->region);
-		$s->setOwnerId($discordServer->owner_id);
-		$s->setLarge($discordServer->large);
-		$s->setIconUrl($discordServer->icon) ;//?null
-		$s->setMemberCount($discordServer->member_count);
-		$s->setCreationTimestamp($discordServer->createdTimestamp());
-		return $s;
+		return new Server($discordServer->id, $discordServer->name, $discordServer->region, $discordServer->owner_id,
+			$discordServer->createdTimestamp(), $discordServer->large, $discordServer->member_count, $discordServer->icon);
 	}
 
 	/**
@@ -336,17 +321,8 @@ abstract class ModelConverter{
 	}
 
 	static public function genModelInvite(DiscordInvite $invite): Invite{
-		$i = new Invite();
-		$i->setCode($invite->code);
-		$i->setServerId($invite->guild_id);
-		$i->setChannelId($invite->channel_id);
-		$i->setCreatedAt($invite->created_at->getTimestamp());
-		$i->setCreator($invite->guild_id.".".$invite->inviter->id);
-		$i->setMaxAge($invite->max_age);
-		$i->setMaxUses($invite->max_uses);
-		$i->setTemporary($invite->temporary);
-		$i->setUses($invite->uses);
-		return $i;
+		return new Invite($invite->guild_id, $invite->channel_id, $invite->max_age, $invite->max_uses, $invite->temporary,
+		$invite->code, $invite->created_at->getTimestamp(), $invite->guild_id.".".$invite->inviter->id, $invite->uses);
 	}
 
 	static public function genModelBan(DiscordBan $ban): Ban{

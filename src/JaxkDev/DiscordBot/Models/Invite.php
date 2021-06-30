@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 class Invite implements \Serializable{
 
 	/** @var string|null Also used as ID internally, null when creating model. */
-	private $code = null;
+	private $code;
 
 	/** @var string */
 	private $server_id;
@@ -27,19 +27,32 @@ class Invite implements \Serializable{
 	private $max_age;
 
 	/** @var int|null Timestamp null when creating model. */
-	private $created_at = null;
+	private $created_at;
 
 	/** @var bool */
 	private $temporary;
 
 	/** @var int How many times has this invite been used | NOTICE: This does not get updated when used */
-	private $uses = 0;
+	private $uses;
 
 	/** @var int 0 for unlimited uses */
 	private $max_uses;
 
 	/** @var string|null Member ID, null when creating model. */
-	private $creator = null;
+	private $creator;
+
+	public function __construct(string $server_id, string $channel_id, int $max_age, int $max_uses, bool $temporary,
+								?string $code = null, ?int $created_at = null, ?string $creator = null, int $uses = 0){
+		$this->server_id = $server_id;
+		$this->channel_id = $channel_id;
+		$this->max_age = $max_age;
+		$this->max_uses = $max_uses;
+		$this->temporary = $temporary;
+		$this->code = $code;
+		$this->created_at = $created_at;
+		$this->creator = $creator;
+		$this->uses = $uses;
+	}
 
 	public function getCode(): ?string{
 		return $this->code;

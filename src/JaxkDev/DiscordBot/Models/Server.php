@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+//TODO, ALL MODELS Have format/data checks on construction/setters.
 class Server implements \Serializable{
 
 	/** @var string */
@@ -37,6 +38,18 @@ class Server implements \Serializable{
 
 	/** @var int */
 	private $member_count;
+
+	public function __construct(string $id, string $name, string $region, string $owner_id, float $creation_timestamp,
+	bool $large, int $member_count, ?string $icon_url = null){
+		$this->id = $id;
+		$this->name = $name;
+		$this->region = $region;
+		$this->owner_id = $owner_id;
+		$this->creation_timestamp = $creation_timestamp;
+		$this->large = $large;
+		$this->member_count = $member_count;
+		$this->icon_url = $icon_url;
+	}
 
 	public function getId(): string{
 		return $this->id;

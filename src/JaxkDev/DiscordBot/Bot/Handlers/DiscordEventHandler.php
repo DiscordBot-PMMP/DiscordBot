@@ -143,6 +143,7 @@ class DiscordEventHandler{
 
 			/** @var DiscordChannel $channel */
 			foreach($guild->channels as $channel){
+				//Webhooks need freshen.
 				$c = ModelConverter::genModelChannel($channel);
 				if($c !== null) $pk->addChannel($c);
 			}

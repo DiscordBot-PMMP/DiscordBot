@@ -49,6 +49,10 @@ class PocketMineEventHandler implements Listener{
 
 		foreach($config['channels'] as $c){
 			$channel = Storage::getChannel($c);
+			if($channel === null){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c', no such channel exists.");
+				continue;
+			}
 			if(!$channel instanceof TextChannel){
 				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the channel must be a TextChannel class, got class '".get_class($channel)."'");
 				continue;
@@ -81,6 +85,10 @@ class PocketMineEventHandler implements Listener{
 
 		foreach($config['channels'] as $c){
 			$channel = Storage::getChannel($c);
+			if($channel === null){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c', no such channel exists.");
+				continue;
+			}
 			if(!$channel instanceof TextChannel){
 				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the channel must be a TextChannel class, got class '".get_class($channel)."'");
 				continue;
@@ -110,6 +118,10 @@ class PocketMineEventHandler implements Listener{
 
 		foreach($config['channels'] as $c){
 			$channel = Storage::getChannel($c);
+			if($channel === null){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c', no such channel exists.");
+				continue;
+			}
 			if(!$channel instanceof TextChannel){
 				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the channel must be a TextChannel class, got class '".get_class($channel)."'");
 				continue;
@@ -143,6 +155,10 @@ class PocketMineEventHandler implements Listener{
 
 		foreach($config['channels'] as $c){
 			$channel = Storage::getChannel($c);
+			if($channel === null){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c', no such channel exists.");
+				continue;
+			}
 			if(!$channel instanceof TextChannel){
 				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the channel must be a TextChannel class, got class '".get_class($channel)."'");
 				continue;
@@ -176,6 +192,10 @@ class PocketMineEventHandler implements Listener{
 
 		foreach($config['channels'] as $c){
 			$channel = Storage::getChannel($c);
+			if($channel === null){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c', no such channel exists.");
+				continue;
+			}
 			if(!$channel instanceof TextChannel){
 				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the channel must be a TextChannel class, got class '".get_class($channel)."'");
 				continue;

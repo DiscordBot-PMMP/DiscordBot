@@ -50,13 +50,27 @@ class User implements \Serializable{
 	private $creation_timestamp;
 
 	/** @var bool */
-	private $bot = false;
+	private $bot;
 
 	/** @var int */
-	private $flags_bitwise = 0;
+	private $flags_bitwise;
 
 	/** @var Array<string, bool> */
 	private $flags = [];
+
+	public function __construct(string $id, string $username, string $discriminator, string $avatar_url, int $creation_timestamp,
+	bool $bot = false, int $flags_bitwise = 0, bool $recalculate_flags = true){
+		$this->id = $id;
+		$this->username = $username;
+		$this->discriminator = $discriminator;
+		$this->avatar_url = $avatar_url;
+		$this->creation_timestamp = $creation_timestamp;
+		$this->bot = $bot;
+		$this->flags_bitwise = $flags_bitwise;
+		if($recalculate_flags){
+			$this->updateFlags();
+		}
+	}
 
 	public function getId(): string{
 		return $this->id;
