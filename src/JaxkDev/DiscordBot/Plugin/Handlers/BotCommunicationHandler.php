@@ -194,6 +194,9 @@ class BotCommunicationHandler{
 	private function handleChannelDelete(EventChannelDelete $packet): void{
 		$c = Storage::getChannel($packet->getChannelId());
 		if($c === null) return;
+		if($c->getId() === null){
+			throw new \AssertionError("No ID in channel from storage.");
+		}
 		$e = new DiscordChannelDeleted($this->plugin, $c);
 		$e->call();
 		Storage::removeChannel($c->getId());

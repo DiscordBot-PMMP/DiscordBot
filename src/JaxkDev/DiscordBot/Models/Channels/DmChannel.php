@@ -24,17 +24,17 @@ class DmChannel extends Channel{
 	 *
 	 * @see Channel::getId(); DM Channel ID, is recipient user ID.
 	 */
-	public function getRecipient(): string{
+	public function getRecipient(): ?string{
 		return $this->id;
 	}
 
 	/**
 	 * Set recipient of DM channel.
 	 *
-	 * @param string $user_id
+	 * @param string|null $user_id
 	 * @see Channel::setId(); DM Channel ID, is recipient user ID.
 	 */
-	public function setRecipient(string $user_id): void{
+	public function setRecipient(?string $user_id): void{
 		$this->setId($user_id);
 	}
 

@@ -16,7 +16,7 @@ use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 
 class Role implements \Serializable{
 
-	/** @var string */
+	/** @var null|string */
 	private $id;
 
 	/** @var string */
@@ -37,11 +37,11 @@ class Role implements \Serializable{
 	/** @var string */
 	private $server_id;
 
-	public function getId(): string{
+	public function getId(): ?string{
 		return $this->id;
 	}
 
-	public function setId(string $id): void{
+	public function setId(?string $id): void{
 		$this->id = $id;
 	}
 

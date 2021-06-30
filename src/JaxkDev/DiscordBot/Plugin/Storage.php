@@ -194,6 +194,9 @@ class Storage{
 	}
 
 	public static function addChannel(ServerChannel $channel): void{
+		if($channel->getId() === null){
+			throw new \AssertionError("Failed to add channel to storage, ID not found.");
+		}
 		if(isset(self::$channelMap[$channel->getId()])) return;
 		if($channel instanceof CategoryChannel){
 			self::$categoryServerMap[$channel->getServerId()][] = $channel->getId();
@@ -205,6 +208,9 @@ class Storage{
 	}
 
 	public static function updateChannel(ServerChannel $channel): void{
+		if($channel->getId() === null){
+			throw new \AssertionError("Failed to update channel in storage, ID not found.");
+		}
 		if(!isset(self::$channelMap[$channel->getId()])){
 			self::addChannel($channel);
 		}else{
@@ -311,12 +317,18 @@ class Storage{
 	}
 
 	public static function addRole(Role $role): void{
+		if($role->getId() === null){
+			throw new \AssertionError("Failed to add role to storage, ID not found.");
+		}
 		if(isset(self::$roleMap[$role->getId()])) return;
 		self::$roleServerMap[$role->getServerId()][] = $role->getId();
 		self::$roleMap[$role->getId()] = $role;
 	}
 
 	public static function updateRole(Role $role): void{
+		if($role->getId() === null){
+			throw new \AssertionError("Failed to update role in storage, ID not found.");
+		}
 		if(!isset(self::$roleMap[$role->getId()])){
 			self::addRole($role);
 		}else{
@@ -385,12 +397,18 @@ class Storage{
 	}
 
 	public static function addInvite(Invite $invite): void{
+		if($invite->getCode() === null){
+			throw new \AssertionError("Failed to add invite to storage, Code not found.");
+		}
 		if(isset(self::$inviteMap[$invite->getCode()])) return;
 		self::$inviteServerMap[$invite->getServerId()][] = $invite->getCode();
 		self::$inviteMap[$invite->getCode()] = $invite;
 	}
 
 	public static function updateInvite(Invite $invite): void{
+		if($invite->getCode() === null){
+			throw new \AssertionError("Failed to update invite in storage, Code not found.");
+		}
 		if(!isset(self::$inviteMap[$invite->getCode()])){
 			self::addinvite($invite);
 		}else{

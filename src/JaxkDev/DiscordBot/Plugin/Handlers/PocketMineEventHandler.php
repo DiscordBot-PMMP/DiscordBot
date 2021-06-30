@@ -47,9 +47,20 @@ class PocketMineEventHandler implements Listener{
 
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
 
-		foreach($config['channels'] as $channel){
-			$channel = Storage::getChannel($channel);
-			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
+		foreach($config['channels'] as $c){
+			$channel = Storage::getChannel($c);
+			if(!$channel instanceof TextChannel){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the channel must be a TextChannel class, got class '".get_class($channel)."'");
+				continue;
+			}
+			if(strlen($message) > 2000){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the message must be below 2000 characters, got '".strlen($message)."' characters");
+				continue;
+			}
+			if($channel->getId() === null){
+				//Models from storage all have ID's
+				throw new \AssertionError("No ID in channel from storage.");
+			}
 			$msg = new Message();
 			$msg->setChannelId($channel->getId());
 			$msg->setServerId($channel->getServerId());
@@ -68,9 +79,20 @@ class PocketMineEventHandler implements Listener{
 
 		$message = str_replace(['{TIME}', '{USERNAME}'], [date('G:i:s'), $event->getPlayer()->getName()], $config['format']);
 
-		foreach($config['channels'] as $channel){
-			$channel = Storage::getChannel($channel);
-			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
+		foreach($config['channels'] as $c){
+			$channel = Storage::getChannel($c);
+			if(!$channel instanceof TextChannel){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the channel must be a TextChannel class, got class '".get_class($channel)."'");
+				continue;
+			}
+			if(strlen($message) > 2000){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the message must be below 2000 characters, got '".strlen($message)."' characters");
+				continue;
+			}
+			if($channel->getId() === null){
+				//Models from storage all have ID's
+				throw new \AssertionError("No ID in channel from storage.");
+			}
 			$msg = new Message();
 			$msg->setChannelId($channel->getId());
 			$msg->setServerId($channel->getServerId());
@@ -86,9 +108,20 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}', '{ADDRESS}', '{PORT}'],
 			[date('G:i:s'), $event->getPlayer()->getName(), $event->getAddress(), $event->getPort()], $config['format']);
 
-		foreach($config['channels'] as $channel){
-			$channel = Storage::getChannel($channel);
-			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
+		foreach($config['channels'] as $c){
+			$channel = Storage::getChannel($c);
+			if(!$channel instanceof TextChannel){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the channel must be a TextChannel class, got class '".get_class($channel)."'");
+				continue;
+			}
+			if(strlen($message) > 2000){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the message must be below 2000 characters, got '".strlen($message)."' characters");
+				continue;
+			}
+			if($channel->getId() === null){
+				//Models from storage all have ID's
+				throw new \AssertionError("No ID in channel from storage.");
+			}
 			$msg = new Message();
 			$msg->setChannelId($channel->getId());
 			$msg->setServerId($channel->getServerId());
@@ -108,9 +141,20 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}', '{MESSAGE}'],
 			[date('G:i:s'), $event->getPlayer()->getName(), $event->getMessage()], $config['format']);
 
-		foreach($config['channels'] as $channel){
-			$channel = Storage::getChannel($channel);
-			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
+		foreach($config['channels'] as $c){
+			$channel = Storage::getChannel($c);
+			if(!$channel instanceof TextChannel){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the channel must be a TextChannel class, got class '".get_class($channel)."'");
+				continue;
+			}
+			if(strlen($message) > 2000){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the message must be below 2000 characters, got '".strlen($message)."' characters");
+				continue;
+			}
+			if($channel->getId() === null){
+				//Models from storage all have ID's
+				throw new \AssertionError("No ID in channel from storage.");
+			}
 			$msg = new Message();
 			$msg->setChannelId($channel->getId());
 			$msg->setServerId($channel->getServerId());
@@ -130,9 +174,20 @@ class PocketMineEventHandler implements Listener{
 		$message = str_replace(['{TIME}', '{USERNAME}', '{COMMAND}'],
 			[date('G:i:s'), $event->getSender()->getName(), $event->getCommand()], $config['format']);
 
-		foreach($config['channels'] as $channel){
-			$channel = Storage::getChannel($channel);
-			if(!$channel instanceof TextChannel || strlen($message) > 2000) continue;
+		foreach($config['channels'] as $c){
+			$channel = Storage::getChannel($c);
+			if(!$channel instanceof TextChannel){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the channel must be a TextChannel class, got class '".get_class($channel)."'");
+				continue;
+			}
+			if(strlen($message) > 2000){
+				$this->plugin->getLogger()->error("Failed to send message to channel '$c' the message must be below 2000 characters, got '".strlen($message)."' characters");
+				continue;
+			}
+			if($channel->getId() === null){
+				//Models from storage all have ID's
+				throw new \AssertionError("No ID in channel from storage.");
+			}
 			$msg = new Message();
 			$msg->setChannelId($channel->getId());
 			$msg->setServerId($channel->getServerId());
