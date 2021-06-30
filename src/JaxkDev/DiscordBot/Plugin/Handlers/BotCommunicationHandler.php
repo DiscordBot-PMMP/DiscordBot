@@ -115,12 +115,6 @@ class BotCommunicationHandler{
 			MainLogger::getLogger()->logException($a);
 		});
 
-		$this->plugin->getApi()->leaveServer("819219430663913562")->then(function($a){
-			var_dump($a);
-		}, function($a){
-			var_dump($a);
-		});
-
 		(new DiscordReady($this->plugin))->call();
 	}
 

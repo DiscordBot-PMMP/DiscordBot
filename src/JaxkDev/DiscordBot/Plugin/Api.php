@@ -53,6 +53,7 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Unregister listener
  *
  * Tested:
+ * - Leave Server.
  * - Ban
  * - Unban
  * - Kick
