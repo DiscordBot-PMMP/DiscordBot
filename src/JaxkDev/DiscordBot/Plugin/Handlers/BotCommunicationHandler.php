@@ -107,10 +107,8 @@ class BotCommunicationHandler{
 
 	private function handleReady(): void{
 		//Default activity, Feel free to change activity after ReadyEvent.
-		$ac = new Activity();
-		$ac->setMessage("PocketMine-MP v".\pocketmine\VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION);
-		$ac->setType(Activity::TYPE_PLAYING);
-		$ac->setStatus(Activity::STATUS_IDLE);
+		$ac = new Activity(Activity::STATUS_IDLE, Activity::TYPE_PLAYING,
+			"PocketMine-MP v".\pocketmine\VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION);
 		$this->plugin->getApi()->updateActivity($ac)->otherwise(function(ApiRejection $a){
 			MainLogger::getLogger()->logException($a);
 		});

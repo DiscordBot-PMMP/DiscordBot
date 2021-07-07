@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Plugin\Utils;
+
 class Invite implements \Serializable{
 
 	/** @var string|null Also used as ID internally, null when creating model. */
@@ -43,22 +45,22 @@ class Invite implements \Serializable{
 
 	public function __construct(string $server_id, string $channel_id, int $max_age, int $max_uses, bool $temporary,
 								?string $code = null, ?int $created_at = null, ?string $creator = null, int $uses = 0){
-		$this->server_id = $server_id;
-		$this->channel_id = $channel_id;
-		$this->max_age = $max_age;
-		$this->max_uses = $max_uses;
-		$this->temporary = $temporary;
-		$this->code = $code;
-		$this->created_at = $created_at;
-		$this->creator = $creator;
-		$this->uses = $uses;
+		$this->setServerId($server_id);
+		$this->setChannelId($channel_id);
+		$this->setMaxAge($max_age);
+		$this->setMaxUses($max_uses);
+		$this->setTemporary($temporary);
+		$this->setCode($code);
+		$this->setCreatedAt($created_at);
+		$this->setCreator($creator);
+		$this->setUses($uses);
 	}
 
 	public function getCode(): ?string{
 		return $this->code;
 	}
 
-	public function setCode(string $code): void{
+	public function setCode(?string $code): void{
 		$this->code = $code;
 	}
 
@@ -67,6 +69,9 @@ class Invite implements \Serializable{
 	}
 
 	public function setServerId(string $server_id): void{
+		if(!Utils::validDiscordSnowflake($server_id)){
+			throw new \AssertionError("Server ID '$server_id' is invalid.");
+		}
 		$this->server_id = $server_id;
 	}
 
@@ -75,6 +80,9 @@ class Invite implements \Serializable{
 	}
 
 	public function setChannelId(string $channel_id): void{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			throw new \AssertionError("Channel ID '$channel_id' is invalid.");
+		}
 		$this->channel_id = $channel_id;
 	}
 
@@ -82,7 +90,11 @@ class Invite implements \Serializable{
 		return $this->max_age;
 	}
 
+	/**  @param int $max_age 0 for eternity. */
 	public function setMaxAge(int $max_age): void{
+		if($max_age > 604800 or $max_age < 0){
+			throw new \AssertionError("Max age '$max_age' is outside bounds 0-604800.");
+		}
 		$this->max_age = $max_age;
 	}
 
@@ -90,7 +102,10 @@ class Invite implements \Serializable{
 		return $this->created_at;
 	}
 
-	public function setCreatedAt(int $created_at): void{
+	public function setCreatedAt(?int $created_at): void{
+		if($created_at !== null and $created_at > time()){
+			throw new \AssertionError("Time travel has been attempted, '$created_at' is in the future !");
+		}
 		$this->created_at = $created_at;
 	}
 
@@ -107,6 +122,9 @@ class Invite implements \Serializable{
 	}
 
 	public function setUses(int $uses): void{
+		if($this->max_uses !== 0 and $uses > $this->max_uses){
+			throw new \AssertionError("Uses '$uses' is bigger than max uses '$this->max_uses'.");
+		}
 		$this->uses = $uses;
 	}
 
@@ -115,6 +133,9 @@ class Invite implements \Serializable{
 	}
 
 	public function setMaxUses(int $max_uses): void{
+		if($max_uses < 0 or $max_uses > 100){
+			throw new \AssertionError("Max uses '$max_uses' is outside the bounds 0-100.");
+		}
 		$this->max_uses = $max_uses;
 	}
 
@@ -122,7 +143,7 @@ class Invite implements \Serializable{
 		return $this->creator;
 	}
 
-	public function setCreator(string $creator): void{
+	public function setCreator(?string $creator): void{
 		$this->creator = $creator;
 	}
 

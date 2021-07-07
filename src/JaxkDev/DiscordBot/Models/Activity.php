@@ -39,6 +39,12 @@ class Activity implements \Serializable{
 	/** @var string */
 	private $status;
 
+	public function __construct(string $status, ?int $type = null, ?string $message = null){
+		$this->setStatus($status);
+		$this->setType($type);
+		$this->setMessage($message);
+	}
+
 	public function getMessage(): ?string{
 		return $this->message;
 	}
@@ -63,6 +69,9 @@ class Activity implements \Serializable{
 	}
 
 	public function setStatus(string $status): void{
+		if(!in_array($status, [self::STATUS_ONLINE, self::STATUS_OFFLINE, self::STATUS_INVISIBLE, self::STATUS_INVISIBLE, self::STATUS_DND, self::STATUS_IDLE])){
+			throw new \AssertionError("Invalid status '$status'.");
+		}
 		$this->status = $status;
 	}
 

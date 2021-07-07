@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Plugin\Utils;
+
 class Ban implements \Serializable{
 
 	/** @var string */
@@ -21,10 +23,17 @@ class Ban implements \Serializable{
 	private $user_id;
 
 	/** @var string|null */
-	private $reason = null;
+	private $reason;
 
 	/** @var int|null Only present on banRequest. */
-	private $daysToDelete = null;
+	private $daysToDelete;
+
+	public function __construct(string $server_id, string $user_id, ?string $reason = null, ?int $daysToDelete = null){
+		$this->setServerId($server_id);
+		$this->setUserId($user_id);
+		$this->setReason($reason);
+		$this->setDaysToDelete($daysToDelete);
+	}
 
 	public function getId(): string{
 		return $this->server_id.".".$this->user_id;
@@ -35,6 +44,9 @@ class Ban implements \Serializable{
 	}
 
 	public function setServerId(string $server_id): void{
+		if(!Utils::validDiscordSnowflake($server_id)){
+			throw new \AssertionError("Server ID '$server_id' is invalid.");
+		}
 		$this->server_id = $server_id;
 	}
 
@@ -43,6 +55,9 @@ class Ban implements \Serializable{
 	}
 
 	public function setUserId(string $user_id): void{
+		if(!Utils::validDiscordSnowflake($user_id)){
+			throw new \AssertionError("User ID '$user_id' is invalid.");
+		}
 		$this->user_id = $user_id;
 	}
 
@@ -59,6 +74,9 @@ class Ban implements \Serializable{
 	}
 
 	public function setDaysToDelete(?int $daysToDelete): void{
+		if($daysToDelete !== null and ($daysToDelete < 0 or $daysToDelete > 7)){
+			throw new \AssertionError("Days to delete '$daysToDelete' is invalid, 0-7 allowed.");
+		}
 		$this->daysToDelete = $daysToDelete;
 	}
 

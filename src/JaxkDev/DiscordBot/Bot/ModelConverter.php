@@ -95,13 +95,13 @@ abstract class ModelConverter{
 	}
 
 	static public function genModelUser(DiscordUser $user): User{
-		return new User($user->id, $user->username, $user->discriminator, $user->avatar, (int)$user->createdTimestamp(),
-			$user->bot??false, $user->public_flags??0, false);
+		return new User($user->id, $user->username, $user->discriminator, $user->avatar, $user->bot??false,
+			$user->public_flags??0, false);
 	}
 
 	static public function genModelServer(DiscordServer $discordServer): Server{
 		return new Server($discordServer->id, $discordServer->name, $discordServer->region, $discordServer->owner_id,
-			$discordServer->createdTimestamp(), $discordServer->large, $discordServer->member_count, $discordServer->icon);
+			$discordServer->large, $discordServer->member_count, $discordServer->icon);
 	}
 
 	/**
@@ -326,11 +326,7 @@ abstract class ModelConverter{
 	}
 
 	static public function genModelBan(DiscordBan $ban): Ban{
-		$b = new Ban();
-		$b->setServerId($ban->guild_id);
-		$b->setUserId($ban->user_id);
-		$b->setReason($ban->reason);
-		return $b;
+		return new Ban($ban->guild_id, $ban->user_id, $ban->reason);
 	}
 
 	/**
@@ -339,10 +335,7 @@ abstract class ModelConverter{
 	 * @return Activity
 	 */
 	static public function genModelActivity(DiscordActivity $discordActivity): Activity{
-		$a = new Activity();
-		$a->setType($discordActivity->type);
-		$a->setMessage($discordActivity->state);
-		$a->setStatus(Activity::STATUS_OFFLINE); //Not included in discord activity must be set from user.
-		return $a;
+		return new Activity(Activity::STATUS_OFFLINE, $discordActivity->type, $discordActivity->state);
+		//Status not included in discord activity must be set from user.
 	}
 }

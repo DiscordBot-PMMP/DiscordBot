@@ -12,7 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
-//TODO, ALL MODELS Have format/data checks on construction/setters.
+use JaxkDev\DiscordBot\Plugin\Utils;
+
 class Server implements \Serializable{
 
 	/** @var string */
@@ -30,25 +31,21 @@ class Server implements \Serializable{
 	/** @var string */
 	private $owner_id;
 
-	/** @var float */
-	private $creation_timestamp;
-
 	/** @var bool */
 	private $large;
 
 	/** @var int */
 	private $member_count;
 
-	public function __construct(string $id, string $name, string $region, string $owner_id, float $creation_timestamp,
+	public function __construct(string $id, string $name, string $region, string $owner_id,
 	bool $large, int $member_count, ?string $icon_url = null){
-		$this->id = $id;
-		$this->name = $name;
-		$this->region = $region;
-		$this->owner_id = $owner_id;
-		$this->creation_timestamp = $creation_timestamp;
-		$this->large = $large;
-		$this->member_count = $member_count;
-		$this->icon_url = $icon_url;
+		$this->setId($id);
+		$this->setName($name);
+		$this->setRegion($region);
+		$this->setOwnerId($owner_id);
+		$this->setLarge($large);
+		$this->setMemberCount($member_count);
+		$this->setIconUrl($icon_url);
 	}
 
 	public function getId(): string{
@@ -56,6 +53,9 @@ class Server implements \Serializable{
 	}
 
 	public function setId(string $id): void{
+		if(!Utils::validDiscordSnowflake($id)){
+			throw new \AssertionError("Server ID '$id' is invalid.");
+		}
 		$this->id = $id;
 	}
 
@@ -88,15 +88,14 @@ class Server implements \Serializable{
 	}
 
 	public function setOwnerId(string $owner_id): void{
+		if(!Utils::validDiscordSnowflake($owner_id)){
+			throw new \AssertionError("Owner ID '$owner_id' is invalid.");
+		}
 		$this->owner_id = $owner_id;
 	}
 
 	public function getCreationTimestamp(): float{
-		return $this->creation_timestamp;
-	}
-
-	public function setCreationTimestamp(float $creation_timestamp): void{
-		$this->creation_timestamp = $creation_timestamp;
+		return Utils::getDiscordSnowflakeTimestamp($this->id);
 	}
 
 	public function isLarge(): bool{
@@ -124,7 +123,6 @@ class Server implements \Serializable{
 			$this->icon_url,
 			$this->region,
 			$this->owner_id,
-			$this->creation_timestamp,
 			$this->large,
 			$this->member_count
 		]);
@@ -137,7 +135,6 @@ class Server implements \Serializable{
 			$this->icon_url,
 			$this->region,
 			$this->owner_id,
-			$this->creation_timestamp,
 			$this->large,
 			$this->member_count
 		] = unserialize($data);

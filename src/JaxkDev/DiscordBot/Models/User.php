@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Plugin\Utils;
+
 class User implements \Serializable{
 
 	//https://github.com/Delitefully/DiscordLists/blob/master/flags.md
@@ -46,9 +48,6 @@ class User implements \Serializable{
 	/** @var string */
 	private $avatar_url;
 
-	/** @var int */
-	private $creation_timestamp;
-
 	/** @var bool */
 	private $bot;
 
@@ -58,18 +57,14 @@ class User implements \Serializable{
 	/** @var Array<string, bool> */
 	private $flags = [];
 
-	public function __construct(string $id, string $username, string $discriminator, string $avatar_url, int $creation_timestamp,
+	public function __construct(string $id, string $username, string $discriminator, string $avatar_url,
 	bool $bot = false, int $flags_bitwise = 0, bool $recalculate_flags = true){
-		$this->id = $id;
-		$this->username = $username;
-		$this->discriminator = $discriminator;
-		$this->avatar_url = $avatar_url;
-		$this->creation_timestamp = $creation_timestamp;
-		$this->bot = $bot;
-		$this->flags_bitwise = $flags_bitwise;
-		if($recalculate_flags){
-			$this->updateFlags();
-		}
+		$this->setId($id);
+		$this->setUsername($username);
+		$this->setDiscriminator($discriminator);
+		$this->setAvatarUrl($avatar_url);
+		$this->setBot($bot);
+		$this->setFlagsBitwise($flags_bitwise, $recalculate_flags);
 	}
 
 	public function getId(): string{
@@ -77,6 +72,9 @@ class User implements \Serializable{
 	}
 
 	public function setId(string $id): void{
+		if(!Utils::validDiscordSnowflake($id)){
+			throw new \AssertionError("User ID '$id' is invalid.");
+		}
 		$this->id = $id;
 	}
 
@@ -93,6 +91,9 @@ class User implements \Serializable{
 	}
 
 	public function setDiscriminator(string $discriminator): void{
+		if(strlen($discriminator) !== 4){
+			throw new \AssertionError("Discriminator '$discriminator' is invalid.");
+		}
 		$this->discriminator = $discriminator;
 	}
 
@@ -105,11 +106,7 @@ class User implements \Serializable{
 	}
 
 	public function getCreationTimestamp(): int{
-		return $this->creation_timestamp;
-	}
-
-	public function setCreationTimestamp(int $creation_timestamp): void{
-		$this->creation_timestamp = $creation_timestamp;
+		return Utils::getDiscordSnowflakeTimestamp($this->id);
 	}
 
 	public function isBot(): bool{
@@ -126,7 +123,7 @@ class User implements \Serializable{
 
 	public function setFlagsBitwise(int $flags_bitwise, bool $recalculate = true): void{
 		$this->flags_bitwise = $flags_bitwise;
-		if($recalculate) $this->updateFlags();
+		if($recalculate) $this->recalculateFlags();
 	}
 
 	/**
@@ -153,9 +150,9 @@ class User implements \Serializable{
 	}
 
 	/**
-	 * @internal Using current flags_bitwise update flags to correct state.
+	 * @internal Using current flags_bitwise recalculate flags.
 	 */
-	private function updateFlags(): void{
+	private function recalculateFlags(): void{
 		$this->flags = [];
 		foreach(self::FLAGS as $name => $v){
 			$this->flags[$name] = (($this->flags_bitwise & $v) !== 0);
@@ -170,7 +167,6 @@ class User implements \Serializable{
 			$this->username,
 			$this->discriminator,
 			$this->avatar_url,
-			$this->creation_timestamp,
 			$this->bot,
 			$this->flags_bitwise
 		]);
@@ -182,10 +178,9 @@ class User implements \Serializable{
 			$this->username,
 			$this->discriminator,
 			$this->avatar_url,
-			$this->creation_timestamp,
 			$this->bot,
 			$this->flags_bitwise
 		] = unserialize($data);
-		$this->updateFlags();
+		$this->recalculateFlags();
 	}
 }
