@@ -1,6 +1,6 @@
 How to setup the bot:
 
-Visit https://github.com/JaxkDev/DiscordBot/wiki
+Visit https://github.com/DiscordBot-PMMP/DiscordBot/wiki
 
 
 

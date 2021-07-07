@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models\Permissions;
 
+// Remember categories are classed as channels.
 class ChannelPermissions extends Permissions{
 
 	/**

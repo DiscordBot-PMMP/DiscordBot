@@ -67,9 +67,9 @@ abstract class Permissions implements \Serializable{
 		return $this->bitwise;
 	}
 
-	public function setBitwise(int $bitwise, bool $update = true): void{
+	public function setBitwise(int $bitwise, bool $recalculate = true): void{
 		$this->bitwise = $bitwise;
-		if($update) $this->updatePermissions();
+		if($recalculate) $this->recalculatePermissions();
 	}
 
 	/**
@@ -99,9 +99,9 @@ abstract class Permissions implements \Serializable{
 	}
 
 	/**
-	 * @internal Using current bitwise reset permissions to correct state.
+	 * @internal Using current bitwise recalculate permissions.
 	 */
-	private function updatePermissions(): void{
+	private function recalculatePermissions(): void{
 		$this->permissions = [];
 		$possiblePerms = $this->getPossiblePermissions();
 		foreach($possiblePerms as $name => $v){
@@ -122,6 +122,6 @@ abstract class Permissions implements \Serializable{
 
 	public function unserialize($data): void{
 		$this->bitwise = unserialize($data);
-		$this->updatePermissions();
+		$this->recalculatePermissions();
 	}
 }
