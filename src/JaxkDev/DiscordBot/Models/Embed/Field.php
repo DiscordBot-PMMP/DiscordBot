@@ -24,6 +24,12 @@ class Field implements \Serializable{
 	/** @var bool */
 	private $inline = false;
 
+	public function __construct(string $name, string $value, bool $inline = false){
+		$this->setName($name);
+		$this->setValue($value);
+		$this->setInline($inline);
+	}
+
 	public function getName(): string{
 		return $this->name;
 	}

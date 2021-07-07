@@ -22,7 +22,7 @@ class Role implements \Serializable{
 	/** @var string */
 	private $name;
 
-	/** @var RolePermissions TODO: Investigate no denied permissions?? */
+	/** @var RolePermissions TODO: Investigate no denied permissions?? then constructor */
 	private $permissions;
 
 	/** @var int */

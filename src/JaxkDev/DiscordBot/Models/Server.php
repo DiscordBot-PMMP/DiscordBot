@@ -38,7 +38,7 @@ class Server implements \Serializable{
 	private $member_count;
 
 	public function __construct(string $id, string $name, string $region, string $owner_id,
-	bool $large, int $member_count, ?string $icon_url = null){
+								bool $large, int $member_count, ?string $icon_url = null){
 		$this->setId($id);
 		$this->setName($name);
 		$this->setRegion($region);

@@ -24,6 +24,12 @@ class Image implements \Serializable{
 	/** @var null|int */
 	private $height;
 
+	public function __construct(?string $url = null, ?int $width = null, ?int $height = null){
+		$this->setUrl($url);
+		$this->setWidth($width);
+		$this->setHeight($height);
+	}
+
 	public function getUrl(): ?string{
 		return $this->url;
 	}

@@ -23,6 +23,26 @@ class VoiceChannel extends ServerChannel{
 	/** @var string[] Members in the channel (ID's only). */
 	private $members = [];
 
+	/**
+	 * VoiceChannel constructor.
+	 *
+	 * @param int         $bitrate
+	 * @param int         $member_limit
+	 * @param string      $name
+	 * @param int         $position
+	 * @param string      $server_id
+	 * @param string[]    $members Array of Member ID's
+	 * @param string|null $category_id
+	 * @param string|null $id
+	 */
+	public function __construct(int $bitrate, int $member_limit, string $name, int $position, string $server_id,
+								   array $members, ?string $category_id = null, ?string $id = null){
+		parent::__construct($name, $position, $server_id, $category_id, $id);
+		$this->setBitrate($bitrate);
+		$this->setMemberLimit($member_limit);
+		$this->setMembers($members);
+	}
+
 	public function getBitrate(): int{
 		return $this->bitrate;
 	}

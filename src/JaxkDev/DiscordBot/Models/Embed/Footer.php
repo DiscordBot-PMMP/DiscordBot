@@ -20,6 +20,11 @@ class Footer implements \Serializable{
 	/** @var null|string Must be prefixed with `https` */
 	private $icon_url;
 
+	public function __construct(?string $text = null, ?string $icon_url = null){
+		$this->setText($text);
+		$this->setIconUrl($icon_url);
+	}
+
 	public function getText(): ?string{
 		return $this->text;
 	}

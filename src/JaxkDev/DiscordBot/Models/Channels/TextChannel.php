@@ -28,6 +28,28 @@ class TextChannel extends ServerChannel{
 
 	//TODO Webhooks/integrations.
 
+	/**
+	 * TextChannel constructor.
+	 *
+	 * @param string      $topic
+	 * @param string      $name
+	 * @param int         $position
+	 * @param string      $server_id
+	 * @param bool        $nsfw
+	 * @param int|null    $rate_limit
+	 * @param string[]    $pins Array of message ID's
+	 * @param string|null $category_id
+	 * @param string|null $id
+	 */
+	public function __construct(string $topic, string $name, int $position, string $server_id, bool $nsfw = false,
+								   ?int $rate_limit = null, array $pins = [], ?string $category_id = null, ?string $id = null){
+		parent::__construct($name, $position, $server_id, $category_id, $id);
+		$this->setTopic($topic);
+		$this->setNsfw($nsfw);
+		$this->setRateLimit($rate_limit);
+		$this->setPins($pins);
+	}
+
 	public function getTopic(): string{
 		return $this->topic;
 	}

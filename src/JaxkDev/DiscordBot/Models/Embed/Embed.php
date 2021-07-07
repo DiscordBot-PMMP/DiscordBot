@@ -62,12 +62,37 @@ class Embed implements \Serializable{
 	/** @var Field[] 25 max */
 	private $fields = [];
 
-	public function __construct(){
-		$this->footer = new Footer();
-		$this->image = new Image();
-		$this->thumbnail = new Image();
-		$this->video = new Video();
-		$this->author = new Author();
+	/**
+	 * Embed constructor.
+	 *
+	 * @param string|null $title
+	 * @param string|null $type
+	 * @param string|null $description
+	 * @param string|null $url
+	 * @param int|null    $timestamp
+	 * @param int|null    $colour
+	 * @param Footer|null $footer
+	 * @param Image|null  $image
+	 * @param Image|null  $thumbnail
+	 * @param Video|null  $video
+	 * @param Author|null $author
+	 * @param Field[]     $fields
+	 */
+	public function __construct(?string $title = null, ?string $type = null, ?string $description = null, ?string $url = null,
+								   ?int $timestamp = null, ?int $colour = null, Footer $footer = null, Image $image = null,
+								   Image $thumbnail = null, Video $video = null, Author $author = null, array $fields = []){
+		$this->setTitle($title);
+		$this->setType($type);
+		$this->setDescription($description);
+		$this->setUrl($url);
+		$this->setTimestamp($timestamp);
+		$this->setColour($colour);
+		$this->setFooter($footer ?? new Footer());
+		$this->setImage($image ?? new Image());
+		$this->setThumbnail($thumbnail ?? new Image());
+		$this->setVideo($video ?? new Video());
+		$this->setAuthor($author ?? new Author());
+		$this->setFields($fields);
 	}
 
 	public function getTitle(): ?string{

@@ -37,7 +37,16 @@ abstract class ServerChannel extends Channel{
 	protected $server_id;
 
 	/** @var ?string Category ID | null when not categorised. */
-	protected $category_id = null;
+	protected $category_id;
+
+	public function __construct(string $name, int $position, string $server_id, ?string $category_id = null, ?string $id = null){
+		parent::__construct($id);
+		$this->setName($name);
+		$this->setPosition($position);
+		$this->setServerId($server_id);
+		$this->setCategoryId($category_id);
+		//Note permissions are not in constructor.
+	}
 
 	public function getName(): string{
 		return $this->name;

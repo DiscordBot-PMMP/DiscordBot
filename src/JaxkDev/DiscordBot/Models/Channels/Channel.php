@@ -17,6 +17,10 @@ abstract class Channel implements \Serializable{
 	/** @var string|null */
 	protected $id;
 
+	public function __construct(?string $id = null){
+		$this->setId($id);
+	}
+
 	public function getId(): ?string{
 		return $this->id;
 	}

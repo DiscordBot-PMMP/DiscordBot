@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
+use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Member implements \Serializable{
 
@@ -41,6 +42,28 @@ class Member implements \Serializable{
 	//private $activity; Activities are actually from member :/
 
 	/**
+	 * Member constructor.
+	 *
+	 * @param string               $user_id
+	 * @param int                  $join_timestamp
+	 * @param string               $server_id
+	 * @param string[]             $roles_id
+	 * @param string|null          $nickname
+	 * @param int|null             $boost_timestamp
+	 * @param RolePermissions|null $permissions
+	 */
+	public function __construct(string $user_id, int $join_timestamp, string $server_id, array $roles_id = [],
+								   ?string $nickname = null, ?int $boost_timestamp = null, RolePermissions $permissions = null){
+		$this->setUserId($user_id);
+		$this->setJoinTimestamp($join_timestamp);
+		$this->setServerId($server_id);
+		$this->setRolesId($roles_id);
+		$this->setNickname($nickname);
+		$this->setBoostTimestamp($boost_timestamp);
+		$this->setPermissions($permissions ?? new RolePermissions());
+	}
+
+	/**
 	 * @description Composite key guild_id.user_id
 	 * @see Member::getServerId()
 	 * @see Member::getUserId()
@@ -54,6 +77,9 @@ class Member implements \Serializable{
 	}
 
 	public function setUserId(string $id): void{
+		if(!Utils::validDiscordSnowflake($id)){
+			throw new \AssertionError("User ID '$id' is invalid.");
+		}
 		$this->user_id = $id;
 	}
 
@@ -108,6 +134,9 @@ class Member implements \Serializable{
 	}
 
 	public function setServerId(string $server_id): void{
+		if(!Utils::validDiscordSnowflake($server_id)){
+			throw new \AssertionError("Server ID '$server_id' is invalid.");
+		}
 		$this->server_id = $server_id;
 	}
 

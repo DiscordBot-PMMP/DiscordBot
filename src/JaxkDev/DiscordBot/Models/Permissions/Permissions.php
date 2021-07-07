@@ -63,6 +63,10 @@ abstract class Permissions implements \Serializable{
 	/** @var Array<string, bool> */
 	private $permissions = [];
 
+	public function __construct(int $bitwise = 0, bool $recalculate = true){
+		$this->setBitwise($bitwise, $recalculate);
+	}
+
 	public function getBitwise(): int{
 		return $this->bitwise;
 	}

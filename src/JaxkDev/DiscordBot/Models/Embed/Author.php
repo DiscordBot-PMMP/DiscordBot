@@ -24,6 +24,12 @@ class Author implements \Serializable{
 	/** @var null|string Must be prefixed with `https` */
 	private $icon_url;
 
+	public function __construct(?string $name = null, ?string $url = null, ?string $icon_url = null){
+		$this->setName($name);
+		$this->setUrl($url);
+		$this->setIconUrl($icon_url);
+	}
+
 	public function getName(): ?string{
 		return $this->name;
 	}

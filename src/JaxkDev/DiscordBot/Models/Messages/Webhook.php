@@ -22,13 +22,39 @@ class Webhook extends Message{
 	/** @var String */
 	private $webhook_id;
 
+	/**
+	 * Webhook constructor.
+	 *
+	 * @param string      $channel_id
+	 * @param string      $webhook_id
+	 * @param Embed[]     $embeds
+	 * @param string|null $id
+	 * @param string      $content
+	 * @param string|null $author_id
+	 * @param string|null $server_id
+	 * @param float|null  $timestamp
+	 * @param bool        $everyone_mentioned
+	 * @param string[]    $users_mentioned
+	 * @param string[]    $roles_mentioned
+	 * @param string[]    $channels_mentioned
+	 */
+	public function __construct(string $channel_id, string $webhook_id, array $embeds = [], ?string $id = null, string $content = "",
+								   ?string $author_id = null, ?string $server_id = null, ?float $timestamp = null,
+								   bool $everyone_mentioned = false, array $users_mentioned = [], array $roles_mentioned = [],
+								   array $channels_mentioned = []){
+		parent::__construct($channel_id, $id, $content, null, $author_id, $server_id, $timestamp, $everyone_mentioned,
+			$users_mentioned, $roles_mentioned, $channels_mentioned);
+		$this->setWebhookId($webhook_id);
+		$this->setEmbeds($embeds);
+	}
+
 	//Hmm...
 	public function getEmbed(): ?Embed{
 		throw new \AssertionError("Webhook messages must use getEmbeds()");
 	}
 
-	public function setEmbed(Embed $embed): void{
-		throw new \AssertionError("Webhook messages must use setEmbeds()");
+	public function setEmbed(?Embed $embed): void{
+		if($embed !== null) throw new \AssertionError("Webhook messages must use setEmbeds()");
 	}
 
 	/** @return Embed[] */

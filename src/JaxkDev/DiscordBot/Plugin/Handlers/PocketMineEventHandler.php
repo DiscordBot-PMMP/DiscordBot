@@ -65,10 +65,7 @@ class PocketMineEventHandler implements Listener{
 				//Models from storage all have ID's
 				throw new \AssertionError("No ID in channel from storage.");
 			}
-			$msg = new Message();
-			$msg->setChannelId($channel->getId());
-			$msg->setServerId($channel->getServerId());
-			$msg->setContent($message);
+			$msg = new Message($channel->getId(), null, $message, null, null, $channel->getServerId());
 			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
@@ -101,10 +98,7 @@ class PocketMineEventHandler implements Listener{
 				//Models from storage all have ID's
 				throw new \AssertionError("No ID in channel from storage.");
 			}
-			$msg = new Message();
-			$msg->setChannelId($channel->getId());
-			$msg->setServerId($channel->getServerId());
-			$msg->setContent($message);
+			$msg = new Message($channel->getId(), null, $message, null, null, $channel->getServerId());
 			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
@@ -134,10 +128,7 @@ class PocketMineEventHandler implements Listener{
 				//Models from storage all have ID's
 				throw new \AssertionError("No ID in channel from storage.");
 			}
-			$msg = new Message();
-			$msg->setChannelId($channel->getId());
-			$msg->setServerId($channel->getServerId());
-			$msg->setContent($message);
+			$msg = new Message($channel->getId(), null, $message, null, null, $channel->getServerId());
 			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
@@ -171,10 +162,7 @@ class PocketMineEventHandler implements Listener{
 				//Models from storage all have ID's
 				throw new \AssertionError("No ID in channel from storage.");
 			}
-			$msg = new Message();
-			$msg->setChannelId($channel->getId());
-			$msg->setServerId($channel->getServerId());
-			$msg->setContent($message);
+			$msg = new Message($channel->getId(), null, $message, null, null, $channel->getServerId());
 			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}
@@ -208,10 +196,7 @@ class PocketMineEventHandler implements Listener{
 				//Models from storage all have ID's
 				throw new \AssertionError("No ID in channel from storage.");
 			}
-			$msg = new Message();
-			$msg->setChannelId($channel->getId());
-			$msg->setServerId($channel->getServerId());
-			$msg->setContent($message);
+			$msg = new Message($channel->getId(), null, $message, null, null, $channel->getServerId());
 			$this->plugin->getAPI()->sendMessage($msg);
 		}
 	}

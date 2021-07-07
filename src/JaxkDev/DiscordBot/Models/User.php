@@ -58,7 +58,7 @@ class User implements \Serializable{
 	private $flags = [];
 
 	public function __construct(string $id, string $username, string $discriminator, string $avatar_url,
-	bool $bot = false, int $flags_bitwise = 0, bool $recalculate_flags = true){
+								bool $bot = false, int $flags_bitwise = 0, bool $recalculate_flags = true){
 		$this->setId($id);
 		$this->setUsername($username);
 		$this->setDiscriminator($discriminator);

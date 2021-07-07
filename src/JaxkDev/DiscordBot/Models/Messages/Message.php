@@ -49,11 +49,43 @@ class Message implements \Serializable{
 	/** @var string[] */
 	protected $channels_mentioned = [];
 
+	/**
+	 * Message constructor.
+	 *
+	 * @param string      $channel_id
+	 * @param string|null $id
+	 * @param string      $content
+	 * @param Embed|null  $embed
+	 * @param string|null $author_id
+	 * @param string|null $server_id
+	 * @param float|null  $timestamp
+	 * @param bool        $everyone_mentioned
+	 * @param string[]    $users_mentioned
+	 * @param string[]    $roles_mentioned
+	 * @param string[]    $channels_mentioned
+	 */
+	public function __construct(string $channel_id, ?string $id = null, string $content = "", ?Embed $embed = null,
+								   ?string $author_id = null, ?string $server_id = null, ?float $timestamp = null,
+								   bool $everyone_mentioned = false, array $users_mentioned = [], array $roles_mentioned = [],
+								   array $channels_mentioned = []){
+		$this->setChannelId($channel_id);
+		$this->setId($id);
+		$this->setContent($content);
+		$this->setEmbed($embed);
+		$this->setAuthorId($author_id);
+		$this->setServerId($server_id);
+		$this->setTimestamp($timestamp);
+		$this->setEveryoneMentioned($everyone_mentioned);
+		$this->setUsersMentioned($users_mentioned);
+		$this->setRolesMentioned($roles_mentioned);
+		$this->setChannelsMentioned($channels_mentioned);
+	}
+
 	public function getId(): ?string{
 		return $this->id;
 	}
 
-	public function setId(string $id): void{
+	public function setId(?string $id): void{
 		$this->id = $id;
 	}
 
@@ -73,7 +105,7 @@ class Message implements \Serializable{
 		return $this->embed;
 	}
 
-	public function setEmbed(Embed $embed): void{
+	public function setEmbed(?Embed $embed): void{
 		$this->embed = $embed;
 	}
 
