@@ -78,7 +78,7 @@ abstract class ModelConverter{
 		}
 
 		$m->setPermissions(new RolePermissions((($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0) ? 2147483647 : $bitwise, false));
-		$m->setRolesId($roles);
+		$m->setRoles($roles);
 		//todo activities.
 		return $m;
 	}
@@ -263,15 +263,8 @@ abstract class ModelConverter{
 	}
 
 	static public function genModelRole(DiscordRole $discordRole): Role{
-		$r = new Role();
-		$r->setId($discordRole->id);
-		$r->setServerId($discordRole->guild_id);
-		$r->setName($discordRole->name);
-		$r->setPermissions(self::genModelRolePermission($discordRole->permissions));
-		$r->setMentionable($discordRole->mentionable);
-		$r->setHoistedPosition($discordRole->position);
-		$r->setColour($discordRole->color);
-		return $r;
+		return new Role($discordRole->name, $discordRole->color, $discordRole->position, $discordRole->mentionable,
+			$discordRole->guild_id, self::genModelRolePermission($discordRole->permissions), $discordRole->id);
 	}
 
 	static public function genModelInvite(DiscordInvite $invite): Invite{
@@ -284,11 +277,11 @@ abstract class ModelConverter{
 	}
 
 	/**
-	 * @description NOTICE, setStatus() from User after generating.
+	 * @description NOTICE, setStatus() from Member's activity after generating.
 	 * @param DiscordActivity $discordActivity
 	 * @return Activity
 	 */
-	static public function genModelActivity(DiscordActivity $discordActivity): Activity{
+	static public function genModelActivity(DiscordActivity $discordActivity, ?DiscordUser $discordUser = null): Activity{
 		return new Activity(Activity::STATUS_OFFLINE, $discordActivity->type, $discordActivity->state);
 		//Status not included in discord activity must be set from user.
 	}

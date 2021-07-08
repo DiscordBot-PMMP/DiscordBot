@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Messages;
 
 use JaxkDev\DiscordBot\Models\Embed\Embed;
+use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Message implements \Serializable{
 
@@ -25,7 +26,7 @@ class Message implements \Serializable{
 	/** @var ?Embed */
 	protected $embed;
 
-	/** @var ?string MemberID Null when sending or receiving webhook messages.*/
+	/** @var ?string MemberID, Null when sending or receiving webhook messages.*/
 	protected $author_id;
 
 	/** @var string */
@@ -114,6 +115,12 @@ class Message implements \Serializable{
 	}
 
 	public function setAuthorId(?string $author_id): void{
+		if($author_id !== null){
+			[$sid, $uid] = explode(".", $author_id);
+			if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
+				throw new \AssertionError("Author ID '$author_id' is invalid.");
+			}
+		}
 		$this->author_id = $author_id;
 	}
 
@@ -122,6 +129,9 @@ class Message implements \Serializable{
 	}
 
 	public function setChannelId(string $channel_id): void{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			throw new \AssertionError("Channel ID '$channel_id' is invalid.");
+		}
 		$this->channel_id = $channel_id;
 	}
 
@@ -130,6 +140,9 @@ class Message implements \Serializable{
 	}
 
 	public function setServerId(?string $server_id): void{
+		if($server_id !== null and !Utils::validDiscordSnowflake($server_id)){
+			throw new \AssertionError("Server ID '$server_id' is invalid.");
+		}
 		$this->server_id = $server_id;
 	}
 
@@ -160,6 +173,11 @@ class Message implements \Serializable{
 	 * @param string[] $users_mentioned
 	 */
 	public function setUsersMentioned(array $users_mentioned): void{
+		foreach($users_mentioned as $id){
+			if(!Utils::validDiscordSnowflake($id)){
+				throw new \AssertionError("User ID '$id' is invalid.");
+			}
+		}
 		$this->users_mentioned = $users_mentioned;
 	}
 
@@ -174,6 +192,11 @@ class Message implements \Serializable{
 	 * @param string[] $roles_mentioned
 	 */
 	public function setRolesMentioned(array $roles_mentioned): void{
+		foreach($roles_mentioned as $id){
+			if(!Utils::validDiscordSnowflake($id)){
+				throw new \AssertionError("Role ID '$id' is invalid.");
+			}
+		}
 		$this->roles_mentioned = $roles_mentioned;
 	}
 
@@ -188,6 +211,11 @@ class Message implements \Serializable{
 	 * @param string[] $channels_mentioned
 	 */
 	public function setChannelsMentioned(array $channels_mentioned): void{
+		foreach($channels_mentioned as $id){
+			if(!Utils::validDiscordSnowflake($id)){
+				throw new \AssertionError("Channel ID '$id' is invalid.");
+			}
+		}
 		$this->channels_mentioned = $channels_mentioned;
 	}
 

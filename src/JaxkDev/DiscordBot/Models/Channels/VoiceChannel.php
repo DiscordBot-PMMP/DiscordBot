@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Models\Channels;
 
+use JaxkDev\DiscordBot\Plugin\Utils;
+
 class VoiceChannel extends ServerChannel{
 
 	/** @var int */
@@ -66,6 +68,12 @@ class VoiceChannel extends ServerChannel{
 
 	/** @param string[] $members Member ID's */
 	public function setMembers(array $members): void{
+		foreach($members as $member){
+			[$sid, $uid] = explode(".", $member);
+			if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
+				throw new \AssertionError("Member ID '$member' is invalid.");
+			}
+		}
 		$this->members = $members;
 	}
 

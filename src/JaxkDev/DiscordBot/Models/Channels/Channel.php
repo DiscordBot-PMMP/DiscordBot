@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Models\Channels;
 
+use JaxkDev\DiscordBot\Plugin\Utils;
+
 abstract class Channel implements \Serializable{
 
 	/** @var string|null */
@@ -26,6 +28,9 @@ abstract class Channel implements \Serializable{
 	}
 
 	public function setId(?string $id): void{
+		if($id !== null and !Utils::validDiscordSnowflake($id)){
+			throw new \AssertionError("Channel ID '$id' is invalid.");
+		}
 		$this->id = $id;
 	}
 }

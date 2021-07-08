@@ -33,7 +33,7 @@ class Member implements \Serializable{
 	private $permissions;
 
 	/** @var string[] */
-	private $roles_id;
+	private $roles;
 
 	/** @var string */
 	private $server_id;
@@ -47,17 +47,17 @@ class Member implements \Serializable{
 	 * @param string               $user_id
 	 * @param int                  $join_timestamp
 	 * @param string               $server_id
-	 * @param string[]             $roles_id
+	 * @param string[]             $roles
 	 * @param string|null          $nickname
 	 * @param int|null             $boost_timestamp
 	 * @param RolePermissions|null $permissions
 	 */
-	public function __construct(string $user_id, int $join_timestamp, string $server_id, array $roles_id = [],
-								   ?string $nickname = null, ?int $boost_timestamp = null, RolePermissions $permissions = null){
+	public function __construct(string $user_id, int $join_timestamp, string $server_id, array $roles = [],
+								?string $nickname = null, ?int $boost_timestamp = null, RolePermissions $permissions = null){
 		$this->setUserId($user_id);
 		$this->setJoinTimestamp($join_timestamp);
 		$this->setServerId($server_id);
-		$this->setRolesId($roles_id);
+		$this->setRoles($roles);
 		$this->setNickname($nickname);
 		$this->setBoostTimestamp($boost_timestamp);
 		$this->setPermissions($permissions ?? new RolePermissions());
@@ -118,15 +118,20 @@ class Member implements \Serializable{
 	/**
 	 * @return string[]
 	 */
-	public function getRolesId(): array{
-		return $this->roles_id;
+	public function getRoles(): array{
+		return $this->roles;
 	}
 
 	/**
-	 * @param string[] $roles_id
+	 * @param string[] $roles
 	 */
-	public function setRolesId(array $roles_id): void{
-		$this->roles_id = $roles_id;
+	public function setRoles(array $roles): void{
+		foreach($roles as $id){
+			if(!Utils::validDiscordSnowflake($id)){
+				throw new \AssertionError("Role ID '$id' is invalid.");
+			}
+		}
+		$this->roles = $roles;
 	}
 
 	public function getServerId(): string{
@@ -149,7 +154,7 @@ class Member implements \Serializable{
 			$this->join_timestamp,
 			$this->boost_timestamp,
 			$this->permissions,
-			$this->roles_id,
+			$this->roles,
 			$this->server_id
 		]);
 	}
@@ -161,7 +166,7 @@ class Member implements \Serializable{
 			$this->join_timestamp,
 			$this->boost_timestamp,
 			$this->permissions,
-			$this->roles_id,
+			$this->roles,
 			$this->server_id
 		] = unserialize($data);
 	}

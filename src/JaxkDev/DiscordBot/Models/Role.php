@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
+use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Role implements \Serializable{
 
@@ -22,14 +23,14 @@ class Role implements \Serializable{
 	/** @var string */
 	private $name;
 
-	/** @var RolePermissions TODO: Investigate no denied permissions?? then constructor */
+	/** @var RolePermissions */
 	private $permissions;
 
 	/** @var int */
 	private $colour;
 
 	/** @var int */
-	private $hoistedPosition;
+	private $hoisted_position;
 
 	/** @var bool */
 	private $mentionable;
@@ -37,11 +38,25 @@ class Role implements \Serializable{
 	/** @var string */
 	private $server_id;
 
+	public function __construct(string $name, int $colour, int $hoisted_position, bool $mentionable, string $server_id,
+								RolePermissions $permissions = null, ?string $id = null){
+		$this->setName($name);
+		$this->setColour($colour);
+		$this->setHoistedPosition($hoisted_position);
+		$this->setMentionable($mentionable);
+		$this->setServerId($server_id);
+		$this->setPermissions($permissions??new RolePermissions(0));
+		$this->setId($id);
+	}
+
 	public function getId(): ?string{
 		return $this->id;
 	}
 
 	public function setId(?string $id): void{
+		if($id !== null and !Utils::validDiscordSnowflake($id)){
+			throw new \AssertionError("Role ID '$id' is invalid.");
+		}
 		$this->id = $id;
 	}
 
@@ -69,6 +84,9 @@ class Role implements \Serializable{
 	 * @param int $colour Hex [0x000000 - 0xFFFFFF]
 	 */
 	public function setColour(int $colour): void{
+		if($colour < 0 or $colour > 0xFFFFFF){
+			throw new \AssertionError("Colour '$colour' is outside the bounds 0x000000-0xFFFFFF.");
+		}
 		$this->colour = $colour;
 	}
 
@@ -76,11 +94,11 @@ class Role implements \Serializable{
 	 * @return int [-1 if not hoisted.]
 	 */
 	public function getHoistedPosition(): int{
-		return $this->hoistedPosition;
+		return $this->hoisted_position;
 	}
 
-	public function setHoistedPosition(int $hoistedPosition): void{
-		$this->hoistedPosition = $hoistedPosition;
+	public function setHoistedPosition(int $hoisted_position): void{
+		$this->hoisted_position = $hoisted_position;
 	}
 
 	public function isMentionable(): bool{
@@ -96,6 +114,9 @@ class Role implements \Serializable{
 	}
 
 	public function setServerId(string $server_id): void{
+		if(!Utils::validDiscordSnowflake($server_id)){
+			throw new \AssertionError("Server ID '$server_id' is invalid.");
+		}
 		$this->server_id = $server_id;
 	}
 
@@ -108,7 +129,7 @@ class Role implements \Serializable{
 			$this->colour,
 			$this->permissions,
 			$this->mentionable,
-			$this->hoistedPosition,
+			$this->hoisted_position,
 			$this->server_id
 		]);
 	}
@@ -120,7 +141,7 @@ class Role implements \Serializable{
 			$this->colour,
 			$this->permissions,
 			$this->mentionable,
-			$this->hoistedPosition,
+			$this->hoisted_position,
 			$this->server_id
 		] = unserialize($data);
 	}

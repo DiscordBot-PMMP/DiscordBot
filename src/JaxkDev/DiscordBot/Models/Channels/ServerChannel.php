@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Channels;
 
 use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
+use JaxkDev\DiscordBot\Plugin\Utils;
 
 abstract class ServerChannel extends Channel{
 
@@ -131,6 +132,9 @@ abstract class ServerChannel extends Channel{
 	}
 
 	public function setServerId(string $server_id): void{
+		if(!Utils::validDiscordSnowflake($server_id)){
+			throw new \AssertionError("Server ID '$server_id' is invalid.");
+		}
 		$this->server_id = $server_id;
 	}
 
@@ -139,6 +143,9 @@ abstract class ServerChannel extends Channel{
 	}
 
 	public function setCategoryId(?string $category_id): void{
+		if($category_id !== null and !Utils::validDiscordSnowflake($category_id)){
+			throw new \AssertionError("Category ID '$category_id' is invalid.");
+		}
 		$this->category_id = $category_id;
 	}
 }

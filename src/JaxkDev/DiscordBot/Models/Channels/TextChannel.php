@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Models\Channels;
 
+use JaxkDev\DiscordBot\Plugin\Utils;
+
 class TextChannel extends ServerChannel{
 
 	/** @var string AKA Description. */
@@ -70,7 +72,13 @@ class TextChannel extends ServerChannel{
 		return $this->rate_limit;
 	}
 
+	/**
+	 * @param int|null $rate_limit 0-21600 seconds.
+	 */
 	public function setRateLimit(?int $rate_limit): void{
+		if($rate_limit !== null and ($rate_limit < 0 or $rate_limit > 21600)){
+			throw new \AssertionError("Rate limit '$rate_limit' is outside the bounds 0-21600.");
+		}
 		$this->rate_limit = $rate_limit;
 	}
 
@@ -81,6 +89,11 @@ class TextChannel extends ServerChannel{
 
 	/** @param string[] $pins Message ID's */
 	public function setPins(array $pins): void{
+		foreach($pins as $pin){
+			if(!Utils::validDiscordSnowflake($pin)){
+				throw new \AssertionError("Pin message ID '$pin' is invalid.");
+			}
+		}
 		$this->pins = $pins;
 	}
 
