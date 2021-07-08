@@ -78,6 +78,11 @@ class Main extends PluginBase{
 
 	public function onEnable(){
 		if(!$this->loadConfig()) return;
+		if(is_file($this->getDataFolder()."events.yml")){
+			// Don't delete file, DiscordChat will transfer it then delete it.
+			$this->getLogger()->alert("DiscordBot v1 events.yml file found, please note this has been stripped out of
+			the DiscordBot core, see https://github.com/DiscordBot-PMMP/DiscordChat for similar features.");
+		}
 		if(extension_loaded("xdebug")){
 			if(ini_get("xdebug.output_dir") === $this->getDataFolder()){
 				$this->getLogger()->warning("X-Debug is running, this will cause data pack to be ~3min long.");
