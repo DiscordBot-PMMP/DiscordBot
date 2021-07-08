@@ -138,6 +138,7 @@ class Role implements \Serializable{
 			$this->colour,
 			$this->permissions,
 			$this->mentionable,
+			$this->hoisted,
 			$this->hoisted_position,
 			$this->server_id
 		]);
@@ -150,6 +151,7 @@ class Role implements \Serializable{
 			$this->colour,
 			$this->permissions,
 			$this->mentionable,
+			$this->hoisted,
 			$this->hoisted_position,
 			$this->server_id
 		] = unserialize($data);

@@ -129,7 +129,7 @@ class CommunicationHandler{
 			$r = $pk->getRole();
 			$guild->createRole([
 				'name' => $r->getName(),
-				'oolor' => $r->getColour(),
+				'color' => $r->getColour(),
 				'permissions' => $r->getPermissions()->getBitwise(),
 				'hoist' => $r->isHoisted(),
 				'position' => $r->getHoistedPosition(),

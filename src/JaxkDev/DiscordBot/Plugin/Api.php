@@ -47,21 +47,22 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
  * TODO:
- * - Update Permissions (member)
+ * - Update Permissions (member), todo find out what this was exactly
  * - Fetch Message
+ * - Pin Message
  * - Fetch Channel Pins (entire message obj's)
  *
- * V3.x or v2.1+ (depending on BC):
+ * v2.1+ :
  * - Register listener (messages, reactions etc)
  * - Unregister listener
  *
  * To Test:
- * - Create Channel
- * - Create Role
- * - Update Role
- * - Update Channel
+ * - Create Role (Pending external investigation)
+ * - Update Role (Pending external investigation)
+ * - Update Channel (Pending external changes or internal workaround (re-create))
  *
  * Tested:
+ * - Create Channel
  * - Leave Server
  * - Ban
  * - Unban
@@ -420,6 +421,7 @@ class Api{
 
 	/**
 	 * Update a server channel, ID Must be present.
+	 * TODO Keep checking Discord.PHP seems they missed a few updatable attributes...
 	 *
 	 * @param ServerChannel $channel
 	 * @return PromiseInterface
