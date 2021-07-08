@@ -77,7 +77,7 @@ abstract class ModelConverter{
 			}
 		}
 
-		$m->setPermissions(new RolePermissions(($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0 ? 2147483647 : $bitwise, false));
+		$m->setPermissions(new RolePermissions((($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0) ? 2147483647 : $bitwise, false));
 		$m->setRolesId($roles);
 		//todo activities.
 		return $m;
