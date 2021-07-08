@@ -263,7 +263,7 @@ abstract class ModelConverter{
 	}
 
 	static public function genModelRole(DiscordRole $discordRole): Role{
-		return new Role($discordRole->name, $discordRole->color, $discordRole->position, $discordRole->mentionable,
+		return new Role($discordRole->name, $discordRole->color, $discordRole->hoist, $discordRole->position, $discordRole->mentionable,
 			$discordRole->guild_id, self::genModelRolePermission($discordRole->permissions), $discordRole->id);
 	}
 

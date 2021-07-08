@@ -29,6 +29,9 @@ class Role implements \Serializable{
 	/** @var int */
 	private $colour;
 
+	/** @var bool Is role hoisted on member list. */
+	private $hoisted;
+
 	/** @var int */
 	private $hoisted_position;
 
@@ -38,10 +41,11 @@ class Role implements \Serializable{
 	/** @var string */
 	private $server_id;
 
-	public function __construct(string $name, int $colour, int $hoisted_position, bool $mentionable, string $server_id,
-								RolePermissions $permissions = null, ?string $id = null){
+	public function __construct(string $name, int $colour, bool $hoisted, int $hoisted_position, bool $mentionable,
+								string $server_id, RolePermissions $permissions = null, ?string $id = null){
 		$this->setName($name);
 		$this->setColour($colour);
+		$this->setHoisted($hoisted);
 		$this->setHoistedPosition($hoisted_position);
 		$this->setMentionable($mentionable);
 		$this->setServerId($server_id);
@@ -90,9 +94,14 @@ class Role implements \Serializable{
 		$this->colour = $colour;
 	}
 
-	/**
-	 * @return int [-1 if not hoisted.]
-	 */
+	public function isHoisted(): bool{
+		return $this->hoisted;
+	}
+
+	public function setHoisted(bool $hoisted): void{
+		$this->hoisted = $hoisted;
+	}
+
 	public function getHoistedPosition(): int{
 		return $this->hoisted_position;
 	}

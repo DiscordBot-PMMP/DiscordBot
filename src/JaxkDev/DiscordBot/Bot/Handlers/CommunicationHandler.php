@@ -27,6 +27,7 @@ use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
@@ -91,6 +92,7 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestDeleteMessage) $this->handleDeleteMessage($pk);
 		elseif($pk instanceof RequestAddRole) $this->handleAddRole($pk);
 		elseif($pk instanceof RequestRemoveRole) $this->handleRemoveRole($pk);
+		elseif($pk instanceof RequestCreateRole) $this->handleCreateRole($pk);
 		elseif($pk instanceof RequestDeleteRole) $this->handleDeleteRole($pk);
 		elseif($pk instanceof RequestKickMember) $this->handleKickMember($pk);
 		elseif($pk instanceof RequestInitialiseInvite) $this->handleInitialiseInvite($pk);
@@ -109,6 +111,25 @@ class CommunicationHandler{
 				//Shouldn't happen unless not in server/connection issues.
 				$this->resolveRequest($pk->getUID(), false, "Failed to leave server.", [$e->getMessage(), $e->getTraceAsString()]);
 				MainLogger::getLogger()->debug("Failed to leave server? ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
+	}
+
+	private function handleCreateRole(RequestCreateRole $pk): void{
+		$this->getServer($pk, $pk->getRole()->getServerId(), function(DiscordGuild $guild) use($pk){
+			$r = $pk->getRole();
+			$guild->createRole([
+				'name' => $r->getName(),
+				'oolor' => $r->getColour(),
+				'permissions' => $r->getPermissions()->getBitwise(),
+				'hoist' => $r->isHoisted(),
+				'position' => $r->getHoistedPosition(),
+				'mentionable' => $r->isMentionable()
+			])->then(function(DiscordRole $role) use($pk){
+				$this->resolveRequest($pk->getUID(), true, "Created role.", [ModelConverter::genModelRole($role)]);
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to create role.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to create role ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}

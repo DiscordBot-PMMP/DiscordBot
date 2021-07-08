@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
@@ -37,6 +38,7 @@ use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Webhook;
+use JaxkDev\DiscordBot\Models\Role;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
@@ -44,15 +46,17 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Update Permissions (channel,role,member)
  * - Update Channel
  * - Update Role
- * - Create Role
  * - Create Channel
  *
  * V3.x or v2.1+ (depending on BC):
  * - Register listener (messages, reactions etc)
  * - Unregister listener
  *
+ * To Test:
+ * - Create Role
+ *
  * Tested:
- * - Leave Server.
+ * - Leave Server
  * - Ban
  * - Unban
  * - Kick
@@ -104,6 +108,19 @@ class Api{
 		}
 		$pk = new RequestLeaveServer();
 		$pk->setServerId($server_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Create a role.
+	 *
+	 * @param Role $role
+	 * @return PromiseInterface
+	 */
+	public function createRole(Role $role): PromiseInterface{
+		$pk = new RequestCreateRole();
+		$pk->setRole($role);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
