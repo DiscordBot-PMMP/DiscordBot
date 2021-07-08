@@ -3,8 +3,6 @@ How to setup the bot:
 Visit https://github.com/DiscordBot-PMMP/DiscordBot/wiki
 
 
-
-
 ===========================================================================================
 
 
@@ -23,95 +21,4 @@ logging:
   directory: "logs"		What directory to keep log files in, relative from plugin_data/DiscordBot/
 
 
-
-
-
-
 ===========================================================================================
-
-
-Events.yml Explained:
-
-channels:
-  - "0000000000000000" 			where 000... is the channel ID, Remember to put " around the ID !
-
-servers:
-  - "0000000000000000"			where 000... is the server ID, Remember to put " around the ID !
-  - "AnotherIDHERE"				Add more lines as shown to add more IDS.
-  - "And another !"
-
-format: "Format text here, see 'FORMATTING Explained' for keys that can be used."
-
-
-
-
-
-
-
-FORMATTING Explained:
-
-any fromDiscord format can contain minecraft colour codes eg §6 means all text after that is gold.
-
-any toDiscord format can contain discord features like **BOLD** text, *italic* text, `Quote` text, ```code block`` text.
-
-
-All formats have the following keys available:
-{TIME} (Format: Hours:Minutes:Seconds)
-{USERNAME}
-
-
-fromDiscord formats have the following keys also available:
-{USER_ID}
-{USER_DISCRIMINATOR}
-{SERVER_ID}
-{SERVER_NAME}
-
-
-message event format also has:
-{MESSAGE}
-{CHANNEL_ID}
-{CHANNEL_NAME}
-
-member transfer event format also has:
-{ADDRESS}
-{PORT}
-
-toDiscord command event format also has:
-{COMMAND}
-
-toDiscord message event format also has:
-{MESSAGE}
-
-
-
-
-Example using every key / format where possible:
-
----
-
-message:
-  toDiscord:
-    format: "[*{TIME}*] **{USERNAME}**: ```{MESSAGE}```"
-  fromDiscord:
-    format: "[{TIME}][({SERVER_ID}){SERVER_NAME}|({CHANNEL_ID}){CHANNEL_NAME}] ({USER_ID}){USERNAME}#{USER_DISCRIMINATOR} : {MESSAGE}"
-
-command:
-  toDiscord:
-    format: "[*{TIME}*] **{USERNAME}** Used command: ```{COMMAND}```"
-
-member_join:
-  toDiscord:
-    format: "[*{TIME}*] **{USERNAME}** Has joined the minecraft server."
-  fromDiscord:
-    format: "[*{TIME}*] {USERNAME}#{USER_DISCRIMINATOR} Has joined the ({SERVER_ID}){SERVER_NAME} discord server."
-
-member_leave:
-  toDiscord:
-    format: "[*{TIME}*] **{USERNAME}** Has left the minecraft server."
-  fromDiscord:
-    format: "[*{TIME}*] ({USER_ID}){USERNAME}#{USER_DISCRIMINATOR} Has left the ({SERVER_ID}){SERVER_NAME} discord server."
-
-member_transfer:
-  toDiscord:
-    format: "[{TIME}] **{USERNAME}** Has been transferred to {ADDRESS}:{PORT}."
-...

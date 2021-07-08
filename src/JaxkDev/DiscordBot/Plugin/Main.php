@@ -16,8 +16,6 @@ use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
-use JaxkDev\DiscordBot\Plugin\Handlers\PocketMineEventHandler;
-use JaxkDev\DiscordBot\Plugin\Handlers\BotCommunicationHandler;
 use Phar;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginException;
@@ -47,14 +45,9 @@ class Main extends PluginBase{
 	/** @var BotCommunicationHandler */
 	private $botCommsHandler;
 
-	/** @var PocketMineEventHandler */
-	private $pocketmineEventHandler;
-
 	/** @var Api */
 	private $api;
 
-	/** @var array */
-	private $eventConfig;
 	/** @var array */
 	private $config;
 
@@ -76,7 +69,6 @@ class Main extends PluginBase{
 		if(!is_dir($this->getDataFolder()."logs")) mkdir($this->getDataFolder()."logs");
 
 		$this->saveResource("config.yml");
-		$this->saveResource("events.yml");
 		$this->saveResource("HELP_ENG.txt", true); //Always keep that up-to-date.
 		$this->saveResource("cacert.pem", true);   //And this.
 
@@ -98,14 +90,12 @@ class Main extends PluginBase{
 
 		$this->api = new Api($this);
 		$this->botCommsHandler = new BotCommunicationHandler($this);
-		$this->pocketmineEventHandler = new PocketMineEventHandler($this, $this->eventConfig);
 
 		$this->getLogger()->debug("Starting DiscordBot Thread...");
 		$this->discordBot = new BotThread($this->getServer()->getLogger(), $this->config, $this->outboundData, $this->inboundData);
 		$this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
 		unset($this->config);
 
-		$this->getServer()->getPluginManager()->registerEvents($this->pocketmineEventHandler, $this);
 		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(int $currentTick): void{
 			$this->tick($currentTick);
 		}), 1);
@@ -125,27 +115,12 @@ class Main extends PluginBase{
 			return false;
 		}
 
-		$eventConfig = yaml_parse_file($this->getDataFolder()."events.yml");
-		if($eventConfig === false or !is_int($eventConfig["version"]??"")){
-			$this->getLogger()->critical("Failed to parse events.yml");
-			$this->getServer()->getPluginManager()->disablePlugin($this);
-			return false;
-		}
-
 		if($config["version"] !== ConfigUtils::VERSION){
 			$this->getLogger()->info("Updating your config from v{$config["version"]} to v".ConfigUtils::VERSION);
 			ConfigUtils::update($config);
 			rename($this->getDataFolder()."config.yml", $this->getDataFolder()."config.yml.old");
 			yaml_emit_file($this->getDataFolder()."config.yml", $config);
 			$this->getLogger()->info("Config updated, old config was saved to '{$this->getDataFolder()}config.yml.old'");
-		}
-
-		if($eventConfig["version"] !== ConfigUtils::EVENT_VERSION){
-			$this->getLogger()->info("Updating your event config from v{$eventConfig["version"]} to v".ConfigUtils::EVENT_VERSION);
-			ConfigUtils::update_event($eventConfig);
-			rename($this->getDataFolder()."events.yml", $this->getDataFolder()."events.yml.old");
-			yaml_emit_file($this->getDataFolder()."events.yml", $eventConfig);
-			$this->getLogger()->info("Event config updated, old event config was saved to '{$this->getDataFolder()}events.yml.old'");
 		}
 
 		$this->getLogger()->debug("Verifying config...");
@@ -159,20 +134,9 @@ class Main extends PluginBase{
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return false;
 		}
-		$result_raw = ConfigUtils::verify_event($eventConfig);
-		if(sizeof($result_raw) !== 0){
-			$result = TextFormat::RED."There were some problems with your events.yml, see below:\n".TextFormat::RESET;
-			foreach($result_raw as $value){
-				$result .= "{$value}\n";
-			}
-			$this->getLogger()->error(rtrim($result));
-			$this->getServer()->getPluginManager()->disablePlugin($this);
-			return false;
-		}
 
 		//Config is now updated and verified.
 		$this->config = $config;
-		$this->eventConfig = $eventConfig;
 		return true;
 	}
 
@@ -223,10 +187,6 @@ class Main extends PluginBase{
 
 	public function getBotCommunicationHandler(): BotCommunicationHandler{
 		return $this->botCommsHandler;
-	}
-
-	public function getEventsConfig(): array{
-		return $this->eventConfig;
 	}
 
 	public function getApi(): Api{

@@ -10,15 +10,11 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Plugin\Handlers;
+namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Models\Activity;
-use JaxkDev\DiscordBot\Models\Channels\Channel;
-use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Member;
-use JaxkDev\DiscordBot\Models\Messages\Webhook;
 use JaxkDev\DiscordBot\Models\Server;
-use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DataDump;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\EventBanAdd;
@@ -44,8 +40,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\EventReady;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
-use JaxkDev\DiscordBot\Plugin\ApiRejection;
-use JaxkDev\DiscordBot\Plugin\ApiResolver;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordChannelDeleted;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordChannelUpdated;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordMessageDeleted;
@@ -55,8 +49,6 @@ use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordServerDeleted;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordServerJoined;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordServerUpdated;
-use JaxkDev\DiscordBot\Plugin\Main;
-use JaxkDev\DiscordBot\Plugin\Storage;
 use pocketmine\utils\MainLogger;
 
 class BotCommunicationHandler{
@@ -117,51 +109,7 @@ class BotCommunicationHandler{
 	}
 
 	private function handleMessageSent(EventMessageSent $packet): void{
-		$message = $packet->getMessage();
-
-		$e = new DiscordMessageSent($this->plugin, $message);
-		$e->call();
-		if($e->isCancelled()) return;
-		if($message instanceof Webhook or trim($message->getContent()) === "") return;
-
-		$config = $this->plugin->getEventsConfig()["message"]["fromDiscord"];
-		if(!in_array($message->getChannelId(), $config["channels"])) return;
-
-		//If any of these asserts fire theres a mismatch between Storage and discord.
-
-		/** @var Server $server */
-		$server = Storage::getServer($message->getServerId()??"");
-		if(!$server instanceof Server){
-			throw new \AssertionError("Server '{$message->getServerId()}' not found in storage.");
-		}
-
-		/** @var Channel $channel */
-		$channel = Storage::getChannel($message->getChannelId());
-		if(!$channel instanceof Channel){
-			throw new \AssertionError("Channel '{$message->getChannelId()}' not found in storage.");
-		}
-
-		/** @var Member $author */
-		$author = Storage::getMember($message->getAuthorId()??"");
-		if(!$author instanceof Member){
-			throw new \AssertionError("Member '{$message->getAuthorId()}' not found in storage.");
-		}
-
-		/** @var User $user */
-		$user = Storage::getUser($author->getUserId());
-		if(!$user instanceof User){
-			throw new \AssertionError("User '{$author->getUserId()}' not found in storage.");
-		}
-
-		$formatted = str_replace(["{TIME}", "{USER_ID}", "{USERNAME}", "{USER_DISCRIMINATOR}", "{SERVER_ID}",
-			"{SERVER_NAME}", "{CHANNEL_ID}", "{CHANNEL_NAME}", "{MESSAGE}"], [
-				date("G:i:s", (int)$message->getTimestamp()??0), $author->getUserId(), $user->getUsername(),
-				$user->getDiscriminator(), $server->getId(), $server->getName(), $channel->getId(),
-				(($channel instanceof ServerChannel) ? $channel->getName() : $channel->getId()), $message->getContent()
-			],
-			$config["format"]);
-
-		$this->plugin->getServer()->broadcastMessage($formatted);
+		(new DiscordMessageSent($this->plugin, $packet->getMessage()))->call();
 	}
 
 	private function handleMessageUpdate(EventMessageUpdate $packet): void{
@@ -170,23 +118,18 @@ class BotCommunicationHandler{
 
 	private function handleMessageDelete(EventMessageDelete $packet): void{
 		(new DiscordMessageDeleted($this->plugin, $packet->getMessageId()))->call();
-		return;
 	}
 
 	private function handleChannelCreate(EventChannelCreate $packet): void{
 		$c = $packet->getChannel();
-		$e = new DiscordChannelUpdated($this->plugin, $c);
-		$e->call();
+		(new DiscordChannelUpdated($this->plugin, $c))->call();
 		Storage::addChannel($c);
-		if(!$e->isCancelled()) return;
 	}
 
 	private function handleChannelUpdate(EventChannelUpdate $packet): void{
 		$c = $packet->getChannel();
-		$e = new DiscordChannelUpdated($this->plugin, $c);
-		$e->call();
+		(new DiscordChannelUpdated($this->plugin, $c))->call();
 		Storage::updateChannel($c);
-		if($e->isCancelled()) return;
 	}
 
 	private function handleChannelDelete(EventChannelDelete $packet): void{
@@ -195,10 +138,8 @@ class BotCommunicationHandler{
 		if($c->getId() === null){
 			throw new \AssertionError("No ID in channel from storage.");
 		}
-		$e = new DiscordChannelDeleted($this->plugin, $c);
-		$e->call();
+		(new DiscordChannelDeleted($this->plugin, $c))->call();
 		Storage::removeChannel($c->getId());
-		if($e->isCancelled()) return;
 	}
 
 	private function handleRoleCreate(EventRoleCreate $packet): void{
@@ -213,8 +154,6 @@ class BotCommunicationHandler{
 
 	private function handleRoleDelete(EventRoleDelete $packet): void{
 		//TODO Event
-		$role = Storage::getRole($packet->getRoleId());
-		if($role === null) return;
 		Storage::removeRole($packet->getRoleId());
 	}
 
@@ -240,8 +179,6 @@ class BotCommunicationHandler{
 
 	private function handleMemberJoin(EventMemberJoin $packet): void{
 		//TODO Event
-		$config = $this->plugin->getEventsConfig()["member_join"]["fromDiscord"];
-		if(($config["format"] ?? "") === "") return;
 
 		/** @var Server $server */
 		$server = Storage::getServer($packet->getMember()->getServerId());
@@ -249,20 +186,8 @@ class BotCommunicationHandler{
 			throw new \AssertionError("Server '{$packet->getMember()->getServerId()}' not found for member '{$packet->getMember()->getId()}'");
 		}
 
-		if(!in_array($server->getId(), $config["servers"])) return;
-
-		$member = $packet->getMember();
-		$user = $packet->getUser();
-
-		Storage::addMember($member);
-		Storage::addUser($user);
-
-		$formatted = str_replace(
-			["{TIME}", "{USER_ID}", "{USERNAME}", "{USER_DISCRIMINATOR}", "{SERVER_ID}", "{SERVER_NAME}"],
-			[date("G:i:s", $member->getJoinTimestamp()), $member->getId(), $user->getUsername(),
-				$user->getDiscriminator(), $server->getId(), $server->getName()], $config["format"]);
-
-		$this->plugin->getServer()->broadcastMessage($formatted);
+		Storage::addMember($packet->getMember());
+		Storage::addUser($packet->getUser());
 	}
 
 	private function handleMemberUpdate(EventMemberUpdate $packet): void{
@@ -275,8 +200,6 @@ class BotCommunicationHandler{
 		if(($u = Storage::getBotUser()) !== null and $u->getId() === explode(".", $packet->getMemberID())[1]) return;
 
 		//TODO Event
-		$config = $this->plugin->getEventsConfig()["member_leave"]["fromDiscord"];
-		if(($config["format"] ?? "") === "") return;
 
 		/** @var Member $member */
 		$member = Storage::getMember($packet->getMemberID());
@@ -290,30 +213,13 @@ class BotCommunicationHandler{
 			throw new \AssertionError("Server '{$member->getServerId()}' not found for member '{$member->getId()}'");
 		}
 
-		//Have to fetch member first because onLeave we dont have their data direct from discord, so use cache :)
-		if(!in_array($server->getId(), $config["servers"])) return;
-
-		/** @var User $user */
-		$user = Storage::getUser($member->getUserId());
-		if(!$user instanceof User){
-			throw new \AssertionError("User '{$member->getUserId()}' not found in storage.");
-		}
-
 		Storage::removeMember($member->getId());
-
-		$formatted = str_replace(
-			["{TIME}", "{USER_ID}", "{USERNAME}", "{USER_DISCRIMINATOR}", "{SERVER_ID}", "{SERVER_NAME}"],
-			[date("G:i:s", $member->getJoinTimestamp()), $user->getId(), $user->getUsername(),
-				$user->getDiscriminator(), $server->getId(), $server->getName()], $config["format"]);
-
-		$this->plugin->getServer()->broadcastMessage($formatted);
 	}
 
 	private function handleServerJoin(EventServerJoin $packet): void{
 		$e = new DiscordServerJoined($this->plugin, $packet->getServer(), $packet->getRoles(),
 			$packet->getChannels(), $packet->getMembers());
 		$e->call();
-		if($e->isCancelled()) return;
 
 		Storage::addServer($packet->getServer());
 		foreach($packet->getMembers() as $member){
@@ -328,18 +234,14 @@ class BotCommunicationHandler{
 	}
 
 	private function handleServerUpdate(EventServerUpdate $packet): void{
-		$e = new DiscordServerUpdated($this->plugin, $packet->getServer());
-		$e->call();
-		if($e->isCancelled()) return;
+		(new DiscordServerUpdated($this->plugin, $packet->getServer()))->call();
 		Storage::updateServer($packet->getServer());
 	}
 
 	private function handleServerLeave(EventServerLeave $packet): void{
 		$server = Storage::getServer($packet->getServerId());
 		if($server === null) return;
-		$e = new DiscordServerDeleted($this->plugin, $server);
-		$e->call();
-		if($e->isCancelled()) return;
+		(new DiscordServerDeleted($this->plugin, $server))->call();
 		Storage::removeServer($packet->getServerId());
 	}
 
