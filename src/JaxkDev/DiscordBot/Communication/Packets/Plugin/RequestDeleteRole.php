@@ -22,20 +22,18 @@ class RequestDeleteRole extends Packet{
 	/** @var string */
 	private $role_id;
 
+	public function __construct(string $server_id, string $role_id){
+		parent::__construct();
+		$this->server_id = $server_id;
+		$this->role_id = $role_id;
+	}
+
 	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(string $server_id): void{
-		$this->server_id = $server_id;
-	}
-
 	public function getRoleId(): string{
 		return $this->role_id;
-	}
-
-	public function setRoleId(string $role_id): void{
-		$this->role_id = $role_id;
 	}
 
 	public function serialize(): ?string{

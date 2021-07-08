@@ -22,20 +22,18 @@ class RequestRevokeInvite extends Packet{
 	/** @var string */
 	private $invite_code;
 
+	public function __construct(string $server_id, string $invite_code){
+		parent::__construct();
+		$this->server_id = $server_id;
+		$this->invite_code = $invite_code;
+	}
+
 	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(string $server_id): void{
-		$this->server_id = $server_id;
-	}
-
 	public function getInviteCode(): string{
 		return $this->invite_code;
-	}
-
-	public function setInviteCode(string $invite_code): void{
-		$this->invite_code = $invite_code;
 	}
 
 	public function serialize(): ?string{

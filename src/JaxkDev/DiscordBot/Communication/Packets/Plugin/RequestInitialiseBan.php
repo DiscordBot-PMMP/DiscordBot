@@ -20,12 +20,13 @@ class RequestInitialiseBan extends Packet{
 	/** @var Ban */
 	private $ban;
 
-	public function getBan(): Ban{
-		return $this->ban;
+	public function __construct(Ban $ban){
+		parent::__construct();
+		$this->ban = $ban;
 	}
 
-	public function setBan(Ban $ban): void{
-		$this->ban = $ban;
+	public function getBan(): Ban{
+		return $this->ban;
 	}
 
 	public function serialize(): ?string{

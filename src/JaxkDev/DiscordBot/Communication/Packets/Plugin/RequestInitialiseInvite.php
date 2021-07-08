@@ -20,12 +20,13 @@ class RequestInitialiseInvite extends Packet{
 	/** @var Invite */
 	private $invite;
 
-	public function getInvite(): Invite{
-		return $this->invite;
+	public function __construct(Invite $invite){
+		parent::__construct();
+		$this->invite = $invite;
 	}
 
-	public function setInvite(Invite $invite): void{
-		$this->invite = $invite;
+	public function getInvite(): Invite{
+		return $this->invite;
 	}
 
 	public function serialize(): ?string{

@@ -20,12 +20,13 @@ class RequestCreateChannel extends Packet{
 	/** @var ServerChannel */
 	private $channel;
 
-	public function getChannel(): ServerChannel{
-		return $this->channel;
+	public function __construct(ServerChannel $channel){
+		parent::__construct();
+		$this->channel = $channel;
 	}
 
-	public function setChannel(ServerChannel $channel): void{
-		$this->channel = $channel;
+	public function getChannel(): ServerChannel{
+		return $this->channel;
 	}
 
 	public function serialize(): ?string{

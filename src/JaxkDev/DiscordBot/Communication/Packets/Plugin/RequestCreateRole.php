@@ -20,12 +20,13 @@ class RequestCreateRole extends Packet{
 	/** @var Role */
 	private $role;
 
-	public function getRole(): Role{
-		return $this->role;
+	public function __construct(Role $role){
+		parent::__construct();
+		$this->role = $role;
 	}
 
-	public function setRole(Role $role): void{
-		$this->role = $role;
+	public function getRole(): Role{
+		return $this->role;
 	}
 
 	public function serialize(): ?string{

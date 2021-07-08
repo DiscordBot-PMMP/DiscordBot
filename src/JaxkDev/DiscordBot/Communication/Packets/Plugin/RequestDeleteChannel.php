@@ -12,7 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
-use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestDeleteChannel extends Packet{
@@ -23,20 +22,18 @@ class RequestDeleteChannel extends Packet{
 	/** @var string */
 	private $channel_id;
 
+	public function __construct(string $server_id, string $channel_id){
+		parent::__construct();
+		$this->server_id = $server_id;
+		$this->channel_id = $channel_id;
+	}
+
 	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(string $server_id): void{
-		$this->server_id = $server_id;
-	}
-
 	public function getChannelId(): string{
 		return $this->channel_id;
-	}
-
-	public function setChannelId(string $channel_id): void{
-		$this->channel_id = $channel_id;
 	}
 
 	public function serialize(): ?string{

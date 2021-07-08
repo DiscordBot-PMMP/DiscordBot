@@ -20,12 +20,13 @@ class RequestUpdateActivity extends Packet{
 	/** @var Activity */
 	private $activity;
 
-	public function getActivity(): Activity{
-		return $this->activity;
+	public function __construct(Activity $activity){
+		parent::__construct();
+		$this->activity = $activity;
 	}
 
-	public function setActivity(Activity $activity): void{
-		$this->activity = $activity;
+	public function getActivity(): Activity{
+		return $this->activity;
 	}
 
 	public function serialize(): ?string{

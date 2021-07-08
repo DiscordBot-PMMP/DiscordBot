@@ -19,12 +19,13 @@ class RequestBroadcastTyping extends Packet{
 	/** @var string */
 	private $channel_id;
 
-	public function getChannelId(): string{
-		return $this->channel_id;
+	public function __construct(string $channel_id){
+		parent::__construct();
+		$this->channel_id = $channel_id;
 	}
 
-	public function setChannelId(string $channel_id): void{
-		$this->channel_id = $channel_id;
+	public function getChannelId(): string{
+		return $this->channel_id;
 	}
 
 	public function serialize(): ?string{

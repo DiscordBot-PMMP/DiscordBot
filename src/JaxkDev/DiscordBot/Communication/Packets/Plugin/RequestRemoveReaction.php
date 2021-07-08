@@ -28,36 +28,28 @@ class RequestRemoveReaction extends Packet{
 	/** @var string */
 	private $emoji;
 
-	public function getChannelId(): string{
-		return $this->channel_id;
+	public function __construct(string $channel_id, string $message_id, string $user_id, string $emoji){
+		parent::__construct();
+		$this->channel_id = $channel_id;
+		$this->message_id = $message_id;
+		$this->user_id = $user_id;
+		$this->emoji = $emoji;
 	}
 
-	public function setChannelId(string $channel_id): void{
-		$this->channel_id = $channel_id;
+	public function getChannelId(): string{
+		return $this->channel_id;
 	}
 
 	public function getMessageId(): string{
 		return $this->message_id;
 	}
 
-	public function setMessageId(string $message_id): void{
-		$this->message_id = $message_id;
-	}
-
 	public function getUserId(): string{
 		return $this->user_id;
 	}
 
-	public function setUserId(string $user_id): void{
-		$this->user_id = $user_id;
-	}
-
 	public function getEmoji(): string{
 		return $this->emoji;
-	}
-
-	public function setEmoji(string $emoji): void{
-		$this->emoji = $emoji;
 	}
 
 	public function serialize(): ?string{

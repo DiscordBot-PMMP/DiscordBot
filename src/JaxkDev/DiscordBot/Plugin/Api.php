@@ -108,8 +108,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($server_id)){
 			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
 		}
-		$pk = new RequestLeaveServer();
-		$pk->setServerId($server_id);
+		$pk = new RequestLeaveServer($server_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -121,8 +120,7 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function createRole(Role $role): PromiseInterface{
-		$pk = new RequestCreateRole();
-		$pk->setRole($role);
+		$pk = new RequestCreateRole($role);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -141,9 +139,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($role_id)){
 			return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
 		}
-		$pk = new RequestDeleteRole();
-		$pk->setServerId($server_id);
-		$pk->setRoleId($role_id);
+		$pk = new RequestDeleteRole($server_id, $role_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -163,10 +159,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($role_id)){
 			return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
 		}
-		$pk = new RequestRemoveRole();
-		$pk->setServerId($sid);
-		$pk->setUserId($uid);
-		$pk->setRoleId($role_id);
+		$pk = new RequestRemoveRole($sid, $uid, $role_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -186,10 +179,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($role_id)){
 			return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
 		}
-		$pk = new RequestAddRole();
-		$pk->setServerId($sid);
-		$pk->setUserId($uid);
-		$pk->setRoleId($role_id);
+		$pk = new RequestAddRole($sid, $uid, $role_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -213,11 +203,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($user_id)){
 			return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
 		}
-		$pk = new RequestRemoveReaction();
-		$pk->setChannelId($channel_id);
-		$pk->setUserId($user_id);
-		$pk->setMessageId($message_id);
-		$pk->setEmoji($emoji);
+		$pk = new RequestRemoveReaction($channel_id, $message_id, $user_id, $emoji);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -243,10 +229,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($message_id)){
 			return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
 		}
-		$pk = new RequestRemoveAllReactions();
-		$pk->setChannelId($channel_id);
-		$pk->setMessageId($message_id);
-		$pk->setEmoji($emoji);
+		$pk = new RequestRemoveAllReactions($channel_id, $message_id, $emoji);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -268,10 +251,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($message_id)){
 			return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
 		}
-		$pk = new RequestAddReaction();
-		$pk->setChannelId($channel_id);
-		$pk->setMessageId($message_id);
-		$pk->setEmoji($emoji);
+		$pk = new RequestAddReaction($channel_id, $message_id, $emoji);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -290,8 +270,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($channel_id)){
 			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
 		}
-		$pk = new RequestBroadcastTyping();
-		$pk->setChannelId($channel_id);
+		$pk = new RequestBroadcastTyping($channel_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -303,8 +282,7 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function updateActivity(Activity $activity): PromiseInterface{
-		$pk = new RequestUpdateActivity();
-		$pk->setActivity($activity);
+		$pk = new RequestUpdateActivity($activity);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -316,8 +294,7 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function initialiseBan(Ban $ban): PromiseInterface{
-		$pk = new RequestInitialiseBan();
-		$pk->setBan($ban);
+		$pk = new RequestInitialiseBan($ban);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -336,9 +313,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($user_id)){
 			return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
 		}
-		$pk = new RequestRevokeBan();
-		$pk->setServerId($server_id);
-		$pk->setUserId($user_id);
+		$pk = new RequestRevokeBan($server_id, $user_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -354,9 +329,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
 			return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
 		}
-		$pk = new RequestKickMember();
-		$pk->setServerId($sid);
-		$pk->setUserId($uid);
+		$pk = new RequestKickMember($sid, $uid);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -371,8 +344,7 @@ class Api{
 		if($message instanceof Webhook){
 			return rejectPromise(new ApiRejection("Webhook messages cannot be sent, only received."));
 		}
-		$pk = new RequestSendMessage();
-		$pk->setMessage($message);
+		$pk = new RequestSendMessage($message);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -391,8 +363,7 @@ class Api{
 		if($message->getId() === null){
 			return rejectPromise(new ApiRejection("Message must have a valid ID to be able to edit it."));
 		}
-		$pk = new RequestEditMessage();
-		$pk->setMessage($message);
+		$pk = new RequestEditMessage($message);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -411,9 +382,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($message_id)){
 			return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
 		}
-		$pk = new RequestDeleteMessage();
-		$pk->setMessageId($message_id);
-		$pk->setChannelId($channel_id);
+		$pk = new RequestDeleteMessage($message_id, $channel_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -425,8 +394,7 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function createChannel(ServerChannel $channel): PromiseInterface{
-		$pk = new RequestCreateChannel();
-		$pk->setChannel($channel);
+		$pk = new RequestCreateChannel($channel);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -445,9 +413,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($channel_id)){
 			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
 		}
-		$pk = new RequestDeleteChannel();
-		$pk->setServerId($server_id);
-		$pk->setChannelId($channel_id);
+		$pk = new RequestDeleteChannel($server_id, $channel_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -460,8 +426,7 @@ class Api{
 	 * @see Api::revokeInvite() For revoking an initialised invite.
 	 */
 	public function initialiseInvite(Invite $invite): PromiseInterface{
-		$pk = new RequestInitialiseInvite();
-		$pk->setInvite($invite);
+		$pk = new RequestInitialiseInvite($invite);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -477,9 +442,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($server_id)){
 			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
 		}
-		$pk = new RequestRevokeInvite();
-		$pk->setServerId($server_id);
-		$pk->setInviteCode($invite_code);
+		$pk = new RequestRevokeInvite($server_id, $invite_code);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -496,10 +459,7 @@ class Api{
 		if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
 			return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
 		}
-		$pk = new RequestUpdateNickname();
-		$pk->setServerId($sid);
-		$pk->setUserId($uid);
-		$pk->setNickname($nickname);
+		$pk = new RequestUpdateNickname($sid, $uid, $nickname);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}

@@ -22,31 +22,26 @@ class RequestUpdateNickname extends Packet{
 	/** @var string */
 	private $user_id;
 
-	/** @var ?string */
+	/** @var string|null */
 	private $nickname;
+
+	public function __construct(string $server_id, string $user_id, ?string $nickname = null){
+		parent::__construct();
+		$this->server_id = $server_id;
+		$this->user_id = $user_id;
+		$this->nickname = $nickname;
+	}
 
 	public function getServerId(): string{
 		return $this->server_id;
-	}
-
-	public function setServerId(string $server_id): void{
-		$this->server_id = $server_id;
 	}
 
 	public function getUserId(): string{
 		return $this->user_id;
 	}
 
-	public function setUserId(string $user_id): void{
-		$this->user_id = $user_id;
-	}
-
 	public function getNickname(): ?string{
 		return $this->nickname;
-	}
-
-	public function setNickname(?string $nickname): void{
-		$this->nickname = $nickname;
 	}
 
 	public function serialize(): ?string{

@@ -20,12 +20,13 @@ class RequestEditMessage extends Packet{
 	/** @var Message */
 	private $message;
 
-	public function getMessage(): Message{
-		return $this->message;
+	public function __construct(Message $message){
+		parent::__construct();
+		$this->message = $message;
 	}
 
-	public function setMessage(Message $message): void{
-		$this->message = $message;
+	public function getMessage(): Message{
+		return $this->message;
 	}
 
 	public function serialize(): ?string{

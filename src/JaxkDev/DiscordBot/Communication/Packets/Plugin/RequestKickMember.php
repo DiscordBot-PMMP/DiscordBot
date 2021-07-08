@@ -22,20 +22,18 @@ class RequestKickMember extends Packet{
 	/** @var string */
 	private $user_id;
 
+	public function __construct(string $server_id, string $user_id){
+		parent::__construct();
+		$this->server_id = $server_id;
+		$this->user_id = $user_id;
+	}
+
 	public function getServerId(): string{
 		return $this->server_id;
 	}
 
-	public function setServerId(string $server_id): void{
-		$this->server_id = $server_id;
-	}
-
 	public function getUserId(): string{
 		return $this->user_id;
-	}
-
-	public function setUserId(string $user_id): void{
-		$this->user_id = $user_id;
 	}
 
 	public function serialize(): ?string{

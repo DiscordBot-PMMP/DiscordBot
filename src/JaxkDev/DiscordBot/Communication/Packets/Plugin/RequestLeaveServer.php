@@ -19,12 +19,13 @@ class RequestLeaveServer extends Packet{
 	/** @var string */
 	private $server_id;
 
-	public function getServerId(): string{
-		return $this->server_id;
+	public function __construct(string $server_id){
+		parent::__construct();
+		$this->server_id = $server_id;
 	}
 
-	public function setServerId(string $server_id): void{
-		$this->server_id = $server_id;
+	public function getServerId(): string{
+		return $this->server_id;
 	}
 
 	public function serialize(): ?string{
