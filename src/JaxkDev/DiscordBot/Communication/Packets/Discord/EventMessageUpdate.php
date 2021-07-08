@@ -20,19 +20,26 @@ class EventMessageUpdate extends Packet{
 	/** @var Message */
 	private $message;
 
+	public function __construct(Message $message){
+		parent::__construct();
+		$this->message = $message;
+	}
+
 	public function getMessage(): Message{
 		return $this->message;
 	}
 
-	public function setMessage(Message $message): void{
-		$this->message = $message;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->message]);
+		return serialize([
+			$this->UID,
+			$this->message
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->message] = unserialize($data);
+		[
+			$this->UID,
+			$this->message
+		] = unserialize($data);
 	}
 }

@@ -20,19 +20,26 @@ class EventRoleCreate extends Packet{
 	/** @var Role */
 	private $role;
 
+	public function __construct(Role $role){
+		parent::__construct();
+		$this->role = $role;
+	}
+
 	public function getRole(): Role{
 		return $this->role;
 	}
 
-	public function setRole(Role $role): void{
-		$this->role = $role;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->role]);
+		return serialize([
+			$this->UID,
+			$this->role
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->role] = unserialize($data);
+		[
+			$this->UID,
+			$this->role
+		] = unserialize($data);
 	}
 }

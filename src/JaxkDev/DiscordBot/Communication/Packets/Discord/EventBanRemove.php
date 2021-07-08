@@ -19,19 +19,26 @@ class EventBanRemove extends Packet{
 	/** @var string */
 	private $id;
 
+	public function __construct(string $id){
+		parent::__construct();
+		$this->id = $id;
+	}
+
 	public function getId(): string{
 		return $this->id;
 	}
 
-	public function setId(string $id): void{
-		$this->id = $id;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->id]);
+		return serialize([
+			$this->UID,
+			$this->id
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->id] = unserialize($data);
+		[
+			$this->UID,
+			$this->id
+		] = unserialize($data);
 	}
 }

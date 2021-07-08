@@ -32,61 +32,58 @@ class EventServerJoin extends Packet{
 	/** @var Role[] */
 	private $roles;
 
+	/**
+	 * EventServerJoin constructor.
+	 *
+	 * @param Server          $server
+	 * @param ServerChannel[] $channels
+	 * @param Member[]        $members
+	 * @param Role[]          $roles
+	 */
+	public function __construct(Server $server, array $channels, array $members, array $roles){
+		parent::__construct();
+		$this->server = $server;
+		$this->channels = $channels;
+		$this->members = $members;
+		$this->roles = $roles;
+	}
+
 	public function getServer(): Server{
 		return $this->server;
 	}
 
-	public function setServer(Server $server): void{
-		$this->server = $server;
-	}
-
-	/**
-	 * @return ServerChannel[]
-	 */
+	/** @return ServerChannel[] */
 	public function getChannels(): array{
 		return $this->channels;
 	}
 
-	/**
-	 * @param ServerChannel[] $channels
-	 */
-	public function setChannels(array $channels): void{
-		$this->channels = $channels;
-	}
-
-	/**
-	 * @return Role[]
-	 */
+	/** @return Role[] */
 	public function getRoles(): array{
 		return $this->roles;
 	}
 
-	/**
-	 * @param Role[] $roles
-	 */
-	public function setRoles(array $roles): void{
-		$this->roles = $roles;
-	}
-
-	/**
-	 * @return Member[]
-	 */
+	/** @return Member[] */
 	public function getMembers(): array{
 		return $this->members;
 	}
 
-	/**
-	 * @param Member[] $members
-	 */
-	public function setMembers(array $members): void{
-		$this->members = $members;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->server, $this->roles, $this->channels, $this->members]);
+		return serialize([
+			$this->UID,
+			$this->server,
+			$this->roles,
+			$this->channels,
+			$this->members
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->server, $this->roles, $this->channels, $this->members] = unserialize($data);
+		[
+			$this->UID,
+			$this->server,
+			$this->roles,
+			$this->channels,
+			$this->members
+		] = unserialize($data);
 	}
 }

@@ -17,19 +17,26 @@ class Heartbeat extends Packet{
 	/** @var float */
 	private $heartbeat;
 
+	public function __construct(float $heartbeat){
+		parent::__construct();
+		$this->heartbeat = $heartbeat;
+	}
+
 	public function getHeartbeat(): float{
 		return $this->heartbeat;
 	}
 
-	public function setHeartbeat(float $heartbeat): void{
-		$this->heartbeat = $heartbeat;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->heartbeat]);
+		return serialize([
+			$this->UID,
+			$this->heartbeat
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->heartbeat] = unserialize($data);
+		[
+			$this->UID,
+			$this->heartbeat
+		] = unserialize($data);
 	}
 }

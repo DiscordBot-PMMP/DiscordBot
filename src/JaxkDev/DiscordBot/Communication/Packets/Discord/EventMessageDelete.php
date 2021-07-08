@@ -17,21 +17,28 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 class EventMessageDelete extends Packet{
 
 	/** @var string */
-	private $messageId;
+	private $message_id;
 
-	public function getMessageId(): string{
-		return $this->messageId;
+	public function __construct(string $message_id){
+		parent::__construct();
+		$this->message_id = $message_id;
 	}
 
-	public function setMessageId(string $messageId): void{
-		$this->messageId = $messageId;
+	public function getMessageId(): string{
+		return $this->message_id;
 	}
 
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->messageId]);
+		return serialize([
+			$this->UID,
+			$this->message_id
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->messageId] = unserialize($data);
+		[
+			$this->UID,
+			$this->message_id
+		] = unserialize($data);
 	}
 }

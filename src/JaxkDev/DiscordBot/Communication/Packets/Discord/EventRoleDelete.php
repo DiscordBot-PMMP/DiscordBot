@@ -19,19 +19,26 @@ class EventRoleDelete extends Packet{
 	/** @var string */
 	private $role_id;
 
+	public function __construct(string $role_id){
+		parent::__construct();
+		$this->role_id = $role_id;
+	}
+
 	public function getRoleId(): string{
 		return $this->role_id;
 	}
 
-	public function setRoleId(string $role_id): void{
-		$this->role_id = $role_id;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->role_id]);
+		return serialize([
+			$this->UID,
+			$this->role_id
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->role_id] = unserialize($data);
+		[
+			$this->UID,
+			$this->role_id
+		] = unserialize($data);
 	}
 }

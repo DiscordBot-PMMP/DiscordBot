@@ -286,8 +286,7 @@ class BotCommunicationHandler{
 	}
 
 	public function sendHeartbeat(): void{
-		$p = new Heartbeat();
-		$p->setHeartbeat(microtime(true));
+		$p = new Heartbeat(microtime(true));
 		$this->plugin->writeOutboundData($p);
 	}
 

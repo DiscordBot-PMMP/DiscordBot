@@ -520,17 +520,12 @@ class CommunicationHandler{
 	//---------------------------------------------------
 
 	private function resolveRequest(int $pid, bool $successful = true, string $response = "Success.", array $data = []): void{
-		$pk = new Resolution();
-		$pk->setPid($pid);
-		$pk->setSuccessful($successful);
-		$pk->setResponse($response);
-		$pk->setData($data);
+		$pk = new Resolution($pid, $successful, $response, $data);
 		$this->client->getThread()->writeOutboundData($pk);
 	}
 
 	public function sendHeartbeat(): void{
-		$pk = new Heartbeat();
-		$pk->setHeartbeat(microtime(true));
+		$pk = new Heartbeat(microtime(true));
 		$this->client->getThread()->writeOutboundData($pk);
 	}
 

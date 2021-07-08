@@ -24,27 +24,33 @@ class EventMemberJoin extends Packet{
 	/** @var User */
 	private $user;
 
-	public function getMember(): Member{
-		return $this->member;
+	public function __construct(Member $member, User $user){
+		parent::__construct();
+		$this->member = $member;
+		$this->user = $user;
 	}
 
-	public function setMember(Member $member): void{
-		$this->member = $member;
+	public function getMember(): Member{
+		return $this->member;
 	}
 
 	public function getUser(): User{
 		return $this->user;
 	}
 
-	public function setUser(User $user): void{
-		$this->user = $user;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->member, $this->user]);
+		return serialize([
+			$this->UID,
+			$this->member,
+			$this->user
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->member, $this->user] = unserialize($data);
+		[
+			$this->UID,
+			$this->member,
+			$this->user
+		] = unserialize($data);
 	}
 }

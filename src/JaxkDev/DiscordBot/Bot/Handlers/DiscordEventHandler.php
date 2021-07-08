@@ -209,15 +209,13 @@ class DiscordEventHandler{
 		if(!$this->checkMessage($message)) return;
 		//if($message->author->id === "305060807887159296") $message->react("❤️");
 		//Dont ask questions...
-		$packet = new EventMessageSent();
-		$packet->setMessage(ModelConverter::genModelMessage($message));
+		$packet = new EventMessageSent(ModelConverter::genModelMessage($message));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
 		if(!$this->checkMessage($message)) return;
-		$packet = new EventMessageUpdate();
-		$packet->setMessage(ModelConverter::genModelMessage($message));
+		$packet = new EventMessageUpdate(ModelConverter::genModelMessage($message));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
@@ -227,27 +225,22 @@ class DiscordEventHandler{
 	 * @param Discord                  $discord
 	 */
 	public function onMessageDelete($message, Discord $discord): void{
-		$packet = new EventMessageDelete();
-		$packet->setMessageId($message->id);
+		$packet = new EventMessageDelete($message->id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onMemberJoin(DiscordMember $member, Discord $discord): void{
-		$packet = new EventMemberJoin();
-		$packet->setMember(ModelConverter::genModelMember($member));
-		$packet->setUser(ModelConverter::genModelUser($member->user));
+		$packet = new EventMemberJoin(ModelConverter::genModelMember($member), ModelConverter::genModelUser($member->user));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onMemberUpdate(DiscordMember $member, Discord $discord): void{
-		$packet = new EventMemberUpdate();
-		$packet->setMember(ModelConverter::genModelMember($member));
+		$packet = new EventMemberUpdate(ModelConverter::genModelMember($member));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onMemberLeave(DiscordMember $member, Discord $discord): void{
-		$packet = new EventMemberLeave();
-		$packet->setMemberID($member->guild_id.".".$member->id);
+		$packet = new EventMemberLeave($member->guild_id.".".$member->id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
@@ -269,69 +262,56 @@ class DiscordEventHandler{
 			$members[] = ModelConverter::genModelMember($member);
 		}
 
-		$packet = new EventServerJoin();
-		$packet->setServer(ModelConverter::genModelServer($guild));
-		$packet->setChannels($channels);
-		$packet->setMembers($members);
-		$packet->setRoles($roles);
+		$packet = new EventServerJoin(ModelConverter::genModelServer($guild), $channels, $members, $roles);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onGuildUpdate(DiscordGuild $guild, Discord $discord): void{
-		$packet = new EventServerUpdate();
-		$packet->setServer(ModelConverter::genModelServer($guild));
+		$packet = new EventServerUpdate(ModelConverter::genModelServer($guild));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onGuildLeave(DiscordGuild $guild, Discord $discord): void{
-		$packet = new EventServerLeave();
-		$packet->setServerId($guild->id);
+		$packet = new EventServerLeave($guild->id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
 		$c = ModelConverter::genModelChannel($channel);
 		if($c === null) return;
-		$packet = new EventChannelCreate();
-		$packet->setChannel($c);
+		$packet = new EventChannelCreate($c);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
 		$c = ModelConverter::genModelChannel($channel);
 		if($c === null) return;
-		$packet = new EventChannelUpdate();
-		$packet->setChannel($c);
+		$packet = new EventChannelUpdate($c);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
-		$packet = new EventChannelDelete();
-		$packet->setChannelId($channel->id);
+		$packet = new EventChannelDelete($channel->id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onRoleCreate(DiscordRole $role, Discord $discord): void{
-		$packet = new EventRoleCreate();
-		$packet->setRole(ModelConverter::genModelRole($role));
+		$packet = new EventRoleCreate(ModelConverter::genModelRole($role));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onRoleUpdate(DiscordRole $role, Discord $discord): void{
-		$packet = new EventRoleUpdate();
-		$packet->setRole(ModelConverter::genModelRole($role));
+		$packet = new EventRoleUpdate(ModelConverter::genModelRole($role));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onRoleDelete(DiscordRole $role, Discord $discord): void{
-		$packet = new EventRoleDelete();
-		$packet->setRoleId($role->id);
+		$packet = new EventRoleDelete($role->id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
 	public function onInviteCreate(DiscordInvite $invite, Discord $discord): void{
-		$packet = new EventInviteCreate();
-		$packet->setInvite(ModelConverter::genModelInvite($invite));
+		$packet = new EventInviteCreate(ModelConverter::genModelInvite($invite));
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
@@ -340,8 +320,7 @@ class DiscordEventHandler{
 	 * @param Discord   $discord
 	 */
 	public function onInviteDelete(\stdClass $invite, Discord $discord): void{
-		$packet = new EventInviteDelete();
-		$packet->setInviteCode($invite->code);
+		$packet = new EventInviteDelete($invite->code);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
@@ -359,33 +338,28 @@ class DiscordEventHandler{
 				$b = $g->bans->offsetGet($ban->user_id);
 				if($b !== null){
 					MainLogger::getLogger()->debug("Successfully fetched bans, attached reason to new ban event.");
-					$packet = new EventBanAdd();
-					$packet->setBan(ModelConverter::genModelBan($b));
+					$packet = new EventBanAdd(ModelConverter::genModelBan($b));
 					$this->client->getThread()->writeOutboundData($packet);
 				}else{
 					MainLogger::getLogger()->debug("No ban after freshen ??? (IMPORTANT LOGIC ERROR)");
-					$packet = new EventBanAdd();
-					$packet->setBan(ModelConverter::genModelBan($ban));
+					$packet = new EventBanAdd(ModelConverter::genModelBan($ban));
 					$this->client->getThread()->writeOutboundData($packet);
 				}
 			}, function() use ($ban){
 				//Failed so just send ban with no reason.
 				MainLogger::getLogger()->debug("Failed to fetch bans even with ban_members permission, using old ban object.");
-				$packet = new EventBanAdd();
-				$packet->setBan(ModelConverter::genModelBan($ban));
+				$packet = new EventBanAdd(ModelConverter::genModelBan($ban));
 				$this->client->getThread()->writeOutboundData($packet);
 			});
 		}else{
 			MainLogger::getLogger()->debug("Bot does not have ban_members permission so no reason could be attached to this ban.");
-			$packet = new EventBanAdd();
-			$packet->setBan(ModelConverter::genModelBan($ban));
+			$packet = new EventBanAdd(ModelConverter::genModelBan($ban));
 			$this->client->getThread()->writeOutboundData($packet);
 		}
 	}
 
 	public function onBanRemove(DiscordBan $ban, Discord $discord): void{
-		$packet = new EventBanRemove();
-		$packet->setId($ban->guild_id.".".$ban->user_id);
+		$packet = new EventBanRemove($ban->guild_id.".".$ban->user_id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 

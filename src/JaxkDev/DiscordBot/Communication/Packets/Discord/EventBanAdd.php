@@ -20,19 +20,26 @@ class EventBanAdd extends Packet{
 	/** @var Ban */
 	private $ban;
 
+	public function __construct(Ban $ban){
+		parent::__construct();
+		$this->ban = $ban;
+	}
+
 	public function getBan(): Ban{
 		return $this->ban;
 	}
 
-	public function setBan(Ban $ban): void{
-		$this->ban = $ban;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->ban]);
+		return serialize([
+			$this->UID,
+			$this->ban
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->ban] = unserialize($data);
+		[
+			$this->UID,
+			$this->ban
+		] = unserialize($data);
 	}
 }

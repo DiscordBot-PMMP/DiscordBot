@@ -24,39 +24,30 @@ class Resolution extends Packet{
 	private $response;
 
 	/** @var array */
-	private $data = [];
+	private $data;
+
+	public function __construct(int $pid, bool $successful, string $response, array $data = []){
+		parent::__construct();
+		$this->pid = $pid;
+		$this->successful = $successful;
+		$this->response = $response;
+		$this->data = $data;
+	}
 
 	public function getPid(): int{
 		return $this->pid;
-	}
-
-	public function setPid(int $pid): void{
-		$this->pid = $pid;
 	}
 
 	public function wasSuccessful(): bool{
 		return $this->successful;
 	}
 
-	public function setSuccessful(bool $successful): void{
-		$this->successful = $successful;
-	}
-
-
 	public function getResponse(): string{
 		return $this->response;
 	}
 
-	public function setResponse(string $response): void{
-		$this->response = $response;
-	}
-
 	public function getData(): array{
 		return $this->data;
-	}
-
-	public function setData(array $data): void{
-		$this->data = $data;
 	}
 
 	public function serialize(): ?string{

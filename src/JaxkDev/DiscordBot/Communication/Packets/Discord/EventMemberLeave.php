@@ -19,19 +19,26 @@ class EventMemberLeave extends Packet{
 	/** @var string */
 	private $member_id;
 
+	public function __construct(string $member_id){
+		parent::__construct();
+		$this->member_id = $member_id;
+	}
+
 	public function getMemberID(): string{
 		return $this->member_id;
 	}
 
-	public function setMemberID(string $id): void{
-		$this->member_id = $id;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->member_id]);
+		return serialize([
+			$this->UID,
+			$this->member_id
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->member_id] = unserialize($data);
+		[
+			$this->UID,
+			$this->member_id
+		] = unserialize($data);
 	}
 }

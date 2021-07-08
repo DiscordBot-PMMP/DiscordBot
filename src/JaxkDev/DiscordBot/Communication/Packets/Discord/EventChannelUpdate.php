@@ -20,19 +20,26 @@ class EventChannelUpdate extends Packet{
 	/** @var ServerChannel */
 	private $channel;
 
+	public function __construct(ServerChannel $channel){
+		parent::__construct();
+		$this->channel = $channel;
+	}
+
 	public function getChannel(): ServerChannel{
 		return $this->channel;
 	}
 
-	public function setChannel(ServerChannel $channel): void{
-		$this->channel = $channel;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->channel]);
+		return serialize([
+			$this->UID,
+			$this->channel
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->channel] = unserialize($data);
+		[
+			$this->UID,
+			$this->channel
+		] = unserialize($data);
 	}
 }

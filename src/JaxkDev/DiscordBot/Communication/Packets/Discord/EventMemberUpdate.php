@@ -20,19 +20,26 @@ class EventMemberUpdate extends Packet{
 	/** @var Member */
 	private $member;
 
+	public function __construct(Member $member){
+		parent::__construct();
+		$this->member = $member;
+	}
+
 	public function getMember(): Member{
 		return $this->member;
 	}
 
-	public function setMember(Member $member): void{
-		$this->member = $member;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->member]);
+		return serialize([
+			$this->UID,
+			$this->member
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->member] = unserialize($data);
+		[
+			$this->UID,
+			$this->member
+		] = unserialize($data);
 	}
 }

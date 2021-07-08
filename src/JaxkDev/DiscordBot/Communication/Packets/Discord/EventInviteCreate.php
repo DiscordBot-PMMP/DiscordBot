@@ -20,19 +20,26 @@ class EventInviteCreate extends Packet{
 	/** @var Invite */
 	private $invite;
 
+	public function __construct(Invite $invite){
+		parent::__construct();
+		$this->invite = $invite;
+	}
+
 	public function getInvite(): Invite{
 		return $this->invite;
 	}
 
-	public function setInvite(Invite $invite): void{
-		$this->invite = $invite;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->invite]);
+		return serialize([
+			$this->UID,
+			$this->invite
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->invite] = unserialize($data);
+		[
+			$this->UID,
+			$this->invite
+		] = unserialize($data);
 	}
 }

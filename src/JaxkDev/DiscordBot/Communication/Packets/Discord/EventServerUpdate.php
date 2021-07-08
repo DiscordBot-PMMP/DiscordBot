@@ -20,19 +20,26 @@ class EventServerUpdate extends Packet{
 	/** @var Server */
 	private $server;
 
+	public function __construct(Server $server){
+		parent::__construct();
+		$this->server = $server;
+	}
+
 	public function getServer(): Server{
 		return $this->server;
 	}
 
-	public function setServer(Server $server): void{
-		$this->server = $server;
-	}
-
 	public function serialize(): ?string{
-		return serialize([$this->UID, $this->server]);
+		return serialize([
+			$this->UID,
+			$this->server
+		]);
 	}
 
 	public function unserialize($data): void{
-		[$this->UID, $this->server] = unserialize($data);
+		[
+			$this->UID,
+			$this->server
+		] = unserialize($data);
 	}
 }
