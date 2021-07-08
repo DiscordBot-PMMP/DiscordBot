@@ -43,7 +43,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
@@ -97,11 +99,13 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestAddRole) $this->handleAddRole($pk);
 		elseif($pk instanceof RequestRemoveRole) $this->handleRemoveRole($pk);
 		elseif($pk instanceof RequestCreateRole) $this->handleCreateRole($pk);
+		elseif($pk instanceof RequestUpdateRole) $this->handleUpdateRole($pk);
 		elseif($pk instanceof RequestDeleteRole) $this->handleDeleteRole($pk);
 		elseif($pk instanceof RequestKickMember) $this->handleKickMember($pk);
 		elseif($pk instanceof RequestInitialiseInvite) $this->handleInitialiseInvite($pk);
 		elseif($pk instanceof RequestRevokeInvite) $this->handleRevokeInvite($pk);
 		elseif($pk instanceof RequestCreateChannel) $this->handleCreateChannel($pk);
+		elseif($pk instanceof RequestUpdateChannel) $this->handleUpdateChannel($pk);
 		elseif($pk instanceof RequestDeleteChannel) $this->handleDeleteChannel($pk);
 		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
@@ -135,6 +139,32 @@ class CommunicationHandler{
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to create role.", [$e->getMessage(), $e->getTraceAsString()]);
 				MainLogger::getLogger()->debug("Failed to create role ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
+	}
+
+	private function handleUpdateRole(RequestUpdateRole $pk): void{
+		if($pk->getRole()->getId() === null){
+			$this->resolveRequest($pk->getUID(), false, "Failed to update role.", ["Role ID must be present."]);
+			return;
+		}
+		$this->getServer($pk, $pk->getRole()->getServerId(), function(DiscordGuild $guild) use($pk){
+			$guild->roles->fetch($pk->getRole()->getId())->then(function(DiscordRole $role) use($guild, $pk){
+				$role->position = $pk->getRole()->getHoistedPosition();
+				$role->hoist = $pk->getRole()->isHoisted();
+				$role->mentionable = $pk->getRole()->isMentionable();
+				$role->name = $pk->getRole()->getName();
+				$role->color = $pk->getRole()->getColour();
+				$role->permissions->bitwise = $pk->getRole()->getPermissions()->getBitwise();
+				$guild->roles->save($role)->then(function(DiscordRole $role) use($pk){
+					$this->resolveRequest($pk->getUID(), true, "Updated role.", [ModelConverter::genModelRole($role)]);
+				}, function(\Throwable $e) use($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to update role.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to create role ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to update role.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to update role ({$pk->getUID()}) - role error: {$e->getMessage()}");
 			});
 		});
 	}
@@ -241,6 +271,57 @@ class CommunicationHandler{
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to create channel.", [$e->getMessage(), $e->getTraceAsString()]);
 				MainLogger::getLogger()->debug("Failed to create channel ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
+	}
+
+	private function handleUpdateChannel(RequestUpdateChannel $pk): void{
+		if($pk->getChannel()->getId() === null){
+			$this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel ID must be present."]);
+			return;
+		}
+		$this->getServer($pk, $pk->getChannel()->getServerId(), function(DiscordGuild $guild) use($pk){
+			$guild->channels->fetch($pk->getChannel()->getId())->then(function(DiscordChannel $dc) use($guild, $pk){
+				$channel = $pk->getChannel();
+				$dc->name = $pk->getChannel()->getName();
+				$dc->position = $pk->getChannel()->getPosition();
+				if($pk->getChannel()->getCategoryId() !== null){
+					$dc->parent_id = $pk->getChannel()->getCategoryId();
+				}
+				//todo overwrites. (permissions)
+				if($channel instanceof CategoryChannel){
+					if($dc->type !== DiscordChannel::TYPE_CATEGORY){
+						$this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type change is not allowed."]);
+						return;
+					}
+				}elseif($channel instanceof VoiceChannel){
+					if($dc->type !== DiscordChannel::TYPE_VOICE){
+						$this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type change is not allowed."]);
+						return;
+					}
+					$dc->bitrate = $channel->getBitrate();
+					$dc->user_limit = $channel->getMemberLimit();
+				}elseif($channel instanceof TextChannel){
+					if($dc->type !== DiscordChannel::TYPE_TEXT){
+						$this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type change is not allowed."]);
+						return;
+					}
+					$dc->topic = $channel->getTopic();
+					$dc->nsfw = $channel->isNsfw();
+					$dc->rate_limit_per_user = $channel->getRateLimit()??0;
+				}else{
+					$this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type is unknown."]);
+					throw new \AssertionError("What channel type is this ?? '".get_class($channel)."'");
+				}
+				$guild->channels->save($dc)->then(function(DiscordChannel $channel) use($pk){
+					$this->resolveRequest($pk->getUID(), true, "Updated channel.", [ModelConverter::genModelChannel($channel)]);
+				}, function(\Throwable $e) use($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to update channel.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to update channel ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to update channel.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to update channel ({$pk->getUID()}) - channel error: {$e->getMessage()}");
 			});
 		});
 	}

@@ -101,7 +101,6 @@ class Message implements \Serializable{
 		$this->content = $content;
 	}
 
-	//TODO think about this...
 	public function getEmbed(): ?Embed{
 		return $this->embed;
 	}

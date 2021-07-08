@@ -32,7 +32,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
@@ -46,8 +48,8 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 /*
  * TODO:
  * - Update Permissions (member)
- * - Update Channel
- * - Update Role
+ * - Fetch Message
+ * - Fetch Channel Pins (entire message obj's)
  *
  * V3.x or v2.1+ (depending on BC):
  * - Register listener (messages, reactions etc)
@@ -56,6 +58,8 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * To Test:
  * - Create Channel
  * - Create Role
+ * - Update Role
+ * - Update Channel
  *
  * Tested:
  * - Leave Server
@@ -121,6 +125,21 @@ class Api{
 	 */
 	public function createRole(Role $role): PromiseInterface{
 		$pk = new RequestCreateRole($role);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Update a already created role, ID must be present.
+	 *
+	 * @param Role $role
+	 * @return PromiseInterface
+	 */
+	public function updateRole(Role $role): PromiseInterface{
+		if($role->getId() === null){
+			throw new \AssertionError("Role ID must be present when updating.");
+		}
+		$pk = new RequestUpdateRole($role);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
@@ -395,6 +414,18 @@ class Api{
 	 */
 	public function createChannel(ServerChannel $channel): PromiseInterface{
 		$pk = new RequestCreateChannel($channel);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Update a server channel, ID Must be present.
+	 *
+	 * @param ServerChannel $channel
+	 * @return PromiseInterface
+	 */
+	public function updateChannel(ServerChannel $channel): PromiseInterface{
+		$pk = new RequestUpdateChannel($channel);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}
