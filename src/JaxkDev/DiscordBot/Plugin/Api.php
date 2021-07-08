@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
@@ -35,6 +36,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Webhook;
@@ -43,16 +45,16 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
  * TODO:
- * - Update Permissions (channel,role,member)
+ * - Update Permissions (member)
  * - Update Channel
  * - Update Role
- * - Create Channel
  *
  * V3.x or v2.1+ (depending on BC):
  * - Register listener (messages, reactions etc)
  * - Unregister listener
  *
  * To Test:
+ * - Create Channel
  * - Create Role
  *
  * Tested:
@@ -412,6 +414,19 @@ class Api{
 		$pk = new RequestDeleteMessage();
 		$pk->setMessageId($message_id);
 		$pk->setChannelId($channel_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Create a server channel.
+	 *
+	 * @param ServerChannel $channel CategoryChannel, TextChannel or VoiceChannel.
+	 * @return PromiseInterface
+	 */
+	public function createChannel(ServerChannel $channel): PromiseInterface{
+		$pk = new RequestCreateChannel();
+		$pk->setChannel($channel);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}

@@ -27,6 +27,7 @@ use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
@@ -50,6 +51,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
+use JaxkDev\DiscordBot\Models\Channels\TextChannel;
+use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Messages\Reply;
 use pocketmine\utils\MainLogger;
 
@@ -97,6 +101,7 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestKickMember) $this->handleKickMember($pk);
 		elseif($pk instanceof RequestInitialiseInvite) $this->handleInitialiseInvite($pk);
 		elseif($pk instanceof RequestRevokeInvite) $this->handleRevokeInvite($pk);
+		elseif($pk instanceof RequestCreateChannel) $this->handleCreateChannel($pk);
 		elseif($pk instanceof RequestDeleteChannel) $this->handleDeleteChannel($pk);
 		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
@@ -201,6 +206,41 @@ class CommunicationHandler{
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to react to message.", [$e->getMessage(), $e->getTraceAsString()]);
 				MainLogger::getLogger()->debug("Failed to react to message ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
+	}
+
+	private function handleCreateChannel(RequestCreateChannel $pk): void{
+		$this->getServer($pk, $pk->getChannel()->getServerId(), function(DiscordGuild $guild) use($pk){
+			$c = $pk->getChannel();
+			/** @var DiscordChannel $dc */
+			$dc = $guild->channels->create([
+				'name' => $c->getName(),
+				'position' => $c->getPosition(),
+				'guild_id' => $guild->id
+			]);
+			if($c->getCategoryId() !== null){
+				$dc->parent_id = $c->getCategoryId();
+			}
+			//todo overwrites. (permissions)
+			if($c instanceof CategoryChannel){
+				$dc->type = DiscordChannel::TYPE_CATEGORY;
+			}elseif($c instanceof VoiceChannel){
+				$dc->type = DiscordChannel::TYPE_VOICE;
+				$dc->bitrate = $c->getBitrate();
+				$dc->user_limit = $c->getMemberLimit();
+			}elseif($c instanceof TextChannel){
+				$dc->topic = $c->getTopic();
+				$dc->nsfw = $c->isNsfw();
+				$dc->rate_limit_per_user = $c->getRateLimit()??0;
+			}else{
+				throw new \AssertionError("What channel type is this ?? '".get_class($c)."'");
+			}
+			$guild->channels->save($dc)->then(function(DiscordChannel $channel) use($pk){
+				$this->resolveRequest($pk->getUID(), true, "Created channel.", [ModelConverter::genModelChannel($channel)]);
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to create channel.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to create channel ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}

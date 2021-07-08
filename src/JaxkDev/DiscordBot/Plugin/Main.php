@@ -181,6 +181,9 @@ class Main extends PluginBase{
 		}, $this->inboundData->chunk($count, false));
 	}
 
+	/**
+	 * @internal INTERNAL USE ONLY.
+	 */
 	public function writeOutboundData(Packet $packet): void{
 		$this->outboundData[] = serialize($packet);
 	}
