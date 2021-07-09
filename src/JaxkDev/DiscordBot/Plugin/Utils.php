@@ -23,7 +23,7 @@ abstract class Utils{
 		$len = strlen($snowflake);
 		if($len < 17 or $len > 18) return false;
 		$timestamp = self::getDiscordSnowflakeTimestamp($snowflake);
-		if($timestamp > time() or $timestamp <= 1420070400) return false;
+		if($timestamp > time()+86400 or $timestamp <= 1420070400) return false; //+86400 (24h for any timezone problems)
 		return true;
 	}
 }
