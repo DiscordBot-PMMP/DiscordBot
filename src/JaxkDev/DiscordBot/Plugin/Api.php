@@ -47,7 +47,6 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
  * TODO:
- * - Update Permissions (member), todo find out what this was exactly
  * - Fetch Message
  * - Pin Message
  * - Fetch Channel Pins (entire message obj's)
@@ -56,10 +55,10 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Register listener (messages, reactions etc)
  * - Unregister listener
  *
- * To Test:
- * - Create Role (Pending external investigation)
- * - Update Role (Pending external investigation)
- * - Update Channel (Pending external changes or internal workaround (re-create))
+ * Pending:
+ * - Create Role (Cannot create position, https://github.com/discord-php/DiscordPHP/issues/556)
+ * - Update Role (Cannot update position, ^)
+ * - Update Channel (Majority of attributes cant be updated, https://github.com/discord-php/DiscordPHP/issues/555)
  *
  * Tested:
  * - Create Channel
@@ -138,7 +137,7 @@ class Api{
 	 */
 	public function updateRole(Role $role): PromiseInterface{
 		if($role->getId() === null){
-			throw new \AssertionError("Role ID must be present when updating.");
+			return rejectPromise(new ApiRejection("Role ID must be present when updating."));
 		}
 		$pk = new RequestUpdateRole($role);
 		$this->plugin->writeOutboundData($pk);
