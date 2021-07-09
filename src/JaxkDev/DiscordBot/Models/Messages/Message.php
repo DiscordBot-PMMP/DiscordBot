@@ -23,7 +23,7 @@ class Message implements \Serializable{
 	/** @var string (<=2000) Possibly empty with attachments/embeds. */
 	protected $content = "";
 
-	/** @var ?Embed */
+	/** @var ?Embed Note gateway v9 / dphp7 supports several embeds and attachments in normal messages. */
 	protected $embed;
 
 	/** @var ?string MemberID, Null when sending or receiving webhook messages.*/

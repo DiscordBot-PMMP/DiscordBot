@@ -38,11 +38,13 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveServer;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
@@ -96,6 +98,8 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestRemoveReaction) $this->handleRemoveReaction($pk);
 		elseif($pk instanceof RequestRemoveAllReactions) $this->handleRemoveAllReactions($pk);
 		elseif($pk instanceof RequestDeleteMessage) $this->handleDeleteMessage($pk);
+		elseif($pk instanceof RequestPinMessage) $this->handlePinMessage($pk);
+		elseif($pk instanceof RequestUnpinMessage) $this->handleUnpinMessage($pk);
 		elseif($pk instanceof RequestAddRole) $this->handleAddRole($pk);
 		elseif($pk instanceof RequestRemoveRole) $this->handleRemoveRole($pk);
 		elseif($pk instanceof RequestCreateRole) $this->handleCreateRole($pk);
@@ -110,6 +114,32 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
 		elseif($pk instanceof RequestLeaveServer) $this->handleLeaveServer($pk);
+	}
+
+	private function handleUnpinMessage(RequestUnpinMessage $pk): void{
+		$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+			$this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $message) use($channel, $pk){
+				$channel->unpinMessage($message)->then(function() use($pk){
+					$this->resolveRequest($pk->getUID(), true, "Successfully unpinned the message.");
+				}, function(\Throwable $e) use($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to unpin the message.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to pin the message ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			});
+		});
+	}
+
+	private function handlePinMessage(RequestPinMessage $pk): void{
+		$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+			$this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $message) use($channel, $pk){
+				$channel->pinMessage($message)->then(function() use($pk){
+					$this->resolveRequest($pk->getUID(), true, "Successfully pinned the message.");
+				}, function(\Throwable $e) use($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to pin the message.", [$e->getMessage(), $e->getTraceAsString()]);
+					MainLogger::getLogger()->debug("Failed to pin the message ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			});
+		});
 	}
 
 	private function handleLeaveServer(RequestLeaveServer $pk): void{

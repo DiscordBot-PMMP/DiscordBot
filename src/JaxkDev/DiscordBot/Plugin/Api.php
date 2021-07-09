@@ -25,12 +25,14 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveServer;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
@@ -48,7 +50,6 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 /*
  * TODO:
  * - Fetch Message
- * - Pin Message
  * - Fetch Channel Pins (entire message obj's)
  *
  * v2.1+ :
@@ -61,6 +62,8 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Update Channel (Majority of attributes cant be updated, https://github.com/discord-php/DiscordPHP/issues/555)
  *
  * Tested:
+ * - Unpin Message
+ * - Pin Message
  * - Create Channel
  * - Leave Server
  * - Ban
@@ -113,6 +116,44 @@ class Api{
 			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
 		}
 		$pk = new RequestLeaveServer($server_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Pin a message to the channel.
+	 *
+	 * @param string $channel_id
+	 * @param string $message_id
+	 * @return PromiseInterface
+	 */
+	public function pinMessage(string $channel_id, string $message_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($message_id)){
+			return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
+		}
+		$pk = new RequestPinMessage($channel_id, $message_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Un-pin a message to the channel.
+	 *
+	 * @param string $channel_id
+	 * @param string $message_id
+	 * @return PromiseInterface
+	 */
+	public function unpinMessage(string $channel_id, string $message_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($message_id)){
+			return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
+		}
+		$pk = new RequestUnpinMessage($channel_id, $message_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}

@@ -13,9 +13,7 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Models\Activity;
-use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Member;
-use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DataDump;
@@ -106,15 +104,6 @@ class BotCommunicationHandler{
 		$this->plugin->getApi()->updateActivity($ac)->otherwise(function(ApiRejection $a){
 			MainLogger::getLogger()->logException($a);
 		});
-
-
-		$role = new Role("Jaxk", 0x210021, true, 2, true, "554059221847638040");
-		$this->plugin->getApi()->createRole($role)->then(function(ApiResolution $a){
-			var_dump($a);
-		}, function(ApiRejection $a){
-			var_dump($a);
-		});
-
 
 		(new DiscordReady($this->plugin))->call();
 	}
