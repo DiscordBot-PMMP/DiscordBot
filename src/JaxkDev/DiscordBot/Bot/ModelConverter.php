@@ -154,8 +154,11 @@ abstract class ModelConverter{
 		if($discordChannel->guild_id === null){
 			throw new AssertionError("Guild ID must be present.");
 		}
+		$ids = array_map(function($id) use($discordChannel){
+			return $discordChannel->guild->id.".$id";
+		}, array_keys($discordChannel->members->toArray()));
 		return self::applyPermissionOverwrites($discordChannel, new VoiceChannel($discordChannel->bitrate, $discordChannel->user_limit,
-			$discordChannel->name, $discordChannel->position, $discordChannel->guild_id, array_keys($discordChannel->members->toArray()),
+			$discordChannel->name, $discordChannel->position, $discordChannel->guild_id, $ids,
 			$discordChannel->parent_id, $discordChannel->id));
 	}
 
