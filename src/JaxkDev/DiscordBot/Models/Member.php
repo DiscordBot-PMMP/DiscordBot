@@ -39,7 +39,9 @@ class Member implements \Serializable{
 	private $server_id;
 
 	///** @var Activity */
-	//private $activity; Activities are actually from member :/
+	//private $activity; Activities are actually from member :/ TODO INVESTIGATE, Can probably go around this and link to user if not member specific.
+
+	//Voice Activity
 
 	/**
 	 * Member constructor.

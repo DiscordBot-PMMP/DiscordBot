@@ -80,8 +80,8 @@ class Main extends PluginBase{
 		if(!$this->loadConfig()) return;
 		if(is_file($this->getDataFolder()."events.yml")){
 			// Don't delete file, DiscordChat will transfer it then delete it.
-			$this->getLogger()->alert("DiscordBot v1 events.yml file found, please note this has been stripped out of
-			the DiscordBot core, see https://github.com/DiscordBot-PMMP/DiscordChat for similar features.");
+			$this->getLogger()->alert("DiscordBot v1 events.yml file found, please note this has been stripped out of ".
+				"the DiscordBot core, see https://github.com/DiscordBot-PMMP/DiscordChat for similar features.");
 		}
 		if(extension_loaded("xdebug")){
 			if(ini_get("xdebug.output_dir") === $this->getDataFolder()){
@@ -91,6 +91,11 @@ class Main extends PluginBase{
 				$this->getServer()->getPluginManager()->disablePlugin($this);
 				return;
 			}
+		}
+		if($this->getServer()->getTick() !== 0 and PHP_VERSION_ID >= 80000 and PHP_OS === "Darwin"){
+			$this->getLogger()->emergency("Plugin not loaded on server start, self disabling to prevent crashes on MacOS running PHP8.");
+			$this->getServer()->getPluginManager()->disablePlugin($this);
+			return;
 		}
 
 		$this->api = new Api($this);
@@ -207,7 +212,7 @@ class Main extends PluginBase{
 				$this->tickTask->cancel();
 			}
 		}
-		if($this->discordBot->isRunning()){
+		if($this->discordBot !== null and $this->discordBot->isRunning()){
 			//Stopping while bot is not ready (midway through data dump) causes it to wait.
 			$this->discordBot->setStatus(Protocol::THREAD_STATUS_CLOSING);
 			$this->getLogger()->warning("Closing the thread, if doing a data pack or heavy duty tasks this can take a few moments.");

@@ -85,6 +85,10 @@ class DiscordEventHandler{
 		$discord->on("GUILD_BAN_ADD", [$this, "onBanAdd"]);
 		$discord->on("GUILD_BAN_REMOVE", [$this, "onBanRemove"]);
 
+		/*$discord->on("PRESENCE_UPDATE", function(...$args){
+			var_dump($args);
+		});*/
+
 		/*$discord->on("VOICE_STATE_UPDATE", function (DiscordVoiceStateUpdate $state, Discord $discord) {
 			var_dump($state);
 		});*/
@@ -92,10 +96,11 @@ class DiscordEventHandler{
 		/*
 		 * TODO:
 		 * - Voice State Update (track members voice activity, join voice channel, leave voice channel, self deafen/mute)
-		 * - Reactions (Probably wont store previous reactions, could be very large...)
+		 * - Reactions (Probably wont store previous reactions, could be very large, add fetchReactions into API.)
 		 *
 		 * TODO (TBD):
-		 * - Pins (Note event only emits the pins for the channel not if one was added/deleted/unpinned etc.)
+		 * - Presence updates.
+		 * - Pins (Note event only emits the pins for the channel not if one was added/deleted/unpinned etc, handle plugin side to check against storage.)
 		 */
 	}
 
@@ -271,7 +276,7 @@ array(5) {
 
 		$pk->setBotUser(ModelConverter::genModelUser($client->user));
 
-		MainLogger::getLogger()->debug("Data pack Took: ".round(microtime(true)-$t, 5)."s & ".
+		MainLogger::getLogger()->debug("Data pack took: ".round(microtime(true)-$t, 5)."s & ".
 			round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
 
 		//Very important to check status before overwriting, can cause dangerous behaviour.
