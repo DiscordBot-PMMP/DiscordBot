@@ -85,14 +85,98 @@ class DiscordEventHandler{
 		$discord->on("GUILD_BAN_ADD", [$this, "onBanAdd"]);
 		$discord->on("GUILD_BAN_REMOVE", [$this, "onBanRemove"]);
 
+		/*$discord->on("VOICE_STATE_UPDATE", function (DiscordVoiceStateUpdate $state, Discord $discord) {
+			var_dump($state);
+		});*/
+
 		/*
 		 * TODO:
+		 * - Voice State Update (track members voice activity, join voice channel, leave voice channel, self deafen/mute)
 		 * - Reactions (Probably wont store previous reactions, could be very large...)
 		 *
 		 * TODO (TBD):
 		 * - Pins (Note event only emits the pins for the channel not if one was added/deleted/unpinned etc.)
 		 */
 	}
+
+	/*
+Some timing notes.
+array(5) {
+  ["server"]=>
+  array(2) {
+    [0]=>
+    float(0.00259)
+    [1]=>
+    int(46)
+  }
+  ["channel"]=>
+  array(2) {
+    [0]=>
+    float(0.33944)
+    [1]=>
+    int(2721)
+  }
+  ["role"]=>
+  array(2) {
+    [0]=>
+    float(0.03372)
+    [1]=>
+    int(1497)
+  }
+  ["member"]=>
+  array(2) {
+    [0]=>
+    float(0.11359)
+    [1]=>
+    int(436)
+  }
+  ["user"]=>
+  array(2) {
+    [0]=>
+    float(0.00466)
+    [1]=>
+    int(259)
+  }
+}
+
+array(5) {
+  ["server"]=>
+  array(2) {
+    [0]=>
+    float(0.012749999999999975)
+    [1]=>
+    int(46)
+  }
+  ["channel"]=>
+  array(2) {
+    [0]=>
+    float(0.30067999999999995)
+    [1]=>
+    int(2721)
+  }
+  ["role"]=>
+  array(2) {
+    [0]=>
+    float(0.03301)
+    [1]=>
+    int(1497)
+  }
+  ["member"]=>
+  array(2) {
+    [0]=>
+    float(0.17436000000000001)
+    [1]=>
+    int(435)
+  }
+  ["user"]=>
+  array(2) {
+    [0]=>
+    float(0.01252)
+    [1]=>
+    int(258)
+  }
+}
+	 */
 
 	public function onReady(): void{
 		if($this->client->getThread()->getStatus() !== Protocol::THREAD_STATUS_STARTED){

@@ -92,6 +92,7 @@ class Client{
 			Intents::GUILD_INVITES,
 			Intents::GUILD_PRESENCES,
 			Intents::GUILD_MESSAGES,
+			//Intents::GUILD_VOICE_STATES, For voice state update
 			Intents::DIRECT_MESSAGES
 		];
 
