@@ -60,7 +60,12 @@ use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Messages\Reply;
+use JaxkDev\DiscordBot\Models\Role;
+use JaxkDev\DiscordBot\Plugin\ApiRejection;
 use pocketmine\utils\MainLogger;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
+use function React\Promise\reject;
 
 class CommunicationHandler{
 
@@ -166,12 +171,78 @@ class CommunicationHandler{
 				'position' => $r->getHoistedPosition(),
 				'mentionable' => $r->isMentionable()
 			])->then(function(DiscordRole $role) use($pk){
-				$this->resolveRequest($pk->getUID(), true, "Created role.", [ModelConverter::genModelRole($role)]);
+				$this->handleUpdateRolePosition($pk->getRole())->then(function() use($role, $pk){
+					$this->resolveRequest($pk->getUID(), true, "Created role.", [ModelConverter::genModelRole($role)]);
+				}, function(ApiRejection $rejection) use($pk){
+					$this->resolveRequest($pk->getUID(), false, $rejection->getMessage(), [$rejection->getMessage(), $rejection->getTraceAsString()]);
+				});
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to create role.", [$e->getMessage(), $e->getTraceAsString()]);
 				MainLogger::getLogger()->debug("Failed to create role ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
+	}
+
+	private function handleUpdateRolePosition(Role $role): PromiseInterface{
+		if($role->getId() === null){
+			return reject(new ApiRejection("Role does not have a ID."));
+		}
+		if($role->getId() === $role->getServerId()){
+			return reject(new ApiRejection("Cannot move the default 'everyone' role."));
+		}
+		$promise = new Deferred();
+
+		$this->client->getDiscordClient()->guilds->fetch($role->getServerId())->done(function(DiscordGuild $guild) use($promise, $role){
+			//Sort
+			$arr = $guild->roles->toArray();
+			$keys = array_values(array_map(function(DiscordRole $role){
+				return $role->position;
+			}, $arr));
+			$val = array_keys($arr);
+			$data = array_combine($keys, $val);
+			if($data === false){
+				$promise->reject(new ApiRejection("Internal error occurred while updating role positions."));
+				throw new \AssertionError("Keys do not match the associated ID's of the role positions.  (If you see this please open a github issue.)");
+			}
+			/** @var DiscordRole|null $k */
+			$k = $arr[$role->getId()];
+			if($k === null){
+				$promise->reject(new ApiRejection("Cannot update role positions, role not found."));
+				return;
+			}
+			//shift
+			$diff = $role->getHoistedPosition()-$k->position; //How much are we shifting.
+			if($diff === 0){
+				MainLogger::getLogger()->debug("Not updating role position ({$k->id}), no difference found.");
+				$promise->resolve();
+				return;
+			}
+			$v = $k->id;
+			$k = $k->position;
+			if($diff > 0){
+				for($i = $k+1; $i <= $k+$diff; $i++){
+					$data[$i-1] = $data[$i];
+				}
+				$data[$k+$diff] = $v;
+			}else{
+				for($i = $k-1; $i >= $k+$diff; $i--){
+					$data[$i+1] = $data[$i];
+				}
+				$data[$k+$diff] = $v;
+			}
+			//save
+			$guild->updateRolePositions($data)->then(function(DiscordGuild $guild) use($promise){
+				$promise->resolve();
+			}, function(\Throwable $e) use($promise){
+				$promise->reject(new ApiRejection("Failed to update role positions.", [$e->getMessage(), $e->getTraceAsString()]));
+				MainLogger::getLogger()->debug("Failed to update role positions, error: {$e->getMessage()}");
+			});
+		}, function(\Throwable $e) use($promise){
+			$promise->reject(new ApiRejection("Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]));
+			MainLogger::getLogger()->debug("Failed to update role position - server error: {$e->getMessage()}");
+		});
+
+		return $promise->promise();
 	}
 
 	private function handleUpdateRole(RequestUpdateRole $pk): void{
@@ -188,7 +259,15 @@ class CommunicationHandler{
 				$role->color = $pk->getRole()->getColour();
 				$role->permissions->bitwise = $pk->getRole()->getPermissions()->getBitwise();
 				$guild->roles->save($role)->then(function(DiscordRole $role) use($pk){
-					$this->resolveRequest($pk->getUID(), true, "Updated role.", [ModelConverter::genModelRole($role)]);
+					if($pk->getRole()->getId() !== $pk->getRole()->getServerId()){
+						$this->handleUpdateRolePosition($pk->getRole())->then(function() use ($role, $pk){
+							$this->resolveRequest($pk->getUID(), true, "Updated role & position.", [ModelConverter::genModelRole($role)]);
+						}, function(ApiRejection $rejection) use ($pk){
+							$this->resolveRequest($pk->getUID(), false, "Updated role however failed to update position: ".$rejection->getMessage(), [$rejection->getMessage(), $rejection->getTraceAsString()]);
+						});
+					}else{
+						$this->resolveRequest($pk->getUID(), true, "Updated role.", [ModelConverter::genModelRole($role)]);
+					}
 				}, function(\Throwable $e) use($pk){
 					$this->resolveRequest($pk->getUID(), false, "Failed to update role.", [$e->getMessage(), $e->getTraceAsString()]);
 					MainLogger::getLogger()->debug("Failed to create role ({$pk->getUID()}) - {$e->getMessage()}");

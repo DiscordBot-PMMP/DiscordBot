@@ -56,11 +56,9 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * - Register listener (messages, reactions etc)
  * - Unregister listener
  *
- * Pending:
- * - Create Role (Cannot create position, https://github.com/discord-php/DiscordPHP/issues/556)
- * - Update Role (Cannot update position, ^)
- *
  * Tested:
+ * - Create Role (https://github.com/discord-php/DiscordPHP/issues/556)
+ * - Update Role (^)
  * - Update Channel
  * - Unpin Message
  * - Pin Message
@@ -103,7 +101,7 @@ class Api{
 		$this->plugin = $plugin;
 	}
 
-	//Technically we could make our own servers but that would mean bot with owner permissions and that could get dodgy.
+	//Technically we could make our own servers but that would mean bot has owner permissions (overriding admin) and I don't want that ever.
 
 	/**
 	 * Leave a discord server.
@@ -172,6 +170,10 @@ class Api{
 
 	/**
 	 * Update a already created role, ID must be present.
+	 *
+	 * Note you cannot change the hoisted position of the 'everyone' role, or move any role higher than the bots highest role.
+	 *
+	 * If hoisted position changed, all roles that move to account for the change will emit an updated event.
 	 *
 	 * @param Role $role
 	 * @return PromiseInterface
