@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c0a9ef1a8358637ae9396c474614613a",
+    "content-hash": "0eeb26f250414977b5c44cb783eade5b",
     "packages": [
         {
             "name": "discord-php/http",
@@ -224,16 +224,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "df991fd88693ab703aa403413d83e15f688dae33"
+                "reference": "9738e495f288eec0b187e310b7cdbbb285777dbe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/df991fd88693ab703aa403413d83e15f688dae33",
-                "reference": "df991fd88693ab703aa403413d83e15f688dae33",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/9738e495f288eec0b187e310b7cdbbb285777dbe",
+                "reference": "9738e495f288eec0b187e310b7cdbbb285777dbe",
                 "shasum": ""
             },
             "require": {
@@ -304,7 +304,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Seldaek/monolog/issues",
-                "source": "https://github.com/Seldaek/monolog/tree/2.3.0"
+                "source": "https://github.com/Seldaek/monolog/tree/2.3.1"
             },
             "funding": [
                 {
@@ -316,7 +316,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-07-05T11:34:13+00:00"
+            "time": "2021-07-14T11:56:39+00:00"
         },
         {
             "name": "nesbot/carbon",
@@ -1180,23 +1180,23 @@
         },
         {
             "name": "react/promise",
-            "version": "v2.8.0",
+            "version": "2.x-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/reactphp/promise.git",
-                "reference": "f3cff96a19736714524ca0dd1d4130de73dbbbc4"
+                "url": "https://github.com/DiscordBot-PMMP/promise.git",
+                "reference": "c2525d2de231f0a4e565647f9a8f06b521ca658b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/f3cff96a19736714524ca0dd1d4130de73dbbbc4",
-                "reference": "f3cff96a19736714524ca0dd1d4130de73dbbbc4",
+                "url": "https://api.github.com/repos/DiscordBot-PMMP/promise/zipball/c2525d2de231f0a4e565647f9a8f06b521ca658b",
+                "reference": "c2525d2de231f0a4e565647f9a8f06b521ca658b",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^7.0 || ^6.5 || ^5.7 || ^4.8.36"
+                "phpunit/phpunit": "^9.3 || ^5.7 || ^4.8.36"
             },
             "type": "library",
             "autoload": {
@@ -1207,7 +1207,14 @@
                     "src/functions_include.php"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "React\\Promise\\": [
+                        "tests",
+                        "tests/fixtures"
+                    ]
+                }
+            },
             "license": [
                 "MIT"
             ],
@@ -1223,10 +1230,9 @@
                 "promises"
             ],
             "support": {
-                "issues": "https://github.com/reactphp/promise/issues",
-                "source": "https://github.com/reactphp/promise/tree/v2.8.0"
+                "source": "https://github.com/DiscordBot-PMMP/promise/tree/2.x"
             },
-            "time": "2020-05-12T15:16:56+00:00"
+            "time": "2021-07-19T13:45:21+00:00"
         },
         {
             "name": "react/promise-stream",
@@ -2151,16 +2157,16 @@
         },
         {
             "name": "team-reflex/discord-php",
-            "version": "v6.0.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/discord-php/DiscordPHP.git",
-                "reference": "1bd7abde74587c9b94eda228b349d2e97dc9a686"
+                "url": "https://github.com/DiscordBot-PMMP/DiscordPHP.git",
+                "reference": "1eca9cd1a6459b648a36010973973fd4076323cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/1bd7abde74587c9b94eda228b349d2e97dc9a686",
-                "reference": "1bd7abde74587c9b94eda228b349d2e97dc9a686",
+                "url": "https://api.github.com/repos/DiscordBot-PMMP/DiscordPHP/zipball/1eca9cd1a6459b648a36010973973fd4076323cc",
+                "reference": "1eca9cd1a6459b648a36010973973fd4076323cc",
                 "shasum": ""
             },
             "require": {
@@ -2191,6 +2197,7 @@
                 "ext-mbstring": "For accurate calculations of string length when handling non-english characters.",
                 "ext-uv": "For a faster, and more performant loop. Preferred."
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -2200,7 +2207,17 @@
                     "Discord\\": "src/Discord"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "scripts": {
+                "cs": [
+                    "./vendor/bin/php-cs-fixer fix"
+                ],
+                "unit": [
+                    "./vendor/bin/phpunit --testdox"
+                ],
+                "coverage": [
+                    "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-html coverage --testdox"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -2212,10 +2229,10 @@
             ],
             "description": "An unofficial API to interact with the voice and text service Discord.",
             "support": {
-                "issues": "https://github.com/discord-php/DiscordPHP/issues",
-                "source": "https://github.com/discord-php/DiscordPHP/tree/v6.0.1"
+                "source": "https://github.com/DiscordBot-PMMP/DiscordPHP/tree/master",
+                "issues": "https://github.com/DiscordBot-PMMP/DiscordPHP/issues"
             },
-            "time": "2021-04-23T23:52:29+00:00"
+            "time": "2021-07-19T14:31:22+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",
@@ -2690,16 +2707,16 @@
         },
         {
             "name": "pocketmine/pocketmine-mp",
-            "version": "3.21.1",
+            "version": "3.22.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "a50ef2af6f6a695e3002f4397ff089635c181dbb"
+                "reference": "c32c21464c30cd7059a4cbfb0a7d7e493238a561"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/a50ef2af6f6a695e3002f4397ff089635c181dbb",
-                "reference": "a50ef2af6f6a695e3002f4397ff089635c181dbb",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/c32c21464c30cd7059a4cbfb0a7d7e493238a561",
+                "reference": "c32c21464c30cd7059a4cbfb0a7d7e493238a561",
                 "shasum": ""
             },
             "require": {
@@ -2736,7 +2753,7 @@
                 "pocketmine/spl": "^0.4.0"
             },
             "require-dev": {
-                "phpstan/phpstan": "0.12.91",
+                "phpstan/phpstan": "0.12.92",
                 "phpstan/phpstan-phpunit": "^0.12.6",
                 "phpstan/phpstan-strict-rules": "^0.12.2",
                 "phpunit/phpunit": "^9.2"
@@ -2762,7 +2779,7 @@
             "homepage": "https://pmmp.io",
             "support": {
                 "issues": "https://github.com/pmmp/PocketMine-MP/issues",
-                "source": "https://github.com/pmmp/PocketMine-MP/tree/3.21.1"
+                "source": "https://github.com/pmmp/PocketMine-MP/tree/3.22.0"
             },
             "funding": [
                 {
@@ -2774,7 +2791,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-07-05T17:49:26+00:00"
+            "time": "2021-07-13T17:31:28+00:00"
         },
         {
             "name": "pocketmine/raklib",
@@ -2902,7 +2919,10 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "team-reflex/discord-php": 20,
+        "react/promise": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

@@ -59,9 +59,9 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * Pending:
  * - Create Role (Cannot create position, https://github.com/discord-php/DiscordPHP/issues/556)
  * - Update Role (Cannot update position, ^)
- * - Update Channel (Majority of attributes cant be updated, https://github.com/discord-php/DiscordPHP/issues/555)
  *
  * Tested:
+ * - Update Channel
  * - Unpin Message
  * - Pin Message
  * - Create Channel
@@ -461,7 +461,11 @@ class Api{
 
 	/**
 	 * Update a server channel, ID Must be present.
-	 * TODO Keep checking Discord.PHP seems they missed a few updatable attributes...
+	 *
+	 * Note, Pins can NOT be updated directly.
+	 *
+	 * @see Api::pinMessage()
+	 * @see Api::unpinMessage()
 	 *
 	 * @param ServerChannel $channel
 	 * @return PromiseInterface

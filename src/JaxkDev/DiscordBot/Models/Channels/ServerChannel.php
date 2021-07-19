@@ -28,7 +28,9 @@ abstract class ServerChannel extends Channel{
 	 * @var Array<string, Array<null|ChannelPermissions>>
 	 */
 	protected $member_permissions = [];
+
 	/**
+	 * This includes the @everyone role, use the server ID as role ID to set the @everyone permissions.
 	 * ['roleID' => [AllowedPermissions|null, DeniedPermissions|null]]
 	 * @var Array<string, Array<null|ChannelPermissions>>
 	 */

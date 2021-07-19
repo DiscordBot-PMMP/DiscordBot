@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Bot\Handlers;
 
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
+use Discord\Parts\Channel\Overwrite as DiscordOverwrite;
 use Discord\Parts\Embed\Embed as DiscordEmbed;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Invite as DiscordInvite;
@@ -282,7 +283,24 @@ class CommunicationHandler{
 			if($c->getCategoryId() !== null){
 				$dc->parent_id = $c->getCategoryId();
 			}
-			//todo overwrites. (permissions)
+			$permissions = [];
+			foreach($c->getAllMemberPermissions() as $id => [$allowed, $denied]){
+				$permissions[] = [
+					'id' => $id,
+					"type" => DiscordOverwrite::TYPE_MEMBER,
+					"allow" => strval($allowed === null ? 0 : $allowed->getBitwise()),
+					"deny" => strval($denied === null ? 0 : $denied->getBitwise())
+				];
+			}
+			foreach($c->getAllRolePermissions() as $id => [$allowed, $denied]){
+				$permissions[] = [
+					'id' => $id,
+					"type" => DiscordOverwrite::TYPE_ROLE,
+					"allow" => strval($allowed === null ? 0 : $allowed->getBitwise()),
+					"deny" => strval($denied === null ? 0 : $denied->getBitwise())
+				];
+			}
+			$dc->permission_overwrites = $permissions;
 			if($c instanceof CategoryChannel){
 				$dc->type = DiscordChannel::TYPE_CATEGORY;
 			}elseif($c instanceof VoiceChannel){
@@ -318,7 +336,25 @@ class CommunicationHandler{
 				if($pk->getChannel()->getCategoryId() !== null){
 					$dc->parent_id = $pk->getChannel()->getCategoryId();
 				}
-				//todo overwrites. (permissions)
+				$dc->overwrites->clear();
+				$permissions = [];
+				foreach($channel->getAllMemberPermissions() as $id => [$allowed, $denied]){
+					$permissions[] = [
+						'id' => $id,
+						"type" => DiscordOverwrite::TYPE_MEMBER,
+						"allow" => strval($allowed === null ? 0 : $allowed->getBitwise()),
+						"deny" => strval($denied === null ? 0 : $denied->getBitwise())
+					];
+				}
+				foreach($channel->getAllRolePermissions() as $id => [$allowed, $denied]){
+					$permissions[] = [
+						'id' => $id,
+						"type" => DiscordOverwrite::TYPE_ROLE,
+						"allow" => strval($allowed === null ? 0 : $allowed->getBitwise()),
+						"deny" => strval($denied === null ? 0 : $denied->getBitwise())
+					];
+				}
+				$dc->permission_overwrites = $permissions;
 				if($channel instanceof CategoryChannel){
 					if($dc->type !== DiscordChannel::TYPE_CATEGORY){
 						$this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type change is not allowed."]);

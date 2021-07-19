@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Libs\React\Promise\Deferred;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
+use pocketmine\utils\MainLogger;
 
 /**
  * @internal
@@ -46,6 +47,8 @@ abstract class ApiResolver{
 				$d->reject(new ApiRejection($packet->getResponse(), $packet->getData()));
 			}
 			unset(self::$map[$packet->getPid()]);
+		}else{
+			MainLogger::getLogger()->debug("A unidentified resolution has been received, ID: {$packet->getPid()}, Successful: {$packet->wasSuccessful()}, Message: {$packet->getResponse()}");
 		}
 	}
 }
