@@ -13,8 +13,6 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Models\Activity;
-use JaxkDev\DiscordBot\Models\Member;
-use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution as ResolutionPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump as DiscordDataDumpPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd as BanAddPacket;
@@ -40,12 +38,15 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordRead
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
-use JaxkDev\DiscordBot\Plugin\Events\BanCreated;
-use JaxkDev\DiscordBot\Plugin\Events\BanDeleted;
+use JaxkDev\DiscordBot\Plugin\Events\BanCreated as BanCreatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\BanDeleted as BanDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelDeleted as ChannelDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelUpdated as ChannelUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteCreated as InviteCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteDeleted as InviteDeletedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\MemberJoined;
+use JaxkDev\DiscordBot\Plugin\Events\MemberLeft;
+use JaxkDev\DiscordBot\Plugin\Events\MemberUpdated;
 use JaxkDev\DiscordBot\Plugin\Events\MessageDeleted as MessageDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
@@ -127,36 +128,31 @@ class BotCommunicationHandler{
 	}
 
 	private function handleChannelCreate(ChannelCreatePacket $packet): void{
-		$c = $packet->getChannel();
-		(new ChannelUpdatedEvent($this->plugin, $c))->call();
-		Storage::addChannel($c);
+		(new ChannelUpdatedEvent($this->plugin, $packet->getChannel()))->call();
+		Storage::addChannel($packet->getChannel());
 	}
 
 	private function handleChannelUpdate(ChannelUpdatePacket $packet): void{
-		$c = $packet->getChannel();
-		(new ChannelUpdatedEvent($this->plugin, $c))->call();
-		Storage::updateChannel($c);
+		(new ChannelUpdatedEvent($this->plugin, $packet->getChannel()))->call();
+		Storage::updateChannel($packet->getChannel());
 	}
 
 	private function handleChannelDelete(ChannelDeletePacket $packet): void{
 		$c = Storage::getChannel($packet->getChannelId());
-		if($c === null) return;
-		if($c->getId() === null){
-			throw new \AssertionError("No ID in channel from storage.");
+		if($c === null){
+			throw new \AssertionError("Channel '{$packet->getChannelId()}' not found in storage.");
 		}
 		(new ChannelDeletedEvent($this->plugin, $c))->call();
-		Storage::removeChannel($c->getId());
+		Storage::removeChannel($packet->getChannelId());
 	}
 
 	private function handleRoleCreate(RoleCreatePacket $packet): void{
-		$r = $packet->getRole();
-		(new RoleCreatedEvent($this->plugin, $r))->call();
+		(new RoleCreatedEvent($this->plugin, $packet->getRole()))->call();
 		Storage::addRole($packet->getRole());
 	}
 
 	private function handleRoleUpdate(RoleUpdatePacket $packet): void{
-		$r = $packet->getRole();
-		(new RoleUpdatedEvent($this->plugin, $r))->call();
+		(new RoleUpdatedEvent($this->plugin, $packet->getRole()))->call();
 		Storage::updateRole($packet->getRole());
 	}
 
@@ -184,7 +180,7 @@ class BotCommunicationHandler{
 	}
 
 	private function handleBanAdd(BanAddPacket $packet): void{
-		(new BanCreated($this->plugin, $packet->getBan()))->call();
+		(new BanCreatedEvent($this->plugin, $packet->getBan()))->call();
 		Storage::addBan($packet->getBan());
 	}
 
@@ -193,25 +189,22 @@ class BotCommunicationHandler{
 		if($ban === null){
 			throw new \AssertionError("Ban '{$packet->getBanId()}' not found in storage.");
 		}
-		(new BanDeleted($this->plugin, $ban))->call();
+		(new BanDeletedEvent($this->plugin, $ban))->call();
 		Storage::removeBan($packet->getBanId());
 	}
 
 	private function handleMemberJoin(MemberJoinPacket $packet): void{
-		//TODO Event
-
-		/** @var Server $server */
 		$server = Storage::getServer($packet->getMember()->getServerId());
-		if(!$server instanceof Server){
+		if($server === null){
 			throw new \AssertionError("Server '{$packet->getMember()->getServerId()}' not found for member '{$packet->getMember()->getId()}'");
 		}
-
+		(new MemberJoined($this->plugin, $packet->getMember()))->call();
 		Storage::addMember($packet->getMember());
 		Storage::addUser($packet->getUser());
 	}
 
 	private function handleMemberUpdate(MemberUpdatePacket $packet): void{
-		//TODO Event
+		(new MemberUpdated($this->plugin, $packet->getMember()))->call();
 		Storage::updateMember($packet->getMember());
 	}
 
@@ -219,21 +212,19 @@ class BotCommunicationHandler{
 		//When leaving server this is emitted.
 		if(($u = Storage::getBotUser()) !== null and $u->getId() === explode(".", $packet->getMemberID())[1]) return;
 
-		//TODO Event
-
-		/** @var Member $member */
 		$member = Storage::getMember($packet->getMemberID());
-		if(!$member instanceof Member){
+		if($member === null){
 			throw new \AssertionError("Member '{$packet->getMemberID()}' not found in storage.");
 		}
 
-		/** @var Server $server */
 		$server = Storage::getServer($member->getServerId());
-		if(!$server instanceof Server){
+		if($server === null){
 			throw new \AssertionError("Server '{$member->getServerId()}' not found for member '{$member->getId()}'");
 		}
 
-		Storage::removeMember($member->getId());
+		(new MemberLeft($this->plugin, $member))->call();
+
+		Storage::removeMember($packet->getMemberID());
 	}
 
 	private function handleServerJoin(ServerJoinPacket $packet): void{
