@@ -13,32 +13,33 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 
-class EventBanRemove extends Packet{
+class ChannelUpdate extends Packet{
 
-	/** @var string */
-	private $id;
+	/** @var ServerChannel */
+	private $channel;
 
-	public function __construct(string $id){
+	public function __construct(ServerChannel $channel){
 		parent::__construct();
-		$this->id = $id;
+		$this->channel = $channel;
 	}
 
-	public function getId(): string{
-		return $this->id;
+	public function getChannel(): ServerChannel{
+		return $this->channel;
 	}
 
 	public function serialize(): ?string{
 		return serialize([
 			$this->UID,
-			$this->id
+			$this->channel
 		]);
 	}
 
 	public function unserialize($data): void{
 		[
 			$this->UID,
-			$this->id
+			$this->channel
 		] = unserialize($data);
 	}
 }

@@ -13,15 +13,15 @@
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
-use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a channel gets deleted.
- * @see DiscordChannelUpdated
- * @see DiscordChannelCreated
+ * 
+ * @see ChannelUpdated
+ * @see ChannelCreated
  */
-class DiscordChannelDeleted extends DiscordBotEvent implements Cancellable{
+class ChannelDeleted extends DiscordBotEvent{
 
 	/** @var ServerChannel */
 	private $channel;

@@ -12,7 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -21,10 +20,10 @@ use pocketmine\plugin\Plugin;
  * started it will only have message id, channel id and server id if it was made/updated after bot started it will have
  * the full message model.
  *
- * @see DiscordMessageUpdated
- * @see DiscordMessageSent
+ * @see MessageUpdated
+ * @see MessageSent
  */
-class DiscordMessageDeleted extends DiscordBotEvent implements Cancellable{
+class MessageDeleted extends DiscordBotEvent{
 
 	/** @var string */
 	private $message_id;

@@ -13,16 +13,15 @@
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
 use JaxkDev\DiscordBot\Models\Messages\Message;
-use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 
 /**
- * Emitted when a new message is received (not sent by us)
+ * Emitted when a message has been updated.
  *
- * @see DiscordMessageDeleted
- * @see DiscordMessageUpdated
+ * @see MessageDeleted
+ * @see MessageSent
  */
-class DiscordMessageSent extends DiscordBotEvent implements Cancellable{
+class MessageUpdated extends DiscordBotEvent{
 
 	/** @var Message */
 	private $message;

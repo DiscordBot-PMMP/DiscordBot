@@ -12,34 +12,33 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class EventRoleUpdate extends Packet{
+class MemberLeave extends Packet{
 
-	/** @var Role */
-	private $role;
+	/** @var string */
+	private $member_id;
 
-	public function __construct(Role $role){
+	public function __construct(string $member_id){
 		parent::__construct();
-		$this->role = $role;
+		$this->member_id = $member_id;
 	}
 
-	public function getRole(): Role{
-		return $this->role;
+	public function getMemberID(): string{
+		return $this->member_id;
 	}
 
 	public function serialize(): ?string{
 		return serialize([
 			$this->UID,
-			$this->role
+			$this->member_id
 		]);
 	}
 
 	public function unserialize($data): void{
 		[
 			$this->UID,
-			$this->role
+			$this->member_id
 		] = unserialize($data);
 	}
 }

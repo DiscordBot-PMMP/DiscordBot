@@ -12,34 +12,33 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class EventMemberUpdate extends Packet{
+class BanRemove extends Packet{
 
-	/** @var Member */
-	private $member;
+	/** @var string */
+	private $id;
 
-	public function __construct(Member $member){
+	public function __construct(string $id){
 		parent::__construct();
-		$this->member = $member;
+		$this->id = $id;
 	}
 
-	public function getMember(): Member{
-		return $this->member;
+	public function getId(): string{
+		return $this->id;
 	}
 
 	public function serialize(): ?string{
 		return serialize([
 			$this->UID,
-			$this->member
+			$this->id
 		]);
 	}
 
 	public function unserialize($data): void{
 		[
 			$this->UID,
-			$this->member
+			$this->id
 		] = unserialize($data);
 	}
 }

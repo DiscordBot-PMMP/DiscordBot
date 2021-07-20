@@ -13,15 +13,15 @@
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
 use JaxkDev\DiscordBot\Models\Server;
-use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 
 /**
- * Emitted when a server the bot is in has been deleted, or the bot left/was kicked.
- * @see DiscordServerUpdated Emitted when a server the bot is in has been updated.
- * @see DiscordServerJoined Emitted when the bot joins a server.
+ * Emitted when a server the bot is in has been updated, eg Changed icon, name, region etc.
+ * 
+ * @see ServerDeleted Emitted when the bot leaves a server
+ * @see ServerJoined Emitted when the bot joins a server.
  */
-class DiscordServerDeleted extends DiscordBotEvent implements Cancellable{
+class ServerUpdated extends DiscordBotEvent{
 
 	/** @var Server */
 	private $server;

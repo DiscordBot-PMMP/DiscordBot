@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 
-class EventChannelUpdate extends Packet{
+class ChannelCreate extends Packet{
 
 	/** @var ServerChannel */
 	private $channel;

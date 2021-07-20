@@ -16,15 +16,15 @@ use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Server;
-use pocketmine\event\Cancellable;
 use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when the bot joins a discord server.
- * @see DiscordServerDeleted Emitted when the bot leaves a server
- * @see DiscordServerUpdated Emitted when a server the bot is in has been updated.
+ * 
+ * @see ServerDeleted Emitted when the bot leaves a server
+ * @see ServerUpdated Emitted when a server the bot is in has been updated.
  */
-class DiscordServerJoined extends DiscordBotEvent implements Cancellable{
+class ServerJoined extends DiscordBotEvent{
 
 	/** @var Server */
 	private $server;

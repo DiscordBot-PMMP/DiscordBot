@@ -21,7 +21,7 @@ use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DataDump extends Packet{
+class DiscordDataDump extends Packet{
 
 	/** @var Server[] */
 	private $servers = [];

@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class EventReady extends Packet{
+class DiscordReady extends Packet{
 
 	public function serialize(): ?string{
 		return serialize($this->UID);

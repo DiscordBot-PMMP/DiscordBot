@@ -10,36 +10,28 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
+namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
+use pocketmine\plugin\Plugin;
 
-class EventChannelCreate extends Packet{
+/**
+ * Emitted when a channel gets updated.
+ * 
+ * @see ChannelDeleted
+ * @see ChannelCreated
+ */
+class ChannelUpdated extends DiscordBotEvent{
 
 	/** @var ServerChannel */
 	private $channel;
 
-	public function __construct(ServerChannel $channel){
-		parent::__construct();
+	public function __construct(Plugin $plugin, ServerChannel $channel){
+		parent::__construct($plugin);
 		$this->channel = $channel;
 	}
 
 	public function getChannel(): ServerChannel{
 		return $this->channel;
-	}
-
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->channel
-		]);
-	}
-
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->channel
-		] = unserialize($data);
 	}
 }

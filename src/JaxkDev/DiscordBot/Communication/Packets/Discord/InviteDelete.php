@@ -12,34 +12,33 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class EventBanAdd extends Packet{
+class InviteDelete extends Packet{
 
-	/** @var Ban */
-	private $ban;
+	/** @var string */
+	private $invite_code;
 
-	public function __construct(Ban $ban){
+	public function __construct(string $invite_code){
 		parent::__construct();
-		$this->ban = $ban;
+		$this->invite_code = $invite_code;
 	}
 
-	public function getBan(): Ban{
-		return $this->ban;
+	public function getInviteCode(): string{
+		return $this->invite_code;
 	}
 
 	public function serialize(): ?string{
 		return serialize([
 			$this->UID,
-			$this->ban
+			$this->invite_code
 		]);
 	}
 
 	public function unserialize($data): void{
 		[
 			$this->UID,
-			$this->ban
+			$this->invite_code
 		] = unserialize($data);
 	}
 }

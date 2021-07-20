@@ -12,34 +12,34 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Messages\Message;
+use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class EventMessageSent extends Packet{
+class InviteCreate extends Packet{
 
-	/** @var Message */
-	private $message;
+	/** @var Invite */
+	private $invite;
 
-	public function __construct(Message $message){
+	public function __construct(Invite $invite){
 		parent::__construct();
-		$this->message = $message;
+		$this->invite = $invite;
 	}
 
-	public function getMessage(): Message{
-		return $this->message;
+	public function getInvite(): Invite{
+		return $this->invite;
 	}
 
 	public function serialize(): ?string{
 		return serialize([
 			$this->UID,
-			$this->message
+			$this->invite
 		]);
 	}
 
 	public function unserialize($data): void{
 		[
 			$this->UID,
-			$this->message
+			$this->invite
 		] = unserialize($data);
 	}
 }

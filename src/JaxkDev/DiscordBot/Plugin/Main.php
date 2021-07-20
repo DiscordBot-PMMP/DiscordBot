@@ -52,25 +52,28 @@ class Main extends PluginBase{
 	private $config;
 
 	public function onLoad(){
-		if(Phar::running(true) === ""){
+		if(($phar = Phar::running(true)) === ""){
 			throw new PluginException("Cannot be run from source.");
 		}
 
 		if(!defined("JaxkDev\DiscordBot\COMPOSER")){
 			define("JaxkDev\DiscordBot\DATA_PATH", $this->getDataFolder());
 			define("JaxkDev\DiscordBot\VERSION", "v".$this->getDescription()->getVersion());
-			define("JaxkDev\DiscordBot\COMPOSER", Phar::running(true)."/vendor/autoload.php");
+			define("JaxkDev\DiscordBot\COMPOSER", $phar."/vendor/autoload.php");
 		}
 		if (!function_exists('JaxkDev\DiscordBot\Libs\React\Promise\resolve')) {
 			/** @noinspection PhpIncludeInspection */
-			require Phar::running(true).'/src/JaxkDev/DiscordBot/Libs/React/Promise/functions.php';
+			require $phar.'/src/JaxkDev/DiscordBot/Libs/React/Promise/functions.php';
 		}
 
-		if(!is_dir($this->getDataFolder()."logs")) mkdir($this->getDataFolder()."logs");
+		if(!is_dir($this->getDataFolder()."logs")){
+			mkdir($this->getDataFolder()."logs");
+		}
 
 		$this->saveResource("config.yml");
-		$this->saveResource("HELP_ENG.txt", true); //Always keep that up-to-date.
-		$this->saveResource("cacert.pem", true);   //And this.
+
+		$this->saveResource("HELP_ENG.txt", true); //Always keep these up-to-date.
+		$this->saveResource("cacert.pem", true);
 
 		$this->inboundData = new Volatile();
 		$this->outboundData = new Volatile();
@@ -85,7 +88,7 @@ class Main extends PluginBase{
 		}
 		if(extension_loaded("xdebug")){
 			if(ini_get("xdebug.output_dir") === $this->getDataFolder()){
-				$this->getLogger()->warning("X-Debug is running, this will cause data pack to be ~3min long.");
+				$this->getLogger()->warning("X-Debug is running, this will cause data pack to be several minutes long.");
 			}else{
 				$this->getLogger()->emergency("Plugin will not run with xdebug due to the performance drops.");
 				$this->getServer()->getPluginManager()->disablePlugin($this);

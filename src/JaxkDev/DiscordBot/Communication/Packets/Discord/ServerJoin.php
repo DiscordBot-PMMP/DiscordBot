@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class EventServerJoin extends Packet{
+class ServerJoin extends Packet{
 
 	/** @var Server */
 	private $server;
@@ -33,7 +33,7 @@ class EventServerJoin extends Packet{
 	private $roles;
 
 	/**
-	 * EventServerJoin constructor.
+	 * ServerJoin constructor.
 	 *
 	 * @param Server          $server
 	 * @param ServerChannel[] $channels

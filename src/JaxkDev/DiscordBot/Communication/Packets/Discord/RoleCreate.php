@@ -12,45 +12,34 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Member;
-use JaxkDev\DiscordBot\Models\User;
+use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class EventMemberJoin extends Packet{
+class RoleCreate extends Packet{
 
-	/** @var Member */
-	private $member;
+	/** @var Role */
+	private $role;
 
-	/** @var User */
-	private $user;
-
-	public function __construct(Member $member, User $user){
+	public function __construct(Role $role){
 		parent::__construct();
-		$this->member = $member;
-		$this->user = $user;
+		$this->role = $role;
 	}
 
-	public function getMember(): Member{
-		return $this->member;
-	}
-
-	public function getUser(): User{
-		return $this->user;
+	public function getRole(): Role{
+		return $this->role;
 	}
 
 	public function serialize(): ?string{
 		return serialize([
 			$this->UID,
-			$this->member,
-			$this->user
+			$this->role
 		]);
 	}
 
 	public function unserialize($data): void{
 		[
 			$this->UID,
-			$this->member,
-			$this->user
+			$this->role
 		] = unserialize($data);
 	}
 }

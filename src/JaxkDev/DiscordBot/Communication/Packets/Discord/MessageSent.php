@@ -12,33 +12,34 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class EventMessageDelete extends Packet{
+class MessageSent extends Packet{
 
-	/** @var string */
-	private $message_id;
+	/** @var Message */
+	private $message;
 
-	public function __construct(string $message_id){
+	public function __construct(Message $message){
 		parent::__construct();
-		$this->message_id = $message_id;
+		$this->message = $message;
 	}
 
-	public function getMessageId(): string{
-		return $this->message_id;
+	public function getMessage(): Message{
+		return $this->message;
 	}
 
 	public function serialize(): ?string{
 		return serialize([
 			$this->UID,
-			$this->message_id
+			$this->message
 		]);
 	}
 
 	public function unserialize($data): void{
 		[
 			$this->UID,
-			$this->message_id
+			$this->message
 		] = unserialize($data);
 	}
 }
