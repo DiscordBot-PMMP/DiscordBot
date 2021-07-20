@@ -17,28 +17,28 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 class BanRemove extends Packet{
 
 	/** @var string */
-	private $id;
+	private $ban_id;
 
-	public function __construct(string $id){
+	public function __construct(string $ban_id){
 		parent::__construct();
-		$this->id = $id;
+		$this->ban_id = $ban_id;
 	}
 
-	public function getId(): string{
-		return $this->id;
+	public function getBanId(): string{
+		return $this->ban_id;
 	}
 
 	public function serialize(): ?string{
 		return serialize([
 			$this->UID,
-			$this->id
+			$this->ban_id
 		]);
 	}
 
 	public function unserialize($data): void{
 		[
 			$this->UID,
-			$this->id
+			$this->ban_id
 		] = unserialize($data);
 	}
 }

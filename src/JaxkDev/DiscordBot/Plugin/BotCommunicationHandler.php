@@ -40,6 +40,8 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordRead
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
+use JaxkDev\DiscordBot\Plugin\Events\BanCreated;
+use JaxkDev\DiscordBot\Plugin\Events\BanDeleted;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelDeleted as ChannelDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelUpdated as ChannelUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteCreated as InviteCreatedEvent;
@@ -182,13 +184,17 @@ class BotCommunicationHandler{
 	}
 
 	private function handleBanAdd(BanAddPacket $packet): void{
-		//TODO Event
+		(new BanCreated($this->plugin, $packet->getBan()))->call();
 		Storage::addBan($packet->getBan());
 	}
 
 	private function handleBanRemove(BanRemovePacket $packet): void{
-		//TODO Event
-		Storage::removeBan($packet->getId());
+		$ban = Storage::getBan($packet->getBanId());
+		if($ban === null){
+			throw new \AssertionError("Ban '{$packet->getBanId()}' not found in storage.");
+		}
+		(new BanDeleted($this->plugin, $ban))->call();
+		Storage::removeBan($packet->getBanId());
 	}
 
 	private function handleMemberJoin(MemberJoinPacket $packet): void{
