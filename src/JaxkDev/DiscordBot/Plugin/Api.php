@@ -305,7 +305,7 @@ class Api{
 	/**
 	 * Remove all reactions on a message.
 	 *
-	 * TODO HIGH PRIORITY, Investigate when emoji present it fails (Bad request) on PHP7 but works fine with PHP8
+	 * TODO NOTE: Pending response, when emoji present it fails (Bad request) on PHP7 but works fine with PHP8
 	 *
 	 * @param string      $channel_id
 	 * @param string      $message_id

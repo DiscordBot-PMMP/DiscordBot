@@ -12,28 +12,38 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
+use JaxkDev\DiscordBot\Models\Messages\Message;
 use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a message has been deleted.
- * TODO, Decide properly here and in DiscordEventHandler#onMessageDelete because if message was made/updated before bot
- * started it will only have message id, channel id and server id if it was made/updated after bot started it will have
- * the full message model.
+ *
+ * If message was made/updated before bot started it will only have message id, channel id and server id.
+ * If it was made/updated after bot started it will have the full message model.
  *
  * @see MessageUpdated
  * @see MessageSent
  */
 class MessageDeleted extends DiscordBotEvent{
 
-	/** @var string */
-	private $message_id;
+	/**
+	 * @var Message|array{"message_id": string, "channel_id": string, "server_id": string}
+	 */
+	private $message;
 
-	public function __construct(Plugin $plugin, string $message_id){
+	/**
+	 * @param Plugin																			$plugin
+	 * @param Message|array{"message_id": string, "channel_id": string, "server_id": string}	$message
+	 */
+	public function __construct(Plugin $plugin, $message){
 		parent::__construct($plugin);
-		$this->message_id = $message_id;
+		$this->message = $message;
 	}
 
-	public function getMessageId(): string{
-		return $this->message_id;
+	/**
+	 * @return Message|array{"message_id": string, "channel_id": string, "server_id": string}
+	 */
+	public function getMessage(){
+		return $this->message;
 	}
 }

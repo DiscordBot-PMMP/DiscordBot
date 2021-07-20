@@ -313,12 +313,20 @@ array(5) {
 	}
 
 	/**
-	 * TODO, Linked to MessageDeleted.php todo.
-	 * @param DiscordMessage|\stdClass $message
+	 * @param DiscordMessage|\stdClass $data
 	 * @param Discord                  $discord
 	 */
-	public function onMessageDelete($message, Discord $discord): void{
-		$packet = new MessageDeletePacket($message->id);
+	public function onMessageDelete($data, Discord $discord): void{
+		if($data instanceof DiscordMessage){
+			$message = ModelConverter::genModelMessage($data);
+		}else{
+			$message = [
+				"message_id" => $data->id,
+				"channel_id" => $data->channel_id,
+				"server_id" => $data->guild_id
+			];
+		}
+		$packet = new MessageDeletePacket($message);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 

@@ -124,7 +124,7 @@ class BotCommunicationHandler{
 	}
 
 	private function handleMessageDelete(MessageDeletePacket $packet): void{
-		(new MessageDeletedEvent($this->plugin, $packet->getMessageId()))->call();
+		(new MessageDeletedEvent($this->plugin, $packet->getMessage()))->call();
 	}
 
 	private function handleChannelCreate(ChannelCreatePacket $packet): void{
