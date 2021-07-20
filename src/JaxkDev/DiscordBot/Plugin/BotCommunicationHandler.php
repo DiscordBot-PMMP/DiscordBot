@@ -42,6 +42,8 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelDeleted as ChannelDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelUpdated as ChannelUpdatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\InviteCreated as InviteCreatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\InviteDeleted as InviteDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageDeleted as MessageDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
@@ -166,12 +168,16 @@ class BotCommunicationHandler{
 	}
 
 	private function handleInviteCreate(InviteCreatePacket $packet): void{
-		//TODO Event
+		(new InviteCreatedEvent($this->plugin, $packet->getInvite()))->call();
 		Storage::addInvite($packet->getInvite());
 	}
 
 	private function handleInviteDelete(InviteDeletePacket $packet): void{
-		//TODO Event
+		$i = Storage::getInvite($packet->getInviteCode());
+		if($i === null){
+			throw new \AssertionError("Invite '{$packet->getInviteCode()}' not found in storage.");
+		}
+		(new InviteDeletedEvent($this->plugin, $i))->call();
 		Storage::removeInvite($packet->getInviteCode());
 	}
 
