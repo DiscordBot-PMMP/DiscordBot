@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Channel\Overwrite;
+use Discord\Parts\Channel\Webhook as DiscordWebhook;
 use Discord\Parts\Embed\Author as DiscordAuthor;
 use Discord\Parts\Embed\Embed as DiscordEmbed;
 use Discord\Parts\Embed\Field as DiscordField;
@@ -46,15 +47,20 @@ use JaxkDev\DiscordBot\Models\Embed\Video;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Message;
-use JaxkDev\DiscordBot\Models\Messages\Reply;
-use JaxkDev\DiscordBot\Models\Messages\Webhook;
+use JaxkDev\DiscordBot\Models\Messages\Reply as ReplyMessage;
+use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
 use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Models\User;
+use JaxkDev\DiscordBot\Models\Webhook;
 
 abstract class ModelConverter{
+
+	static public function genModelWebhook(DiscordWebhook $webhook): Webhook{
+		return new Webhook($webhook->id, $webhook->type, $webhook->user->id, $webhook->name, $webhook->avatar, $webhook->token);
+	}
 
 	static public function genModelMember(DiscordMember $discordMember): Member{
 		$m = new Member($discordMember->id, $discordMember->joined_at === null ? 0 : $discordMember->joined_at->getTimestamp(),
@@ -202,7 +208,7 @@ abstract class ModelConverter{
 					$embeds[] = self::genModelEmbed($embed);
 				}
 				$author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
-				return new Webhook($discordMessage->channel_id, $discordMessage->webhook_id, $embeds, $discordMessage->id,
+				return new WebhookMessage($discordMessage->channel_id, $discordMessage->webhook_id, $embeds, $discordMessage->id,
 					$discordMessage->content, $author, $guild_id, $discordMessage->timestamp->getTimestamp(),
 					$discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
 					array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));
@@ -216,7 +222,7 @@ abstract class ModelConverter{
 				$e = self::genModelEmbed($e);
 			}
 			$author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
-			return new Reply($discordMessage->channel_id, $discordMessage->referenced_message->id, $discordMessage->id,
+			return new ReplyMessage($discordMessage->channel_id, $discordMessage->referenced_message->id, $discordMessage->id,
 				$discordMessage->content, $e, $author, $guild_id, $discordMessage->timestamp->getTimestamp(),
 				$discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
 				array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));

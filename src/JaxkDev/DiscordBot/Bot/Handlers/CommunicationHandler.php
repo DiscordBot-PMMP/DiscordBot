@@ -18,6 +18,7 @@ use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Channel\Overwrite as DiscordOverwrite;
+use Discord\Parts\Channel\Webhook as DiscordWebhook;
 use Discord\Parts\Embed\Embed as DiscordEmbed;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Invite as DiscordInvite;
@@ -25,6 +26,7 @@ use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
+use Discord\Repository\Channel\WebhookRepository as DiscordWebhookRepository;
 use Discord\Repository\Guild\InviteRepository as DiscordInviteRepository;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
@@ -39,6 +41,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -113,6 +116,7 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestDeleteMessage) $this->handleDeleteMessage($pk);
 		elseif($pk instanceof RequestFetchMessage) $this->handleFetchMessage($pk);
 		elseif($pk instanceof RequestFetchPinnedMessages) $this->handleFetchPinnedMessages($pk);
+		elseif($pk instanceof RequestFetchWebhooks) $this->handleFetchWebhooks($pk);
 		elseif($pk instanceof RequestPinMessage) $this->handlePinMessage($pk);
 		elseif($pk instanceof RequestUnpinMessage) $this->handleUnpinMessage($pk);
 		elseif($pk instanceof RequestAddRole) $this->handleAddRole($pk);
@@ -129,6 +133,22 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
 		elseif($pk instanceof RequestLeaveServer) $this->handleLeaveServer($pk);
+	}
+
+	private function handleFetchWebhooks(RequestFetchWebhooks $pk): void{
+		$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+			$channel->webhooks->freshen()->then(function(DiscordWebhookRepository $repository) use($pk){
+				$webhooks = [];
+				/** @var DiscordWebhook $webhook */
+				foreach($repository->toArray() as $webhook){
+					$webhooks[] = ModelConverter::genModelWebhook($webhook);
+				}
+				$this->resolveRequest($pk->getUID(), true, "Fetched webhooks.", $webhooks);
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to fetch webhooks.", [$e->getMessage(), $e->getTraceAsString()]);
+				$this->logger->debug("Failed to fetch webhooks ({$pk->getUID()}) - freshen error: {$e->getMessage()}");
+			});
+		});
 	}
 
 	private function handleFetchPinnedMessages(RequestFetchPinnedMessages $pk): void{

@@ -23,6 +23,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -50,7 +51,13 @@ use JaxkDev\DiscordBot\Models\Role;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
+ * TODO:
+ * - Create Webhook
+ * - Update Webhook
+ * - Delete Webhook
+ *
  * Tested:
+ * - Fetch Webhooks
  * - Fetch Message
  * - Fetch Channel Pins (entire message obj's)
  * - Create Role (https://github.com/discord-php/DiscordPHP/issues/556)
@@ -110,6 +117,21 @@ class Api{
 			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
 		}
 		$pk = new RequestLeaveServer($server_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Fetch all webhooks that are linked to a channel.
+	 *
+	 * @param string $channel_id
+	 * @return PromiseInterface
+	 */
+	public function fetchWebhooks(string $channel_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'"));
+		}
+		$pk = new RequestFetchWebhooks($channel_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}

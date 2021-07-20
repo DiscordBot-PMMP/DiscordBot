@@ -25,10 +25,10 @@ class TextChannel extends ServerChannel{
 	/** @var ?int In seconds | null when disabled. */
 	private $rate_limit = null;
 
-	/** @var string[] Message ID's */
+	/** @var string[] Message ID's, Message objects can be found via API::fetchPinnedMessages() */
 	private $pins = [];
 
-	//TODO Webhooks/integrations.
+	//Webhooks can be found via API::fetchWebhooks();
 
 	/**
 	 * TextChannel constructor.
