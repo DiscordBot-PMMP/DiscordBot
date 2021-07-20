@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
+use AttachableThreadedLogger;
 use Discord\Discord;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
@@ -46,15 +47,18 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\EventServerLeave;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\EventServerUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\EventReady;
 use JaxkDev\DiscordBot\Communication\Protocol;
-use pocketmine\utils\MainLogger;
 
 class DiscordEventHandler{
 
 	/** @var Client */
 	private $client;
 
+	/** @var AttachableThreadedLogger */
+	private $logger;
+
 	public function __construct(Client $client){
 		$this->client = $client;
+		$this->logger = $client->getThread()->getLogger();
 	}
 
 	public function registerEvents(): void{
@@ -185,7 +189,7 @@ array(5) {
 
 	public function onReady(): void{
 		if($this->client->getThread()->getStatus() !== Protocol::THREAD_STATUS_STARTED){
-			MainLogger::getLogger()->warning("Closing thread, unexpected state change.");
+			$this->logger->warning("Closing thread, unexpected state change.");
 			$this->client->close();
 		}
 
@@ -196,7 +200,7 @@ array(5) {
 		$pk = new DataDump();
 		$pk->setTimestamp(time());
 
-		MainLogger::getLogger()->debug("Starting the data pack, please be patient.");
+		$this->logger->debug("Starting the data pack, please be patient.");
 		$t = microtime(true);
 		$mem = memory_get_usage(true);
 
@@ -212,7 +216,7 @@ array(5) {
 			if($permissions->ban_members){
 				/** @noinspection PhpUnhandledExceptionInspection */
 				$guild->bans->freshen()->done(function() use ($guild){
-					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->bans)." bans from server '".
+					$this->logger->debug("Successfully fetched ".sizeof($guild->bans)." bans from server '".
 						$guild->name."' (".$guild->id.")");
 					if(sizeof($guild->bans) === 0) return;
 					$pk = new DataDump();
@@ -223,10 +227,10 @@ array(5) {
 					}
 					$this->client->getThread()->writeOutboundData($pk);
 				}, function() use ($guild){
-					MainLogger::getLogger()->warning("Failed to fetch bans from server '".$guild->name."' (".$guild->id.")");
+					$this->logger->warning("Failed to fetch bans from server '".$guild->name."' (".$guild->id.")");
 				});
 			}else{
-				MainLogger::getLogger()->notice("Cannot fetch bans from server '".$guild->name."' (".$guild->id.
+				$this->logger->notice("Cannot fetch bans from server '".$guild->name."' (".$guild->id.
 					"), Bot does not have 'ban_members' permission.");
 			}
 
@@ -245,7 +249,7 @@ array(5) {
 			if($permissions->manage_guild){
 				/** @noinspection PhpUnhandledExceptionInspection */
 				$guild->invites->freshen()->done(function() use ($guild){
-					MainLogger::getLogger()->debug("Successfully fetched ".sizeof($guild->invites).
+					$this->logger->debug("Successfully fetched ".sizeof($guild->invites).
 						" invites from server '".$guild->name."' (".$guild->id.")");
 					if(sizeof($guild->invites) === 0) return;
 					$pk = new DataDump();
@@ -256,10 +260,10 @@ array(5) {
 					}
 					$this->client->getThread()->writeOutboundData($pk);
 				}, function() use ($guild){
-					MainLogger::getLogger()->warning("Failed to fetch invites from server '".$guild->name."' (".$guild->id.")");
+					$this->logger->warning("Failed to fetch invites from server '".$guild->name."' (".$guild->id.")");
 				});
 			}else{
-				MainLogger::getLogger()->notice("Cannot fetch invites from server '".$guild->name."' (".$guild->id.
+				$this->logger->notice("Cannot fetch invites from server '".$guild->name."' (".$guild->id.
 					"), Bot does not have 'manage_guild' permission.");
 			}
 
@@ -276,19 +280,19 @@ array(5) {
 
 		$pk->setBotUser(ModelConverter::genModelUser($client->user));
 
-		MainLogger::getLogger()->debug("Data pack took: ".round(microtime(true)-$t, 5)."s & ".
+		$this->logger->debug("Data pack took: ".round(microtime(true)-$t, 5)."s & ".
 			round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
 
 		//Very important to check status before overwriting, can cause dangerous behaviour.
 		if($this->client->getThread()->getStatus() !== Protocol::THREAD_STATUS_STARTED){
-			MainLogger::getLogger()->warning("Closing thread, unexpected state change.");
+			$this->logger->warning("Closing thread, unexpected state change.");
 			$this->client->close();
 		}
 
 		$this->client->getThread()->writeOutboundData($pk);
 
 		$this->client->getThread()->setStatus(Protocol::THREAD_STATUS_READY);
-		MainLogger::getLogger()->info("Client '".$client->username."#".$client->discriminator."' ready.");
+		$this->logger->info("Client '".$client->username."#".$client->discriminator."' ready.");
 
 		$this->client->getThread()->writeOutboundData(new EventReady());
 		$this->client->getCommunicationHandler()->sendHeartbeat();
@@ -426,22 +430,22 @@ array(5) {
 				/** @var DiscordBan|null $b */
 				$b = $g->bans->offsetGet($ban->user_id);
 				if($b !== null){
-					MainLogger::getLogger()->debug("Successfully fetched bans, attached reason to new ban event.");
+					$this->logger->debug("Successfully fetched bans, attached reason to new ban event.");
 					$packet = new EventBanAdd(ModelConverter::genModelBan($b));
 					$this->client->getThread()->writeOutboundData($packet);
 				}else{
-					MainLogger::getLogger()->debug("No ban after freshen ??? (IMPORTANT LOGIC ERROR)");
+					$this->logger->debug("No ban after freshen ??? (IMPORTANT LOGIC ERROR)");
 					$packet = new EventBanAdd(ModelConverter::genModelBan($ban));
 					$this->client->getThread()->writeOutboundData($packet);
 				}
 			}, function() use ($ban){
 				//Failed so just send ban with no reason.
-				MainLogger::getLogger()->debug("Failed to fetch bans even with ban_members permission, using old ban object.");
+				$this->logger->debug("Failed to fetch bans even with ban_members permission, using old ban object.");
 				$packet = new EventBanAdd(ModelConverter::genModelBan($ban));
 				$this->client->getThread()->writeOutboundData($packet);
 			});
 		}else{
-			MainLogger::getLogger()->debug("Bot does not have ban_members permission so no reason could be attached to this ban.");
+			$this->logger->debug("Bot does not have ban_members permission so no reason could be attached to this ban.");
 			$packet = new EventBanAdd(ModelConverter::genModelBan($ban));
 			$this->client->getThread()->writeOutboundData($packet);
 		}

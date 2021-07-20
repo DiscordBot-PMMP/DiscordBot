@@ -49,7 +49,6 @@ use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordServerDeleted;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordServerJoined;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordServerUpdated;
-use pocketmine\utils\MainLogger;
 
 class BotCommunicationHandler{
 
@@ -102,7 +101,7 @@ class BotCommunicationHandler{
 		$ac = new Activity(Activity::STATUS_IDLE, Activity::TYPE_PLAYING,
 			"PocketMine-MP v".\pocketmine\VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION);
 		$this->plugin->getApi()->updateActivity($ac)->otherwise(function(ApiRejection $a){
-			MainLogger::getLogger()->logException($a);
+			$this->plugin->getLogger()->logException($a);
 		});
 
 		(new DiscordReady($this->plugin))->call();

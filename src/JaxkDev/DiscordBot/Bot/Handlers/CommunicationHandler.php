@@ -13,6 +13,7 @@
 
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
+use AttachableThreadedLogger;
 use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
@@ -65,7 +66,6 @@ use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Messages\Reply;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Plugin\ApiRejection;
-use pocketmine\utils\MainLogger;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use function React\Promise\reject;
@@ -78,8 +78,12 @@ class CommunicationHandler{
 	/** @var float|null */
 	private $lastHeartbeat = null;
 
+	/** @var AttachableThreadedLogger */
+	private $logger;
+
 	public function __construct(Client $client){
 		$this->client = $client;
+		$this->logger = $client->getThread()->getLogger();
 	}
 
 	//--- Handlers:
@@ -137,7 +141,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Fetched pinned messages.", $messages);
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to fetch pinned messages.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to fetch pinned messages ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to fetch pinned messages ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -155,7 +159,7 @@ class CommunicationHandler{
 					$this->resolveRequest($pk->getUID(), true, "Successfully unpinned the message.");
 				}, function(\Throwable $e) use($pk){
 					$this->resolveRequest($pk->getUID(), false, "Failed to unpin the message.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to pin the message ({$pk->getUID()}) - {$e->getMessage()}");
+					$this->logger->debug("Failed to pin the message ({$pk->getUID()}) - {$e->getMessage()}");
 				});
 			});
 		});
@@ -168,7 +172,7 @@ class CommunicationHandler{
 					$this->resolveRequest($pk->getUID(), true, "Successfully pinned the message.");
 				}, function(\Throwable $e) use($pk){
 					$this->resolveRequest($pk->getUID(), false, "Failed to pin the message.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to pin the message ({$pk->getUID()}) - {$e->getMessage()}");
+					$this->logger->debug("Failed to pin the message ({$pk->getUID()}) - {$e->getMessage()}");
 				});
 			});
 		});
@@ -181,7 +185,7 @@ class CommunicationHandler{
 			}, function(\Throwable $e) use($pk){
 				//Shouldn't happen unless not in server/connection issues.
 				$this->resolveRequest($pk->getUID(), false, "Failed to leave server.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to leave server? ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to leave server? ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -204,7 +208,7 @@ class CommunicationHandler{
 				});
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to create role.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to create role ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to create role ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -239,7 +243,7 @@ class CommunicationHandler{
 			//shift
 			$diff = $role->getHoistedPosition()-$k->position; //How much are we shifting.
 			if($diff === 0){
-				MainLogger::getLogger()->debug("Not updating role position ({$k->id}), no difference found.");
+				$this->logger->debug("Not updating role position ({$k->id}), no difference found.");
 				$promise->resolve();
 				return;
 			}
@@ -261,11 +265,11 @@ class CommunicationHandler{
 				$promise->resolve();
 			}, function(\Throwable $e) use($promise){
 				$promise->reject(new ApiRejection("Failed to update role positions.", [$e->getMessage(), $e->getTraceAsString()]));
-				MainLogger::getLogger()->debug("Failed to update role positions, error: {$e->getMessage()}");
+				$this->logger->debug("Failed to update role positions, error: {$e->getMessage()}");
 			});
 		}, function(\Throwable $e) use($promise){
 			$promise->reject(new ApiRejection("Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]));
-			MainLogger::getLogger()->debug("Failed to update role position - server error: {$e->getMessage()}");
+			$this->logger->debug("Failed to update role position - server error: {$e->getMessage()}");
 		});
 
 		return $promise->promise();
@@ -296,11 +300,11 @@ class CommunicationHandler{
 					}
 				}, function(\Throwable $e) use($pk){
 					$this->resolveRequest($pk->getUID(), false, "Failed to update role.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to create role ({$pk->getUID()}) - {$e->getMessage()}");
+					$this->logger->debug("Failed to create role ({$pk->getUID()}) - {$e->getMessage()}");
 				});
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to update role.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to update role ({$pk->getUID()}) - role error: {$e->getMessage()}");
+				$this->logger->debug("Failed to update role ({$pk->getUID()}) - role error: {$e->getMessage()}");
 			});
 		});
 	}
@@ -312,11 +316,11 @@ class CommunicationHandler{
 					$this->resolveRequest($pk->getUID(), true, "Deleted role.");
 				}, function(\Throwable $e) use($pk){
 					$this->resolveRequest($pk->getUID(), false, "Failed to delete role.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to delete role ({$pk->getUID()}) - {$e->getMessage()}");
+					$this->logger->debug("Failed to delete role ({$pk->getUID()}) - {$e->getMessage()}");
 				});
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to fetch role.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to delete role ({$pk->getUID()}) - fetch role: {$e->getMessage()}");
+				$this->logger->debug("Failed to delete role ({$pk->getUID()}) - fetch role: {$e->getMessage()}");
 			});
 		});
 	}
@@ -327,7 +331,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Removed role.");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to remove role.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to remove role ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to remove role ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -338,7 +342,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Added role.");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to add role.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to add role ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to add role ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -349,7 +353,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Successfully removed reaction.");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to remove reaction.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to remove reaction ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to remove reaction ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -360,7 +364,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Successfully bulk removed all ".($e === null ? "" : "'$e' ")."reactions");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to bulk remove reactions.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to bulk remove reactions ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to bulk remove reactions ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -371,7 +375,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Reaction added.");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to react to message.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to react to message ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to react to message ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -423,7 +427,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Created channel.", [ModelConverter::genModelChannel($channel)]);
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to create channel.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to create channel ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to create channel ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -488,11 +492,11 @@ class CommunicationHandler{
 					$this->resolveRequest($pk->getUID(), true, "Updated channel.", [ModelConverter::genModelChannel($channel)]);
 				}, function(\Throwable $e) use($pk){
 					$this->resolveRequest($pk->getUID(), false, "Failed to update channel.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to update channel ({$pk->getUID()}) - {$e->getMessage()}");
+					$this->logger->debug("Failed to update channel ({$pk->getUID()}) - {$e->getMessage()}");
 				});
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to update channel.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to update channel ({$pk->getUID()}) - channel error: {$e->getMessage()}");
+				$this->logger->debug("Failed to update channel ({$pk->getUID()}) - channel error: {$e->getMessage()}");
 			});
 		});
 	}
@@ -504,7 +508,7 @@ class CommunicationHandler{
 					$this->resolveRequest($pk->getUID(), true, "Channel deleted.");
 				}, function(\Throwable $e) use($pk){
 					$this->resolveRequest($pk->getUID(), false, "Failed to delete channel.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to delete channel ({$pk->getUID()}) - {$e->getMessage()}");
+					$this->logger->debug("Failed to delete channel ({$pk->getUID()}) - {$e->getMessage()}");
 				});
 			});
 		});
@@ -514,10 +518,10 @@ class CommunicationHandler{
 		$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
 			$channel->broadcastTyping()->done(function() use($pk){
 				$this->resolveRequest($pk->getUID());
-				MainLogger::getLogger()->debug("BroadcastTyping - success ({$pk->getUID()})");
+				$this->logger->debug("BroadcastTyping - success ({$pk->getUID()})");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to broadcast typing.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to broadcast typing ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to broadcast typing ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -528,7 +532,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Updated nickname.");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to update nickname.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to update nickname ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to update nickname ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -572,25 +576,25 @@ class CommunicationHandler{
 			if($m instanceof Reply){
 				if($m->getReferencedMessageId() === null){
 					$this->resolveRequest($pk->getUID(), false, "Failed to send.", ["Reply message has no referenced message ID."]);
-					MainLogger::getLogger()->debug("Failed to send message ({$pk->getUID()}) - Reply message has no referenced message ID.");
+					$this->logger->debug("Failed to send message ({$pk->getUID()}) - Reply message has no referenced message ID.");
 					return;
 				}
 				$this->getMessage($pk, $m->getChannelId(), $m->getReferencedMessageId(), function(DiscordMessage $msg) use($channel, $pk, $de){
 					$channel->sendMessage($pk->getMessage()->getContent(), false, $de, null, $msg)->done(function(DiscordMessage $msg) use($pk){
 						$this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
-						MainLogger::getLogger()->debug("Sent message ({$pk->getUID()})");
+						$this->logger->debug("Sent message ({$pk->getUID()})");
 					}, function(\Throwable $e) use($pk){
 						$this->resolveRequest($pk->getUID(), false, "Failed to send.", [$e->getMessage(), $e->getTraceAsString()]);
-						MainLogger::getLogger()->debug("Failed to send message ({$pk->getUID()}) - {$e->getMessage()}");
+						$this->logger->debug("Failed to send message ({$pk->getUID()}) - {$e->getMessage()}");
 					});
 				});
 			}else{
 				$channel->sendMessage($m->getContent(), false, $de)->done(function(DiscordMessage $msg) use ($pk){
 					$this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
-					MainLogger::getLogger()->debug("Sent message ({$pk->getUID()})");
+					$this->logger->debug("Sent message ({$pk->getUID()})");
 				}, function(\Throwable $e) use ($pk){
 					$this->resolveRequest($pk->getUID(), false, "Failed to send.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to send message ({$pk->getUID()}) - {$e->getMessage()}");
+					$this->logger->debug("Failed to send message ({$pk->getUID()}) - {$e->getMessage()}");
 				});
 			}
 		});
@@ -630,7 +634,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Message edited.", [ModelConverter::genModelMessage($dMessage)]);
 			}, function(\ThreadException $e) use ($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to edit message.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to edit message ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to edit message ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -641,7 +645,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID());
 			}, function(\ThreadException $e) use ($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to delete message.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to delete message ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to delete message ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -652,7 +656,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Member kicked.");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to kick member.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to kick member ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to kick member ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -663,7 +667,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Member banned.");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to ban member.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to ban member ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to ban member ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -674,7 +678,7 @@ class CommunicationHandler{
 				$this->resolveRequest($pk->getUID(), true, "Member unbanned.");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to unban member.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to unban member ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to unban member ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -687,10 +691,10 @@ class CommunicationHandler{
 				"max_age" => $invite->getMaxAge(), "max_uses" => $invite->getMaxUses(), "temporary" => $invite->isTemporary(), "unique" => true
 			])->done(function(DiscordInvite $dInvite) use($pk){
 				$this->resolveRequest($pk->getUID(), true, "Invite initialised.", [ModelConverter::genModelInvite($dInvite)]);
-				MainLogger::getLogger()->debug("Invite initialised ({$pk->getUID()})");
+				$this->logger->debug("Invite initialised ({$pk->getUID()})");
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to initialise.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to initialise invite ({$pk->getUID()}) - {$e->getMessage()}");
+				$this->logger->debug("Failed to initialise invite ({$pk->getUID()}) - {$e->getMessage()}");
 			});
 		});
 	}
@@ -702,14 +706,14 @@ class CommunicationHandler{
 				$dInvite = $invites->offsetGet($pk->getInviteCode());
 				$invites->delete($dInvite)->done(function(DiscordInvite $dInvite) use($pk){
 					$this->resolveRequest($pk->getUID(), true, "Invite revoked.", [ModelConverter::genModelInvite($dInvite)]);
-					MainLogger::getLogger()->debug("Invite revoked ({$pk->getUID()})");
+					$this->logger->debug("Invite revoked ({$pk->getUID()})");
 				}, function(\Throwable $e) use($pk){
 					$this->resolveRequest($pk->getUID(), false, "Failed to revoke.", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to revoke invite ({$pk->getUID()}) - {$e->getMessage()}");
+					$this->logger->debug("Failed to revoke invite ({$pk->getUID()}) - {$e->getMessage()}");
 				});
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to freshen invites.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to revoke invite ({$pk->getUID()}) - invite freshen error: {$e->getMessage()}");
+				$this->logger->debug("Failed to revoke invite ({$pk->getUID()}) - invite freshen error: {$e->getMessage()}");
 			});
 		});
 	}
@@ -721,7 +725,7 @@ class CommunicationHandler{
 			$cb($guild);
 		}, function(\Throwable $e) use($pk){
 			$this->resolveRequest($pk->getUID(), false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
-			MainLogger::getLogger()->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - server error: {$e->getMessage()}");
+			$this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - server error: {$e->getMessage()}");
 		});
 	}
 
@@ -733,13 +737,13 @@ class CommunicationHandler{
 			$u = $this->client->getDiscordClient()->users->offsetGet($channel_id);
 			if($u === null){
 				$this->resolveRequest($pk->getUID(), false, "Failed to find channel/user.", ["Failed to find channel from local storage."]);
-				MainLogger::getLogger()->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - channel error: Failed to find channel from local storage.");
+				$this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - channel error: Failed to find channel from local storage.");
 			}else{
 				$u->getPrivateChannel()->then(function(DiscordChannel $channel) use($cb){
 					$cb($channel);
 				}, function(\Throwable $e) use($pk){
 					$this->resolveRequest($pk->getUID(), false, "Failed to fetch private channel..", [$e->getMessage(), $e->getTraceAsString()]);
-					MainLogger::getLogger()->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - private channel error: {$e->getMessage()}");
+					$this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - private channel error: {$e->getMessage()}");
 				});
 			}
 		}else{
@@ -753,7 +757,7 @@ class CommunicationHandler{
 				$cb($dMessage);
 			}, function(\Throwable $e) use ($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to fetch message.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - message error: {$e->getMessage()}");
+				$this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - message error: {$e->getMessage()}");
 			});
 		});
 	}
@@ -764,7 +768,7 @@ class CommunicationHandler{
 				$cb($member, $guild);
 			}, function(\Throwable $e) use($pk){
 				$this->resolveRequest($pk->getUID(), false, "Failed to fetch member.", [$e->getMessage(), $e->getTraceAsString()]);
-				MainLogger::getLogger()->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - member error: {$e->getMessage()}");
+				$this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - member error: {$e->getMessage()}");
 			});
 		});
 	}
@@ -784,7 +788,7 @@ class CommunicationHandler{
 	public function checkHeartbeat(): void{
 		if($this->lastHeartbeat === null) return;
 		if(($diff = (microtime(true) - $this->lastHeartbeat)) > Protocol::HEARTBEAT_ALLOWANCE){
-			MainLogger::getLogger()->emergency("Plugin has not responded for {$diff} seconds, closing thread.");
+			$this->logger->emergency("Plugin has not responded for {$diff} seconds, closing thread.");
 			$this->client->close();
 		}
 	}

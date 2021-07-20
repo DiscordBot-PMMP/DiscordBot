@@ -21,7 +21,6 @@ use Volatile;
 
 class BotThread extends Thread{
 
-	// TODO Use this logger instance instead of singletons everywhere.
 	/** @var AttachableThreadedLogger */
 	private $logger;
 
@@ -80,6 +79,10 @@ class BotThread extends Thread{
 
 	public function getStatus(): int{
 		return $this->status;
+	}
+
+	public function getLogger(): AttachableThreadedLogger{
+		return $this->logger;
 	}
 
 	public function getThreadName() : string{
