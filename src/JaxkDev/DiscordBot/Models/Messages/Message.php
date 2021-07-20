@@ -23,17 +23,17 @@ class Message implements \Serializable{
 	/** @var string (<=2000) Possibly empty with attachments/embeds. */
 	protected $content = "";
 
-	/** @var ?Embed Note gateway v9 / dphp7 supports several embeds and attachments in normal messages. */
+	/** @var ?Embed Note gateway v9 / dphp7 supports several embeds and attachments in normal messages. (merge with webhook handling) */
 	protected $embed;
 
-	/** @var ?string MemberID, Null when sending or receiving webhook messages.*/
+	/** @var ?string MemberID (guildID.userID), Null when sending or receiving webhook messages, just (UserID) if DM Channel. */
 	protected $author_id;
 
 	/** @var string */
 	protected $channel_id;
 
 	/** @var ?string Null if DM Channel. */
-	protected $server_id;  //This is needed for faster handling discord side.
+	protected $server_id;
 
 	/** @var ?float Null when sending message. */
 	protected $timestamp;
@@ -114,9 +114,14 @@ class Message implements \Serializable{
 	}
 
 	public function setAuthorId(?string $author_id): void{
-		if($author_id !== null){
+		if($author_id !== null and stripos($author_id, ".") !== false){
 			[$sid, $uid] = explode(".", $author_id);
 			if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
+				throw new \AssertionError("Author ID '$author_id' is invalid.");
+			}
+		}elseif($author_id !== null){
+			//Webhooks and DM's
+			if(!Utils::validDiscordSnowflake($author_id)){
 				throw new \AssertionError("Author ID '$author_id' is invalid.");
 			}
 		}

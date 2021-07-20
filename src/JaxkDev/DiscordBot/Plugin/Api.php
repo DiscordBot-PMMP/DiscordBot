@@ -22,6 +22,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -49,13 +50,9 @@ use JaxkDev\DiscordBot\Models\Role;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
- * TODO:
- * - Fetch Channel Pins (entire message obj's)
- *
- * Test:
- * - Fetch Message
- *
  * Tested:
+ * - Fetch Message
+ * - Fetch Channel Pins (entire message obj's)
  * - Create Role (https://github.com/discord-php/DiscordPHP/issues/556)
  * - Update Role (^)
  * - Update Channel
@@ -113,6 +110,23 @@ class Api{
 			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
 		}
 		$pk = new RequestLeaveServer($server_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Fetch all the pinned messages in a channel.
+	 *
+	 * Note you could fetch individual messages by id using fetchMessage from channel::pins but this is easier.
+	 *
+	 * @param string $channel_id
+	 * @return PromiseInterface
+	 */
+	public function fetchPinnedMessages(string $channel_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
+		$pk = new RequestFetchPinnedMessages($channel_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}

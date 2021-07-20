@@ -13,6 +13,7 @@
 
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
+use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Channel\Overwrite as DiscordOverwrite;
@@ -36,6 +37,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -106,6 +108,7 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestRemoveAllReactions) $this->handleRemoveAllReactions($pk);
 		elseif($pk instanceof RequestDeleteMessage) $this->handleDeleteMessage($pk);
 		elseif($pk instanceof RequestFetchMessage) $this->handleFetchMessage($pk);
+		elseif($pk instanceof RequestFetchPinnedMessages) $this->handleFetchPinnedMessages($pk);
 		elseif($pk instanceof RequestPinMessage) $this->handlePinMessage($pk);
 		elseif($pk instanceof RequestUnpinMessage) $this->handleUnpinMessage($pk);
 		elseif($pk instanceof RequestAddRole) $this->handleAddRole($pk);
@@ -122,6 +125,21 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
 		elseif($pk instanceof RequestLeaveServer) $this->handleLeaveServer($pk);
+	}
+
+	private function handleFetchPinnedMessages(RequestFetchPinnedMessages $pk): void{
+		$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+			$channel->getPinnedMessages()->then(function(Collection $collection) use($pk){
+				$messages = [];
+				foreach($collection->toArray() as $message){
+					$messages[] = ModelConverter::genModelMessage($message);
+				}
+				$this->resolveRequest($pk->getUID(), true, "Fetched pinned messages.", $messages);
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to fetch pinned messages.", [$e->getMessage(), $e->getTraceAsString()]);
+				MainLogger::getLogger()->debug("Failed to fetch pinned messages ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
 	}
 
 	private function handleFetchMessage(RequestFetchMessage $pk): void{

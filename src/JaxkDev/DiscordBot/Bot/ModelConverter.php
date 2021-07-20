@@ -181,21 +181,19 @@ abstract class ModelConverter{
 	}
 
 	static public function genModelMessage(DiscordMessage $discordMessage): Message{
-		if($discordMessage->guild_id === null){
-			throw new AssertionError("Discord message does not have a guild_id, cannot generate model message.");
-		}
 		if($discordMessage->author === null){
 			throw new AssertionError("Discord message does not have a author, cannot generate model message.");
 		}
+		$guild_id = $discordMessage->guild_id??($discordMessage->author instanceof DiscordMember ? $discordMessage->author->guild_id : null);
 		if($discordMessage->type === DiscordMessage::TYPE_NORMAL){
 			if($discordMessage->webhook_id === null){
 				$e = $discordMessage->embeds->first();
 				if($e !== null){
 					$e = self::genModelEmbed($e);
 				}
+				$author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
 				return new Message($discordMessage->channel_id, $discordMessage->id, $discordMessage->content, $e,
-					$discordMessage->guild_id.".".$discordMessage->author->id, $discordMessage->guild_id,
-					$discordMessage->timestamp->getTimestamp(), $discordMessage->mention_everyone,
+					$author, $guild_id, $discordMessage->timestamp->getTimestamp(), $discordMessage->mention_everyone,
 					array_keys($discordMessage->mentions->toArray()), array_keys($discordMessage->mention_roles->toArray()),
 					array_keys($discordMessage->mention_channels->toArray()));
 			}else{
@@ -203,11 +201,11 @@ abstract class ModelConverter{
 				foreach($discordMessage->embeds as $embed){
 					$embeds[] = self::genModelEmbed($embed);
 				}
+				$author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
 				return new Webhook($discordMessage->channel_id, $discordMessage->webhook_id, $embeds, $discordMessage->id,
-					$discordMessage->content, $discordMessage->guild_id.".".$discordMessage->author->id, $discordMessage->guild_id,
-					$discordMessage->timestamp->getTimestamp(), $discordMessage->mention_everyone,
-					array_keys($discordMessage->mentions->toArray()), array_keys($discordMessage->mention_roles->toArray()),
-					array_keys($discordMessage->mention_channels->toArray()));
+					$discordMessage->content, $author, $guild_id, $discordMessage->timestamp->getTimestamp(),
+					$discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
+					array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));
 			}
 		}elseif($discordMessage->type === DiscordMessage::TYPE_REPLY){
 			if($discordMessage->referenced_message === null){
@@ -217,11 +215,11 @@ abstract class ModelConverter{
 			if($e !== null){
 				$e = self::genModelEmbed($e);
 			}
+			$author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
 			return new Reply($discordMessage->channel_id, $discordMessage->referenced_message->id, $discordMessage->id,
-				$discordMessage->content, $e, $discordMessage->guild_id.".".$discordMessage->author->id,
-				$discordMessage->guild_id, $discordMessage->timestamp->getTimestamp(), $discordMessage->mention_everyone,
-				array_keys($discordMessage->mentions->toArray()), array_keys($discordMessage->mention_roles->toArray()),
-				array_keys($discordMessage->mention_channels->toArray()));
+				$discordMessage->content, $e, $author, $guild_id, $discordMessage->timestamp->getTimestamp(),
+				$discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
+				array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));
 		}
 		throw new AssertionError("Discord message type not supported.");
 	}

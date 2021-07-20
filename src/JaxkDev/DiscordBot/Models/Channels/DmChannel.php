@@ -14,6 +14,11 @@ namespace JaxkDev\DiscordBot\Models\Channels;
 
 //This is a big mess in terms of events, any update causes it to be a channel create event.
 //So this is not stored/sent in terms of events/dumps its only use is outbound message requests.
+
+// TODO HIGH PRIORITY INVESTIGATE
+// This is stupid but discord is discord, DM Channels have their own unique ID irrelevant of recipient ID's
+// This is also the cause of the above notes.
+
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 class DmChannel extends Channel{
