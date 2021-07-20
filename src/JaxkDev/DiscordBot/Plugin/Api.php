@@ -21,6 +21,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -49,12 +50,10 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
  * TODO:
- * - Fetch Message
  * - Fetch Channel Pins (entire message obj's)
  *
- * v2.1+ :
- * - Register listener (messages, reactions etc)
- * - Unregister listener
+ * Test:
+ * - Fetch Message
  *
  * Tested:
  * - Create Role (https://github.com/discord-php/DiscordPHP/issues/556)
@@ -114,6 +113,25 @@ class Api{
 			return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
 		}
 		$pk = new RequestLeaveServer($server_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	/**
+	 * Fetch a message by ID.
+	 *
+	 * @param string $channel_id
+	 * @param string $message_id
+	 * @return PromiseInterface
+	 */
+	public function fetchMessage(string $channel_id, string $message_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($message_id)){
+			return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
+		}
+		$pk = new RequestFetchMessage($channel_id, $message_id);
 		$this->plugin->writeOutboundData($pk);
 		return ApiResolver::create($pk->getUID());
 	}

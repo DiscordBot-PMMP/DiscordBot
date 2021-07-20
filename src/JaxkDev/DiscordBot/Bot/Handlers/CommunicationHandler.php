@@ -35,6 +35,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -104,6 +105,7 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestRemoveReaction) $this->handleRemoveReaction($pk);
 		elseif($pk instanceof RequestRemoveAllReactions) $this->handleRemoveAllReactions($pk);
 		elseif($pk instanceof RequestDeleteMessage) $this->handleDeleteMessage($pk);
+		elseif($pk instanceof RequestFetchMessage) $this->handleFetchMessage($pk);
 		elseif($pk instanceof RequestPinMessage) $this->handlePinMessage($pk);
 		elseif($pk instanceof RequestUnpinMessage) $this->handleUnpinMessage($pk);
 		elseif($pk instanceof RequestAddRole) $this->handleAddRole($pk);
@@ -120,6 +122,12 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
 		elseif($pk instanceof RequestLeaveServer) $this->handleLeaveServer($pk);
+	}
+
+	private function handleFetchMessage(RequestFetchMessage $pk): void{
+		$this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $message) use($pk){
+			$this->resolveRequest($pk->getUID(), true, "Fetched message.", [ModelConverter::genModelMessage($message)]);
+		});
 	}
 
 	private function handleUnpinMessage(RequestUnpinMessage $pk): void{
