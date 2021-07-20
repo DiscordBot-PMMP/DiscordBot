@@ -46,6 +46,9 @@ use JaxkDev\DiscordBot\Plugin\Events\MessageDeleted as MessageDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady as DiscordReadyEvent;
+use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ServerDeleted as ServerDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ServerJoined as ServerJoinedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ServerUpdated as ServerUpdatedEvent;
@@ -142,17 +145,23 @@ class BotCommunicationHandler{
 	}
 
 	private function handleRoleCreate(RoleCreatePacket $packet): void{
-		//TODO Event
+		$r = $packet->getRole();
+		(new RoleCreatedEvent($this->plugin, $r))->call();
 		Storage::addRole($packet->getRole());
 	}
 
 	private function handleRoleUpdate(RoleUpdatePacket $packet): void{
-		//TODO Event
+		$r = $packet->getRole();
+		(new RoleUpdatedEvent($this->plugin, $r))->call();
 		Storage::updateRole($packet->getRole());
 	}
 
 	private function handleRoleDelete(RoleDeletePacket $packet): void{
-		//TODO Event
+		$r = Storage::getRole($packet->getRoleId());
+		if($r === null){
+			throw new \AssertionError("Role '{$packet->getRoleId()}' not found in storage.");
+		}
+		(new RoleDeletedEvent($this->plugin, $r))->call();
 		Storage::removeRole($packet->getRoleId());
 	}
 
