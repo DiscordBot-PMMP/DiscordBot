@@ -12,8 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Models\Channels;
 
-use JaxkDev\DiscordBot\Plugin\Utils;
-
 class TextChannel extends ServerChannel{
 
 	/** @var string AKA Description. */
@@ -25,8 +23,7 @@ class TextChannel extends ServerChannel{
 	/** @var ?int In seconds | null when disabled. */
 	private $rate_limit = null;
 
-	/** @var string[] Message ID's, Message objects can be found via API::fetchPinnedMessages() */
-	private $pins = [];
+	//Pins can be found via API::fetchPinnedMessages();
 
 	//Webhooks can be found via API::fetchWebhooks();
 
@@ -39,17 +36,15 @@ class TextChannel extends ServerChannel{
 	 * @param string      $server_id
 	 * @param bool        $nsfw
 	 * @param int|null    $rate_limit
-	 * @param string[]    $pins Array of message ID's
 	 * @param string|null $category_id
 	 * @param string|null $id
 	 */
 	public function __construct(string $topic, string $name, int $position, string $server_id, bool $nsfw = false,
-								   ?int $rate_limit = null, array $pins = [], ?string $category_id = null, ?string $id = null){
+								   ?int $rate_limit = null, ?string $category_id = null, ?string $id = null){
 		parent::__construct($name, $position, $server_id, $category_id, $id);
 		$this->setTopic($topic);
 		$this->setNsfw($nsfw);
 		$this->setRateLimit($rate_limit);
-		$this->setPins($pins);
 	}
 
 	public function getTopic(): string{
@@ -82,21 +77,6 @@ class TextChannel extends ServerChannel{
 		$this->rate_limit = $rate_limit;
 	}
 
-	/** @return string[] Message ID's */
-	public function getPins(): array{
-		return $this->pins;
-	}
-
-	/** @param string[] $pins Message ID's */
-	public function setPins(array $pins): void{
-		foreach($pins as $pin){
-			if(!Utils::validDiscordSnowflake($pin)){
-				throw new \AssertionError("Pin message ID '$pin' is invalid.");
-			}
-		}
-		$this->pins = $pins;
-	}
-
 	//----- Serialization -----//
 
 	public function serialize(): ?string{
@@ -110,8 +90,7 @@ class TextChannel extends ServerChannel{
 			$this->topic,
 			$this->nsfw,
 			$this->rate_limit,
-			$this->category_id,
-			$this->pins
+			$this->category_id
 		]);
 	}
 
@@ -126,8 +105,7 @@ class TextChannel extends ServerChannel{
 			$this->topic,
 			$this->nsfw,
 			$this->rate_limit,
-			$this->category_id,
-			$this->pins
+			$this->category_id
 		] = unserialize($data);
 	}
 }

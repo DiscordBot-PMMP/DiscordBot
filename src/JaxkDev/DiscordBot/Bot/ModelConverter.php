@@ -168,11 +168,6 @@ abstract class ModelConverter{
 			$discordChannel->parent_id, $discordChannel->id));
 	}
 
-	/**
-	 * Excludes pins, that requires a fetch.
-	 * @param DiscordChannel $discordChannel
-	 * @return TextChannel
-	 */
 	static public function genModelTextChannel(DiscordChannel $discordChannel): TextChannel{
 		if($discordChannel->type !== DiscordChannel::TYPE_TEXT and $discordChannel->type !== DiscordChannel::TYPE_NEWS){
 			throw new AssertionError("Discord channel type must be `text|news` to generate model text channel.");
@@ -182,8 +177,7 @@ abstract class ModelConverter{
 		}
 		return self::applyPermissionOverwrites($discordChannel, new TextChannel($discordChannel->topic??"", $discordChannel->name,
 			$discordChannel->position, $discordChannel->guild_id, $discordChannel->nsfw??false, $discordChannel->rate_limit_per_user,
-			[], $discordChannel->parent_id, $discordChannel->id));
-		//Pins require a fetch.
+			$discordChannel->parent_id, $discordChannel->id));
 	}
 
 	static public function genModelMessage(DiscordMessage $discordMessage): Message{
