@@ -20,6 +20,7 @@ use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Models\User;
+use pocketmine\utils\MainLogger;
 
 /*
  * Notes:
@@ -447,4 +448,55 @@ class Storage{
 	public static function setTimestamp(int $timestamp): void{
 		self::$timestamp = $timestamp;
 	}
+
+	/**
+	 * Dumps the entire storage into a use-able file for debugging purposes.
+	 *
+	 * Security Notice, No sensitive information like webhook tokens will be stored.
+	 *
+	 * @param string $file Full path + extension
+	 * @return bool False on failure
+	 */
+	public static function saveStorage(string $file): bool{
+		MainLogger::getLogger()->debug("[DiscordBot] Dumping all storage data into '$file'...");
+
+		$data = serialize([1, (new \ReflectionClass("\JaxkDev\DiscordBot\Plugin\Storage"))->getStaticProperties()]);
+		if(file_put_contents($file, $data) === false){
+			MainLogger::getLogger()->error("[DiscordBot] Failed to dump storage into '$file'");
+			return false;
+		}
+
+		MainLogger::getLogger()->debug("[DiscordBot] Storage dumped into '$file'");
+		return true;
+	}
+
+	//Disabled for public, this should ONLY be used by active developers of DiscordBot.
+	/*public static function loadStorage(string $file): bool{
+		MainLogger::getLogger()->debug("[DiscordBot] Loading storage from '$file'...");
+
+		$data = file_get_contents($file);
+		if($data === false) return false;
+		$data = unserialize($data);
+		if(!is_array($data) or sizeof($data) !== 2 or !is_int($data[0])) return false;
+		$storage = $data[1];
+		self::$botUser = $storage["botUser"];
+		self::$timestamp = $storage["timestamp"];
+		self::$inviteServerMap = $storage["inviteServerMap"];
+		self::$inviteMap = $storage["inviteMap"];
+		self::$banServerMap = $storage["banServerMap"];
+		self::$banMap = $storage["banMap"];
+		self::$roleServerMap = $storage["roleServerMap"];
+		self::$roleMap = $storage["roleMap"];
+		self::$userMap = $storage["userMap"];
+		self::$memberServerMap = $storage["memberServerMap"];
+		self::$memberMap = $storage["memberMap"];
+		self::$categoryServerMap = $storage["categoryServerMap"];
+		self::$channelCategoryMap = $storage["channelCategoryMap"];
+		self::$channelServerMap = $storage["channelServerMap"];
+		self::$channelMap = $storage["channelMap"];
+		self::$serverMap = $storage["serverMap"];
+
+		MainLogger::getLogger()->debug("[DiscordBot] Successfully loaded storage from '$file'.");
+		return true;
+	}*/
 }
