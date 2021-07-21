@@ -68,7 +68,6 @@ class Client{
 		// Must be set globally due to internal methods in the rotating file handler.
 		// Note, this does not effect outside thread config.
 		ini_set("date.timezone", "UTC");
-		$this->thread->getLogger()->debug("DiscordBot logs will be in UTC timezone.");
 
 		Packet::$UID_COUNT = 1;
 
