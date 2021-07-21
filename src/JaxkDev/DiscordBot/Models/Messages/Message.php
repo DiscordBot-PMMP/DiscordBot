@@ -38,6 +38,9 @@ class Message implements \Serializable{
 	/** @var ?float Null when sending message. */
 	protected $timestamp;
 
+	/** @var Attachment[] Used for INBOUND messages only. */
+	protected $attachments = [];
+
 	/** @var bool */
 	protected $everyone_mentioned = false;
 
@@ -53,22 +56,23 @@ class Message implements \Serializable{
 	/**
 	 * Message constructor.
 	 *
-	 * @param string      $channel_id
-	 * @param string|null $id
-	 * @param string      $content
-	 * @param Embed|null  $embed
-	 * @param string|null $author_id
-	 * @param string|null $server_id
-	 * @param float|null  $timestamp
-	 * @param bool        $everyone_mentioned
-	 * @param string[]    $users_mentioned
-	 * @param string[]    $roles_mentioned
-	 * @param string[]    $channels_mentioned
+	 * @param string       $channel_id
+	 * @param string|null  $id
+	 * @param string       $content
+	 * @param Embed|null   $embed
+	 * @param string|null  $author_id
+	 * @param string|null  $server_id
+	 * @param float|null   $timestamp
+	 * @param Attachment[] $attachments
+	 * @param bool         $everyone_mentioned
+	 * @param string[]     $users_mentioned
+	 * @param string[]     $roles_mentioned
+	 * @param string[]     $channels_mentioned
 	 */
 	public function __construct(string $channel_id, ?string $id = null, string $content = "", ?Embed $embed = null,
-								   ?string $author_id = null, ?string $server_id = null, ?float $timestamp = null,
-								   bool $everyone_mentioned = false, array $users_mentioned = [], array $roles_mentioned = [],
-								   array $channels_mentioned = []){
+								?string $author_id = null, ?string $server_id = null, ?float $timestamp = null,
+								array $attachments = [], bool $everyone_mentioned = false, array $users_mentioned = [],
+								array $roles_mentioned = [], array $channels_mentioned = []){
 		$this->setChannelId($channel_id);
 		$this->setId($id);
 		$this->setContent($content);
@@ -76,6 +80,7 @@ class Message implements \Serializable{
 		$this->setAuthorId($author_id);
 		$this->setServerId($server_id);
 		$this->setTimestamp($timestamp);
+		$this->setAttachments($attachments);
 		$this->setEveryoneMentioned($everyone_mentioned);
 		$this->setUsersMentioned($users_mentioned);
 		$this->setRolesMentioned($roles_mentioned);
@@ -158,6 +163,27 @@ class Message implements \Serializable{
 		$this->timestamp = $timestamp;
 	}
 
+	/**
+	 * @return Attachment[]
+	 */
+	public function getAttachments(): array{
+		return $this->attachments;
+	}
+
+	/**
+	 * Notice, these will not work when sending/updating messages, its for INBOUND ONLY.
+	 *
+	 * @var Attachment[] $attachments
+	 */
+	public function setAttachments(array $attachments): void{
+		foreach($attachments as $attachment){
+			if(!$attachment instanceof Attachment){
+				throw new \AssertionError("Attachments must be an Attachment instance.");
+			}
+		}
+		$this->attachments = $attachments;
+	}
+
 	public function isEveryoneMentioned(): bool{
 		return $this->everyone_mentioned;
 	}
@@ -234,6 +260,7 @@ class Message implements \Serializable{
 			$this->channel_id,
 			$this->server_id,
 			$this->timestamp,
+			$this->attachments,
 			$this->everyone_mentioned,
 			$this->users_mentioned,
 			$this->roles_mentioned,
@@ -250,6 +277,7 @@ class Message implements \Serializable{
 			$this->channel_id,
 			$this->server_id,
 			$this->timestamp,
+			$this->attachments,
 			$this->everyone_mentioned,
 			$this->users_mentioned,
 			$this->roles_mentioned,

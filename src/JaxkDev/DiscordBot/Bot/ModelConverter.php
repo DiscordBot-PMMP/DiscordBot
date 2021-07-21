@@ -46,6 +46,7 @@ use JaxkDev\DiscordBot\Models\Embed\Image;
 use JaxkDev\DiscordBot\Models\Embed\Video;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Messages\Attachment;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Reply as ReplyMessage;
 use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
@@ -184,6 +185,10 @@ abstract class ModelConverter{
 		if($discordMessage->author === null){
 			throw new AssertionError("Discord message does not have a author, cannot generate model message.");
 		}
+		$attachments = [];
+		foreach($discordMessage->attachments as $attachment){
+			$attachments[] = self::genModelAttachment($attachment);
+		}
 		$guild_id = $discordMessage->guild_id??($discordMessage->author instanceof DiscordMember ? $discordMessage->author->guild_id : null);
 		if($discordMessage->type === DiscordMessage::TYPE_NORMAL){
 			if($discordMessage->webhook_id === null){
@@ -193,7 +198,7 @@ abstract class ModelConverter{
 				}
 				$author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
 				return new Message($discordMessage->channel_id, $discordMessage->id, $discordMessage->content, $e,
-					$author, $guild_id, $discordMessage->timestamp->getTimestamp(), $discordMessage->mention_everyone,
+					$author, $guild_id, $discordMessage->timestamp->getTimestamp(), $attachments, $discordMessage->mention_everyone,
 					array_keys($discordMessage->mentions->toArray()), array_keys($discordMessage->mention_roles->toArray()),
 					array_keys($discordMessage->mention_channels->toArray()));
 			}else{
@@ -203,7 +208,7 @@ abstract class ModelConverter{
 				}
 				$author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
 				return new WebhookMessage($discordMessage->channel_id, $discordMessage->webhook_id, $embeds, $discordMessage->id,
-					$discordMessage->content, $author, $guild_id, $discordMessage->timestamp->getTimestamp(),
+					$discordMessage->content, $author, $guild_id, $discordMessage->timestamp->getTimestamp(), $attachments,
 					$discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
 					array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));
 			}
@@ -217,11 +222,16 @@ abstract class ModelConverter{
 			}
 			$author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
 			return new ReplyMessage($discordMessage->channel_id, $discordMessage->referenced_message->id, $discordMessage->id,
-				$discordMessage->content, $e, $author, $guild_id, $discordMessage->timestamp->getTimestamp(),
+				$discordMessage->content, $e, $author, $guild_id, $discordMessage->timestamp->getTimestamp(), $attachments,
 				$discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
 				array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));
 		}
 		throw new AssertionError("Discord message type not supported.");
+	}
+
+	static public function genModelAttachment(\stdClass $attachment): Attachment{
+		return new Attachment($attachment->id, $attachment->filename, $attachment->content_type, $attachment->size,
+			$attachment->url, $attachment->width??null, $attachment->height??null);
 	}
 
 	static public function genModelEmbed(DiscordEmbed $discordEmbed): Embed{

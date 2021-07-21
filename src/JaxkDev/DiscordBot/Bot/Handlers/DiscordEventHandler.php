@@ -104,7 +104,7 @@ class DiscordEventHandler{
 		 *
 		 * TODO (TBD):
 		 * - Presence updates.
-		 * - Pins (Note event only emits the pins for the channel not if one was added/deleted/unpinned etc, handle plugin side to check against storage.)
+		 * - Pins (Note event only emits the pins list for the channel not if one was added/deleted/unpinned)
 		 */
 	}
 
@@ -475,8 +475,8 @@ array(5) {
 
 		// Other types of messages not used right now.
 		if($message->type !== DiscordMessage::TYPE_NORMAL and $message->type !== DiscordMessage::TYPE_REPLY) return false;
-		if(($message->content??"") === "" and $message->embeds->count() === 0) return false;
-		// ^ Images/Files/Spotify/Games etc
+		if(($message->content??"") === "" and $message->embeds->count() === 0 and sizeof($message->attachments) === 0) return false;
+		// ^ Spotify/Games etc
 
 		return true;
 	}
