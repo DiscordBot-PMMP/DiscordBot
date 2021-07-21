@@ -25,6 +25,7 @@ use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
+use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump as DiscordDataDumpPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd as BanAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanRemove as BanRemovePacket;
@@ -46,7 +47,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerJoin as ServerJoinPac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerLeave as ServerLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerUpdate as ServerUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
-use JaxkDev\DiscordBot\Communication\Protocol;
 
 class DiscordEventHandler{
 
@@ -188,7 +188,7 @@ array(5) {
 	 */
 
 	public function onReady(): void{
-		if($this->client->getThread()->getStatus() !== Protocol::THREAD_STATUS_STARTED){
+		if($this->client->getThread()->getStatus() !== BotThread::STATUS_STARTED){
 			$this->logger->warning("Closing thread, unexpected state change.");
 			$this->client->close();
 		}
@@ -284,14 +284,14 @@ array(5) {
 			round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
 
 		//Very important to check status before overwriting, can cause dangerous behaviour.
-		if($this->client->getThread()->getStatus() !== Protocol::THREAD_STATUS_STARTED){
+		if($this->client->getThread()->getStatus() !== BotThread::STATUS_STARTED){
 			$this->logger->warning("Closing thread, unexpected state change.");
 			$this->client->close();
 		}
 
 		$this->client->getThread()->writeOutboundData($pk);
 
-		$this->client->getThread()->setStatus(Protocol::THREAD_STATUS_READY);
+		$this->client->getThread()->setStatus(BotThread::STATUS_READY);
 		$this->logger->info("Client '".$client->username."#".$client->discriminator."' ready.");
 
 		$this->client->getThread()->writeOutboundData(new DiscordReadyPacket());

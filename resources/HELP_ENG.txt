@@ -8,17 +8,21 @@ Visit https://github.com/DiscordBot-PMMP/DiscordBot/wiki
 
 Config.yml Explained:
 
-version: 2				DO NOT EVER TOUCH THIS.
+version: 2						DO NOT EVER TOUCH THIS.
 
 discord:
-  token: "ABCD123"		DO NOT EVER SHOW THIS TOKEN TO ANYBODY !!! Paste your discord bots token into here,
-  						for how to get/setup the bot and get token, see beginning of file.
-  usePluginCacert: true Leave this alone unless told specifically to disable (set to false)
+  token: "ABCD123"				DO NOT EVER SHOW THIS TOKEN TO ANYBODY !!! Paste your discord bots token into here,
+								for how to get/setup the bot and get token, see beginning of file.
+  use_plugin_acert: true|false	DO NOT modify this without being told to explicitly, You have been warned...
 
 logging:
-  debug: false|true     Log information to screen/console, all debug messages are logged to file by default.
-  maxFiles: 28			How many log files to keep on disk at any one time.
-  directory: "logs"		What directory to keep log files in, relative from plugin_data/DiscordBot/
+  debug: false|true     		Log information to screen/console, all debug messages are logged to file by default.
+  max_files: 28					How many log files to keep on disk at any one time.
+  directory: "logs"				What directory to keep log files in, relative from plugin_data/DiscordBot/
 
+protocol:
+  packets_per_tick: 50			How many packets can be processed per tick.
+  heartbeat_allowance: 60		How many seconds after last heartbeat received before the plugin/thread is declared dead.
+  								DO NOT modify the protocol fields without being told to explicitly, You have been warned...
 
 ===========================================================================================

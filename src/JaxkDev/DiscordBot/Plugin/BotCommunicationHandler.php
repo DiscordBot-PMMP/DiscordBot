@@ -37,7 +37,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerUpdate as ServerUpdat
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Plugin\Events\BanCreated as BanCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\BanDeleted as BanDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelDeleted as ChannelDeletedEvent;
@@ -291,7 +290,7 @@ class BotCommunicationHandler{
 	 */
 	public function checkHeartbeat(): void{
 		if($this->lastHeartbeat === null) return;
-		if(($diff = microtime(true) - $this->lastHeartbeat) > Protocol::HEARTBEAT_ALLOWANCE){
+		if(($diff = microtime(true) - $this->lastHeartbeat) > $this->plugin->getPluginConfig()["protocol"]["heartbeat_allowance"]){
 			$this->plugin->getLogger()->emergency("DiscordBot has not responded for {$diff} seconds, disabling plugin.");
 			$this->plugin->stopAll();
 		}

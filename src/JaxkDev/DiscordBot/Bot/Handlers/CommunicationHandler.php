@@ -30,6 +30,7 @@ use Discord\Repository\Channel\WebhookRepository as DiscordWebhookRepository;
 use Discord\Repository\Guild\InviteRepository as DiscordInviteRepository;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
+use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
@@ -62,7 +63,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
-use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
@@ -99,7 +99,7 @@ class CommunicationHandler{
 		}
 
 		//API Check:
-		if($this->client->getThread()->getStatus() !== Protocol::THREAD_STATUS_READY){
+		if($this->client->getThread()->getStatus() !== BotThread::STATUS_READY){
 			$this->resolveRequest($pk->getUID(), false, "Thread not ready for API Requests.");
 			return;
 		}
@@ -807,7 +807,7 @@ class CommunicationHandler{
 
 	public function checkHeartbeat(): void{
 		if($this->lastHeartbeat === null) return;
-		if(($diff = (microtime(true) - $this->lastHeartbeat)) > Protocol::HEARTBEAT_ALLOWANCE){
+		if(($diff = (microtime(true) - $this->lastHeartbeat)) > $this->client->getConfig()['protocol']['heartbeat_allowance']){
 			$this->logger->emergency("Plugin has not responded for {$diff} seconds, closing thread.");
 			$this->client->close();
 		}

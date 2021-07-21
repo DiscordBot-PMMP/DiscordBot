@@ -21,7 +21,6 @@ use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\Bot\Handlers\CommunicationHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Communication\Protocol;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
@@ -74,7 +73,7 @@ class Client{
 		Packet::$UID_COUNT = 1;
 
 		$logger = new Logger('DiscordPHP');
-		$handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['maxFiles'], Logger::DEBUG);
+		$handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['max_files'], Logger::DEBUG);
 		$handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
 		$logger->setHandlers(array($handler));
 
@@ -96,7 +95,7 @@ class Client{
 		];
 
 		$socket_opts = [];
-		if($config["discord"]["usePluginCacert"]){
+		if($config["discord"]["use_plugin_cacert"]){
 			$this->thread->getLogger()->debug("TLS cafile set to '".\JaxkDev\DiscordBot\DATA_PATH."cacert.pem"."'");
 			$socket_opts["tls"] = [
 				"cafile" => \JaxkDev\DiscordBot\DATA_PATH."cacert.pem"
@@ -124,8 +123,8 @@ class Client{
 		$this->registerHandlers();
 		$this->registerTimers();
 
-		if($this->thread->getStatus() === Protocol::THREAD_STATUS_STARTING){
-			$this->thread->setStatus(Protocol::THREAD_STATUS_STARTED);
+		if($this->thread->getStatus() === BotThread::STATUS_STARTING){
+			$this->thread->setStatus(BotThread::STATUS_STARTED);
 			$this->client->run();
 		}else{
 			$this->thread->getLogger()->warning("Closing thread, unexpected state change.");
@@ -137,7 +136,7 @@ class Client{
 		// Handles shutdown, rather than a SHUTDOWN const to send through internal communication, set flag to closed.
 		// Saves time & will guarantee closure ASAP rather then waiting in line through ^
 		$this->client->getLoop()->addPeriodicTimer(1, function(){
-			if($this->thread->getStatus() === Protocol::THREAD_STATUS_CLOSING){
+			if($this->thread->getStatus() === BotThread::STATUS_CLOSING){
 				$this->close();
 			}
 		});
@@ -147,7 +146,7 @@ class Client{
 			if($this->client->id !== null){
 				$this->thread->getLogger()->warning("Client has taken >30s to get ready, How large is your discord server !?  [Create an issue on github is this persists]");
 				$this->client->getLoop()->addTimer(30, function(){
-					if($this->thread->getStatus() !== Protocol::THREAD_STATUS_READY){
+					if($this->thread->getStatus() !== BotThread::STATUS_READY){
 						$this->thread->getLogger()->critical("Client has taken too long to become ready, shutting down.");
 						$this->close();
 					}
@@ -183,14 +182,14 @@ class Client{
 	}
 
 	public function tick(): void{
-		$data = $this->thread->readInboundData(Protocol::PACKETS_PER_TICK);
+		$data = $this->thread->readInboundData($this->config["protocol"]["packets_per_tick"]);
 
 		foreach($data as $d){
 			$this->communicationHandler->handle($d);
 		}
 
 		if(($this->tickCount % 20) === 0){
-			if($this->thread->getStatus() === Protocol::THREAD_STATUS_READY){
+			if($this->thread->getStatus() === BotThread::STATUS_READY){
 				$this->communicationHandler->checkHeartbeat();
 				$this->communicationHandler->sendHeartbeat();
 			}
@@ -205,6 +204,10 @@ class Client{
 		}
 
 		$this->tickCount++;
+	}
+
+	public function getConfig(): array{
+		return $this->config;
 	}
 
 	public function getThread(): BotThread{
@@ -230,8 +233,8 @@ class Client{
 	}
 
 	public function close($error = null): void{ /** @phpstan-ignore-line  */
-		if($this->thread->getStatus() === Protocol::THREAD_STATUS_CLOSED) return;
-		$this->thread->setStatus(Protocol::THREAD_STATUS_CLOSED);
+		if($this->thread->getStatus() === BotThread::STATUS_CLOSED) return;
+		$this->thread->setStatus(BotThread::STATUS_CLOSED);
 		if($error instanceof Throwable){
 			$this->thread->getLogger()->logException($error);
 		}

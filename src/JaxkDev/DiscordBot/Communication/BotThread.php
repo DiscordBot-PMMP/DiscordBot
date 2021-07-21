@@ -21,6 +21,13 @@ use Volatile;
 
 class BotThread extends Thread{
 
+	const
+		STATUS_STARTING = 0,
+		STATUS_STARTED 	= 1,
+		STATUS_READY 	= 2,
+		STATUS_CLOSING 	= 8,
+		STATUS_CLOSED 	= 9;
+
 	/** @var AttachableThreadedLogger */
 	private $logger;
 
@@ -33,7 +40,7 @@ class BotThread extends Thread{
 	private $outboundData;
 
 	/** @var int */
-	private $status = Protocol::THREAD_STATUS_STARTING;
+	private $status = self::STATUS_STARTING;
 
 	public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData){
 		$this->logger = $logger;
@@ -71,7 +78,7 @@ class BotThread extends Thread{
 	}
 
 	public function setStatus(int $status): void{
-		if(!in_array($status, [0,1,2,8,9])){
+		if(!in_array($status, [0,1,2,8,9])){ //TODO Const's
 			throw new \AssertionError("Invalid thread status.");
 		}
 		$this->status = $status;

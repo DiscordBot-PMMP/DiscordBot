@@ -14,13 +14,13 @@ namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Communication\Protocol;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
 use Phar;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginException;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
+use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use Volatile;
 
@@ -107,7 +107,6 @@ class Main extends PluginBase{
 		$this->getLogger()->debug("Starting DiscordBot Thread...");
 		$this->discordBot = new BotThread($this->getServer()->getLogger(), $this->config, $this->outboundData, $this->inboundData);
 		$this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
-		unset($this->config);
 
 		$this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(int $currentTick): void{
 			$this->tick($currentTick);
@@ -119,7 +118,7 @@ class Main extends PluginBase{
 	}
 
 	private function loadConfig(): bool{
-		$this->getLogger()->debug("Loading initial configuration...");
+		$this->getLogger()->debug("Loading configuration...");
 
 		$config = yaml_parse_file($this->getDataFolder()."config.yml");
 		if($config === false or !is_int($config["version"]??"")){
@@ -154,7 +153,7 @@ class Main extends PluginBase{
 	}
 
 	private function tick(int $currentTick): void{
-		$data = $this->readInboundData(Protocol::PACKETS_PER_TICK);
+		$data = $this->readInboundData($this->config["protocol"]["packets_per_tick"]);
 
 		/** @var Packet $d */
 		foreach($data as $d){
@@ -163,11 +162,11 @@ class Main extends PluginBase{
 
 		if(($currentTick % 20) === 0){
 			//Run every second. [Faster/More accurate over bots tick]
-			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_READY){
+			if($this->discordBot->getStatus() === BotThread::STATUS_READY){
 				$this->botCommsHandler->checkHeartbeat();
 				$this->botCommsHandler->sendHeartbeat();
 			}
-			if($this->discordBot->getStatus() === Protocol::THREAD_STATUS_CLOSED){
+			if($this->discordBot->getStatus() === BotThread::STATUS_CLOSED){
 				$this->stopAll();
 			}
 		}
@@ -209,6 +208,14 @@ class Main extends PluginBase{
 		return $this->api;
 	}
 
+	public function getConfig(): Config{
+		throw new PluginException("getConfig() is not used, see Main::getPluginConfig()");
+	}
+
+	public function getPluginConfig(): array{
+		return $this->config;
+	}
+
 	public function stopAll(bool $stopPlugin = true): void{
 		if($this->tickTask !== null){
 			if(!$this->tickTask->isCancelled()){
@@ -216,10 +223,10 @@ class Main extends PluginBase{
 			}
 		}
 		if($this->discordBot !== null and $this->discordBot->isRunning()){
-			//Stopping while bot is not ready (midway through data dump) causes it to wait.
-			$this->discordBot->setStatus(Protocol::THREAD_STATUS_CLOSING);
-			$this->getLogger()->warning("Closing the thread, if doing a data pack or heavy duty tasks this can take a few moments.");
-			$this->discordBot->quit();  // Joins thread (<-- beware) (Right now this forces bot to close)
+			$this->discordBot->setStatus(BotThread::STATUS_CLOSING);
+			$this->getLogger()->warning("Closing discord thread, This can take a several seconds.");
+			//^ Stopping while bot is not ready (midway through data dump) causes it to wait for it to finish.
+			$this->discordBot->quit();  // Joins thread
 			$this->getLogger()->info("Thread closed.");
 			(new DiscordClosed($this))->call();
 		}

@@ -23,7 +23,7 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class DmChannel extends Channel{
 
-	//** @var string[] Message ID's */
+	//** @var string[] Message ID's TODO Decide. */
 	//private $pins = [];
 
 	/**
