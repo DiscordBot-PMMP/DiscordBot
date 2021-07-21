@@ -78,7 +78,7 @@ class BotThread extends Thread{
 	}
 
 	public function setStatus(int $status): void{
-		if(!in_array($status, [0,1,2,8,9])){ //TODO Const's
+		if(!in_array($status, [self::STATUS_STARTING, self::STATUS_STARTED, self::STATUS_READY, self::STATUS_CLOSING, self::STATUS_CLOSED])){
 			throw new \AssertionError("Invalid thread status.");
 		}
 		$this->status = $status;
