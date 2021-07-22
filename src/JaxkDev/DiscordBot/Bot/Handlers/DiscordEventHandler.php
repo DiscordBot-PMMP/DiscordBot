@@ -25,6 +25,7 @@ use Discord\Parts\User\User as DiscordUser;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump as DiscordDataDumpPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd as BanAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanRemove as BanRemovePacket;
@@ -78,6 +79,7 @@ class DiscordEventHandler{
 		$discord->on("CHANNEL_CREATE", [$this, "onChannelCreate"]);
 		$discord->on("CHANNEL_UPDATE", [$this, "onChannelUpdate"]);
 		$discord->on("CHANNEL_DELETE", [$this, "onChannelDelete"]);
+		$discord->on("CHANNEL_PINS_UPDATE", [$this, "onChannelPinsUpdate"]);
 
 		$discord->on("GUILD_ROLE_CREATE", [$this, "onRoleCreate"]);
 		$discord->on("GUILD_ROLE_UPDATE", [$this, "onRoleUpdate"]);
@@ -99,12 +101,11 @@ class DiscordEventHandler{
 
 		/*
 		 * TODO:
-		 * - Voice State Update (track members voice activity, join voice channel, leave voice channel, self deafen/mute)
 		 * - Reactions (Probably wont store previous reactions, could be very large, add fetchReactions into API.)
 		 *
 		 * TODO (TBD):
+		 * - Voice State Update (track members voice activity, join voice channel, leave voice channel, self deafen/mute)
 		 * - Presence updates.
-		 * - Pins (Note event only emits the pins list for the channel not if one was added/deleted/unpinned)
 		 */
 	}
 
@@ -392,6 +393,12 @@ array(5) {
 
 	public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
 		$packet = new ChannelDeletePacket($channel->id);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	/** $data ["last_pin_timestamp" => string, "channel_id" => string, "guild_id" => string] */
+	public function onChannelPinsUpdate(\stdClass $data): void{
+		$packet = new ChannelPinsUpdate($data->channel_id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 

@@ -20,6 +20,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\BanRemove as BanRemovePacke
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate as ChannelCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelDelete as ChannelDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelUpdate as ChannelUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate as ChannelPinsUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteCreate as InviteCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteDelete as InviteDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberJoin as MemberJoinPacket;
@@ -37,15 +38,17 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerUpdate as ServerUpdat
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Plugin\Events\BanCreated as BanCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\BanDeleted as BanDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelDeleted as ChannelDeletedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\ChannelPinsUpdated;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelUpdated as ChannelUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteCreated as InviteCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteDeleted as InviteDeletedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\MemberJoined;
-use JaxkDev\DiscordBot\Plugin\Events\MemberLeft;
-use JaxkDev\DiscordBot\Plugin\Events\MemberUpdated;
+use JaxkDev\DiscordBot\Plugin\Events\MemberJoined as MemberJoinedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\MemberLeft as MemberLeftEvent;
+use JaxkDev\DiscordBot\Plugin\Events\MemberUpdated as MemberUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageDeleted as MessageDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
@@ -89,6 +92,7 @@ class BotCommunicationHandler{
 		elseif($packet instanceof ChannelCreatePacket) $this->handleChannelCreate($packet);
 		elseif($packet instanceof ChannelUpdatePacket) $this->handleChannelUpdate($packet);
 		elseif($packet instanceof ChannelDeletePacket) $this->handleChannelDelete($packet);
+		elseif($packet instanceof ChannelPinsUpdatePacket) $this->handleChannelPinsUpdate($packet);
 		elseif($packet instanceof RoleCreatePacket) $this->handleRoleCreate($packet);
 		elseif($packet instanceof RoleUpdatePacket) $this->handleRoleUpdate($packet);
 		elseif($packet instanceof RoleDeletePacket) $this->handleRoleDelete($packet);
@@ -139,10 +143,18 @@ class BotCommunicationHandler{
 	private function handleChannelDelete(ChannelDeletePacket $packet): void{
 		$c = Storage::getChannel($packet->getChannelId());
 		if($c === null){
-			throw new \AssertionError("Channel '{$packet->getChannelId()}' not found in storage.");
+			throw new \AssertionError("Server Channel '{$packet->getChannelId()}' not found in storage.");
 		}
 		(new ChannelDeletedEvent($this->plugin, $c))->call();
 		Storage::removeChannel($packet->getChannelId());
+	}
+
+	private function handleChannelPinsUpdate(ChannelPinsUpdatePacket $packet): void{
+		$c = Storage::getChannel($packet->getChannelId());
+		if($c === null or !$c instanceof TextChannel){
+			throw new \AssertionError("Text Channel '{$packet->getChannelId()}' not found in storage.");
+		}
+		(new ChannelPinsUpdated($this->plugin, $c))->call();
 	}
 
 	private function handleRoleCreate(RoleCreatePacket $packet): void{
@@ -197,13 +209,13 @@ class BotCommunicationHandler{
 		if($server === null){
 			throw new \AssertionError("Server '{$packet->getMember()->getServerId()}' not found for member '{$packet->getMember()->getId()}'");
 		}
-		(new MemberJoined($this->plugin, $packet->getMember()))->call();
+		(new MemberJoinedEvent($this->plugin, $packet->getMember()))->call();
 		Storage::addMember($packet->getMember());
 		Storage::addUser($packet->getUser());
 	}
 
 	private function handleMemberUpdate(MemberUpdatePacket $packet): void{
-		(new MemberUpdated($this->plugin, $packet->getMember()))->call();
+		(new MemberUpdatedEvent($this->plugin, $packet->getMember()))->call();
 		Storage::updateMember($packet->getMember());
 	}
 
@@ -221,7 +233,7 @@ class BotCommunicationHandler{
 			throw new \AssertionError("Server '{$member->getServerId()}' not found for member '{$member->getId()}'");
 		}
 
-		(new MemberLeft($this->plugin, $member))->call();
+		(new MemberLeftEvent($this->plugin, $member))->call();
 
 		Storage::removeMember($packet->getMemberID());
 	}

@@ -502,7 +502,7 @@ class Api{
 	 */
 	public function sendMessage(Message $message): PromiseInterface{
 		if($message instanceof WebhookMessage){
-			//TODO Send webhook message, this does not need to be sent to DiscordThread, async task can be used.
+			//You can execute webhooks yourself using Api::fetchWebhooks() and use its token.
 			return rejectPromise(new ApiRejection("Webhook messages cannot be sent, only received."));
 		}
 		$pk = new RequestSendMessage($message);
