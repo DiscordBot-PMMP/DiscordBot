@@ -12,7 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
-use AttachableThreadedLogger;
 use Discord\Discord;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
@@ -47,18 +46,19 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerJoin as ServerJoinPac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerLeave as ServerLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerUpdate as ServerUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
+use Monolog\Logger;
 
 class DiscordEventHandler{
 
 	/** @var Client */
 	private $client;
 
-	/** @var AttachableThreadedLogger */
+	/** @var Logger */
 	private $logger;
 
 	public function __construct(Client $client){
 		$this->client = $client;
-		$this->logger = $client->getThread()->getLogger();
+		$this->logger = $client->getLogger();
 	}
 
 	public function registerEvents(): void{

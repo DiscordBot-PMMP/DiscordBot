@@ -19,11 +19,12 @@ use Error;
 use ErrorException;
 use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\Bot\Handlers\CommunicationHandler;
+use JaxkDev\DiscordBot\Bot\Handlers\LogStreamHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
+use pocketmine\utils\Utils;
 use React\EventLoop\TimerInterface;
 use Throwable;
 
@@ -34,6 +35,9 @@ class Client{
 
 	/** @var Discord */
 	private $client;
+
+	/** @var Logger */
+	private $logger;
 
 	/** @var CommunicationHandler */
 	private $communicationHandler;
@@ -71,16 +75,11 @@ class Client{
 
 		Packet::$UID_COUNT = 1;
 
-		$logger = new Logger('DiscordPHP');
+		$this->logger = new Logger('DiscordThread');
 		$handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['max_files'], Logger::DEBUG);
 		$handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
-		$logger->setHandlers(array($handler));
-
-		if($config['logging']['debug']){
-			//Note not thread safe on the output could mix and match between servers synced output and this debug output.
-			$handler = new StreamHandler(($r = fopen('php://stdout', 'w')) === false ? "" : $r);
-			$logger->pushHandler($handler);
-		}
+		$this->logger->setHandlers(array($handler));
+		$this->logger->pushHandler(new LogStreamHandler($this->thread->getLogger(), $config["logging"]["debug"]));
 
 		$intents = [
 			Intents::GUILDS,
@@ -95,7 +94,7 @@ class Client{
 
 		$socket_opts = [];
 		if($config["discord"]["use_plugin_cacert"]){
-			$this->thread->getLogger()->debug("TLS cafile set to '".\JaxkDev\DiscordBot\DATA_PATH."cacert.pem"."'");
+			$this->logger->debug("TLS cafile set to '".\JaxkDev\DiscordBot\DATA_PATH."cacert.pem"."'");
 			$socket_opts["tls"] = [
 				"cafile" => \JaxkDev\DiscordBot\DATA_PATH."cacert.pem"
 			];
@@ -104,7 +103,7 @@ class Client{
 		try{
 			$this->client = new Discord([
 				'token' => $config['discord']['token'],
-				'logger' => $logger,
+				'logger' => $this->logger,
 				'socket_options' => $socket_opts,
 				'loadAllMembers' => true,
 				'storeMessages' => true,
@@ -126,7 +125,7 @@ class Client{
 			$this->thread->setStatus(BotThread::STATUS_STARTED);
 			$this->client->run();
 		}else{
-			$this->thread->getLogger()->warning("Closing thread, unexpected state change.");
+			$this->logger->warning("Closing thread, unexpected state change.");
 			$this->close();
 		}
 	}
@@ -143,16 +142,16 @@ class Client{
 		// Handles any problems pre-ready.
 		$this->readyTimer = $this->client->getLoop()->addTimer(30, function(){
 			if($this->client->id !== null){
-				$this->thread->getLogger()->warning("Client has taken >30s to get ready, How large is your discord server !?  [Create an issue on github is this persists]");
+				$this->logger->warning("Client has taken >30s to get ready, How large is your discord server !?  [Create an issue on github is this persists]");
 				$this->client->getLoop()->addTimer(30, function(){
 					if($this->thread->getStatus() !== BotThread::STATUS_READY){
-						$this->thread->getLogger()->critical("Client has taken too long to become ready, shutting down.");
+						$this->logger->critical("Client has taken too long to become ready, shutting down.");
 						$this->close();
 					}
 				});
 			}else{
 				//Should never happen unless your internet speed is like <10kb/s
-				$this->thread->getLogger()->critical("Client failed to login/connect within 30 seconds, See log file for details.");
+				$this->logger->critical("Client failed to login/connect within 30 seconds, See log file for details.");
 				$this->close();
 			}
 		});
@@ -197,7 +196,7 @@ class Client{
 			if(microtime(true)-$this->lastGCCollection >= 6000){
 				$cycles = gc_collect_cycles();
 				$mem = round(gc_mem_caches()/1024, 3);
-				$this->thread->getLogger()->debug("[GC] Claimed {$mem}kb and {$cycles} cycles.");
+				$this->logger->debug("[GC] Claimed {$mem}kb and {$cycles} cycles.");
 				$this->lastGCCollection = time();
 			}
 		}
@@ -207,6 +206,10 @@ class Client{
 
 	public function getConfig(): array{
 		return $this->config;
+	}
+
+	public function getLogger(): Logger{
+		return $this->logger;
 	}
 
 	public function getThread(): BotThread{
@@ -235,16 +238,38 @@ class Client{
 		if($this->thread->getStatus() === BotThread::STATUS_CLOSED) return;
 		$this->thread->setStatus(BotThread::STATUS_CLOSED);
 		if($error instanceof Throwable){
-			$this->thread->getLogger()->logException($error);
+			$errorConversion = [
+				0 => "EXCEPTION",
+				E_ERROR => "E_ERROR",
+				E_WARNING => "E_WARNING",
+				E_PARSE => "E_PARSE",
+				E_NOTICE => "E_NOTICE",
+				E_CORE_ERROR => "E_CORE_ERROR",
+				E_CORE_WARNING => "E_CORE_WARNING",
+				E_COMPILE_ERROR => "E_COMPILE_ERROR",
+				E_COMPILE_WARNING => "E_COMPILE_WARNING",
+				E_USER_ERROR => "E_USER_ERROR",
+				E_USER_WARNING => "E_USER_WARNING",
+				E_USER_NOTICE => "E_USER_NOTICE",
+				E_STRICT => "E_STRICT",
+				E_RECOVERABLE_ERROR => "E_RECOVERABLE_ERROR",
+				E_DEPRECATED => "E_DEPRECATED",
+				E_USER_DEPRECATED => "E_USER_DEPRECATED"
+			];
+			$errno = $errorConversion[$error->getCode()]??$error->getCode();
+			$this->logger->critical(get_class($error) . ": \"{$error->getMessage()}\" ({$errno}) in \"{$error->getFile()}\" at line {$error->getLine()}");
+			foreach(Utils::printableTrace($error->getTrace()) as $line){
+				$this->logger->critical($line);
+			}
 		}
 		if($this->client instanceof Discord){
 			try{
 				$this->client->close(true);
 			}catch (Error $e){
-				$this->thread->getLogger()->debug("Failed to close client, probably not started.");
+				$this->logger->debug("Failed to close client, probably not started.");
 			}
 		}
-		$this->thread->getLogger()->debug("Client closed.");
+		$this->logger->debug("Client closed.");
 		exit(0);
 	}
 }

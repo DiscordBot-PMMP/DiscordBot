@@ -28,7 +28,7 @@ class BotThread extends Thread{
 		STATUS_CLOSING 	= 8,
 		STATUS_CLOSED 	= 9;
 
-	/** @var AttachableThreadedLogger */
+	/** @var MainLogger */
 	private $logger;
 
 	/**  @var array */
@@ -43,16 +43,19 @@ class BotThread extends Thread{
 	private $status = self::STATUS_STARTING;
 
 	public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData){
-		$this->logger = $logger;
+		if($logger instanceof MainLogger){
+			$this->logger = $logger;
+		}else{
+			throw new \AssertionError("No MainLogger passed to constructor ?  (Are you using an unofficial pmmp release....)");
+		}
 		$this->initialConfig = $initialConfig;
 		$this->inboundData = $inboundData;
 		$this->outboundData = $outboundData;
 	}
 
 	public function run(){
-		if($this->logger instanceof MainLogger){
-			$this->logger->registerStatic();
-		}
+		$this->logger->setLogDebug(true);
+		$this->logger->registerStatic();
 
 		$this->registerClassLoader();
 
@@ -88,7 +91,7 @@ class BotThread extends Thread{
 		return $this->status;
 	}
 
-	public function getLogger(): AttachableThreadedLogger{
+	public function getLogger(): MainLogger{
 		return $this->logger;
 	}
 

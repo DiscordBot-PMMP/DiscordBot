@@ -13,7 +13,6 @@
 
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
-use AttachableThreadedLogger;
 use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
@@ -69,6 +68,7 @@ use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Messages\Reply;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Plugin\ApiRejection;
+use Monolog\Logger;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use function React\Promise\reject;
@@ -81,12 +81,12 @@ class CommunicationHandler{
 	/** @var float|null */
 	private $lastHeartbeat = null;
 
-	/** @var AttachableThreadedLogger */
+	/** @var Logger */
 	private $logger;
 
 	public function __construct(Client $client){
 		$this->client = $client;
-		$this->logger = $client->getThread()->getLogger();
+		$this->logger = $client->getLogger();
 	}
 
 	//--- Handlers:
