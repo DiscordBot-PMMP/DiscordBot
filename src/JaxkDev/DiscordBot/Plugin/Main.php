@@ -16,6 +16,8 @@ use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
 use Phar;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginException;
 use pocketmine\scheduler\ClosureTask;
@@ -69,6 +71,9 @@ class Main extends PluginBase{
 		if(!is_dir($this->getDataFolder()."logs")){
 			mkdir($this->getDataFolder()."logs");
 		}
+		if(!is_dir($this->getDataFolder()."debug_data")){
+			mkdir($this->getDataFolder()."debug_data");
+		}
 
 		$this->saveResource("config.yml");
 
@@ -115,6 +120,27 @@ class Main extends PluginBase{
 
 	public function onDisable(){
 		$this->stopAll(false);
+	}
+
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool{
+		if($command->getName() !== "dumpdiscord") return false;
+		if(!$command->testPermission($sender)) return true;
+		if(Storage::getTimestamp() === 0){
+			$sender->sendMessage(TextFormat::RED."Failed to dump discord data, there is no data to dump.");
+			return true;
+		}
+
+		$sender->sendMessage(TextFormat::YELLOW."Starting discord dump...");
+		$file = $this->getDataFolder()."debug_data/discord_dump_".time().".txt";
+		if(!Storage::saveStorage($file)){
+			$sender->sendMessage(TextFormat::RED."Failed to dump discord data.");
+			if(is_file($file)){
+				unlink($file);
+			}
+		}else{
+			$sender->sendMessage(TextFormat::GREEN."Successfully dumped all data to '$file'");
+		}
+		return true;
 	}
 
 	private function loadConfig(): bool{

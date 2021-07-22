@@ -20,7 +20,6 @@ use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Models\User;
-use pocketmine\utils\MainLogger;
 
 /*
  * Notes:
@@ -458,16 +457,8 @@ class Storage{
 	 * @return bool False on failure
 	 */
 	public static function saveStorage(string $file): bool{
-		MainLogger::getLogger()->debug("[DiscordBot] Dumping all storage data into '$file'...");
-
 		$data = serialize([1, (new \ReflectionClass("\JaxkDev\DiscordBot\Plugin\Storage"))->getStaticProperties()]);
-		if(file_put_contents($file, $data) === false){
-			MainLogger::getLogger()->error("[DiscordBot] Failed to dump storage into '$file'");
-			return false;
-		}
-
-		MainLogger::getLogger()->debug("[DiscordBot] Storage dumped into '$file'");
-		return true;
+		return !((file_put_contents($file, $data) === false));
 	}
 
 	//Disabled for public, this should ONLY be used by active developers of DiscordBot.
