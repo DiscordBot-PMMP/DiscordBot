@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Logger;
 use pocketmine\utils\MainLogger;
@@ -27,6 +28,9 @@ class LogStreamHandler extends AbstractHandler{
 	/** @var MainLogger|null */
 	private $logger;
 
+	/** @var LineFormatter */
+	private $formatter;
+
 	/** @var bool */
 	private $debug;
 
@@ -36,12 +40,14 @@ class LogStreamHandler extends AbstractHandler{
 			try{
 				(new \ReflectionProperty($logger, "logStream"))->setAccessible(true);
 			}catch(\Exception $e){
-				$logger->critical("Failed to make log stream accessible, logs will not be stored in server.log");
+				//I dont like this but its one of the last resorts to storing log to file without outputting.
+				$logger->warning("Failed to make log stream accessible, logs will not be saved to server.log");
 				$logger = null;
 			}
 		}
 		$this->debug = $debug;
 		$this->logger = $logger;
+		$this->formatter = new LineFormatter("%message% %context%");
 		parent::__construct($level, $bubble);
 	}
 
@@ -49,8 +55,8 @@ class LogStreamHandler extends AbstractHandler{
 
 	public function handle(array $record): bool{
 		if($this->logger === null) return false;
+		$record['message'] = str_replace(" []\X1","",$this->formatter->format($record)."\X1");
 
-		//TODO 'context'
 		if(!$this->debug){
 			$message = sprintf(self::FORMAT, $record["datetime"]->format("H:i:s"), "", "Discord thread", $record['level_name'], TextFormat::clean($record['message'], false));
 			/** @phpstan-ignore-next-line */
