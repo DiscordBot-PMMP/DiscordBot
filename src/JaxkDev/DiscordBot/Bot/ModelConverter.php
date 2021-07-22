@@ -60,7 +60,8 @@ use JaxkDev\DiscordBot\Models\Webhook;
 abstract class ModelConverter{
 
 	static public function genModelWebhook(DiscordWebhook $webhook): Webhook{
-		return new Webhook($webhook->id, $webhook->type, $webhook->user->id, $webhook->name, $webhook->avatar, $webhook->token);
+		return new Webhook($webhook->type, $webhook->channel_id, $webhook->name, $webhook->id, $webhook->user->id,
+			$webhook->avatar, $webhook->token);
 	}
 
 	static public function genModelMember(DiscordMember $discordMember): Member{

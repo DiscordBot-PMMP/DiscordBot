@@ -34,9 +34,11 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
@@ -56,6 +58,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
@@ -132,7 +135,61 @@ class CommunicationHandler{
 		elseif($pk instanceof RequestDeleteChannel) $this->handleDeleteChannel($pk);
 		elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
 		elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
+		elseif($pk instanceof RequestCreateWebhook) $this->handleCreateWebhook($pk);
+		elseif($pk instanceof RequestUpdateWebhook) $this->handleUpdateWebhook($pk);
+		elseif($pk instanceof RequestDeleteWebhook) $this->handleDeleteWebhook($pk);
 		elseif($pk instanceof RequestLeaveServer) $this->handleLeaveServer($pk);
+	}
+
+	private function handleDeleteWebhook(RequestDeleteWebhook $pk): void{
+		$this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+			$channel->webhooks->fetch($pk->getWebhookId())->then(function(DiscordWebhook $webhook) use($channel, $pk){
+				$channel->webhooks->delete($webhook)->then(function() use($pk){
+					$this->resolveRequest($pk->getUID());
+				}, function(\Throwable $e) use($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to delete webhook.", [$e->getMessage(), $e->getTraceAsString()]);
+					$this->logger->debug("Failed to delete webhook ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to delete webhook.", [$e->getMessage(), $e->getTraceAsString()]);
+				$this->logger->debug("Failed to delete webhook ({$pk->getUID()}) - fetch error: {$e->getMessage()}");
+			});
+		});
+	}
+
+	private function handleUpdateWebhook(RequestUpdateWebhook $pk): void{
+		if($pk->getWebhook()->getId() === null){
+			throw new \AssertionError("Webhook ID must be present.");
+		}
+		$this->getChannel($pk, $pk->getWebhook()->getChannelId(), function(DiscordChannel $channel) use($pk){
+			$channel->webhooks->fetch($pk->getWebhook()->getId())->then(function(DiscordWebhook $webhook) use($channel, $pk){
+				$webhook->name = $pk->getWebhook()->getName();
+				$webhook->avatar = $pk->getWebhook()->getAvatar(); /** @phpstan-ignore-line avatar can be null. */
+				$channel->webhooks->save($webhook)->then(function(DiscordWebhook $webhook) use($pk){
+					$this->resolveRequest($pk->getUID(), true, "Successfully updated webhook.", [ModelConverter::genModelWebhook($webhook)]);
+				}, function(\Throwable $e) use($pk){
+					$this->resolveRequest($pk->getUID(), false, "Failed to update webhook.", [$e->getMessage(), $e->getTraceAsString()]);
+					$this->logger->debug("Failed to update webhook ({$pk->getUID()}) - {$e->getMessage()}");
+				});
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to update webhook.", [$e->getMessage(), $e->getTraceAsString()]);
+				$this->logger->debug("Failed to update webhook ({$pk->getUID()}) - fetch error: {$e->getMessage()}");
+			});
+		});
+	}
+
+	private function handleCreateWebhook(RequestCreateWebhook $pk): void{
+		$this->getChannel($pk, $pk->getWebhook()->getChannelId(), function(DiscordChannel $channel) use($pk){
+			$channel->webhooks->save($channel->webhooks->create([
+				'name' => $pk->getWebhook()->getName(),
+				'avatar' => $pk->getWebhook()->getAvatar()
+			]))->then(function(DiscordWebhook $webhook) use($pk){
+				$this->resolveRequest($pk->getUID(), true, "Successfully created webhook.", [ModelConverter::genModelWebhook($webhook)]);
+			}, function(\Throwable $e) use($pk){
+				$this->resolveRequest($pk->getUID(), false, "Failed to create webhook.", [$e->getMessage(), $e->getTraceAsString()]);
+				$this->logger->debug("Failed to create webhook ({$pk->getUID()}) - {$e->getMessage()}");
+			});
+		});
 	}
 
 	private function handleFetchWebhooks(RequestFetchWebhooks $pk): void{

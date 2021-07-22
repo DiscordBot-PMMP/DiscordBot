@@ -19,7 +19,7 @@ class Webhook implements \Serializable{
 	const TYPE_NORMAL = 1, //Standard webhook
 		TYPE_FOLLOWER = 2; //Receiving 'news' from another channel.
 
-	/** @var string */
+	/** @var string|null Only present on created webhooks. */
 	private $id;
 
 	/**
@@ -29,8 +29,11 @@ class Webhook implements \Serializable{
 	 */
 	private $type;
 
-	/** @var string User that added/created this webhook. */
+	/** @var string|null User that added/created this webhook, only present on created webhooks. */
 	private $user_id;
+
+	/** @var string */
+	private $channel_id;
 
 	/** @var string */
 	private $name;
@@ -41,32 +44,34 @@ class Webhook implements \Serializable{
 	/** @var string|null Only present on TYPE_NORMAL. */
 	private $token;
 
-	public function __construct(string $id, int $type, string $user_id, string $name, ?string $avatar = null, ?string $token = null){
+	public function __construct(int $type, string $channel_id, string $name, ?string $id = null, ?string $user_id = null,
+								?string $avatar = null, ?string $token = null){
 		$this->setId($id);
 		$this->setType($type);
 		$this->setUserId($user_id);
+		$this->setChannelId($channel_id);
 		$this->setName($name);
 		$this->setAvatar($avatar);
 		$this->setToken($token);
 	}
 
-	public function getId(): string{
+	public function getId(): ?string{
 		return $this->id;
 	}
 
-	public function setId(string $id): void{
-		if(!Utils::validDiscordSnowflake($id)){
+	public function setId(?string $id): void{
+		if($id !== null and !Utils::validDiscordSnowflake($id)){
 			throw new \AssertionError("ID '$id' is invalid.");
 		}
 		$this->id = $id;
 	}
 
-	public function getUserId(): string{
+	public function getUserId(): ?string{
 		return $this->user_id;
 	}
 
-	public function setUserId(string $user_id): void{
-		if(!Utils::validDiscordSnowflake($user_id)){
+	public function setUserId(?string $user_id): void{
+		if($user_id !== null and !Utils::validDiscordSnowflake($user_id)){
 			throw new \AssertionError("User ID '$user_id' is invalid.");
 		}
 		$this->user_id = $user_id;
@@ -81,6 +86,17 @@ class Webhook implements \Serializable{
 			throw new \AssertionError("Type '$type' is invalid.");
 		}
 		$this->type = $type;
+	}
+
+	public function getChannelId(): string{
+		return $this->channel_id;
+	}
+
+	public function setChannelId(string $channel_id): void{
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			throw new \AssertionError("Channel ID '$channel_id' is invalid.");
+		}
+		$this->channel_id = $channel_id;
 	}
 
 	public function getName(): string{
@@ -114,6 +130,7 @@ class Webhook implements \Serializable{
 			$this->id,
 			$this->type,
 			$this->user_id,
+			$this->channel_id,
 			$this->name,
 			$this->avatar,
 			$this->token
@@ -125,6 +142,7 @@ class Webhook implements \Serializable{
 			$this->id,
 			$this->type,
 			$this->user_id,
+			$this->channel_id,
 			$this->name,
 			$this->avatar,
 			$this->token

@@ -16,9 +16,11 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
@@ -40,23 +42,23 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Messages\Message;
-use JaxkDev\DiscordBot\Models\Messages\Webhook;
+use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
+use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\Role;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /*
- * TODO:
+ * Tested:
  * - Create Webhook
  * - Update Webhook
  * - Delete Webhook
- *
- * Tested:
  * - Fetch Webhooks
  * - Fetch Message
  * - Fetch Channel Pins (entire message obj's)
@@ -104,6 +106,48 @@ class Api{
 		$this->plugin = $plugin;
 	}
 
+	public function createWebhook(Webhook $webhook): PromiseInterface{
+		if($webhook->getType() !== Webhook::TYPE_NORMAL){
+			return rejectPromise(new ApiRejection("Only normal webhooks can be created right now."));
+		}
+		if(!Utils::validDiscordSnowflake($webhook->getChannelId())){
+			return rejectPromise(new ApiRejection("Webhook channel ID is invalid."));
+		}
+		if($webhook->getId() !== null or $webhook->getToken() !== null){
+			return rejectPromise(new ApiRejection("Webhook already has an ID/token, it cannot be created twice."));
+		}
+		$pk = new RequestCreateWebhook($webhook);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	public function updateWebhook(Webhook $webhook): PromiseInterface{
+		if($webhook->getType() !== Webhook::TYPE_NORMAL){
+			return rejectPromise(new ApiRejection("Only normal webhooks can be edited right now."));
+		}
+		if($webhook->getId() === null or $webhook->getToken() === null){
+			return rejectPromise(new ApiRejection("Webhook does not have an ID/token, it cannot be edited before being created."));
+		}
+		if(!Utils::validDiscordSnowflake($webhook->getId())){
+			return rejectPromise(new ApiRejection("Invalid webhook ID '{$webhook->getId()}'."));
+		}
+		$pk = new RequestUpdateWebhook($webhook);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
+	public function deleteWebhook(string $channel_id, string $webhook_id): PromiseInterface{
+		if(!Utils::validDiscordSnowflake($webhook_id)){
+			return rejectPromise(new ApiRejection("Invalid webhook ID '$webhook_id'."));
+		}
+		if(!Utils::validDiscordSnowflake($channel_id)){
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+		}
+		$pk = new RequestDeleteWebhook($channel_id, $webhook_id);
+		$this->plugin->writeOutboundData($pk);
+		return ApiResolver::create($pk->getUID());
+	}
+
 	//Technically we could make our own servers but that would mean bot has owner permissions (overriding admin) and I don't want that ever.
 
 	/**
@@ -129,7 +173,7 @@ class Api{
 	 */
 	public function fetchWebhooks(string $channel_id): PromiseInterface{
 		if(!Utils::validDiscordSnowflake($channel_id)){
-			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'"));
+			return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
 		}
 		$pk = new RequestFetchWebhooks($channel_id);
 		$this->plugin->writeOutboundData($pk);
@@ -457,7 +501,7 @@ class Api{
 	 * @return PromiseInterface
 	 */
 	public function sendMessage(Message $message): PromiseInterface{
-		if($message instanceof Webhook){
+		if($message instanceof WebhookMessage){
 			//TODO Send webhook message, this does not need to be sent to DiscordThread, async task can be used.
 			return rejectPromise(new ApiRejection("Webhook messages cannot be sent, only received."));
 		}
