@@ -81,17 +81,6 @@ class Client{
 		$this->logger->setHandlers(array($handler));
 		$this->logger->pushHandler(new LogStreamHandler($this->thread->getLogger(), $config["logging"]["debug"]));
 
-		$intents = [
-			Intents::GUILDS,
-			Intents::GUILD_MEMBERS,
-			Intents::GUILD_BANS,
-			Intents::GUILD_INVITES,
-			Intents::GUILD_PRESENCES,
-			Intents::GUILD_MESSAGES,
-			//Intents::GUILD_VOICE_STATES, For voice state update
-			Intents::DIRECT_MESSAGES
-		];
-
 		$socket_opts = [];
 		if($config["discord"]["use_plugin_cacert"]){
 			$this->logger->debug("TLS cafile set to '".\JaxkDev\DiscordBot\DATA_PATH."cacert.pem"."'");
@@ -107,7 +96,7 @@ class Client{
 				'socket_options' => $socket_opts,
 				'loadAllMembers' => true,
 				'storeMessages' => true,
-				'intents' => $intents
+				'intents' => Intents::getAllIntents()
 			]);
 		}catch(IntentException $e){
 			$this->close($e);

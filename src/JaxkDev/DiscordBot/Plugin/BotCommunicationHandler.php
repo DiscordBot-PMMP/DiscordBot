@@ -29,6 +29,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberUpdate as MemberUpdat
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageDelete as MessageDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageSent as MessageSentPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageUpdate as MessageUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionAdd as MessageReactionAddPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemove as MessageReactionRemovePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveAll as MessageReactionRemoveAllPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
@@ -42,7 +45,7 @@ use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Plugin\Events\BanCreated as BanCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\BanDeleted as BanDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelDeleted as ChannelDeletedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\ChannelPinsUpdated;
+use JaxkDev\DiscordBot\Plugin\Events\ChannelPinsUpdated as ChannelPinsUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelUpdated as ChannelUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteCreated as InviteCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteDeleted as InviteDeletedEvent;
@@ -50,6 +53,9 @@ use JaxkDev\DiscordBot\Plugin\Events\MemberJoined as MemberJoinedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MemberLeft as MemberLeftEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MemberUpdated as MemberUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageDeleted as MessageDeletedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\MessageReactionAdd as MessageReactionAddEvent;
+use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemove as MessageReactionRemoveEvent;
+use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveAll;
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady as DiscordReadyEvent;
@@ -89,6 +95,9 @@ class BotCommunicationHandler{
 		elseif($packet instanceof MessageSentPacket) $this->handleMessageSent($packet);
 		elseif($packet instanceof MessageUpdatePacket) $this->handleMessageUpdate($packet);
 		elseif($packet instanceof MessageDeletePacket) $this->handleMessageDelete($packet);
+		elseif($packet instanceof MessageReactionAddPacket) $this->handleMessageReactionAdd($packet);
+		elseif($packet instanceof MessageReactionRemovePacket) $this->handleMessageReactionRemove($packet);
+		elseif($packet instanceof MessageReactionRemoveAllPacket) $this->handleMessageReactionRemoveAll($packet);
 		elseif($packet instanceof ChannelCreatePacket) $this->handleChannelCreate($packet);
 		elseif($packet instanceof ChannelUpdatePacket) $this->handleChannelUpdate($packet);
 		elseif($packet instanceof ChannelDeletePacket) $this->handleChannelDelete($packet);
@@ -130,6 +139,38 @@ class BotCommunicationHandler{
 		(new MessageDeletedEvent($this->plugin, $packet->getMessage()))->call();
 	}
 
+	private function handleMessageReactionAdd(MessageReactionAddPacket $packet): void{
+		$channel = Storage::getChannel($packet->getChannelId());
+		if($channel === null){
+			throw new \AssertionError("Channel '{$packet->getChannelId()}' does not exist in storage.");
+		}
+		$member = Storage::getMember($packet->getMemberId());
+		if($member === null){
+			throw new \AssertionError("Member '{$packet->getMemberId()}' does not exist in storage.");
+		}
+		(new MessageReactionAddEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $channel, $member))->call();
+	}
+
+	private function handleMessageReactionRemove(MessageReactionRemovePacket $packet): void{
+		$channel = Storage::getChannel($packet->getChannelId());
+		if($channel === null){
+			throw new \AssertionError("Channel '{$packet->getChannelId()}' does not exist in storage.");
+		}
+		$member = Storage::getMember($packet->getMemberId());
+		if($member === null){
+			throw new \AssertionError("Member '{$packet->getMemberId()}' does not exist in storage.");
+		}
+		(new MessageReactionRemoveEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $channel, $member))->call();
+	}
+
+	private function handleMessageReactionRemoveAll(MessageReactionRemoveAllPacket $packet): void{
+		$channel = Storage::getChannel($packet->getChannelId());
+		if($channel === null){
+			throw new \AssertionError("Channel '{$packet->getChannelId()}' does not exist in storage.");
+		}
+		(new MessageReactionRemoveAll($this->plugin, $packet->getMessageId(), $channel))->call();
+	}
+
 	private function handleChannelCreate(ChannelCreatePacket $packet): void{
 		(new ChannelUpdatedEvent($this->plugin, $packet->getChannel()))->call();
 		Storage::addChannel($packet->getChannel());
@@ -154,7 +195,7 @@ class BotCommunicationHandler{
 		if($c === null or !$c instanceof TextChannel){
 			throw new \AssertionError("Text Channel '{$packet->getChannelId()}' not found in storage.");
 		}
-		(new ChannelPinsUpdated($this->plugin, $c))->call();
+		(new ChannelPinsUpdatedEvent($this->plugin, $c))->call();
 	}
 
 	private function handleRoleCreate(RoleCreatePacket $packet): void{

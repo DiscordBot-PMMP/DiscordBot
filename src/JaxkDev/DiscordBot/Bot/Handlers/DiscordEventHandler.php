@@ -22,10 +22,11 @@ use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
+use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\BotThread;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate as ChannelPinsUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump as DiscordDataDumpPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd as BanAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanRemove as BanRemovePacket;
@@ -38,6 +39,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberJoin as MemberJoinPac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberLeave as MemberLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberUpdate as MemberUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageDelete as MessageDeletePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionAdd as MessageReactionAddPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemove as MessageReactionRemovePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveAll as MessageReactionRemoveAllPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageSent as MessageSentPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageUpdate as MessageUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
@@ -91,6 +95,11 @@ class DiscordEventHandler{
 		$discord->on("GUILD_BAN_ADD", [$this, "onBanAdd"]);
 		$discord->on("GUILD_BAN_REMOVE", [$this, "onBanRemove"]);
 
+		$discord->on("MESSAGE_REACTION_ADD", [$this, "onMessageReactionAdd"]);
+		$discord->on("MESSAGE_REACTION_REMOVE", [$this, "onMessageReactionRemove"]);
+		$discord->on("MESSAGE_REACTION_REMOVE_ALL", [$this, "onMessageReactionRemoveAll"]);
+		//$discord->on("MESSAGE_REACTION_REMOVE_EMOJI", [$this, "onMessageReactionRemoveEmoji"]);
+
 		/*$discord->on("PRESENCE_UPDATE", function(...$args){
 			var_dump($args);
 		});*/
@@ -100,9 +109,6 @@ class DiscordEventHandler{
 		});*/
 
 		/*
-		 * TODO:
-		 * - Reactions (Probably wont store previous reactions, could be very large, add fetchReactions into API.)
-		 *
 		 * TODO (TBD):
 		 * - Voice State Update (track members voice activity, join voice channel, leave voice channel, self deafen/mute)
 		 * - Presence updates.
@@ -330,6 +336,29 @@ array(5) {
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
+	public function onMessageReactionAdd(DiscordMessageReaction $reaction): void{
+		$packet = new MessageReactionAddPacket($reaction->message_id, $reaction->emoji->name,
+			$reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function onMessageReactionRemove(DiscordMessageReaction $reaction): void{
+		$packet = new MessageReactionRemovePacket($reaction->message_id, $reaction->emoji->name,
+			$reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	public function onMessageReactionRemoveAll(DiscordMessageReaction $reaction): void{
+		$packet = new MessageReactionRemoveAllPacket($reaction->message_id, $reaction->channel_id);
+		$this->client->getThread()->writeOutboundData($packet);
+	}
+
+	/*public function onMessageReactionRemoveEmoji(...$d): void{
+		//TODO Cant verify data, requires bot to remove all reactions by emoji as a user cannot from what ive tried.
+		//But i think its safe to assume its $message_id, $channel_id, $guild_id and $emoji
+		var_dump($d);
+	}*/
+
 	public function onMemberJoin(DiscordMember $member, Discord $discord): void{
 		$packet = new MemberJoinPacket(ModelConverter::genModelMember($member), ModelConverter::genModelUser($member->user));
 		$this->client->getThread()->writeOutboundData($packet);
@@ -398,7 +427,7 @@ array(5) {
 
 	/** $data ["last_pin_timestamp" => string, "channel_id" => string, "guild_id" => string] */
 	public function onChannelPinsUpdate(\stdClass $data): void{
-		$packet = new ChannelPinsUpdate($data->channel_id);
+		$packet = new ChannelPinsUpdatePacket($data->channel_id);
 		$this->client->getThread()->writeOutboundData($packet);
 	}
 
