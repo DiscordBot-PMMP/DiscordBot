@@ -23,6 +23,7 @@ use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
+use Discord\Parts\WebSockets\PresenceUpdate as DiscordPresenceUpdate;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\BotThread;
@@ -44,6 +45,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemove as Me
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveAll as MessageReactionRemoveAllPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageSent as MessageSentPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageUpdate as MessageUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate as PresenceUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
@@ -100,18 +102,15 @@ class DiscordEventHandler{
         $discord->on("MESSAGE_REACTION_REMOVE_ALL", [$this, "onMessageReactionRemoveAll"]);
         //$discord->on("MESSAGE_REACTION_REMOVE_EMOJI", [$this, "onMessageReactionRemoveEmoji"]);
     
-        /*$discord->on("PRESENCE_UPDATE", function(...$args){
-            var_dump($args);
-        });*/
+        $discord->on("PRESENCE_UPDATE", [$this, "onPresenceUpdate"]);
 
         /*$discord->on("VOICE_STATE_UPDATE", function (DiscordVoiceStateUpdate $state, Discord $discord) {
             var_dump($state);
         });*/
 
-        /*
+        /*s
          * TODO (TBD):
          * - Voice State Update (track members voice activity, join voice channel, leave voice channel, self deafen/mute)
-         * - Presence updates.
          */
     }
 
@@ -302,6 +301,21 @@ array(5) {
 
         $this->client->getThread()->writeOutboundData(new DiscordReadyPacket());
         $this->client->getCommunicationHandler()->sendHeartbeat();
+    }
+
+    public function onPresenceUpdate(DiscordPresenceUpdate $presenceUpdate): void{
+        $clientStatus = [
+            /** @phpstan-ignore-next-line Undocumented property client_status */
+            "desktop" => $presenceUpdate->client_status->desktop??null, /** @phpstan-ignore-next-line */
+            "mobile" => $presenceUpdate->client_status->mobile??null, /** @phpstan-ignore-next-line */
+            "web" => $presenceUpdate->client_status->web??null
+        ];
+        $activities = [];
+        foreach($presenceUpdate->activities as $activity){
+            $activities[] = ModelConverter::genModelActivity($activity);
+        }
+        $this->client->getThread()->writeOutboundData(new PresenceUpdatePacket($presenceUpdate->guild_id.".".$presenceUpdate->user->id,
+            $presenceUpdate->status, $clientStatus, $activities));
     }
 
     public function onMessageCreate(DiscordMessage $message, Discord $discord): void{

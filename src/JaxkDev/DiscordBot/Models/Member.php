@@ -17,11 +17,22 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Member implements \Serializable{
 
+    const STATUS_ONLINE = "online",
+        STATUS_IDLE = "idle",
+        STATUS_DND = "dnd",
+        STATUS_OFFLINE = "offline";
+
     /** @var string */
     private $user_id;
 
     /** @var null|string */
     private $nickname;
+
+    /** @var null|string null until a presence update is sent. */
+    private $status;
+
+    /** @var null|array{"mobile": string|null, "desktop": string|null, "web": string|null} null until a present update is sent. */
+    private $client_status;
 
     /** @var int */
     private $join_timestamp;
@@ -38,8 +49,8 @@ class Member implements \Serializable{
     /** @var string */
     private $server_id;
 
-    ///** @var Activity */
-    //private $activity; Activities are actually from member :/ TODO INVESTIGATE, Can probably go around this and link to user if not member specific.
+    /** @var null|Activity[] */
+    private $activities;
 
     //Voice Activity
 
@@ -147,6 +158,39 @@ class Member implements \Serializable{
         $this->server_id = $server_id;
     }
 
+    public function getStatus(): ?string{
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): void{
+        $this->status = $status;
+    }
+
+    /** @return null|array{"mobile": string|null, "desktop": string|null, "web": string|null} */
+    public function getClientStatus(): ?array{
+        return $this->client_status;
+    }
+
+    /** @param null|array{"mobile": string|null, "desktop": string|null, "web": string|null} $client_status*/
+    public function setClientStatus(?array $client_status): void{
+        $this->client_status = $client_status;
+    }
+
+    /** @return null|Activity[] */
+    public function getActivities(): ?array{
+        return $this->activities;
+    }
+
+    /** @param null|Activity[] $activities */
+    public function setActivities(?array $activities): void{
+        foreach($activities??[] as $activity){
+            if(!$activity instanceof Activity){
+                throw new \AssertionError("Activity not valid.");
+            }
+        }
+        $this->activities = $activities;
+    }
+
     //----- Serialization -----//
 
     public function serialize(): ?string{
@@ -157,7 +201,10 @@ class Member implements \Serializable{
             $this->boost_timestamp,
             $this->permissions,
             $this->roles,
-            $this->server_id
+            $this->server_id,
+            $this->status,
+            $this->client_status,
+            $this->activities
         ]);
     }
 
@@ -169,7 +216,10 @@ class Member implements \Serializable{
             $this->boost_timestamp,
             $this->permissions,
             $this->roles,
-            $this->server_id
+            $this->server_id,
+            $this->status,
+            $this->client_status,
+            $this->activities
         ] = unserialize($data);
     }
 }

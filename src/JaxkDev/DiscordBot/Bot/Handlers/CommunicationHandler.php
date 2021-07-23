@@ -54,20 +54,20 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdatePresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
-use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
+use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Reply;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Plugin\ApiRejection;
@@ -109,7 +109,7 @@ class CommunicationHandler{
 
         //API Packets:
         if($pk instanceof RequestUpdateNickname) $this->handleUpdateNickname($pk);
-        elseif($pk instanceof RequestUpdateActivity) $this->handleUpdateActivity($pk);
+        elseif($pk instanceof RequestUpdatePresence) $this->handleUpdatePresence($pk);
         elseif($pk instanceof RequestBroadcastTyping) $this->handleBroadcastTyping($pk);
         elseif($pk instanceof RequestSendMessage) $this->handleSendMessage($pk);
         elseif($pk instanceof RequestEditMessage) $this->handleEditMessage($pk);
@@ -614,15 +614,15 @@ class CommunicationHandler{
         });
     }
 
-    private function handleUpdateActivity(RequestUpdateActivity $pk): void{
+    private function handleUpdatePresence(RequestUpdatePresence $pk): void{
         $activity = $pk->getActivity();
         $presence = new DiscordActivity($this->client->getDiscordClient(), [
-            'name' => $activity->getMessage(),
+            'name' => $activity->getName(),
             'type' => $activity->getType()
         ]);
 
         try{
-            $this->client->getDiscordClient()->updatePresence($presence, $activity->getStatus() === Activity::STATUS_IDLE, $activity->getStatus());
+            $this->client->getDiscordClient()->updatePresence($presence, $pk->getStatus() === Member::STATUS_IDLE, $pk->getStatus());
             $this->resolveRequest($pk->getUID());
         }catch (\Throwable $e){
             $this->resolveRequest($pk->getUID(), false, $e->getMessage());

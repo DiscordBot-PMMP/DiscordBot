@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0eeb26f250414977b5c44cb783eade5b",
+    "content-hash": "be9866265fef796f59c7db1b3d8a7482",
     "packages": [
         {
             "name": "discord-php/http",
@@ -2161,12 +2161,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DiscordBot-PMMP/DiscordPHP.git",
-                "reference": "1eca9cd1a6459b648a36010973973fd4076323cc"
+                "reference": "e8a2e2ca865124853f41fb64db98b4d0e6c61c1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DiscordBot-PMMP/DiscordPHP/zipball/1eca9cd1a6459b648a36010973973fd4076323cc",
-                "reference": "1eca9cd1a6459b648a36010973973fd4076323cc",
+                "url": "https://api.github.com/repos/DiscordBot-PMMP/DiscordPHP/zipball/e8a2e2ca865124853f41fb64db98b4d0e6c61c1a",
+                "reference": "e8a2e2ca865124853f41fb64db98b4d0e6c61c1a",
                 "shasum": ""
             },
             "require": {
@@ -2232,7 +2232,7 @@
                 "source": "https://github.com/DiscordBot-PMMP/DiscordPHP/tree/master",
                 "issues": "https://github.com/DiscordBot-PMMP/DiscordPHP/issues"
             },
-            "time": "2021-07-19T14:31:22+00:00"
+            "time": "2021-07-23T11:16:42+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",
@@ -2707,16 +2707,16 @@
         },
         {
             "name": "pocketmine/pocketmine-mp",
-            "version": "3.22.0",
+            "version": "3.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "c32c21464c30cd7059a4cbfb0a7d7e493238a561"
+                "reference": "9477034a4ae58cc5c12b8278c14a8e46a43992b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/c32c21464c30cd7059a4cbfb0a7d7e493238a561",
-                "reference": "c32c21464c30cd7059a4cbfb0a7d7e493238a561",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/9477034a4ae58cc5c12b8278c14a8e46a43992b2",
+                "reference": "9477034a4ae58cc5c12b8278c14a8e46a43992b2",
                 "shasum": ""
             },
             "require": {
@@ -2779,7 +2779,7 @@
             "homepage": "https://pmmp.io",
             "support": {
                 "issues": "https://github.com/pmmp/PocketMine-MP/issues",
-                "source": "https://github.com/pmmp/PocketMine-MP/tree/3.22.0"
+                "source": "https://github.com/pmmp/PocketMine-MP/tree/3.22.1"
             },
             "funding": [
                 {
@@ -2791,7 +2791,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-07-13T17:31:28+00:00"
+            "time": "2021-07-23T12:03:27+00:00"
         },
         {
             "name": "pocketmine/raklib",

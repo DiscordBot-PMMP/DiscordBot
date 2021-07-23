@@ -15,25 +15,33 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestUpdateActivity extends Packet{
+class RequestUpdatePresence extends Packet{
 
     /** @var Activity */
     private $activity;
 
-    public function __construct(Activity $activity){
+    /** @var string */
+    private $status;
+
+    public function __construct(Activity $activity, string $status){
         parent::__construct();
         $this->activity = $activity;
+        $this->status = $status;
     }
 
     public function getActivity(): Activity{
         return $this->activity;
     }
 
+    public function getStatus(): string{
+        return $this->status;
+    }
+
     public function serialize(): ?string{
-        return serialize([$this->UID, $this->activity]);
+        return serialize([$this->UID, $this->activity, $this->status]);
     }
 
     public function unserialize($data): void{
-        [$this->UID, $this->activity] = unserialize($data);
+        [$this->UID, $this->activity, $this->status] = unserialize($data);
     }
 }

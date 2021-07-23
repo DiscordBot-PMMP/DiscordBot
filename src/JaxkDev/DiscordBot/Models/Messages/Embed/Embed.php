@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Models\Embed;
+namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
 //Yes quite a lot of nullables... (https://discord.com/developers/docs/resources/channel#embed-object)
 class Embed implements \Serializable{

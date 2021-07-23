@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Models\Embed;
+namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
 class Footer implements \Serializable{
 

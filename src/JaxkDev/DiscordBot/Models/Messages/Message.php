@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages;
 
-use JaxkDev\DiscordBot\Models\Embed\Embed;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Message implements \Serializable{

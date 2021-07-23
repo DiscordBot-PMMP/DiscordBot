@@ -16,7 +16,7 @@ use AssertionError;
 use Carbon\Carbon;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Message as DiscordMessage;
-use Discord\Parts\Channel\Overwrite;
+use Discord\Parts\Channel\Overwrite as DiscordOverwrite;
 use Discord\Parts\Channel\Webhook as DiscordWebhook;
 use Discord\Parts\Embed\Author as DiscordAuthor;
 use Discord\Parts\Embed\Embed as DiscordEmbed;
@@ -38,15 +38,15 @@ use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
-use JaxkDev\DiscordBot\Models\Embed\Author;
-use JaxkDev\DiscordBot\Models\Embed\Embed;
-use JaxkDev\DiscordBot\Models\Embed\Field;
-use JaxkDev\DiscordBot\Models\Embed\Footer;
-use JaxkDev\DiscordBot\Models\Embed\Image;
-use JaxkDev\DiscordBot\Models\Embed\Video;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Attachment;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Author;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Field;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Footer;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Image;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Video;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Reply as ReplyMessage;
 use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
@@ -62,6 +62,24 @@ abstract class ModelConverter{
     static public function genModelWebhook(DiscordWebhook $webhook): Webhook{
         return new Webhook($webhook->type, $webhook->channel_id, $webhook->name, $webhook->id, $webhook->user->id,
             $webhook->avatar, $webhook->token);
+    }
+
+    static public function genModelActivity(DiscordActivity $discordActivity): Activity{
+        /** @var \stdClass{"end" => int|null, "start" => int|null} $timestamps */
+        $timestamps = $discordActivity->timestamps;
+        /** @var \stdClass{"id" => string|null, "size" => int[]|null} $party */
+        $party = $discordActivity->party;
+        /** @var \stdClass{"large_image" => string|null, "large_text" => string|null, "small_image" => string|null, "small_text" => string|null} $assets */
+        $assets = $discordActivity->assets;
+        /** @var \stdClass{"join" => string|null, "spectate" => string|null, "match" => string|null} $secrets  TODO, Confirm this. no one had a single secret all day so couldn't see exact data. */
+        $secrets = $discordActivity->secrets;
+        return new Activity($discordActivity->name, $discordActivity->type, $discordActivity->created_at->getTimestamp(),
+            $discordActivity->url, $timestamps->start??null, $timestamps->end??null,
+            $discordActivity->application_id, $discordActivity->details, $discordActivity->state, $discordActivity->emoji,
+            $party->id??null, ($party->size??[])[0]??null,($party->size??[])[1]??null,
+            $assets->large_image??null, $assets->large_text??null, $assets->small_image??null,
+            $assets->small_text??null, $secrets->join??null, $secrets->spectate??null,
+            $secrets->match??null, $discordActivity->instance, $discordActivity->flags);
     }
 
     static public function genModelMember(DiscordMember $discordMember): Member{
@@ -87,7 +105,6 @@ abstract class ModelConverter{
 
         $m->setPermissions(new RolePermissions((($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0) ? 2147483647 : $bitwise, false));
         $m->setRoles($roles);
-        //todo activities.
         return $m;
     }
 
@@ -108,14 +125,14 @@ abstract class ModelConverter{
      * @return T
      */
     static private function applyPermissionOverwrites(DiscordChannel $dc, $c){
-        /** @var Overwrite $overwrite */
+        /** @var DiscordOverwrite $overwrite */
         foreach($dc->overwrites as $overwrite){
             $allowed = new ChannelPermissions($overwrite->allow->bitwise, false);
             $denied = new ChannelPermissions($overwrite->deny->bitwise, false);
-            if($overwrite->type === Overwrite::TYPE_MEMBER){
+            if($overwrite->type === DiscordOverwrite::TYPE_MEMBER){
                 $c->setAllowedMemberPermissions($overwrite->id, $allowed);
                 $c->setDeniedMemberPermissions($overwrite->id, $denied);
-            }elseif($overwrite->type === Overwrite::TYPE_ROLE){
+            }elseif($overwrite->type === DiscordOverwrite::TYPE_ROLE){
                 $c->setAllowedRolePermissions($overwrite->id, $allowed);
                 $c->setDeniedRolePermissions($overwrite->id, $denied);
             }else{
@@ -286,15 +303,5 @@ abstract class ModelConverter{
 
     static public function genModelBan(DiscordBan $ban): Ban{
         return new Ban($ban->guild_id, $ban->user_id, $ban->reason);
-    }
-
-    /**
-     * @description NOTICE, setStatus() from Member's activity after generating.
-     * @param DiscordActivity $discordActivity
-     * @return Activity
-     */
-    static public function genModelActivity(DiscordActivity $discordActivity, ?DiscordUser $discordUser = null): Activity{
-        return new Activity(Activity::STATUS_OFFLINE, $discordActivity->type, $discordActivity->state);
-        //Status not included in discord activity must be set from user.
     }
 }

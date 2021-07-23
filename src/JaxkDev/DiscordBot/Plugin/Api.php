@@ -38,7 +38,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateActivity;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdatePresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
@@ -48,6 +48,7 @@ use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
 use JaxkDev\DiscordBot\Models\Invite;
+use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
 use JaxkDev\DiscordBot\Models\Webhook;
@@ -436,13 +437,17 @@ class Api{
     }
 
     /**
-     * Sends the new activity to replace the current one the bot has.
+     * Sends a new presence to replace the current one the bot has.
      *
      * @param Activity $activity
+     * @param string $status See Member::STATUS_ constants.
      * @return PromiseInterface
      */
-    public function updateActivity(Activity $activity): PromiseInterface{
-        $pk = new RequestUpdateActivity($activity);
+    public function updatePresence(Activity $activity, string $status = Member::STATUS_ONLINE): PromiseInterface{
+        if(!in_array($status, [Member::STATUS_ONLINE, Member::STATUS_IDLE, Member::STATUS_OFFLINE, Member::STATUS_DND])){
+            return rejectPromise(new ApiRejection("Invalid status '$status'."));
+        }
+        $pk = new RequestUpdatePresence($activity, $status);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

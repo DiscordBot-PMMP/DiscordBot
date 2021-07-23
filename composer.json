@@ -26,7 +26,7 @@
     ],
     "require": {
         "php": "^7.4||^8.0.3",
-        "team-reflex/discord-php": "dev-master#1eca9cd1a6459b648a36010973973fd4076323cc",
+        "team-reflex/discord-php": "dev-master#e8a2e2ca865124853f41fb64db98b4d0e6c61c1a",
         "react/promise": "v2.x-dev#c2525d2de231f0a4e565647f9a8f06b521ca658b"
     },
     "require-dev": {

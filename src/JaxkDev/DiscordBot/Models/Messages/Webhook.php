@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages;
 
-use JaxkDev\DiscordBot\Models\Embed\Embed;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 
 class Webhook extends Message{
 
