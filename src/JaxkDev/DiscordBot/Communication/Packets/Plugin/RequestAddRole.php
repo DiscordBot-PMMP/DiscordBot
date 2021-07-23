@@ -16,49 +16,49 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestAddRole extends Packet{
 
-	/** @var string */
-	private $server_id;
+    /** @var string */
+    private $server_id;
 
-	/** @var string */
-	private $user_id;
+    /** @var string */
+    private $user_id;
 
-	/** @var string */
-	private $role_id;
+    /** @var string */
+    private $role_id;
 
-	public function __construct(string $server_id, string $user_id, string $role_id){
-		parent::__construct();
-		$this->server_id = $server_id;
-		$this->user_id = $user_id;
-		$this->role_id = $role_id;
-	}
+    public function __construct(string $server_id, string $user_id, string $role_id){
+        parent::__construct();
+        $this->server_id = $server_id;
+        $this->user_id = $user_id;
+        $this->role_id = $role_id;
+    }
 
-	public function getServerId(): string{
-		return $this->server_id;
-	}
+    public function getServerId(): string{
+        return $this->server_id;
+    }
 
-	public function getUserId(): string{
-		return $this->user_id;
-	}
+    public function getUserId(): string{
+        return $this->user_id;
+    }
 
-	public function getRoleId(): string{
-		return $this->role_id;
-	}
+    public function getRoleId(): string{
+        return $this->role_id;
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->server_id,
-			$this->user_id,
-			$this->role_id
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->server_id,
+            $this->user_id,
+            $this->role_id
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->server_id,
-			$this->user_id,
-			$this->role_id
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->server_id,
+            $this->user_id,
+            $this->role_id
+        ] = unserialize($data);
+    }
 }

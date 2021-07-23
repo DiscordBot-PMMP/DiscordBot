@@ -14,29 +14,29 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 
 class Heartbeat extends Packet{
 
-	/** @var float */
-	private $heartbeat;
+    /** @var float */
+    private $heartbeat;
 
-	public function __construct(float $heartbeat){
-		parent::__construct();
-		$this->heartbeat = $heartbeat;
-	}
+    public function __construct(float $heartbeat){
+        parent::__construct();
+        $this->heartbeat = $heartbeat;
+    }
 
-	public function getHeartbeat(): float{
-		return $this->heartbeat;
-	}
+    public function getHeartbeat(): float{
+        return $this->heartbeat;
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->heartbeat
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->heartbeat
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->heartbeat
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->heartbeat
+        ] = unserialize($data);
+    }
 }

@@ -16,39 +16,39 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestRevokeInvite extends Packet{
 
-	/** @var string */
-	private $server_id;
+    /** @var string */
+    private $server_id;
 
-	/** @var string */
-	private $invite_code;
+    /** @var string */
+    private $invite_code;
 
-	public function __construct(string $server_id, string $invite_code){
-		parent::__construct();
-		$this->server_id = $server_id;
-		$this->invite_code = $invite_code;
-	}
+    public function __construct(string $server_id, string $invite_code){
+        parent::__construct();
+        $this->server_id = $server_id;
+        $this->invite_code = $invite_code;
+    }
 
-	public function getServerId(): string{
-		return $this->server_id;
-	}
+    public function getServerId(): string{
+        return $this->server_id;
+    }
 
-	public function getInviteCode(): string{
-		return $this->invite_code;
-	}
+    public function getInviteCode(): string{
+        return $this->invite_code;
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->server_id,
-			$this->invite_code
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->server_id,
+            $this->invite_code
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->server_id,
-			$this->invite_code
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->server_id,
+            $this->invite_code
+        ] = unserialize($data);
+    }
 }

@@ -22,33 +22,33 @@ use pocketmine\utils\MainLogger;
  */
 abstract class ApiResolver{
 
-	/** @var Array<int, Deferred> */
-	static private $map = [];
+    /** @var Array<int, Deferred> */
+    static private $map = [];
 
-	static public function create(int $uid): PromiseInterface{
-		if(isset(self::$map[$uid])){
-			throw new \AssertionError("Packet {$uid} already linked to a promise resolver.");
-		}
-		$d = new Deferred();
-		self::$map[$uid] = $d;
-		return $d->promise();
-	}
+    static public function create(int $uid): PromiseInterface{
+        if(isset(self::$map[$uid])){
+            throw new \AssertionError("Packet {$uid} already linked to a promise resolver.");
+        }
+        $d = new Deferred();
+        self::$map[$uid] = $d;
+        return $d->promise();
+    }
 
-	static public function getPromise(int $uid): ?PromiseInterface{
-		return isset(self::$map[$uid]) ? self::$map[$uid]->promise() : null;
-	}
+    static public function getPromise(int $uid): ?PromiseInterface{
+        return isset(self::$map[$uid]) ? self::$map[$uid]->promise() : null;
+    }
 
-	static public function handleResolution(Resolution $packet): void{
-		if(isset(self::$map[$packet->getPid()])){
-			$d = self::$map[$packet->getPid()];
-			if($packet->wasSuccessful()){
-				$d->resolve(new ApiResolution([$packet->getResponse(), ...$packet->getData()]));
-			}else{
-				$d->reject(new ApiRejection($packet->getResponse(), $packet->getData()));
-			}
-			unset(self::$map[$packet->getPid()]);
-		}else{
-			MainLogger::getLogger()->debug("A unidentified resolution has been received, ID: {$packet->getPid()}, Successful: {$packet->wasSuccessful()}, Message: {$packet->getResponse()}");
-		}
-	}
+    static public function handleResolution(Resolution $packet): void{
+        if(isset(self::$map[$packet->getPid()])){
+            $d = self::$map[$packet->getPid()];
+            if($packet->wasSuccessful()){
+                $d->resolve(new ApiResolution([$packet->getResponse(), ...$packet->getData()]));
+            }else{
+                $d->reject(new ApiRejection($packet->getResponse(), $packet->getData()));
+            }
+            unset(self::$map[$packet->getPid()]);
+        }else{
+            MainLogger::getLogger()->debug("A unidentified resolution has been received, ID: {$packet->getPid()}, Successful: {$packet->wasSuccessful()}, Message: {$packet->getResponse()}");
+        }
+    }
 }

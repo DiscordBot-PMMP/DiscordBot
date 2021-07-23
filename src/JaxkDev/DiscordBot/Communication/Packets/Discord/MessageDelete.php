@@ -17,37 +17,37 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
 
 class MessageDelete extends Packet{
 
-	/**
-	 * @var Message|array{"message_id": string, "channel_id": string, "server_id": string}
-	 */
-	private $message;
+    /**
+     * @var Message|array{"message_id": string, "channel_id": string, "server_id": string}
+     */
+    private $message;
 
-	/**
-	 * @param Message|array{"message_id": string, "channel_id": string, "server_id": string} $message
-	 */
-	public function __construct($message){
-		parent::__construct();
-		$this->message = $message;
-	}
+    /**
+     * @param Message|array{"message_id": string, "channel_id": string, "server_id": string} $message
+     */
+    public function __construct($message){
+        parent::__construct();
+        $this->message = $message;
+    }
 
-	/**
-	 * @return Message|array{"message_id": string, "channel_id": string, "server_id": string}
-	 */
-	public function getMessage(){
-		return $this->message;
-	}
+    /**
+     * @return Message|array{"message_id": string, "channel_id": string, "server_id": string}
+     */
+    public function getMessage(){
+        return $this->message;
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->message
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->message
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->message
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->message
+        ] = unserialize($data);
+    }
 }

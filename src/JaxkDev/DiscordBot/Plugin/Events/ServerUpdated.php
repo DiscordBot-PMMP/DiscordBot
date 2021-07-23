@@ -23,15 +23,15 @@ use pocketmine\plugin\Plugin;
  */
 class ServerUpdated extends DiscordBotEvent{
 
-	/** @var Server */
-	private $server;
+    /** @var Server */
+    private $server;
 
-	public function __construct(Plugin $plugin, Server $server){
-		parent::__construct($plugin);
-		$this->server = $server;
-	}
+    public function __construct(Plugin $plugin, Server $server){
+        parent::__construct($plugin);
+        $this->server = $server;
+    }
 
-	public function getServer(): Server{
-		return $this->server;
-	}
+    public function getServer(): Server{
+        return $this->server;
+    }
 }

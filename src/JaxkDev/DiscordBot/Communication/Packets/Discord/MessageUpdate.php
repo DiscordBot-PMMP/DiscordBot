@@ -17,29 +17,29 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MessageUpdate extends Packet{
 
-	/** @var Message */
-	private $message;
+    /** @var Message */
+    private $message;
 
-	public function __construct(Message $message){
-		parent::__construct();
-		$this->message = $message;
-	}
+    public function __construct(Message $message){
+        parent::__construct();
+        $this->message = $message;
+    }
 
-	public function getMessage(): Message{
-		return $this->message;
-	}
+    public function getMessage(): Message{
+        return $this->message;
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->message
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->message
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->message
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->message
+        ] = unserialize($data);
+    }
 }

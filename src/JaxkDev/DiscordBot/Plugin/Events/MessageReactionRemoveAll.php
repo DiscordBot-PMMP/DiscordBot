@@ -23,23 +23,23 @@ use pocketmine\plugin\Plugin;
  */
 class MessageReactionRemoveAll extends DiscordBotEvent{
 
-	/** @var string */
-	private $message_id;
+    /** @var string */
+    private $message_id;
 
-	/** @var Channel */
-	private $channel;
+    /** @var Channel */
+    private $channel;
 
-	public function __construct(Plugin $plugin, string $message_id, Channel $channel){
-		parent::__construct($plugin);
-		$this->message_id = $message_id;
-		$this->channel = $channel;
-	}
+    public function __construct(Plugin $plugin, string $message_id, Channel $channel){
+        parent::__construct($plugin);
+        $this->message_id = $message_id;
+        $this->channel = $channel;
+    }
 
-	public function getMessageId(): string{
-		return $this->message_id;
-	}
+    public function getMessageId(): string{
+        return $this->message_id;
+    }
 
-	public function getChannel(): Channel{
-		return $this->channel;
-	}
+    public function getChannel(): Channel{
+        return $this->channel;
+    }
 }

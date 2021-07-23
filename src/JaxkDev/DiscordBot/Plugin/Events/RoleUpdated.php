@@ -23,15 +23,15 @@ use pocketmine\plugin\Plugin;
  */
 class RoleUpdated extends DiscordBotEvent{
 
-	/** @var Role */
-	private $role;
+    /** @var Role */
+    private $role;
 
-	public function __construct(Plugin $plugin, Role $role){
-		parent::__construct($plugin);
-		$this->role = $role;
-	}
+    public function __construct(Plugin $plugin, Role $role){
+        parent::__construct($plugin);
+        $this->role = $role;
+    }
 
-	public function getRole(): Role{
-		return $this->role;
-	}
+    public function getRole(): Role{
+        return $this->role;
+    }
 }

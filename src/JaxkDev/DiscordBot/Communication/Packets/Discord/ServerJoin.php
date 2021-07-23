@@ -20,70 +20,70 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class ServerJoin extends Packet{
 
-	/** @var Server */
-	private $server;
+    /** @var Server */
+    private $server;
 
-	/** @var ServerChannel[] */
-	private $channels;
+    /** @var ServerChannel[] */
+    private $channels;
 
-	/** @var Member[] */
-	private $members;
+    /** @var Member[] */
+    private $members;
 
-	/** @var Role[] */
-	private $roles;
+    /** @var Role[] */
+    private $roles;
 
-	/**
-	 * ServerJoin constructor.
-	 *
-	 * @param Server          $server
-	 * @param ServerChannel[] $channels
-	 * @param Member[]        $members
-	 * @param Role[]          $roles
-	 */
-	public function __construct(Server $server, array $channels, array $members, array $roles){
-		parent::__construct();
-		$this->server = $server;
-		$this->channels = $channels;
-		$this->members = $members;
-		$this->roles = $roles;
-	}
+    /**
+     * ServerJoin constructor.
+     *
+     * @param Server          $server
+     * @param ServerChannel[] $channels
+     * @param Member[]        $members
+     * @param Role[]          $roles
+     */
+    public function __construct(Server $server, array $channels, array $members, array $roles){
+        parent::__construct();
+        $this->server = $server;
+        $this->channels = $channels;
+        $this->members = $members;
+        $this->roles = $roles;
+    }
 
-	public function getServer(): Server{
-		return $this->server;
-	}
+    public function getServer(): Server{
+        return $this->server;
+    }
 
-	/** @return ServerChannel[] */
-	public function getChannels(): array{
-		return $this->channels;
-	}
+    /** @return ServerChannel[] */
+    public function getChannels(): array{
+        return $this->channels;
+    }
 
-	/** @return Role[] */
-	public function getRoles(): array{
-		return $this->roles;
-	}
+    /** @return Role[] */
+    public function getRoles(): array{
+        return $this->roles;
+    }
 
-	/** @return Member[] */
-	public function getMembers(): array{
-		return $this->members;
-	}
+    /** @return Member[] */
+    public function getMembers(): array{
+        return $this->members;
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->server,
-			$this->roles,
-			$this->channels,
-			$this->members
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->server,
+            $this->roles,
+            $this->channels,
+            $this->members
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->server,
-			$this->roles,
-			$this->channels,
-			$this->members
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->server,
+            $this->roles,
+            $this->channels,
+            $this->members
+        ] = unserialize($data);
+    }
 }

@@ -22,15 +22,15 @@ use pocketmine\plugin\Plugin;
  */
 class InviteDeleted extends DiscordBotEvent{
 
-	/** @var Invite */
-	private $invite;
+    /** @var Invite */
+    private $invite;
 
-	public function __construct(Plugin $plugin, Invite $invite){
-		parent::__construct($plugin);
-		$this->invite = $invite;
-	}
+    public function __construct(Plugin $plugin, Invite $invite){
+        parent::__construct($plugin);
+        $this->invite = $invite;
+    }
 
-	public function getInvite(): Invite{
-		return $this->invite;
-	}
+    public function getInvite(): Invite{
+        return $this->invite;
+    }
 }

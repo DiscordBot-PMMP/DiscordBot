@@ -16,11 +16,11 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordReady extends Packet{
 
-	public function serialize(): ?string{
-		return serialize($this->UID);
-	}
+    public function serialize(): ?string{
+        return serialize($this->UID);
+    }
 
-	public function unserialize($data): void{
-		$this->UID = unserialize($data);
-	}
+    public function unserialize($data): void{
+        $this->UID = unserialize($data);
+    }
 }

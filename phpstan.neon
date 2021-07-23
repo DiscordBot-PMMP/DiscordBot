@@ -1,11 +1,11 @@
 parameters:
-	level: 8
-	paths:
-		- src
-	excludePaths:
-		analyse:
-			- vendor
-			- src/JaxkDev/DiscordBot/Libs
-	bootstrapFiles:
-		- test/bootstrap.php
-	checkMissingIterableValueType: false
+    level: 8
+    paths:
+        - src
+    excludePaths:
+        analyse:
+            - vendor
+            - src/JaxkDev/DiscordBot/Libs
+    bootstrapFiles:
+        - test/bootstrap.php
+    checkMissingIterableValueType: false

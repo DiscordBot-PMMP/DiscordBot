@@ -26,55 +26,55 @@ use pocketmine\plugin\Plugin;
  */
 class ServerJoined extends DiscordBotEvent{
 
-	/** @var Server */
-	private $server;
+    /** @var Server */
+    private $server;
 
-	/** @var Role[] */
-	private $roles;
+    /** @var Role[] */
+    private $roles;
 
-	/** @var Channel[] */
-	private $channels;
+    /** @var Channel[] */
+    private $channels;
 
-	/** @var Member[] */
-	private $members;
+    /** @var Member[] */
+    private $members;
 
-	/**
-	 * @param Plugin    $plugin
-	 * @param Server    $server
-	 * @param Role[]    $roles
-	 * @param Channel[] $channels
-	 * @param Member[]  $members
-	 */
-	public function __construct(Plugin $plugin, Server $server, array $roles, array $channels, array $members){
-		parent::__construct($plugin);
-		$this->server = $server;
-		$this->roles = $roles;
-		$this->channels = $channels;
-		$this->members = $members;
-	}
+    /**
+     * @param Plugin    $plugin
+     * @param Server    $server
+     * @param Role[]    $roles
+     * @param Channel[] $channels
+     * @param Member[]  $members
+     */
+    public function __construct(Plugin $plugin, Server $server, array $roles, array $channels, array $members){
+        parent::__construct($plugin);
+        $this->server = $server;
+        $this->roles = $roles;
+        $this->channels = $channels;
+        $this->members = $members;
+    }
 
-	public function getServer(): Server{
-		return $this->server;
-	}
+    public function getServer(): Server{
+        return $this->server;
+    }
 
-	/**
-	 * @return Role[]
-	 */
-	public function getRoles(): array{
-		return $this->roles;
-	}
+    /**
+     * @return Role[]
+     */
+    public function getRoles(): array{
+        return $this->roles;
+    }
 
-	/**
-	 * @return Channel[]
-	 */
-	public function getChannels(): array{
-		return $this->channels;
-	}
+    /**
+     * @return Channel[]
+     */
+    public function getChannels(): array{
+        return $this->channels;
+    }
 
-	/**
-	 * @return Member[]
-	 */
-	public function getMembers(): array{
-		return $this->members;
-	}
+    /**
+     * @return Member[]
+     */
+    public function getMembers(): array{
+        return $this->members;
+    }
 }

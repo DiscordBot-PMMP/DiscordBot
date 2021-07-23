@@ -1,16 +1,16 @@
 VERSION="$1"
 
 sudo apt update && sudo apt install -y \
-	re2c \
-	libtool \
-	libtool-bin \
-	zlib1g-dev \
-	libcurl4-openssl-dev \
-	libxml2-dev \
-	libyaml-dev \
-	libgmp-dev \
-	libzip-dev \
-	libssl-dev
+    re2c \
+    libtool \
+    libtool-bin \
+    zlib1g-dev \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libyaml-dev \
+    libgmp-dev \
+    libzip-dev \
+    libssl-dev
 
 INSTALL_DIR="$(pwd)/bin/php7"
 

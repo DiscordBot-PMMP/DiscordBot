@@ -17,29 +17,29 @@ use JaxkDev\DiscordBot\Models\Webhook;
 
 class RequestCreateWebhook extends Packet{
 
-	/** @var Webhook */
-	private $webhook;
+    /** @var Webhook */
+    private $webhook;
 
-	public function __construct(Webhook $webhook){
-		parent::__construct();
-		$this->webhook = $webhook;
-	}
+    public function __construct(Webhook $webhook){
+        parent::__construct();
+        $this->webhook = $webhook;
+    }
 
-	public function getWebhook(): Webhook{
-		return $this->webhook;
-	}
+    public function getWebhook(): Webhook{
+        return $this->webhook;
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->webhook
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->webhook
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->webhook
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->webhook
+        ] = unserialize($data);
+    }
 }

@@ -17,23 +17,23 @@ use JaxkDev\DiscordBot\Models\Invite;
 
 class RequestInitialiseInvite extends Packet{
 
-	/** @var Invite */
-	private $invite;
+    /** @var Invite */
+    private $invite;
 
-	public function __construct(Invite $invite){
-		parent::__construct();
-		$this->invite = $invite;
-	}
+    public function __construct(Invite $invite){
+        parent::__construct();
+        $this->invite = $invite;
+    }
 
-	public function getInvite(): Invite{
-		return $this->invite;
-	}
+    public function getInvite(): Invite{
+        return $this->invite;
+    }
 
-	public function serialize(): ?string{
-		return serialize([$this->UID, $this->invite]);
-	}
+    public function serialize(): ?string{
+        return serialize([$this->UID, $this->invite]);
+    }
 
-	public function unserialize($data): void{
-		[$this->UID, $this->invite] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [$this->UID, $this->invite] = unserialize($data);
+    }
 }

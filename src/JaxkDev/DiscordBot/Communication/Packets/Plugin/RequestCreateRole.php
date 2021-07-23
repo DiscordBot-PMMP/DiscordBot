@@ -17,29 +17,29 @@ use JaxkDev\DiscordBot\Models\Role;
 
 class RequestCreateRole extends Packet{
 
-	/** @var Role */
-	private $role;
+    /** @var Role */
+    private $role;
 
-	public function __construct(Role $role){
-		parent::__construct();
-		$this->role = $role;
-	}
+    public function __construct(Role $role){
+        parent::__construct();
+        $this->role = $role;
+    }
 
-	public function getRole(): Role{
-		return $this->role;
-	}
+    public function getRole(): Role{
+        return $this->role;
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->role
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->role
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->role
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->role
+        ] = unserialize($data);
+    }
 }

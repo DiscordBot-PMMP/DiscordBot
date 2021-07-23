@@ -23,15 +23,15 @@ use pocketmine\plugin\Plugin;
  */
 class ChannelDeleted extends DiscordBotEvent{
 
-	/** @var ServerChannel */
-	private $channel;
+    /** @var ServerChannel */
+    private $channel;
 
-	public function __construct(Plugin $plugin, ServerChannel $channel){
-		parent::__construct($plugin);
-		$this->channel = $channel;
-	}
+    public function __construct(Plugin $plugin, ServerChannel $channel){
+        parent::__construct($plugin);
+        $this->channel = $channel;
+    }
 
-	public function getChannel(): ServerChannel{
-		return $this->channel;
-	}
+    public function getChannel(): ServerChannel{
+        return $this->channel;
+    }
 }

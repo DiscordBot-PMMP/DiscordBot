@@ -17,23 +17,23 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestUpdateActivity extends Packet{
 
-	/** @var Activity */
-	private $activity;
+    /** @var Activity */
+    private $activity;
 
-	public function __construct(Activity $activity){
-		parent::__construct();
-		$this->activity = $activity;
-	}
+    public function __construct(Activity $activity){
+        parent::__construct();
+        $this->activity = $activity;
+    }
 
-	public function getActivity(): Activity{
-		return $this->activity;
-	}
+    public function getActivity(): Activity{
+        return $this->activity;
+    }
 
-	public function serialize(): ?string{
-		return serialize([$this->UID, $this->activity]);
-	}
+    public function serialize(): ?string{
+        return serialize([$this->UID, $this->activity]);
+    }
 
-	public function unserialize($data): void{
-		[$this->UID, $this->activity] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [$this->UID, $this->activity] = unserialize($data);
+    }
 }

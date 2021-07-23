@@ -23,158 +23,158 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordDataDump extends Packet{
 
-	/** @var Server[] */
-	private $servers = [];
+    /** @var Server[] */
+    private $servers = [];
 
-	/** @var ServerChannel[] */
-	private $channels = [];
+    /** @var ServerChannel[] */
+    private $channels = [];
 
-	/** @var Role[] */
-	private $roles = [];
+    /** @var Role[] */
+    private $roles = [];
 
-	/** @var Invite[] */
-	private $invites = [];
+    /** @var Invite[] */
+    private $invites = [];
 
-	/** @var Ban[] */
-	private $bans = [];
+    /** @var Ban[] */
+    private $bans = [];
 
-	/** @var Member[] */
-	private $members = [];
+    /** @var Member[] */
+    private $members = [];
 
-	/** @var User[] */
-	private $users = [];
+    /** @var User[] */
+    private $users = [];
 
-	/** @var null|User */
-	private $botUser = null;
+    /** @var null|User */
+    private $botUser = null;
 
-	/** @var int */
-	private $timestamp;
+    /** @var int */
+    private $timestamp;
 
-	/**
-	 * @return Server[]
-	 */
-	public function getServers(): array{
-		return $this->servers;
-	}
+    /**
+     * @return Server[]
+     */
+    public function getServers(): array{
+        return $this->servers;
+    }
 
-	public function addServer(Server $server): void{
-		$this->servers[] = $server;
-	}
+    public function addServer(Server $server): void{
+        $this->servers[] = $server;
+    }
 
-	/**
-	 * @return ServerChannel[]
-	 */
-	public function getChannels(): array{
-		return $this->channels;
-	}
+    /**
+     * @return ServerChannel[]
+     */
+    public function getChannels(): array{
+        return $this->channels;
+    }
 
-	public function addChannel(ServerChannel $channel): void{
-		$this->channels[] = $channel;
-	}
+    public function addChannel(ServerChannel $channel): void{
+        $this->channels[] = $channel;
+    }
 
-	/**
-	 * @return Role[]
-	 */
-	public function getRoles(): array{
-		return $this->roles;
-	}
+    /**
+     * @return Role[]
+     */
+    public function getRoles(): array{
+        return $this->roles;
+    }
 
-	public function addRole(Role $role): void{
-		$this->roles[] = $role;
-	}
+    public function addRole(Role $role): void{
+        $this->roles[] = $role;
+    }
 
-	/**
-	 * @return Invite[]
-	 */
-	public function getInvites(): array{
-		return $this->invites;
-	}
+    /**
+     * @return Invite[]
+     */
+    public function getInvites(): array{
+        return $this->invites;
+    }
 
-	public function addInvite(Invite $invite): void{
-		$this->invites[] = $invite;
-	}
+    public function addInvite(Invite $invite): void{
+        $this->invites[] = $invite;
+    }
 
-	/**
-	 * @return Ban[]
-	 */
-	public function getBans(): array{
-		return $this->bans;
-	}
+    /**
+     * @return Ban[]
+     */
+    public function getBans(): array{
+        return $this->bans;
+    }
 
-	public function addBan(Ban $ban): void{
-		$this->bans[] = $ban;
-	}
+    public function addBan(Ban $ban): void{
+        $this->bans[] = $ban;
+    }
 
-	/**
-	 * @return Member[]
-	 */
-	public function getMembers(): array{
-		return $this->members;
-	}
+    /**
+     * @return Member[]
+     */
+    public function getMembers(): array{
+        return $this->members;
+    }
 
-	public function addMember(Member $member): void{
-		$this->members[] = $member;
-	}
+    public function addMember(Member $member): void{
+        $this->members[] = $member;
+    }
 
-	/**
-	 * @return User[]
-	 */
-	public function getUsers(): array{
-		return $this->users;
-	}
+    /**
+     * @return User[]
+     */
+    public function getUsers(): array{
+        return $this->users;
+    }
 
-	public function addUser(User $user): void{
-		$this->users[] = $user;
-	}
+    public function addUser(User $user): void{
+        $this->users[] = $user;
+    }
 
-	public function getBotUser(): ?User{
-		return $this->botUser;
-	}
+    public function getBotUser(): ?User{
+        return $this->botUser;
+    }
 
-	public function setBotUser(User $bot): void{
-		$this->botUser = $bot;
-	}
+    public function setBotUser(User $bot): void{
+        $this->botUser = $bot;
+    }
 
-	public function getTimestamp(): int{
-		return $this->timestamp;
-	}
+    public function getTimestamp(): int{
+        return $this->timestamp;
+    }
 
-	public function setTimestamp(int $timestamp): void{
-		$this->timestamp = $timestamp;
-	}
+    public function setTimestamp(int $timestamp): void{
+        $this->timestamp = $timestamp;
+    }
 
-	public function getSize(): int{
-		return sizeof($this->servers)+sizeof($this->channels)+sizeof($this->roles)+sizeof($this->members)
-			+sizeof($this->users)+sizeof($this->bans)+sizeof($this->invites);
-	}
+    public function getSize(): int{
+        return sizeof($this->servers)+sizeof($this->channels)+sizeof($this->roles)+sizeof($this->members)
+            +sizeof($this->users)+sizeof($this->bans)+sizeof($this->invites);
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->servers,
-			$this->channels,
-			$this->roles,
-			$this->invites,
-			$this->bans,
-			$this->members,
-			$this->users,
-			$this->botUser,
-			$this->timestamp
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->servers,
+            $this->channels,
+            $this->roles,
+            $this->invites,
+            $this->bans,
+            $this->members,
+            $this->users,
+            $this->botUser,
+            $this->timestamp
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->servers,
-			$this->channels,
-			$this->roles,
-			$this->invites,
-			$this->bans,
-			$this->members,
-			$this->users,
-			$this->botUser,
-			$this->timestamp
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->servers,
+            $this->channels,
+            $this->roles,
+            $this->invites,
+            $this->bans,
+            $this->members,
+            $this->users,
+            $this->botUser,
+            $this->timestamp
+        ] = unserialize($data);
+    }
 }

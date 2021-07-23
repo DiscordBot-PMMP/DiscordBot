@@ -14,19 +14,19 @@ namespace JaxkDev\DiscordBot\Plugin;
 
 class ApiRejection extends \Exception{
 
-	/** @var string[] */
-	private $data;
+    /** @var string[] */
+    private $data;
 
-	public function __construct(string $message, array $data = []){
-		parent::__construct($message);
-		$this->data = $data;
-	}
+    public function __construct(string $message, array $data = []){
+        parent::__construct($message);
+        $this->data = $data;
+    }
 
-	public function getOriginalMessage(): ?string{
-		return $this->data[0]??null;
-	}
+    public function getOriginalMessage(): ?string{
+        return $this->data[0]??null;
+    }
 
-	public function getOriginalTrace(): ?string{
-		return $this->data[1]??null;
-	}
+    public function getOriginalTrace(): ?string{
+        return $this->data[1]??null;
+    }
 }

@@ -15,10 +15,10 @@ namespace JaxkDev\DiscordBot\Models\Permissions;
 // Remember categories are classed as channels.
 class ChannelPermissions extends Permissions{
 
-	/**
-	 * @return Array<string, int>
-	 */
-	static function getPossiblePermissions(): array{
-		return array_merge(Permissions::ALL_PERMISSIONS, Permissions::TEXT_PERMISSIONS, Permissions::VOICE_PERMISSIONS);
-	}
+    /**
+     * @return Array<string, int>
+     */
+    static function getPossiblePermissions(): array{
+        return array_merge(Permissions::ALL_PERMISSIONS, Permissions::TEXT_PERMISSIONS, Permissions::VOICE_PERMISSIONS);
+    }
 }

@@ -55,67 +55,67 @@ use Monolog\Logger;
 
 class DiscordEventHandler{
 
-	/** @var Client */
-	private $client;
+    /** @var Client */
+    private $client;
 
-	/** @var Logger */
-	private $logger;
+    /** @var Logger */
+    private $logger;
 
-	public function __construct(Client $client){
-		$this->client = $client;
-		$this->logger = $client->getLogger();
-	}
+    public function __construct(Client $client){
+        $this->client = $client;
+        $this->logger = $client->getLogger();
+    }
 
-	public function registerEvents(): void{
-		$discord = $this->client->getDiscordClient();
-		$discord->on("MESSAGE_CREATE", [$this, "onMessageCreate"]);
-		$discord->on("MESSAGE_DELETE", [$this, "onMessageDelete"]);
-		$discord->on("MESSAGE_UPDATE", [$this, "onMessageUpdate"]);  //AKA Edit
+    public function registerEvents(): void{
+        $discord = $this->client->getDiscordClient();
+        $discord->on("MESSAGE_CREATE", [$this, "onMessageCreate"]);
+        $discord->on("MESSAGE_DELETE", [$this, "onMessageDelete"]);
+        $discord->on("MESSAGE_UPDATE", [$this, "onMessageUpdate"]);  //AKA Edit
 
-		$discord->on("GUILD_MEMBER_ADD", [$this, "onMemberJoin"]);
-		$discord->on("GUILD_MEMBER_REMOVE", [$this, "onMemberLeave"]);
-		$discord->on("GUILD_MEMBER_UPDATE", [$this, "onMemberUpdate"]);   //Includes Roles,nickname etc
+        $discord->on("GUILD_MEMBER_ADD", [$this, "onMemberJoin"]);
+        $discord->on("GUILD_MEMBER_REMOVE", [$this, "onMemberLeave"]);
+        $discord->on("GUILD_MEMBER_UPDATE", [$this, "onMemberUpdate"]);   //Includes Roles,nickname etc
 
-		$discord->on("GUILD_CREATE", [$this, "onGuildJoin"]);
-		$discord->on("GUILD_UPDATE", [$this, "onGuildUpdate"]);
-		$discord->on("GUILD_DELETE", [$this, "onGuildLeave"]);
+        $discord->on("GUILD_CREATE", [$this, "onGuildJoin"]);
+        $discord->on("GUILD_UPDATE", [$this, "onGuildUpdate"]);
+        $discord->on("GUILD_DELETE", [$this, "onGuildLeave"]);
 
-		$discord->on("CHANNEL_CREATE", [$this, "onChannelCreate"]);
-		$discord->on("CHANNEL_UPDATE", [$this, "onChannelUpdate"]);
-		$discord->on("CHANNEL_DELETE", [$this, "onChannelDelete"]);
-		$discord->on("CHANNEL_PINS_UPDATE", [$this, "onChannelPinsUpdate"]);
+        $discord->on("CHANNEL_CREATE", [$this, "onChannelCreate"]);
+        $discord->on("CHANNEL_UPDATE", [$this, "onChannelUpdate"]);
+        $discord->on("CHANNEL_DELETE", [$this, "onChannelDelete"]);
+        $discord->on("CHANNEL_PINS_UPDATE", [$this, "onChannelPinsUpdate"]);
 
-		$discord->on("GUILD_ROLE_CREATE", [$this, "onRoleCreate"]);
-		$discord->on("GUILD_ROLE_UPDATE", [$this, "onRoleUpdate"]);
-		$discord->on("GUILD_ROLE_DELETE", [$this, "onRoleDelete"]);
+        $discord->on("GUILD_ROLE_CREATE", [$this, "onRoleCreate"]);
+        $discord->on("GUILD_ROLE_UPDATE", [$this, "onRoleUpdate"]);
+        $discord->on("GUILD_ROLE_DELETE", [$this, "onRoleDelete"]);
 
-		$discord->on("INVITE_CREATE", [$this, "onInviteCreate"]);
-		$discord->on("INVITE_DELETE", [$this, "onInviteDelete"]);
+        $discord->on("INVITE_CREATE", [$this, "onInviteCreate"]);
+        $discord->on("INVITE_DELETE", [$this, "onInviteDelete"]);
 
-		$discord->on("GUILD_BAN_ADD", [$this, "onBanAdd"]);
-		$discord->on("GUILD_BAN_REMOVE", [$this, "onBanRemove"]);
+        $discord->on("GUILD_BAN_ADD", [$this, "onBanAdd"]);
+        $discord->on("GUILD_BAN_REMOVE", [$this, "onBanRemove"]);
 
-		$discord->on("MESSAGE_REACTION_ADD", [$this, "onMessageReactionAdd"]);
-		$discord->on("MESSAGE_REACTION_REMOVE", [$this, "onMessageReactionRemove"]);
-		$discord->on("MESSAGE_REACTION_REMOVE_ALL", [$this, "onMessageReactionRemoveAll"]);
-		//$discord->on("MESSAGE_REACTION_REMOVE_EMOJI", [$this, "onMessageReactionRemoveEmoji"]);
+        $discord->on("MESSAGE_REACTION_ADD", [$this, "onMessageReactionAdd"]);
+        $discord->on("MESSAGE_REACTION_REMOVE", [$this, "onMessageReactionRemove"]);
+        $discord->on("MESSAGE_REACTION_REMOVE_ALL", [$this, "onMessageReactionRemoveAll"]);
+        //$discord->on("MESSAGE_REACTION_REMOVE_EMOJI", [$this, "onMessageReactionRemoveEmoji"]);
+    
+        /*$discord->on("PRESENCE_UPDATE", function(...$args){
+            var_dump($args);
+        });*/
 
-		/*$discord->on("PRESENCE_UPDATE", function(...$args){
-			var_dump($args);
-		});*/
+        /*$discord->on("VOICE_STATE_UPDATE", function (DiscordVoiceStateUpdate $state, Discord $discord) {
+            var_dump($state);
+        });*/
 
-		/*$discord->on("VOICE_STATE_UPDATE", function (DiscordVoiceStateUpdate $state, Discord $discord) {
-			var_dump($state);
-		});*/
+        /*
+         * TODO (TBD):
+         * - Voice State Update (track members voice activity, join voice channel, leave voice channel, self deafen/mute)
+         * - Presence updates.
+         */
+    }
 
-		/*
-		 * TODO (TBD):
-		 * - Voice State Update (track members voice activity, join voice channel, leave voice channel, self deafen/mute)
-		 * - Presence updates.
-		 */
-	}
-
-	/*
+    /*
 Some timing notes.
 array(5) {
   ["server"]=>
@@ -192,328 +192,328 @@ array(5) {
     int(258)
   }
 }
-	 */
+     */
 
-	public function onReady(): void{
-		if($this->client->getThread()->getStatus() !== BotThread::STATUS_STARTED){
-			$this->logger->warning("Closing thread, unexpected state change.");
-			$this->client->close();
-		}
+    public function onReady(): void{
+        if($this->client->getThread()->getStatus() !== BotThread::STATUS_STARTED){
+            $this->logger->warning("Closing thread, unexpected state change.");
+            $this->client->close();
+        }
 
-		// Register all other events.
-		$this->registerEvents();
+        // Register all other events.
+        $this->registerEvents();
 
-		// Dump all discord data.
-		$pk = new DiscordDataDumpPacket();
-		$pk->setTimestamp(time());
+        // Dump all discord data.
+        $pk = new DiscordDataDumpPacket();
+        $pk->setTimestamp(time());
 
-		$this->logger->debug("Starting the data pack, please be patient.");
-		$t = microtime(true);
-		$mem = memory_get_usage(true);
+        $this->logger->debug("Starting the data pack, please be patient.");
+        $t = microtime(true);
+        $mem = memory_get_usage(true);
 
-		$client = $this->client->getDiscordClient();
+        $client = $this->client->getDiscordClient();
 
-		/** @var DiscordGuild $guild */
-		foreach($client->guilds as $guild){
-			$pk->addServer(ModelConverter::genModelServer($guild));
+        /** @var DiscordGuild $guild */
+        foreach($client->guilds as $guild){
+            $pk->addServer(ModelConverter::genModelServer($guild));
 
-			/** @var DiscordRolePermission $permissions */
-			$permissions = $guild->members->offsetGet($client->id)->getPermissions();
+            /** @var DiscordRolePermission $permissions */
+            $permissions = $guild->members->offsetGet($client->id)->getPermissions();
 
-			if($permissions->ban_members){
-				/** @noinspection PhpUnhandledExceptionInspection */
-				$guild->bans->freshen()->done(function() use ($guild){
-					$this->logger->debug("Successfully fetched ".sizeof($guild->bans)." bans from server '".
-						$guild->name."' (".$guild->id.")");
-					if(sizeof($guild->bans) === 0) return;
-					$pk = new DiscordDataDumpPacket();
-					$pk->setTimestamp(time());
-					/** @var DiscordBan $ban */
-					foreach($guild->bans as $ban){
-						$pk->addBan(ModelConverter::genModelBan($ban));
-					}
-					$this->client->getThread()->writeOutboundData($pk);
-				}, function() use ($guild){
-					$this->logger->warning("Failed to fetch bans from server '".$guild->name."' (".$guild->id.")");
-				});
-			}else{
-				$this->logger->notice("Cannot fetch bans from server '".$guild->name."' (".$guild->id.
-					"), Bot does not have 'ban_members' permission.");
-			}
+            if($permissions->ban_members){
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $guild->bans->freshen()->done(function() use ($guild){
+                    $this->logger->debug("Successfully fetched ".sizeof($guild->bans)." bans from server '".
+                        $guild->name."' (".$guild->id.")");
+                    if(sizeof($guild->bans) === 0) return;
+                    $pk = new DiscordDataDumpPacket();
+                    $pk->setTimestamp(time());
+                    /** @var DiscordBan $ban */
+                    foreach($guild->bans as $ban){
+                        $pk->addBan(ModelConverter::genModelBan($ban));
+                    }
+                    $this->client->getThread()->writeOutboundData($pk);
+                }, function() use ($guild){
+                    $this->logger->warning("Failed to fetch bans from server '".$guild->name."' (".$guild->id.")");
+                });
+            }else{
+                $this->logger->notice("Cannot fetch bans from server '".$guild->name."' (".$guild->id.
+                    "), Bot does not have 'ban_members' permission.");
+            }
 
-			/** @var DiscordChannel $channel */
-			foreach($guild->channels as $channel){
-				$c = ModelConverter::genModelChannel($channel);
-				if($c !== null) $pk->addChannel($c);
-			}
+            /** @var DiscordChannel $channel */
+            foreach($guild->channels as $channel){
+                $c = ModelConverter::genModelChannel($channel);
+                if($c !== null) $pk->addChannel($c);
+            }
 
-			/** @var DiscordRole $role */
-			foreach($guild->roles as $role){
-				$pk->addRole(ModelConverter::genModelRole($role));
-			}
+            /** @var DiscordRole $role */
+            foreach($guild->roles as $role){
+                $pk->addRole(ModelConverter::genModelRole($role));
+            }
 
-			if($permissions->manage_guild){
-				/** @noinspection PhpUnhandledExceptionInspection */
-				$guild->invites->freshen()->done(function() use ($guild){
-					$this->logger->debug("Successfully fetched ".sizeof($guild->invites).
-						" invites from server '".$guild->name."' (".$guild->id.")");
-					if(sizeof($guild->invites) === 0) return;
-					$pk = new DiscordDataDumpPacket();
-					$pk->setTimestamp(time());
-					/** @var DiscordInvite $invite */
-					foreach($guild->invites as $invite){
-						$pk->addInvite(ModelConverter::genModelInvite($invite));
-					}
-					$this->client->getThread()->writeOutboundData($pk);
-				}, function() use ($guild){
-					$this->logger->warning("Failed to fetch invites from server '".$guild->name."' (".$guild->id.")");
-				});
-			}else{
-				$this->logger->notice("Cannot fetch invites from server '".$guild->name."' (".$guild->id.
-					"), Bot does not have 'manage_guild' permission.");
-			}
+            if($permissions->manage_guild){
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $guild->invites->freshen()->done(function() use ($guild){
+                    $this->logger->debug("Successfully fetched ".sizeof($guild->invites).
+                        " invites from server '".$guild->name."' (".$guild->id.")");
+                    if(sizeof($guild->invites) === 0) return;
+                    $pk = new DiscordDataDumpPacket();
+                    $pk->setTimestamp(time());
+                    /** @var DiscordInvite $invite */
+                    foreach($guild->invites as $invite){
+                        $pk->addInvite(ModelConverter::genModelInvite($invite));
+                    }
+                    $this->client->getThread()->writeOutboundData($pk);
+                }, function() use ($guild){
+                    $this->logger->warning("Failed to fetch invites from server '".$guild->name."' (".$guild->id.")");
+                });
+            }else{
+                $this->logger->notice("Cannot fetch invites from server '".$guild->name."' (".$guild->id.
+                    "), Bot does not have 'manage_guild' permission.");
+            }
 
-			/** @var DiscordMember $member */
-			foreach($guild->members as $member){
-				$pk->addMember(ModelConverter::genModelMember($member));
-			}
-		}
+            /** @var DiscordMember $member */
+            foreach($guild->members as $member){
+                $pk->addMember(ModelConverter::genModelMember($member));
+            }
+        }
 
-		/** @var DiscordUser $user */
-		foreach($client->users as $user){
-			$pk->addUser(ModelConverter::genModelUser($user));
-		}
+        /** @var DiscordUser $user */
+        foreach($client->users as $user){
+            $pk->addUser(ModelConverter::genModelUser($user));
+        }
 
-		$pk->setBotUser(ModelConverter::genModelUser($client->user));
+        $pk->setBotUser(ModelConverter::genModelUser($client->user));
 
-		$this->logger->debug("Data pack took: ".round(microtime(true)-$t, 5)."s & ".
-			round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
+        $this->logger->debug("Data pack took: ".round(microtime(true)-$t, 5)."s & ".
+            round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
 
-		//Very important to check status before overwriting, can cause dangerous behaviour.
-		if($this->client->getThread()->getStatus() !== BotThread::STATUS_STARTED){
-			$this->logger->warning("Closing thread, unexpected state change.");
-			$this->client->close();
-		}
+        //Very important to check status before overwriting, can cause dangerous behaviour.
+        if($this->client->getThread()->getStatus() !== BotThread::STATUS_STARTED){
+            $this->logger->warning("Closing thread, unexpected state change.");
+            $this->client->close();
+        }
 
-		$this->client->getThread()->writeOutboundData($pk);
+        $this->client->getThread()->writeOutboundData($pk);
 
-		$this->client->getThread()->setStatus(BotThread::STATUS_READY);
-		$this->logger->info("Client '".$client->username."#".$client->discriminator."' ready.");
+        $this->client->getThread()->setStatus(BotThread::STATUS_READY);
+        $this->logger->info("Client '".$client->username."#".$client->discriminator."' ready.");
 
-		$this->client->getThread()->writeOutboundData(new DiscordReadyPacket());
-		$this->client->getCommunicationHandler()->sendHeartbeat();
-	}
+        $this->client->getThread()->writeOutboundData(new DiscordReadyPacket());
+        $this->client->getCommunicationHandler()->sendHeartbeat();
+    }
 
-	public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
-		if(!$this->checkMessage($message)) return;
-		//if($message->author->id === "305060807887159296") $message->react("❤️");
-		//Dont ask questions...
-		$packet = new MessageSentPacket(ModelConverter::genModelMessage($message));
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
+        if(!$this->checkMessage($message)) return;
+        //if($message->author->id === "305060807887159296") $message->react("❤️");
+        //Dont ask questions...
+        $packet = new MessageSentPacket(ModelConverter::genModelMessage($message));
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
-		if(!$this->checkMessage($message)) return;
-		$packet = new MessageUpdatePacket(ModelConverter::genModelMessage($message));
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
+        if(!$this->checkMessage($message)) return;
+        $packet = new MessageUpdatePacket(ModelConverter::genModelMessage($message));
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	/**
-	 * @param DiscordMessage|\stdClass $data
-	 * @param Discord                  $discord
-	 */
-	public function onMessageDelete($data, Discord $discord): void{
-		if($data instanceof DiscordMessage){
-			$message = ModelConverter::genModelMessage($data);
-		}else{
-			$message = [
-				"message_id" => $data->id,
-				"channel_id" => $data->channel_id,
-				"server_id" => $data->guild_id
-			];
-		}
-		$packet = new MessageDeletePacket($message);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    /**
+     * @param DiscordMessage|\stdClass $data
+     * @param Discord                  $discord
+     */
+    public function onMessageDelete($data, Discord $discord): void{
+        if($data instanceof DiscordMessage){
+            $message = ModelConverter::genModelMessage($data);
+        }else{
+            $message = [
+                "message_id" => $data->id,
+                "channel_id" => $data->channel_id,
+                "server_id" => $data->guild_id
+            ];
+        }
+        $packet = new MessageDeletePacket($message);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onMessageReactionAdd(DiscordMessageReaction $reaction): void{
-		$packet = new MessageReactionAddPacket($reaction->message_id, $reaction->emoji->name,
-			$reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onMessageReactionAdd(DiscordMessageReaction $reaction): void{
+        $packet = new MessageReactionAddPacket($reaction->message_id, $reaction->emoji->name,
+            $reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onMessageReactionRemove(DiscordMessageReaction $reaction): void{
-		$packet = new MessageReactionRemovePacket($reaction->message_id, $reaction->emoji->name,
-			$reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onMessageReactionRemove(DiscordMessageReaction $reaction): void{
+        $packet = new MessageReactionRemovePacket($reaction->message_id, $reaction->emoji->name,
+            $reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onMessageReactionRemoveAll(DiscordMessageReaction $reaction): void{
-		$packet = new MessageReactionRemoveAllPacket($reaction->message_id, $reaction->channel_id);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onMessageReactionRemoveAll(DiscordMessageReaction $reaction): void{
+        $packet = new MessageReactionRemoveAllPacket($reaction->message_id, $reaction->channel_id);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	/*public function onMessageReactionRemoveEmoji(...$d): void{
-		//TODO Cant verify data, requires bot to remove all reactions by emoji as a user cannot from what ive tried.
-		//But i think its safe to assume its $message_id, $channel_id, $guild_id and $emoji
-		var_dump($d);
-	}*/
+    /*public function onMessageReactionRemoveEmoji(...$d): void{
+        //TODO Cant verify data, requires bot to remove all reactions by emoji as a user cannot from what ive tried.
+        //But i think its safe to assume its $message_id, $channel_id, $guild_id and $emoji
+        var_dump($d);
+    }*/
 
-	public function onMemberJoin(DiscordMember $member, Discord $discord): void{
-		$packet = new MemberJoinPacket(ModelConverter::genModelMember($member), ModelConverter::genModelUser($member->user));
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onMemberJoin(DiscordMember $member, Discord $discord): void{
+        $packet = new MemberJoinPacket(ModelConverter::genModelMember($member), ModelConverter::genModelUser($member->user));
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onMemberUpdate(DiscordMember $member, Discord $discord): void{
-		$packet = new MemberUpdatePacket(ModelConverter::genModelMember($member));
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onMemberUpdate(DiscordMember $member, Discord $discord): void{
+        $packet = new MemberUpdatePacket(ModelConverter::genModelMember($member));
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onMemberLeave(DiscordMember $member, Discord $discord): void{
-		$packet = new MemberLeavePacket($member->guild_id.".".$member->id);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onMemberLeave(DiscordMember $member, Discord $discord): void{
+        $packet = new MemberLeavePacket($member->guild_id.".".$member->id);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onGuildJoin(DiscordGuild $guild, Discord $discord): void{
-		$channels = [];
-		/** @var DiscordChannel $channel */
-		foreach($guild->channels as $channel){
-			$c = ModelConverter::genModelChannel($channel);
-			if($c !== null) $channels[] = $c;
-		}
-		$roles = [];
-		/** @var DiscordRole $role */
-		foreach($guild->roles as $role){
-			$roles[] = ModelConverter::genModelRole($role);
-		}
-		$members = [];
-		/** @var DiscordMember $member */
-		foreach($guild->members as $member){
-			$members[] = ModelConverter::genModelMember($member);
-		}
+    public function onGuildJoin(DiscordGuild $guild, Discord $discord): void{
+        $channels = [];
+        /** @var DiscordChannel $channel */
+        foreach($guild->channels as $channel){
+            $c = ModelConverter::genModelChannel($channel);
+            if($c !== null) $channels[] = $c;
+        }
+        $roles = [];
+        /** @var DiscordRole $role */
+        foreach($guild->roles as $role){
+            $roles[] = ModelConverter::genModelRole($role);
+        }
+        $members = [];
+        /** @var DiscordMember $member */
+        foreach($guild->members as $member){
+            $members[] = ModelConverter::genModelMember($member);
+        }
 
-		$packet = new ServerJoinPacket(ModelConverter::genModelServer($guild), $channels, $members, $roles);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+        $packet = new ServerJoinPacket(ModelConverter::genModelServer($guild), $channels, $members, $roles);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onGuildUpdate(DiscordGuild $guild, Discord $discord): void{
-		$packet = new ServerUpdatePacket(ModelConverter::genModelServer($guild));
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onGuildUpdate(DiscordGuild $guild, Discord $discord): void{
+        $packet = new ServerUpdatePacket(ModelConverter::genModelServer($guild));
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onGuildLeave(DiscordGuild $guild, Discord $discord): void{
-		$packet = new ServerLeavePacket($guild->id);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onGuildLeave(DiscordGuild $guild, Discord $discord): void{
+        $packet = new ServerLeavePacket($guild->id);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
-		$c = ModelConverter::genModelChannel($channel);
-		if($c === null) return;
-		$packet = new ChannelCreatePacket($c);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
+        $c = ModelConverter::genModelChannel($channel);
+        if($c === null) return;
+        $packet = new ChannelCreatePacket($c);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
-		$c = ModelConverter::genModelChannel($channel);
-		if($c === null) return;
-		$packet = new ChannelUpdatePacket($c);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
+        $c = ModelConverter::genModelChannel($channel);
+        if($c === null) return;
+        $packet = new ChannelUpdatePacket($c);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
-		$packet = new ChannelDeletePacket($channel->id);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
+        $packet = new ChannelDeletePacket($channel->id);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	/** $data ["last_pin_timestamp" => string, "channel_id" => string, "guild_id" => string] */
-	public function onChannelPinsUpdate(\stdClass $data): void{
-		$packet = new ChannelPinsUpdatePacket($data->channel_id);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    /** $data ["last_pin_timestamp" => string, "channel_id" => string, "guild_id" => string] */
+    public function onChannelPinsUpdate(\stdClass $data): void{
+        $packet = new ChannelPinsUpdatePacket($data->channel_id);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onRoleCreate(DiscordRole $role, Discord $discord): void{
-		$packet = new RoleCreatePacket(ModelConverter::genModelRole($role));
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onRoleCreate(DiscordRole $role, Discord $discord): void{
+        $packet = new RoleCreatePacket(ModelConverter::genModelRole($role));
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onRoleUpdate(DiscordRole $role, Discord $discord): void{
-		$packet = new RoleUpdatePacket(ModelConverter::genModelRole($role));
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onRoleUpdate(DiscordRole $role, Discord $discord): void{
+        $packet = new RoleUpdatePacket(ModelConverter::genModelRole($role));
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onRoleDelete(DiscordRole $role, Discord $discord): void{
-		$packet = new RoleDeletePacket($role->id);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onRoleDelete(DiscordRole $role, Discord $discord): void{
+        $packet = new RoleDeletePacket($role->id);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onInviteCreate(DiscordInvite $invite, Discord $discord): void{
-		$packet = new InviteCreatePacket(ModelConverter::genModelInvite($invite));
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onInviteCreate(DiscordInvite $invite, Discord $discord): void{
+        $packet = new InviteCreatePacket(ModelConverter::genModelInvite($invite));
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	/**
-	 * @param \stdClass $invite {channel_id: str, guild_id: str, code: str}
-	 * @param Discord   $discord
-	 */
-	public function onInviteDelete(\stdClass $invite, Discord $discord): void{
-		$packet = new InviteDeletePacket($invite->code);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    /**
+     * @param \stdClass $invite {channel_id: str, guild_id: str, code: str}
+     * @param Discord   $discord
+     */
+    public function onInviteDelete(\stdClass $invite, Discord $discord): void{
+        $packet = new InviteDeletePacket($invite->code);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	public function onBanAdd(DiscordBan $ban, Discord $discord): void{
-		//No reason unless you freshen bans which is only possible with ban_members permission.
-		$g = $ban->guild;
-		/** @var DiscordMember|null $m */
-		$m = $g->members->offsetGet($discord->user->id);
-		if($m !== null and $m->getPermissions()->ban_members){
-			//Get ban reason.
-			/** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
-			$g->bans->freshen()->done(function() use ($ban, $g){
-				//Got latest bans so we can fetch reason unless it was unbanned in like 0.01s
-				/** @var DiscordBan|null $b */
-				$b = $g->bans->offsetGet($ban->user_id);
-				if($b !== null){
-					$this->logger->debug("Successfully fetched bans, attached reason to new ban event.");
-					$packet = new BanAddPacket(ModelConverter::genModelBan($b));
-					$this->client->getThread()->writeOutboundData($packet);
-				}else{
-					$this->logger->debug("No ban after freshen ??? (IMPORTANT LOGIC ERROR)");
-					$packet = new BanAddPacket(ModelConverter::genModelBan($ban));
-					$this->client->getThread()->writeOutboundData($packet);
-				}
-			}, function() use ($ban){
-				//Failed so just send ban with no reason.
-				$this->logger->debug("Failed to fetch bans even with ban_members permission, using old ban object.");
-				$packet = new BanAddPacket(ModelConverter::genModelBan($ban));
-				$this->client->getThread()->writeOutboundData($packet);
-			});
-		}else{
-			$this->logger->debug("Bot does not have ban_members permission so no reason could be attached to this ban.");
-			$packet = new BanAddPacket(ModelConverter::genModelBan($ban));
-			$this->client->getThread()->writeOutboundData($packet);
-		}
-	}
+    public function onBanAdd(DiscordBan $ban, Discord $discord): void{
+        //No reason unless you freshen bans which is only possible with ban_members permission.
+        $g = $ban->guild;
+        /** @var DiscordMember|null $m */
+        $m = $g->members->offsetGet($discord->user->id);
+        if($m !== null and $m->getPermissions()->ban_members){
+            //Get ban reason.
+            /** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
+            $g->bans->freshen()->done(function() use ($ban, $g){
+                //Got latest bans so we can fetch reason unless it was unbanned in like 0.01s
+                /** @var DiscordBan|null $b */
+                $b = $g->bans->offsetGet($ban->user_id);
+                if($b !== null){
+                    $this->logger->debug("Successfully fetched bans, attached reason to new ban event.");
+                    $packet = new BanAddPacket(ModelConverter::genModelBan($b));
+                    $this->client->getThread()->writeOutboundData($packet);
+                }else{
+                    $this->logger->debug("No ban after freshen ??? (IMPORTANT LOGIC ERROR)");
+                    $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
+                    $this->client->getThread()->writeOutboundData($packet);
+                }
+            }, function() use ($ban){
+                //Failed so just send ban with no reason.
+                $this->logger->debug("Failed to fetch bans even with ban_members permission, using old ban object.");
+                $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
+                $this->client->getThread()->writeOutboundData($packet);
+            });
+        }else{
+            $this->logger->debug("Bot does not have ban_members permission so no reason could be attached to this ban.");
+            $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
+            $this->client->getThread()->writeOutboundData($packet);
+        }
+    }
 
-	public function onBanRemove(DiscordBan $ban, Discord $discord): void{
-		$packet = new BanRemovePacket($ban->guild_id.".".$ban->user_id);
-		$this->client->getThread()->writeOutboundData($packet);
-	}
+    public function onBanRemove(DiscordBan $ban, Discord $discord): void{
+        $packet = new BanRemovePacket($ban->guild_id.".".$ban->user_id);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
 
-	/**
-	 * Checks if we handle this type of message in this type of channel.
-	 * @param DiscordMessage $message
-	 * @return bool
-	 */
-	private function checkMessage(DiscordMessage $message): bool{
-		// Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
-		if($message->author === null) return false; //"Shouldn't" happen now...
-		if($message->author->id === $this->client->getDiscordClient()->id) return false;
+    /**
+     * Checks if we handle this type of message in this type of channel.
+     * @param DiscordMessage $message
+     * @return bool
+     */
+    private function checkMessage(DiscordMessage $message): bool{
+        // Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
+        if($message->author === null) return false; //"Shouldn't" happen now...
+        if($message->author->id === $this->client->getDiscordClient()->id) return false;
 
-		// Other types of messages not used right now.
-		if($message->type !== DiscordMessage::TYPE_NORMAL and $message->type !== DiscordMessage::TYPE_REPLY) return false;
-		if(($message->content??"") === "" and $message->embeds->count() === 0 and sizeof($message->attachments) === 0) return false;
-		// ^ Spotify/Games etc
+        // Other types of messages not used right now.
+        if($message->type !== DiscordMessage::TYPE_NORMAL and $message->type !== DiscordMessage::TYPE_REPLY) return false;
+        if(($message->content??"") === "" and $message->embeds->count() === 0 and sizeof($message->attachments) === 0) return false;
+        // ^ Spotify/Games etc
 
-		return true;
-	}
+        return true;
+    }
 }

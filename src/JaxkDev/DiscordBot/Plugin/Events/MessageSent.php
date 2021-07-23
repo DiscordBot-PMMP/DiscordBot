@@ -23,15 +23,15 @@ use pocketmine\plugin\Plugin;
  */
 class MessageSent extends DiscordBotEvent{
 
-	/** @var Message */
-	private $message;
+    /** @var Message */
+    private $message;
 
-	public function __construct(Plugin $plugin, Message $message){
-		parent::__construct($plugin);
-		$this->message = $message;
-	}
+    public function __construct(Plugin $plugin, Message $message){
+        parent::__construct($plugin);
+        $this->message = $message;
+    }
 
-	public function getMessage(): Message{
-		return $this->message;
-	}
+    public function getMessage(): Message{
+        return $this->message;
+    }
 }

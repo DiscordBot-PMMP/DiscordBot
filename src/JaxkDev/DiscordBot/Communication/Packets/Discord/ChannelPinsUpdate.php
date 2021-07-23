@@ -16,29 +16,29 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class ChannelPinsUpdate extends Packet{
 
-	/** @var string */
-	private $channel_id;
+    /** @var string */
+    private $channel_id;
 
-	public function __construct(string $channel_id){
-		parent::__construct();
-		$this->channel_id = $channel_id;
-	}
+    public function __construct(string $channel_id){
+        parent::__construct();
+        $this->channel_id = $channel_id;
+    }
 
-	public function getChannelId(): string{
-		return $this->channel_id;
-	}
+    public function getChannelId(): string{
+        return $this->channel_id;
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->channel_id
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->channel_id
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->channel_id
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->channel_id
+        ] = unserialize($data);
+    }
 }

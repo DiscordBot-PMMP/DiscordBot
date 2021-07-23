@@ -14,11 +14,11 @@ namespace JaxkDev\DiscordBot\Models\Permissions;
 
 class RolePermissions extends Permissions{
 
-	/**
-	 * @return Array<string, int>
-	 */
-	static function getPossiblePermissions(): array{
-		return array_merge(Permissions::ALL_PERMISSIONS, Permissions::ROLE_PERMISSIONS, Permissions::TEXT_PERMISSIONS,
-			Permissions::VOICE_PERMISSIONS);
-	}
+    /**
+     * @return Array<string, int>
+     */
+    static function getPossiblePermissions(): array{
+        return array_merge(Permissions::ALL_PERMISSIONS, Permissions::ROLE_PERMISSIONS, Permissions::TEXT_PERMISSIONS,
+            Permissions::VOICE_PERMISSIONS);
+    }
 }

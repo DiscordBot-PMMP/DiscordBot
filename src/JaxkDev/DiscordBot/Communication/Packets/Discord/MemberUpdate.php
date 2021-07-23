@@ -17,29 +17,29 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MemberUpdate extends Packet{
 
-	/** @var Member */
-	private $member;
+    /** @var Member */
+    private $member;
 
-	public function __construct(Member $member){
-		parent::__construct();
-		$this->member = $member;
-	}
+    public function __construct(Member $member){
+        parent::__construct();
+        $this->member = $member;
+    }
 
-	public function getMember(): Member{
-		return $this->member;
-	}
+    public function getMember(): Member{
+        return $this->member;
+    }
 
-	public function serialize(): ?string{
-		return serialize([
-			$this->UID,
-			$this->member
-		]);
-	}
+    public function serialize(): ?string{
+        return serialize([
+            $this->UID,
+            $this->member
+        ]);
+    }
 
-	public function unserialize($data): void{
-		[
-			$this->UID,
-			$this->member
-		] = unserialize($data);
-	}
+    public function unserialize($data): void{
+        [
+            $this->UID,
+            $this->member
+        ] = unserialize($data);
+    }
 }

@@ -328,48 +328,48 @@ function fatalError($error): void
  */
 function _checkTypehint(callable $callback, \Throwable $reason): bool
 {
-	if (\is_array($callback)) {
-		$callbackReflection = new \ReflectionMethod($callback[0], $callback[1]);
-	} elseif (\is_object($callback) && !$callback instanceof \Closure) {
-		$callbackReflection = new \ReflectionMethod($callback, '__invoke');
-	} else {
-		$callbackReflection = new \ReflectionFunction($callback);
-	}
+    if (\is_array($callback)) {
+        $callbackReflection = new \ReflectionMethod($callback[0], $callback[1]);
+    } elseif (\is_object($callback) && !$callback instanceof \Closure) {
+        $callbackReflection = new \ReflectionMethod($callback, '__invoke');
+    } else {
+        $callbackReflection = new \ReflectionFunction($callback);
+    }
 
-	$parameters = $callbackReflection->getParameters();
+    $parameters = $callbackReflection->getParameters();
 
-	if (!isset($parameters[0])) {
-		return true;
-	}
+    if (!isset($parameters[0])) {
+        return true;
+    }
 
-	$type = $parameters[0]->getType();
+    $type = $parameters[0]->getType();
 
-	if (!$type) {
-		return true;
-	}
+    if (!$type) {
+        return true;
+    }
 
-	$types = [$type];
+    $types = [$type];
 
-	/** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
-	if (PHP_VERSION_ID > 80000 and $type instanceof \ReflectionUnionType) {
-		$types = $type->getTypes();
-	}
+    /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
+    if (PHP_VERSION_ID > 80000 and $type instanceof \ReflectionUnionType) {
+        $types = $type->getTypes();
+    }
 
-	$mismatched = false;
+    $mismatched = false;
 
-	foreach ($types as $type) {
-		if (!$type || $type->isBuiltin()) {
-			continue;
-		}
+    foreach ($types as $type) {
+        if (!$type || $type->isBuiltin()) {
+            continue;
+        }
 
-		$expectedClass = $type->getName();
+        $expectedClass = $type->getName();
 
-		if ($reason instanceof $expectedClass) {
-			return true;
-		}
+        if ($reason instanceof $expectedClass) {
+            return true;
+        }
 
-		$mismatched = true;
-	}
+        $mismatched = true;
+    }
 
-	return !$mismatched;
+    return !$mismatched;
 }

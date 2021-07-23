@@ -25,39 +25,39 @@ use pocketmine\plugin\Plugin;
  */
 class MessageReactionAdd extends DiscordBotEvent{
 
-	/** @var string */
-	private $emoji;
+    /** @var string */
+    private $emoji;
 
-	/** @var string */
-	private $message_id;
+    /** @var string */
+    private $message_id;
 
-	/** @var Channel */
-	private $channel;
+    /** @var Channel */
+    private $channel;
 
-	/** @var Member */
-	private $member;
+    /** @var Member */
+    private $member;
 
-	public function __construct(Plugin $plugin, string $emoji, string $message_id, Channel $channel, Member $member){
-		parent::__construct($plugin);
-		$this->emoji = $emoji;
-		$this->message_id = $message_id;
-		$this->channel = $channel;
-		$this->member = $member;
-	}
+    public function __construct(Plugin $plugin, string $emoji, string $message_id, Channel $channel, Member $member){
+        parent::__construct($plugin);
+        $this->emoji = $emoji;
+        $this->message_id = $message_id;
+        $this->channel = $channel;
+        $this->member = $member;
+    }
 
-	public function getEmoji(): string{
-		return $this->emoji;
-	}
+    public function getEmoji(): string{
+        return $this->emoji;
+    }
 
-	public function getMessageId(): string{
-		return $this->message_id;
-	}
+    public function getMessageId(): string{
+        return $this->message_id;
+    }
 
-	public function getChannel(): Channel{
-		return $this->channel;
-	}
+    public function getChannel(): Channel{
+        return $this->channel;
+    }
 
-	public function getMember(): Member{
-		return $this->member;
-	}
+    public function getMember(): Member{
+        return $this->member;
+    }
 }
