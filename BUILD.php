@@ -8,22 +8,7 @@ declare(strict_types=1);
 
 echo "Installing dependencies, Removing any dev-dependencies & Optimising Autoloader...\n";
 
-$p = realpath("./../../PocketMine/PMMP3-PHP8/").'/';
-$php = $p."bin/php7/bin/php";
-
-$composer = '"'.$php.'" "/Users/jackhonour/Documents/PocketMine/composer.phar"';
-
-if(file_exists("vendor\\composer\\InstalledVersions.php")){
-    require_once "vendor\composer\InstalledVersions.php";
-
-    if(\Composer\InstalledVersions::isInstalled("phpstan/phpstan") || \Composer\InstalledVersions::isInstalled("pocketmine/pocketmine-mp")){
-        passthru("${composer} install --no-dev -o");
-    }
-}else{
-    passthru("${composer} install --no-dev -o");
-}
-
-//passthru("${composer} update --no-dev -o");
+passthru("composer install --no-dev -o");
 
 echo "Building plugin...\n";
 
@@ -128,7 +113,7 @@ function buildPhar(string $pharPath, string $basePath, array $includedPaths, arr
     $phar->addFile("LICENSE");
     yield "Added $count files, Compressing...";
 
-    //$phar->compressFiles(Phar::GZ);
+    $phar->compressFiles(Phar::GZ);
 
     yield "Compressed";
 
