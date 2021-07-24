@@ -21,12 +21,12 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/DiscordBot-PMMP/DiscordPHP"
+            "url": "https://github.com/Discord-PHP/DiscordPHP"
         }
     ],
     "require": {
         "php": "^7.4||^8.0.3",
-        "team-reflex/discord-php": "dev-master#e8a2e2ca865124853f41fb64db98b4d0e6c61c1a",
+        "team-reflex/discord-php": "dev-master#b2a52ef8384750676001785e0ff3fe83161a29d4",
         "react/promise": "v2.x-dev#c2525d2de231f0a4e565647f9a8f06b521ca658b"
     },
     "require-dev": {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "be9866265fef796f59c7db1b3d8a7482",
+    "content-hash": "ee01a8915f28a75bfd96f045bbeb820b",
     "packages": [
         {
             "name": "discord-php/http",
@@ -2160,13 +2160,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DiscordBot-PMMP/DiscordPHP.git",
-                "reference": "e8a2e2ca865124853f41fb64db98b4d0e6c61c1a"
+                "url": "https://github.com/discord-php/DiscordPHP.git",
+                "reference": "b2a52ef8384750676001785e0ff3fe83161a29d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DiscordBot-PMMP/DiscordPHP/zipball/e8a2e2ca865124853f41fb64db98b4d0e6c61c1a",
-                "reference": "e8a2e2ca865124853f41fb64db98b4d0e6c61c1a",
+                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/b2a52ef8384750676001785e0ff3fe83161a29d4",
+                "reference": "b2a52ef8384750676001785e0ff3fe83161a29d4",
                 "shasum": ""
             },
             "require": {
@@ -2229,10 +2229,10 @@
             ],
             "description": "An unofficial API to interact with the voice and text service Discord.",
             "support": {
-                "source": "https://github.com/DiscordBot-PMMP/DiscordPHP/tree/master",
-                "issues": "https://github.com/DiscordBot-PMMP/DiscordPHP/issues"
+                "source": "https://github.com/discord-php/DiscordPHP/tree/master",
+                "issues": "https://github.com/discord-php/DiscordPHP/issues"
             },
-            "time": "2021-07-23T11:16:42+00:00"
+            "time": "2021-07-24T11:45:15+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",

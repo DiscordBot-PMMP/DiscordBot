@@ -60,7 +60,7 @@ use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveAll as MessageReaction
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady as DiscordReadyEvent;
-use JaxkDev\DiscordBot\Plugin\Events\PresenceUpdated;
+use JaxkDev\DiscordBot\Plugin\Events\PresenceUpdated as PresenceUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
@@ -134,7 +134,7 @@ class BotCommunicationHandler{
         if($member === null){
             throw new \AssertionError("Member '{$packet->getMemberID()}' not found in storage.");
         }
-        (new PresenceUpdated($this->plugin, $member, $packet->getStatus(), $packet->getClientStatus(), $packet->getActivities()))->call();;
+        (new PresenceUpdatedEvent($this->plugin, $member, $packet->getStatus(), $packet->getClientStatus(), $packet->getActivities()))->call();;
         $member->setStatus($packet->getStatus());
         $member->setClientStatus($packet->getClientStatus());
         $member->setActivities($packet->getActivities());
