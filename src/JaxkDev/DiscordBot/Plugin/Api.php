@@ -346,7 +346,7 @@ class Api{
     }
 
     /**
-     * Remove a single reaction.
+     * Remove a single reaction, PHP8 Only !
      *
      * @param string $channel_id
      * @param string $message_id
@@ -355,6 +355,9 @@ class Api{
      * @return PromiseInterface
      */
     public function removeReaction(string $channel_id, string $message_id, string $user_id, string $emoji): PromiseInterface{
+        if(PHP_VERSION_ID < 80000){
+            return rejectPromise(new ApiRejection("removeAllReactions with emoji does not currently work on PHP7 :("));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
