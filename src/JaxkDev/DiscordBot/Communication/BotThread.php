@@ -23,10 +23,10 @@ class BotThread extends Thread{
 
     const
         STATUS_STARTING = 0,
-        STATUS_STARTED     = 1,
-        STATUS_READY     = 2,
-        STATUS_CLOSING     = 8,
-        STATUS_CLOSED     = 9;
+        STATUS_STARTED  = 1,
+        STATUS_READY    = 2,
+        STATUS_CLOSING  = 8,
+        STATUS_CLOSED   = 9;
 
     /** @var MainLogger */
     private $logger;

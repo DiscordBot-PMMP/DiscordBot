@@ -24,6 +24,7 @@ use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
 use Discord\Parts\WebSockets\PresenceUpdate as DiscordPresenceUpdate;
+use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Bot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\BotThread;
@@ -53,6 +54,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerJoin as ServerJoinPac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerLeave as ServerLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerUpdate as ServerUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use Monolog\Logger;
 
 class DiscordEventHandler{
@@ -103,15 +105,7 @@ class DiscordEventHandler{
         //$discord->on("MESSAGE_REACTION_REMOVE_EMOJI", [$this, "onMessageReactionRemoveEmoji"]);
     
         $discord->on("PRESENCE_UPDATE", [$this, "onPresenceUpdate"]);
-
-        /*$discord->on("VOICE_STATE_UPDATE", function (DiscordVoiceStateUpdate $state, Discord $discord) {
-            var_dump($state);
-        });*/
-
-        /*s
-         * TODO (TBD):
-         * - Voice State Update (track members voice activity, join voice channel, leave voice channel, self deafen/mute)
-         */
+        $discord->on("VOICE_STATE_UPDATE", [$this, "onVoiceStateUpdate"]);
     }
 
     /*
@@ -301,6 +295,12 @@ array(5) {
 
         $this->client->getThread()->writeOutboundData(new DiscordReadyPacket());
         $this->client->getCommunicationHandler()->sendHeartbeat();
+    }
+
+    public function onVoiceStateUpdate(DiscordVoiceStateUpdate $ds): void{
+        if($ds->guild_id === null) return; //DM's
+        $this->client->getThread()->writeOutboundData(new VoiceStateUpdatePacket($ds->guild_id.".".$ds->user_id,
+            ModelConverter::genModelVoiceState($ds)));
     }
 
     public function onPresenceUpdate(DiscordPresenceUpdate $presenceUpdate): void{

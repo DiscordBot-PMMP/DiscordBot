@@ -11,7 +11,7 @@
  */
 
 namespace JaxkDev\DiscordBot\Plugin;
-use JaxkDev\DiscordBot\Models\Activity;
+
 use JaxkDev\DiscordBot\Communication\Packets\Resolution as ResolutionPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump as DiscordDataDumpPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd as BanAddPacket;
@@ -39,9 +39,12 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerJoin as ServerJoinPac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerLeave as ServerLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerUpdate as ServerUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
+use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Plugin\Events\BanCreated as BanCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\BanDeleted as BanDeletedEvent;
@@ -67,6 +70,10 @@ use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ServerDeleted as ServerDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ServerJoined as ServerJoinedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ServerUpdated as ServerUpdatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberJoined;
+use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberLeft;
+use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberMoved;
+use JaxkDev\DiscordBot\Plugin\Events\VoiceStateUpdated;
 
 class BotCommunicationHandler{
 
@@ -92,6 +99,7 @@ class BotCommunicationHandler{
         }
 
         if($packet instanceof PresenceUpdatePacket) $this->handlePresenceUpdate($packet);
+        elseif($packet instanceof VoiceStateUpdatePacket) $this->handleVoiceStateUpdate($packet);
         elseif($packet instanceof MemberJoinPacket) $this->handleMemberJoin($packet);
         elseif($packet instanceof MemberLeavePacket) $this->handleMemberLeave($packet);
         elseif($packet instanceof MemberUpdatePacket) $this->handleMemberUpdate($packet);
@@ -129,12 +137,75 @@ class BotCommunicationHandler{
         (new DiscordReadyEvent($this->plugin))->call();
     }
 
+    //Uses the storage (aka cache)
+    private function handleVoiceStateUpdate(VoiceStateUpdatePacket $packet): void{
+        $member = Storage::getMember($packet->getMemberId());
+        if($member === null){
+            throw new \AssertionError("Member '{$packet->getMemberId()}' not found in storage.");
+        }
+        $state = $packet->getVoiceState();
+        if($state->getChannelId() === null){
+            $channel = Storage::getMembersVoiceChannel($packet->getMemberId());
+            if($channel === null){
+                throw new \AssertionError("Voice Channel '{$state->getChannelId()}' not found in storage.");
+            }
+            (new VoiceChannelMemberLeft($this->plugin, $member, $channel))->call();
+            $member->setVoiceState(null);
+            $members = $channel->getMembers();
+            if(($key = array_search($packet->getMemberId(), $members)) !== false) {
+                unset($members[$key]);
+            }
+            $channel->setMembers($members);
+            Storage::updateMember($member);
+            Storage::updateChannel($channel);
+            Storage::unsetMembersVoiceChannel($packet->getMemberId());
+        }else{
+            $channel = Storage::getChannel($state->getChannelId());
+            if($channel === null){
+                throw new \AssertionError("Channel '{$state->getChannelId()}' not found in storage.");
+            }
+            if(!$channel instanceof VoiceChannel){
+                throw new \AssertionError("Channel '{$state->getChannelId()}' not a voice channel.");
+            }
+            if(in_array($packet->getMemberId(), $channel->getMembers())){
+                //Member did not leave/join/transfer voice channel but muted/deaf/self_muted/self_deafen etc.
+                (new VoiceStateUpdated($this->plugin, $member, $state))->call();
+                $member->setVoiceState($packet->getVoiceState());
+                Storage::updateMember($member);
+            }else{
+                if($channel->getMemberLimit() !== 0 and sizeof($channel->getMembers()) >= $channel->getMemberLimit()){
+                    //Shouldn't ever happen.
+                    throw new \AssertionError("Channel '{$state->getChannelId()}' shouldn't have room for this member.");
+                }
+                $previous = Storage::getMembersVoiceChannel($packet->getMemberId());
+                if($previous !== null and $previous->getId() !== $state->getChannelId()){
+                    (new VoiceChannelMemberMoved($this->plugin, $member, $previous, $channel, $state))->call();
+                    $members = $previous->getMembers();
+                    if(($key = array_search($packet->getMemberId(), $members)) !== false) {
+                        unset($members[$key]);
+                    }
+                    $previous->setMembers($members);
+                    Storage::updateChannel($previous);
+                }else{
+                    (new VoiceChannelMemberJoined($this->plugin, $member, $channel, $state))->call();
+                }
+                $member->setVoiceState($packet->getVoiceState());
+                $members = $channel->getMembers();
+                $members[] = $packet->getMemberId();
+                $channel->setMembers($members);
+                Storage::updateMember($member);
+                Storage::updateChannel($channel);
+                Storage::setMembersVoiceChannel($packet->getMemberId(), $state->getChannelId());
+            }
+        }
+    }
+
     private function handlePresenceUpdate(PresenceUpdatePacket $packet): void{
         $member = Storage::getMember($packet->getMemberId());
         if($member === null){
             throw new \AssertionError("Member '{$packet->getMemberID()}' not found in storage.");
         }
-        (new PresenceUpdatedEvent($this->plugin, $member, $packet->getStatus(), $packet->getClientStatus(), $packet->getActivities()))->call();;
+        (new PresenceUpdatedEvent($this->plugin, $member, $packet->getStatus(), $packet->getClientStatus(), $packet->getActivities()))->call();
         $member->setStatus($packet->getStatus());
         $member->setClientStatus($packet->getClientStatus());
         $member->setActivities($packet->getActivities());

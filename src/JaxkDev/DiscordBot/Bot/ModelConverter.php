@@ -32,6 +32,7 @@ use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\Guild\Guild as DiscordServer;
+use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
@@ -55,9 +56,19 @@ use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Server;
 use JaxkDev\DiscordBot\Models\User;
+use JaxkDev\DiscordBot\Models\VoiceState;
 use JaxkDev\DiscordBot\Models\Webhook;
 
 abstract class ModelConverter{
+
+    static public function genModelVoiceState(DiscordVoiceStateUpdate $stateUpdate): VoiceState{
+        if($stateUpdate->guild_id === null){
+            throw new AssertionError("Not handling DM Voice states.");
+        }
+        return new VoiceState($stateUpdate->session_id, $stateUpdate->channel_id, $stateUpdate->deaf, $stateUpdate->mute,
+            $stateUpdate->self_deaf, $stateUpdate->self_mute, /*$stateUpdate->self_stream, $stateUpdate->self_video, */
+            $stateUpdate->suppress);
+    }
 
     static public function genModelWebhook(DiscordWebhook $webhook): Webhook{
         return new Webhook($webhook->type, $webhook->channel_id, $webhook->name, $webhook->id, $webhook->user->id,

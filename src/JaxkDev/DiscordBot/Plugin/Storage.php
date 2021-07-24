@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
+use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
@@ -42,6 +43,9 @@ class Storage{
 
     /** @var Array<string, string[]> */
     private static $categoryServerMap = [];
+
+    /** @var Array<string, string> Link member to voice channel they're currently in. */
+    private static $voiceChannelMemberMap = [];
 
     /** @var Array<string, Member> */
     private static $memberMap = [];
@@ -101,41 +105,41 @@ class Storage{
 
     /**
      * NOTICE, Removes all linked members,channels and roles.
-     * @param string $serverId
+     * @param string $server_id
      */
-    public static function removeServer(string $serverId): void{
-        if(!isset(self::$serverMap[$serverId])) return; //Was never added or already deleted.
-        unset(self::$serverMap[$serverId]);
+    public static function removeServer(string $server_id): void{
+        if(!isset(self::$serverMap[$server_id])) return; //Was never added or already deleted.
+        unset(self::$serverMap[$server_id]);
         //Remove servers channels.
-        foreach(self::$channelServerMap[$serverId] as $cid){
+        foreach(self::$channelServerMap[$server_id] as $cid){
             unset(self::$channelMap[$cid]);
         }
-        unset(self::$channelServerMap[$serverId]);
+        unset(self::$channelServerMap[$server_id]);
         //Remove servers category's.
-        foreach(self::$categoryServerMap[$serverId] as $cid){
+        foreach(self::$categoryServerMap[$server_id] as $cid){
             unset(self::$channelMap[$cid]); //Category's are channels.
         }
-        unset(self::$channelServerMap[$serverId]);
+        unset(self::$channelServerMap[$server_id]);
         //Remove servers members.
-        foreach(self::$memberServerMap[$serverId] as $mid){
+        foreach(self::$memberServerMap[$server_id] as $mid){
             unset(self::$memberMap[$mid]);
         }
-        unset(self::$memberServerMap[$serverId]);
+        unset(self::$memberServerMap[$server_id]);
         //Remove servers roles.
-        foreach(self::$roleServerMap[$serverId] as $rid){
+        foreach(self::$roleServerMap[$server_id] as $rid){
             unset(self::$roleMap[$rid]);
         }
-        unset(self::$roleServerMap[$serverId]);
+        unset(self::$roleServerMap[$server_id]);
         //Remove servers invites.
-        foreach(self::$inviteServerMap[$serverId] as $iid){
+        foreach(self::$inviteServerMap[$server_id] as $iid){
             unset(self::$inviteMap[$iid]);
         }
-        unset(self::$inviteServerMap[$serverId]);
+        unset(self::$inviteServerMap[$server_id]);
         //Remove servers bans.
-        foreach(self::$banServerMap[$serverId] as $bid){
+        foreach(self::$banServerMap[$server_id] as $bid){
             unset(self::$banMap[$bid]);
         }
-        unset(self::$banServerMap[$serverId]);
+        unset(self::$banServerMap[$server_id]);
     }
 
     public static function getChannel(string $id): ?ServerChannel{
@@ -143,12 +147,12 @@ class Storage{
     }
 
     /**
-     * @param string $serverId
+     * @param string $server_id
      * @return ServerChannel[]
      */
-    public static function getChannelsByServer(string $serverId): array{
+    public static function getChannelsByServer(string $server_id): array{
         $channels = [];
-        foreach((self::$channelServerMap[$serverId] ?? []) as $id){
+        foreach((self::$channelServerMap[$server_id] ?? []) as $id){
             $c = self::getChannel($id);
             if($c !== null) $channels[] = $c;
         }
@@ -156,12 +160,12 @@ class Storage{
     }
 
     /**
-     * @param string $categoryId
+     * @param string $category_id
      * @return ServerChannel[]
      */
-    public static function getChannelsByCategory(string $categoryId): array{
+    public static function getChannelsByCategory(string $category_id): array{
         $channels = [];
-        foreach((self::$channelCategoryMap[$categoryId] ?? []) as $id){
+        foreach((self::$channelCategoryMap[$category_id] ?? []) as $id){
             $c = self::getChannel($id);
             if($c !== null){
                 if($c instanceof CategoryChannel){
@@ -175,12 +179,12 @@ class Storage{
     }
 
     /**
-     * @param string $serverId
+     * @param string $server_id
      * @return CategoryChannel[]
      */
-    public static function getCategoriesByServer(string $serverId): array{
+    public static function getCategoriesByServer(string $server_id): array{
         $channels = [];
-        foreach((self::$categoryServerMap[$serverId] ?? []) as $id){
+        foreach((self::$categoryServerMap[$server_id] ?? []) as $id){
             $c = self::getChannel($id);
             if($c !== null){
                 if(!$c instanceof CategoryChannel){
@@ -218,20 +222,20 @@ class Storage{
         }
     }
 
-    public static function removeChannel(string $channelId): void{
-        $channel = self::getChannel($channelId);
+    public static function removeChannel(string $channel_id): void{
+        $channel = self::getChannel($channel_id);
         if($channel === null) return; //Already deleted or not added.
-        unset(self::$channelMap[$channelId]);
-        $serverId = $channel->getServerId();
+        unset(self::$channelMap[$channel_id]);
+        $server_id = $channel->getServerId();
         if($channel instanceof CategoryChannel){
-            if(isset(self::$channelCategoryMap[$channelId])) unset(self::$channelCategoryMap[$channelId]);
-            $i = array_search($channelId, self::$categoryServerMap[$serverId], true);
+            if(isset(self::$channelCategoryMap[$channel_id])) unset(self::$channelCategoryMap[$channel_id]);
+            $i = array_search($channel_id, self::$categoryServerMap[$server_id], true);
             if($i === false || is_string($i)) return; //Not in this servers category map.
-            array_splice(self::$categoryServerMap[$serverId], $i, 1);
+            array_splice(self::$categoryServerMap[$server_id], $i, 1);
         }elseif($channel instanceof ServerChannel){
-            $i = array_search($channelId, self::$channelServerMap[$serverId], true);
+            $i = array_search($channel_id, self::$channelServerMap[$server_id], true);
             if($i === false || is_string($i)) return; //Not in this servers channel map.
-            array_splice(self::$channelServerMap[$serverId], $i, 1);
+            array_splice(self::$channelServerMap[$server_id], $i, 1);
         }
     }
 
@@ -240,12 +244,12 @@ class Storage{
     }
 
     /**
-     * @param string $serverId
+     * @param string $server_id
      * @return Member[]
      */
-    public static function getMembersByServer(string $serverId): array{
+    public static function getMembersByServer(string $server_id): array{
         $members = [];
-        foreach((self::$memberServerMap[$serverId] ?? []) as $id){
+        foreach((self::$memberServerMap[$server_id] ?? []) as $id){
             $m = self::getMember($id);
             if($m !== null) $members[] = $m;
         }
@@ -266,14 +270,14 @@ class Storage{
         }
     }
 
-    public static function removeMember(string $memberID): void{
-        $member = self::getMember($memberID);
+    public static function removeMember(string $member_id): void{
+        $member = self::getMember($member_id);
         if($member === null) return; //Already deleted or not added.
-        $serverId = $member->getServerId();
-        unset(self::$memberMap[$memberID]);
-        $i = array_search($memberID, self::$memberServerMap[$serverId], true);
+        $server_id = $member->getServerId();
+        unset(self::$memberMap[$member_id]);
+        $i = array_search($member_id, self::$memberServerMap[$server_id], true);
         if($i === false || is_string($i)) return; //Not in this servers member map.
-        array_splice(self::$memberServerMap[$serverId], $i, 1);
+        array_splice(self::$memberServerMap[$server_id], $i, 1);
     }
 
     public static function getUser(string $id): ?User{
@@ -285,6 +289,35 @@ class Storage{
     }
 
     /**
+     * @internal
+     */
+    public static function setMembersVoiceChannel(string $member_id, string $voice_channel_id): void{
+        if(!((self::$channelMap[$voice_channel_id]??null) instanceof VoiceChannel)){
+            throw new \AssertionError("Voice channel '$voice_channel_id' does not exist in storage.");
+        }
+        self::$voiceChannelMemberMap[$member_id] = $voice_channel_id;
+    }
+
+    /**
+     * Returns the voice channel the specified member is currently in.
+     *
+     * @param string $member_id
+     * @return VoiceChannel|null
+     */
+    public static function getMembersVoiceChannel(string $member_id): ?VoiceChannel{
+        if(($id = self::$voiceChannelMemberMap[$member_id]??null) === null) return null;
+        $c = self::$channelMap[$id];
+        return ($c instanceof VoiceChannel) ? $c : null;
+    }
+
+    /**
+     * @internal
+     */
+    public static function unsetMembersVoiceChannel(string $member_id): void{
+        unset(self::$voiceChannelMemberMap[$member_id]);
+    }
+
+    /**
      * Same function as addUser because no links are kept for users.
      * @param User $user
      */
@@ -293,8 +326,8 @@ class Storage{
         self::addUser($user);
     }
 
-    public static function removeUser(string $userId): void{
-        unset(self::$userMap[$userId]);
+    public static function removeUser(string $user_id): void{
+        unset(self::$userMap[$user_id]);
     }
 
     public static function getRole(string $id): ?Role{
@@ -302,12 +335,12 @@ class Storage{
     }
 
     /**
-     * @param string $serverId
+     * @param string $server_id
      * @return Role[]
      */
-    public static function getRolesByServer(string $serverId): array{
+    public static function getRolesByServer(string $server_id): array{
         $roles = [];
-        foreach((self::$roleServerMap[$serverId] ?? []) as $id){
+        foreach((self::$roleServerMap[$server_id] ?? []) as $id){
             $r = self::getRole($id);
             if($r !== null){
                 $roles[] = $r;
@@ -336,14 +369,14 @@ class Storage{
         }
     }
 
-    public static function removeRole(string $roleID): void{
-        $role = self::getRole($roleID);
+    public static function removeRole(string $role_id): void{
+        $role = self::getRole($role_id);
         if($role === null) return; //Already deleted or not added.
-        $serverId = $role->getServerId();
-        unset(self::$roleMap[$roleID]);
-        $i = array_search($roleID, self::$roleServerMap[$serverId], true);
+        $server_id = $role->getServerId();
+        unset(self::$roleMap[$role_id]);
+        $i = array_search($role_id, self::$roleServerMap[$server_id], true);
         if($i === false || is_string($i)) return; //Not in this servers role map.
-        array_splice(self::$roleServerMap[$serverId], $i, 1);
+        array_splice(self::$roleServerMap[$server_id], $i, 1);
     }
 
     public static function getBan(string $id): ?Ban{
@@ -384,12 +417,12 @@ class Storage{
     }
 
     /**
-     * @param string $serverId
+     * @param string $server_id
      * @return Invite[]
      */
-    public static function getInvitesByServer(string $serverId): array{
+    public static function getInvitesByServer(string $server_id): array{
         $invites = [];
-        foreach((self::$inviteServerMap[$serverId] ?? []) as $id){
+        foreach((self::$inviteServerMap[$server_id] ?? []) as $id){
             $i = self::getInvite($id);
             if($i !== null) $invites[] = $i;
         }
@@ -419,11 +452,11 @@ class Storage{
     public static function removeInvite(string $code): void{
         $invite = self::getinvite($code);
         if($invite === null) return; //Already deleted or not added.
-        $serverId = $invite->getServerId();
+        $server_id = $invite->getServerId();
         unset(self::$inviteMap[$code]);
-        $i = array_search($code, self::$inviteServerMap[$serverId], true);
+        $i = array_search($code, self::$inviteServerMap[$server_id], true);
         if($i === false || is_string($i)) return; //Not in this servers invite map.
-        array_splice(self::$inviteServerMap[$serverId], $i, 1);
+        array_splice(self::$inviteServerMap[$server_id], $i, 1);
     }
 
     public static function getBotUser(): ?User{
@@ -434,10 +467,10 @@ class Storage{
         self::$botUser = $user;
     }
 
-    public static function getBotMemberByServer(string $serverId): ?Member{
+    public static function getBotMemberByServer(string $server_id): ?Member{
         $u = self::getBotUser();
         if($u === null) return null;
-        return self::getMember("{$serverId}.{$u->getId()}");
+        return self::getMember("{$server_id}.{$u->getId()}");
     }
 
     public static function getTimestamp(): int{
@@ -449,7 +482,7 @@ class Storage{
     }
 
     /**
-     * Dumps the entire storage into a use-able file for debugging purposes.
+     * Dumps the entire storage into a serialised file for debugging purposes.
      *
      * Security Notice, No sensitive information like webhook tokens will be stored.
      *

@@ -52,7 +52,8 @@ class Member implements \Serializable{
     /** @var null|Activity[] */
     private $activities;
 
-    //Voice Activity
+    /** @var null|VoiceState */
+    private $voice_state;
 
     /**
      * Member constructor.
@@ -64,9 +65,12 @@ class Member implements \Serializable{
      * @param string|null          $nickname
      * @param int|null             $boost_timestamp
      * @param RolePermissions|null $permissions
+     * @param Activity[]|null      $activities
+     * @param VoiceState|null      $voice_state
      */
     public function __construct(string $user_id, int $join_timestamp, string $server_id, array $roles = [],
-                                ?string $nickname = null, ?int $boost_timestamp = null, RolePermissions $permissions = null){
+                                ?string $nickname = null, ?int $boost_timestamp = null, RolePermissions $permissions = null,
+                                ?array $activities = null, ?VoiceState $voice_state = null){
         $this->setUserId($user_id);
         $this->setJoinTimestamp($join_timestamp);
         $this->setServerId($server_id);
@@ -74,6 +78,8 @@ class Member implements \Serializable{
         $this->setNickname($nickname);
         $this->setBoostTimestamp($boost_timestamp);
         $this->setPermissions($permissions ?? new RolePermissions());
+        $this->setActivities($activities);
+        $this->setVoiceState($voice_state);
     }
 
     /**
@@ -191,6 +197,13 @@ class Member implements \Serializable{
         $this->activities = $activities;
     }
 
+    public function getVoiceState(): ?VoiceState{
+        return $this->voice_state;
+    }
+
+    public function setVoiceState(?VoiceState $voice_state): void{
+        $this->voice_state = $voice_state;
+    }
     //----- Serialization -----//
 
     public function serialize(): ?string{
@@ -204,7 +217,8 @@ class Member implements \Serializable{
             $this->server_id,
             $this->status,
             $this->client_status,
-            $this->activities
+            $this->activities,
+            $this->voice_state
         ]);
     }
 
@@ -219,7 +233,8 @@ class Member implements \Serializable{
             $this->server_id,
             $this->status,
             $this->client_status,
-            $this->activities
+            $this->activities,
+            $this->voice_state
         ] = unserialize($data);
     }
 }
