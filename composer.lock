@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ee01a8915f28a75bfd96f045bbeb820b",
+    "content-hash": "7b0dc7c05423c51f15b3f7783d1be832",
     "packages": [
         {
             "name": "discord-php/http",
@@ -2161,12 +2161,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/discord-php/DiscordPHP.git",
-                "reference": "b2a52ef8384750676001785e0ff3fe83161a29d4"
+                "reference": "78c8bc408b29adb611f358278896debcadb509cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/b2a52ef8384750676001785e0ff3fe83161a29d4",
-                "reference": "b2a52ef8384750676001785e0ff3fe83161a29d4",
+                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/78c8bc408b29adb611f358278896debcadb509cd",
+                "reference": "78c8bc408b29adb611f358278896debcadb509cd",
                 "shasum": ""
             },
             "require": {
@@ -2232,7 +2232,7 @@
                 "source": "https://github.com/discord-php/DiscordPHP/tree/master",
                 "issues": "https://github.com/discord-php/DiscordPHP/issues"
             },
-            "time": "2021-07-24T11:45:15+00:00"
+            "time": "2021-07-25T01:32:31+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",
