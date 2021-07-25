@@ -13,17 +13,16 @@
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
 use JaxkDev\DiscordBot\Models\Channels\Channel;
-use JaxkDev\DiscordBot\Models\Member;
 use pocketmine\plugin\Plugin;
 
 /**
- * Emitted when a reaction is removed from a message.
+ * Emitted when ALL reactions of a specific emoji are removed from a message.
  *
  * @see MessageReactionAdd
+ * @see MessageReactionRemove
  * @see MessageReactionRemoveAll
- * @see MessageReactionRemoveEmoji
  */
-class MessageReactionRemove extends DiscordBotEvent{
+class MessageReactionRemoveEmoji extends DiscordBotEvent{
 
     /** @var string */
     private $emoji;
@@ -34,15 +33,11 @@ class MessageReactionRemove extends DiscordBotEvent{
     /** @var Channel */
     private $channel;
 
-    /** @var Member */
-    private $member;
-
-    public function __construct(Plugin $plugin, string $emoji, string $message_id, Channel $channel, Member $member){
+    public function __construct(Plugin $plugin, string $emoji, string $message_id, Channel $channel){
         parent::__construct($plugin);
         $this->emoji = $emoji;
         $this->message_id = $message_id;
         $this->channel = $channel;
-        $this->member = $member;
     }
 
     public function getEmoji(): string{
@@ -55,9 +50,5 @@ class MessageReactionRemove extends DiscordBotEvent{
 
     public function getChannel(): Channel{
         return $this->channel;
-    }
-
-    public function getMember(): Member{
-        return $this->member;
     }
 }

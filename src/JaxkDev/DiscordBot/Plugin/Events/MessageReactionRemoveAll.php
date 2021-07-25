@@ -20,6 +20,7 @@ use pocketmine\plugin\Plugin;
  *
  * @see MessageReactionAdd
  * @see MessageReactionRemove
+ * @see MessageReactionRemoveEmoji
  */
 class MessageReactionRemoveAll extends DiscordBotEvent{
 

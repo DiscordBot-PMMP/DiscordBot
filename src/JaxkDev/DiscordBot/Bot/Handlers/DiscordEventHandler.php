@@ -44,6 +44,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageDelete as MessageDel
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionAdd as MessageReactionAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemove as MessageReactionRemovePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveAll as MessageReactionRemoveAllPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveEmoji as MessageReactionRemoveEmojiPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageSent as MessageSentPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageUpdate as MessageUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate as PresenceUpdatePacket;
@@ -102,7 +103,7 @@ class DiscordEventHandler{
         $discord->on("MESSAGE_REACTION_ADD", [$this, "onMessageReactionAdd"]);
         $discord->on("MESSAGE_REACTION_REMOVE", [$this, "onMessageReactionRemove"]);
         $discord->on("MESSAGE_REACTION_REMOVE_ALL", [$this, "onMessageReactionRemoveAll"]);
-        //$discord->on("MESSAGE_REACTION_REMOVE_EMOJI", [$this, "onMessageReactionRemoveEmoji"]);
+        $discord->on("MESSAGE_REACTION_REMOVE_EMOJI", [$this, "onMessageReactionRemoveEmoji"]);
     
         $discord->on("PRESENCE_UPDATE", [$this, "onPresenceUpdate"]);
         $discord->on("VOICE_STATE_UPDATE", [$this, "onVoiceStateUpdate"]);
@@ -367,11 +368,10 @@ array(5) {
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    /*public function onMessageReactionRemoveEmoji(...$d): void{
-        //TODO Cant verify data, requires bot to remove all reactions by emoji as a user cannot from what ive tried.
-        //But i think its safe to assume its $message_id, $channel_id, $guild_id and $emoji
-        var_dump($d);
-    }*/
+    /** @var \stdClass{"message_id": string, "emoji": \stdClass{"name": string}, "channel_id": string, "guild_id": string} $data */
+    public function onMessageReactionRemoveEmoji(\stdClass $data): void{
+        $this->client->getThread()->writeOutboundData(new MessageReactionRemoveEmojiPacket($data->message_id, $data->channel_id, $data->emoji->name));
+    }
 
     public function onMemberJoin(DiscordMember $member, Discord $discord): void{
         $packet = new MemberJoinPacket(ModelConverter::genModelMember($member), ModelConverter::genModelUser($member->user));

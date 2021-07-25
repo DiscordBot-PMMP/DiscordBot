@@ -31,6 +31,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageUpdate as MessageUpd
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionAdd as MessageReactionAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemove as MessageReactionRemovePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveAll as MessageReactionRemoveAllPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveEmoji as MessageReactionRemoveEmojiPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate as PresenceUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
@@ -60,6 +61,7 @@ use JaxkDev\DiscordBot\Plugin\Events\MessageDeleted as MessageDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageReactionAdd as MessageReactionAddEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemove as MessageReactionRemoveEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveAll as MessageReactionRemoveAllEvent;
+use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveEmoji as MessageReactionRemoveEmojiEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady as DiscordReadyEvent;
@@ -70,10 +72,10 @@ use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ServerDeleted as ServerDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ServerJoined as ServerJoinedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ServerUpdated as ServerUpdatedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberJoined;
-use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberLeft;
-use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberMoved;
-use JaxkDev\DiscordBot\Plugin\Events\VoiceStateUpdated;
+use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberJoined as VoiceChannelMemberJoinedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberLeft as VoiceChannelMemberLeftEvent;
+use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberMoved as VoiceChannelMemberMovedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\VoiceStateUpdated as VoiceStateUpdatedEvent;
 
 class BotCommunicationHandler{
 
@@ -109,6 +111,7 @@ class BotCommunicationHandler{
         elseif($packet instanceof MessageReactionAddPacket) $this->handleMessageReactionAdd($packet);
         elseif($packet instanceof MessageReactionRemovePacket) $this->handleMessageReactionRemove($packet);
         elseif($packet instanceof MessageReactionRemoveAllPacket) $this->handleMessageReactionRemoveAll($packet);
+        elseif($packet instanceof MessageReactionRemoveEmojiPacket) $this->handleMessageReactionRemoveEmoji($packet);
         elseif($packet instanceof ChannelCreatePacket) $this->handleChannelCreate($packet);
         elseif($packet instanceof ChannelUpdatePacket) $this->handleChannelUpdate($packet);
         elseif($packet instanceof ChannelDeletePacket) $this->handleChannelDelete($packet);
@@ -149,7 +152,7 @@ class BotCommunicationHandler{
             if($channel === null){
                 throw new \AssertionError("Voice Channel '{$state->getChannelId()}' not found in storage.");
             }
-            (new VoiceChannelMemberLeft($this->plugin, $member, $channel))->call();
+            (new VoiceChannelMemberLeftEvent($this->plugin, $member, $channel))->call();
             $member->setVoiceState(null);
             $members = $channel->getMembers();
             if(($key = array_search($packet->getMemberId(), $members)) !== false) {
@@ -169,7 +172,7 @@ class BotCommunicationHandler{
             }
             if(in_array($packet->getMemberId(), $channel->getMembers())){
                 //Member did not leave/join/transfer voice channel but muted/deaf/self_muted/self_deafen etc.
-                (new VoiceStateUpdated($this->plugin, $member, $state))->call();
+                (new VoiceStateUpdatedEvent($this->plugin, $member, $state))->call();
                 $member->setVoiceState($packet->getVoiceState());
                 Storage::updateMember($member);
             }else{
@@ -179,7 +182,7 @@ class BotCommunicationHandler{
                 }
                 $previous = Storage::getMembersVoiceChannel($packet->getMemberId());
                 if($previous !== null and $previous->getId() !== $state->getChannelId()){
-                    (new VoiceChannelMemberMoved($this->plugin, $member, $previous, $channel, $state))->call();
+                    (new VoiceChannelMemberMovedEvent($this->plugin, $member, $previous, $channel, $state))->call();
                     $members = $previous->getMembers();
                     if(($key = array_search($packet->getMemberId(), $members)) !== false) {
                         unset($members[$key]);
@@ -187,7 +190,7 @@ class BotCommunicationHandler{
                     $previous->setMembers($members);
                     Storage::updateChannel($previous);
                 }else{
-                    (new VoiceChannelMemberJoined($this->plugin, $member, $channel, $state))->call();
+                    (new VoiceChannelMemberJoinedEvent($this->plugin, $member, $channel, $state))->call();
                 }
                 $member->setVoiceState($packet->getVoiceState());
                 $members = $channel->getMembers();
@@ -254,6 +257,14 @@ class BotCommunicationHandler{
             throw new \AssertionError("Channel '{$packet->getChannelId()}' does not exist in storage.");
         }
         (new MessageReactionRemoveAllEvent($this->plugin, $packet->getMessageId(), $channel))->call();
+    }
+
+    private function handleMessageReactionRemoveEmoji(MessageReactionRemoveEmojiPacket $packet): void{
+        $channel = Storage::getChannel($packet->getChannelId());
+        if($channel === null){
+            throw new \AssertionError("Channel '{$packet->getChannelId()}' does not exist in storage.");
+        }
+        (new MessageReactionRemoveEmojiEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $channel))->call();
     }
 
     private function handleChannelCreate(ChannelCreatePacket $packet): void{
