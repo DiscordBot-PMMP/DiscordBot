@@ -146,7 +146,7 @@ class Activity implements \Serializable{
     }
 
     public function setCreatedAt(int $timestamp): void{
-        if($timestamp < 1609459200){ //2021 01/01 00:00
+        if($timestamp < 0){
             throw new \AssertionError("Invalid created_at timestamp '$timestamp'.");
         }
         $this->created_at = $timestamp;
@@ -170,7 +170,7 @@ class Activity implements \Serializable{
     }
 
     public function setStartTimestamp(?int $timestamp): void{
-        if($timestamp !== null and $timestamp < 1609459200){ //2021 01/01 00:00
+        if($timestamp !== null and $timestamp < 0){
             throw new \AssertionError("Invalid start timestamp '$timestamp'.");
         }
         $this->start_timestamp = $timestamp;
@@ -181,7 +181,7 @@ class Activity implements \Serializable{
     }
 
     public function setEndTimestamp(?int $timestamp): void{
-        if($timestamp !== null and $timestamp < 1609459200){ //2021 01/01 00:00
+        if($timestamp !== null and $timestamp < 0){
             throw new \AssertionError("Invalid end timestamp '$timestamp'.");
         }
         $this->end_timestamp = $timestamp;
