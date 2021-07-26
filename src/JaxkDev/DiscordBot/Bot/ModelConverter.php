@@ -82,15 +82,15 @@ abstract class ModelConverter{
         $party = $discordActivity->party;
         /** @var \stdClass{"large_image" => string|null, "large_text" => string|null, "small_image" => string|null, "small_text" => string|null} $assets */
         $assets = $discordActivity->assets;
-        /** @var \stdClass{"join" => string|null, "spectate" => string|null, "match" => string|null} $secrets  TODO, Confirm this. no one had a single secret all day so couldn't see exact data. */
-        $secrets = $discordActivity->secrets;
+        //** @var \stdClass{"join" => string|null, "spectate" => string|null, "match" => string|null} $secrets  TODO, Cant confirm this. no one has any secrets so I cant see any valid data. */
+        //$secrets = $discordActivity->secrets;
         return new Activity($discordActivity->name, $discordActivity->type, $discordActivity->created_at->getTimestamp(),
             $discordActivity->url, $timestamps->start??null, $timestamps->end??null,
             $discordActivity->application_id, $discordActivity->details, $discordActivity->state, $discordActivity->emoji,
             $party->id??null, ($party->size??[])[0]??null,($party->size??[])[1]??null,
             $assets->large_image??null, $assets->large_text??null, $assets->small_image??null,
-            $assets->small_text??null, $secrets->join??null, $secrets->spectate??null,
-            $secrets->match??null, $discordActivity->instance, $discordActivity->flags);
+            $assets->small_text??null, /*$secrets->join??null, $secrets->spectate??null,
+            $secrets->match??null,*/ $discordActivity->instance, $discordActivity->flags);
     }
 
     static public function genModelMember(DiscordMember $discordMember): Member{

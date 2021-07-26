@@ -76,12 +76,12 @@ class Activity implements \Serializable{
     /** @var null|string */
     private $small_text;
 
-    /** @var null|string https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-secrets */
-    private $join_secret;
-    /** @var null|string */
-    private $spectate_secret;
-    /** @var null|string */
-    private $match_secret;
+    ///** @var null|string https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-secrets */
+    //private $join_secret;
+    ///** @var null|string */
+    //private $spectate_secret;
+    ///** @var null|string */
+    //private $match_secret;
 
     /** @var null|bool Whether or not the activity is an instanced game session */
     private $instance;
@@ -95,8 +95,8 @@ class Activity implements \Serializable{
                                 ?int $end_timestamp = null, ?string $application_id = null, ?string $details = null,
                                 ?string $state = null, ?string $emoji = null, ?string $party_id = null, ?int $party_size = null,
                                 ?int $party_max_size = null, ?string $large_image = null, ?string $large_text = null,
-                                ?string $small_image = null, ?string $small_text = null, ?string $join_secret = null,
-                                ?string $spectate_secret = null, ?string $match_secret = null, ?bool $instance = null,
+                                ?string $small_image = null, ?string $small_text = null, /*?string $join_secret = null,
+                                ?string $spectate_secret = null, ?string $match_secret = null,*/ ?bool $instance = null,
                                 ?int $flags = null){
         $this->setName($name);
         $this->setType($type);
@@ -115,9 +115,9 @@ class Activity implements \Serializable{
         $this->setLargeText($large_text);
         $this->setSmallImage($small_image);
         $this->setSmallText($small_text);
-        $this->setJoinSecret($join_secret);
+        /*$this->setJoinSecret($join_secret);
         $this->setSpectateSecret($spectate_secret);
-        $this->setMatchSecret($match_secret);
+        $this->setMatchSecret($match_secret);*/
         $this->setInstance($instance);
         $this->setFlags($flags);
     }
@@ -281,7 +281,7 @@ class Activity implements \Serializable{
         $this->small_text = $small_text;
     }
 
-    public function getJoinSecret(): ?string{
+    /*public function getJoinSecret(): ?string{
         return $this->join_secret;
     }
 
@@ -303,7 +303,7 @@ class Activity implements \Serializable{
 
     public function setMatchSecret(?string $match_secret): void{
         $this->match_secret = $match_secret;
-    }
+    }*/
 
     public function getInstance(): ?bool{
         return $this->instance;
@@ -342,9 +342,9 @@ class Activity implements \Serializable{
             $this->large_text,
             $this->small_image,
             $this->small_text,
-            $this->join_secret,
+            /*$this->join_secret,
             $this->spectate_secret,
-            $this->match_secret,
+            $this->match_secret,*/
             $this->instance,
             $this->flags
         ]);
@@ -369,9 +369,9 @@ class Activity implements \Serializable{
             $this->large_text,
             $this->small_image,
             $this->small_text,
-            $this->join_secret,
+            /*$this->join_secret,
             $this->spectate_secret,
-            $this->match_secret,
+            $this->match_secret,*/
             $this->instance,
             $this->flags
         ] = unserialize($data);
