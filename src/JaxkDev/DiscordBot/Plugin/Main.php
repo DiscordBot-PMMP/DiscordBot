@@ -52,6 +52,8 @@ class Main extends PluginBase{
     public function onLoad(){
         if(($phar = Phar::running(true)) === ""){
             throw new PluginException("Cannot be run from source.");
+            //Test phpstan action
+            print "hello";
         }
 
         if(!defined("JaxkDev\DiscordBot\COMPOSER")){
