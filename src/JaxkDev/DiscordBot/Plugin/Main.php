@@ -196,7 +196,7 @@ META);
         $z->close();
 
         $time = round(microtime(true)-$startTime, 3);
-        $sender->sendMessage(TextFormat::GREEN."Successfully generated debug data in {$time}s, saved file to '$path'");
+        $sender->sendMessage(TextFormat::GREEN."Successfully generated debug data in {$time} seconds, saved file to '$path'");
         return true;
     }
 
