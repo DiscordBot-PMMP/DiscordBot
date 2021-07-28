@@ -5,6 +5,7 @@ on:
     paths:
       - '**.php'
       - '.github/workflows/*'
+      - 'test/github/*'
 
 jobs:
   get-php:
@@ -26,8 +27,8 @@ jobs:
 
   phpstan:
     name: PHPStan analysis
-    needs: build-php
-    runs-on: ${{ matrix.image }}
+    needs: get-php
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2
