@@ -75,7 +75,7 @@ class Api{
      * Creates a normal webhook inside a channel.
      *
      * @param Webhook $webhook
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with a Webhook model.
      */
     public function createWebhook(Webhook $webhook): PromiseInterface{
         if($webhook->getType() !== Webhook::TYPE_NORMAL){
@@ -96,7 +96,7 @@ class Api{
      * Update a webhooks name or avatar.
      *
      * @param Webhook $webhook
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with a Webhook model.
      */
     public function updateWebhook(Webhook $webhook): PromiseInterface{
         if($webhook->getType() !== Webhook::TYPE_NORMAL){
@@ -118,7 +118,7 @@ class Api{
      *
      * @param string $channel_id
      * @param string $webhook_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function deleteWebhook(string $channel_id, string $webhook_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($webhook_id)){
@@ -138,7 +138,7 @@ class Api{
      * Leave a discord server.
      *
      * @param string $server_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function leaveServer(string $server_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($server_id)){
@@ -153,7 +153,7 @@ class Api{
      * Fetch all webhooks that are linked to a channel.
      *
      * @param string $channel_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with an array of Webhook models.
      */
     public function fetchWebhooks(string $channel_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -170,7 +170,7 @@ class Api{
      * Note you could fetch individual messages by id using fetchMessage from channel::pins but this is easier.
      *
      * @param string $channel_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with an array of Message models.
      */
     public function fetchPinnedMessages(string $channel_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -186,7 +186,7 @@ class Api{
      *
      * @param string $channel_id
      * @param string $message_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with a Message model.
      */
     public function fetchMessage(string $channel_id, string $message_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -205,7 +205,7 @@ class Api{
      *
      * @param string $channel_id
      * @param string $message_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function pinMessage(string $channel_id, string $message_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -224,7 +224,7 @@ class Api{
      *
      * @param string $channel_id
      * @param string $message_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function unpinMessage(string $channel_id, string $message_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -242,7 +242,7 @@ class Api{
      * Create a role.
      *
      * @param Role $role
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with Role model.
      */
     public function createRole(Role $role): PromiseInterface{
         $pk = new RequestCreateRole($role);
@@ -258,7 +258,7 @@ class Api{
      * If hoisted position changed, all roles that move to account for the change will emit an updated event.
      *
      * @param Role $role
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with a Role model.
      */
     public function updateRole(Role $role): PromiseInterface{
         if($role->getId() === null){
@@ -274,7 +274,7 @@ class Api{
      *
      * @param string $server_id
      * @param string $role_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function deleteRole(string $server_id, string $role_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($server_id)){
@@ -293,7 +293,7 @@ class Api{
      *
      * @param string $member_id
      * @param string $role_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function removeRole(string $member_id, string $role_id): PromiseInterface{
         [$sid, $uid] = explode(".", $member_id);
@@ -313,7 +313,7 @@ class Api{
      *
      * @param string $member_id
      * @param string $role_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function addRole(string $member_id, string $role_id): PromiseInterface{
         [$sid, $uid] = explode(".", $member_id);
@@ -335,7 +335,7 @@ class Api{
      * @param string $message_id
      * @param string $user_id
      * @param string $emoji Raw emoji eg '👍'
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function removeReaction(string $channel_id, string $message_id, string $user_id, string $emoji): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -359,7 +359,7 @@ class Api{
      * @param string      $message_id
      * @param string|null $emoji If no emoji specified ALL reactions by EVERYONE will be deleted,
      *                           if specified everyone's reaction with that emoji will be removed.
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function removeAllReactions(string $channel_id, string $message_id, ?string $emoji = null): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -381,7 +381,7 @@ class Api{
      * @param string $channel_id
      * @param string $message_id
      * @param string $emoji            MUST BE THE ACTUAL EMOJI CHARACTER, (Custom/Private emoji's not yet supported) eg '👍'
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function addReaction(string $channel_id, string $message_id, string $emoji): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -403,7 +403,7 @@ class Api{
      * DO NOT ABUSE THIS.
      *
      * @param string $channel_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function broadcastTyping(string $channel_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -419,7 +419,7 @@ class Api{
      *
      * @param Activity $activity
      * @param string $status See Member::STATUS_ constants.
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function updateBotPresence(Activity $activity, string $status = Member::STATUS_ONLINE): PromiseInterface{
         if(!in_array($status, [Member::STATUS_ONLINE, Member::STATUS_IDLE, Member::STATUS_OFFLINE, Member::STATUS_DND])){
@@ -434,7 +434,7 @@ class Api{
      * Attempt to ban a member.
      *
      * @param Ban $ban
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function initialiseBan(Ban $ban): PromiseInterface{
         $pk = new RequestInitialiseBan($ban);
@@ -447,7 +447,7 @@ class Api{
      *
      * @param string $server_id
      * @param string $user_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function revokeBan(string $server_id, string $user_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($server_id)){
@@ -465,7 +465,7 @@ class Api{
      * Attempt to kick a member.
      *
      * @param string $member_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function kickMember(string $member_id): PromiseInterface{
         [$sid, $uid] = explode(".", $member_id);
@@ -481,7 +481,7 @@ class Api{
      * Sends the Message to discord.
      *
      * @param Message $message
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with a Message model.
      */
     public function sendMessage(Message $message): PromiseInterface{
         if($message instanceof WebhookMessage){
@@ -500,7 +500,7 @@ class Api{
      * @param string      $file_path Full file path on disk.
      * @param string      $message   Optional text/message to send with the file
      * @param string|null $file_name Optional file_name to show in discord, Prefix with 'SPOILER_' to make as spoiler.
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with a Message model.
      */
     public function sendFile(string $channel_id, string $file_path, string $message = "", string $file_name = null): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -523,9 +523,7 @@ class Api{
      * Note you can't convert a 'REPLY' message to a normal 'MESSAGE'.
      *
      * @param Message $message
-     * @return PromiseInterface
-     * @see Api::sendMessage For sending a message.
-     * @see Api::deleteMessage For deleting a sent message.
+     * @return PromiseInterface Resolves with a Message model.
      */
     public function editMessage(Message $message): PromiseInterface{
         if($message->getId() === null){
@@ -541,7 +539,7 @@ class Api{
      *
      * @param string $message_id
      * @param string $channel_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function deleteMessage(string $message_id, string $channel_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -559,7 +557,7 @@ class Api{
      * Create a server channel.
      *
      * @param ServerChannel $channel CategoryChannel, TextChannel or VoiceChannel.
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with a Channel model of same type provided.
      */
     public function createChannel(ServerChannel $channel): PromiseInterface{
         $pk = new RequestCreateChannel($channel);
@@ -576,7 +574,7 @@ class Api{
      * @see Api::unpinMessage()
      *
      * @param ServerChannel $channel
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with a Channel model of same type provided.
      */
     public function updateChannel(ServerChannel $channel): PromiseInterface{
         $pk = new RequestUpdateChannel($channel);
@@ -589,7 +587,7 @@ class Api{
      *
      * @param string $server_id
      * @param string $channel_id
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function deleteChannel(string $server_id, string $channel_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($server_id)){
@@ -607,8 +605,7 @@ class Api{
      * Initialise if possible the given invite.
      *
      * @param Invite $invite
-     * @return PromiseInterface
-     * @see Api::revokeInvite() For revoking an initialised invite.
+     * @return PromiseInterface Resolves with a Invite model.
      */
     public function initialiseInvite(Invite $invite): PromiseInterface{
         $pk = new RequestInitialiseInvite($invite);
@@ -621,7 +618,7 @@ class Api{
      *
      * @param string $server_id
      * @param string $invite_code
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with a Invite model.
      */
     public function revokeInvite(string $server_id, string $invite_code): PromiseInterface{
         if(!Utils::validDiscordSnowflake($server_id)){
@@ -637,7 +634,7 @@ class Api{
      *
      * @param string $member_id
      * @param null|string $nickname Null to remove nickname.
-     * @return PromiseInterface
+     * @return PromiseInterface Resolves with no data.
      */
     public function updateNickname(string $member_id, ?string $nickname = null): PromiseInterface{
         [$sid, $uid] = explode(".", $member_id);
