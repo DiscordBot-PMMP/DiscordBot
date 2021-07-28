@@ -482,16 +482,10 @@ class Storage{
     }
 
     /**
-     * Dumps the entire storage into a serialised file for debugging purposes.
-     *
-     * Security Notice, No sensitive information like webhook tokens will be stored.
-     *
-     * @param string $file Full path + extension
-     * @return bool False on failure
+     * Serializes entire storage, ONLY USE FOR DEBUGGING PURPOSES.
      */
-    public static function saveStorage(string $file): bool{
-        $data = serialize([1, (new \ReflectionClass("\JaxkDev\DiscordBot\Plugin\Storage"))->getStaticProperties()]);
-        return !((file_put_contents($file, $data) === false));
+    public static function serializeStorage(): string{
+        return serialize([1, (new \ReflectionClass("\JaxkDev\DiscordBot\Plugin\Storage"))->getStaticProperties()]);
     }
 
     //Disabled for public, this should ONLY be used by active developers of DiscordBot.

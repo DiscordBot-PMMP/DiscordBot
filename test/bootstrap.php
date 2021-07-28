@@ -21,3 +21,4 @@ define('JaxkDev\DiscordBot\VERSION', "");
 define('JaxkDev\DiscordBot\DATA_PATH', "");
 
 define("pocketmine\VERSION", "");
+define("pocketmine\GIT_COMMIT", "");

@@ -10,6 +10,6 @@ extensions:
   core: ">=7.4" #aka PHP Version.
 
 commands:
-  dumpdiscord:
+  debugdiscord:
     permission: op
-    description: Debug use only, dumps all discord data from storage into a file.
+    description: Debug use only, provides a single file to attach to issues etc helpful when debugging issues.

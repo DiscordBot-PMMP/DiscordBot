@@ -25,6 +25,7 @@ use pocketmine\scheduler\TaskHandler;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use Volatile;
+use ZipArchive;
 
 class Main extends PluginBase{
 
@@ -66,9 +67,6 @@ class Main extends PluginBase{
         if(!is_dir($this->getDataFolder()."logs")){
             mkdir($this->getDataFolder()."logs");
         }
-        if(!is_dir($this->getDataFolder()."debug_data")){
-            mkdir($this->getDataFolder()."debug_data");
-        }
 
         $this->saveResource("config.yml");
 
@@ -108,6 +106,9 @@ class Main extends PluginBase{
         $this->discordBot = new BotThread($this->getServer()->getLogger(), $this->config, $this->outboundData, $this->inboundData);
         $this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
 
+        //Redact token.
+        $this->config["discord"]["token"] = preg_replace('([a-zA-Z0-9])','*', $this->config["discord"]["token"]);
+
         $this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(int $currentTick): void{
             $this->tick($currentTick);
         }), 1);
@@ -118,23 +119,84 @@ class Main extends PluginBase{
     }
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool{
-        if($command->getName() !== "dumpdiscord") return false;
+        if($command->getName() !== "debugdiscord") return false;
         if(!$command->testPermission($sender)) return true;
-        if(Storage::getTimestamp() === 0){
-            $sender->sendMessage(TextFormat::RED."Failed to dump discord data, there is no data to dump.");
-            return true;
+
+        $sender->sendMessage(TextFormat::YELLOW."Building debug file please be patient.");
+        $startTime = microtime(true);
+
+        if(!is_dir($this->getDataFolder()."debug")){
+            if(!mkdir($this->getDataFolder()."debug")){
+                $sender->sendMessage(TextFormat::RED."Failed to create folder '".$this->getDataFolder()."debug/'");
+                return true;
+            }
         }
 
-        $sender->sendMessage(TextFormat::YELLOW."Starting discord dump...");
-        $file = $this->getDataFolder()."debug_data/discord_dump_".time().".txt";
-        if(!Storage::saveStorage($file)){
-            $sender->sendMessage(TextFormat::RED."Failed to dump discord data.");
-            if(is_file($file)){
-                unlink($file);
+        $path = $this->getDataFolder()."debug/"."discordbot_".time().".zip";
+        $z = new ZipArchive();
+        $z->open($path, ZIPARCHIVE::CREATE);
+
+        //Config file, (USE $this->config, token is redacted in this but not on file.) (yaml_emit to avoid any comments that include sensitive data)
+        $z->addFromString("config.yml", yaml_emit($this->config));
+
+        //Server log, includes *all* discord threaded logs as well
+        $z->addFile($this->getServer()->getDataPath()."server.log", "server.log");
+
+        //Add Discord thread logs in case it failed to hack its way into server.log
+        $dir = scandir($this->getDataFolder()."logs");
+        if($dir !== false){
+            foreach($dir as $file){
+                if($file !== "." and $file !== ".."){
+                    $z->addFile($this->getDataFolder()."logs/".$file, "thread_logs/".$file);
+                }
             }
-        }else{
-            $sender->sendMessage(TextFormat::GREEN."Successfully dumped all data to '$file'");
         }
+
+        //Add Storage.
+        if(Storage::getTimestamp() !== 0){
+            $z->addFromString("storage.serialized", Storage::serializeStorage());
+        }
+
+        //Some metadata, instead of users having no clue of anything I ask, generate this information before hand.
+        $time = date('d-m-Y H:i:s');
+        $ver = $this->getDescription()->getVersion();
+        /** @phpstan-ignore-next-line Constant default means ternary condition is always false on analysis. */
+        $pmmp = $this->getServer()->getPocketMineVersion().", ".$this->getServer()->getVersion()." [".(\pocketmine\IS_DEVELOPMENT_BUILD ? "DEVELOPMENT" : "RELEASE")." | ".\pocketmine\GIT_COMMIT."]";
+        $os = php_uname();
+        $php = PHP_VERSION;
+        $jit = "N/A";
+        $jit_opt = "N/A";
+        if(function_exists('opcache_get_status') and (($opcacheStatus = opcache_get_status(false)) !== false)){
+            $jit = ((($opcacheStatus["jit"]??[])["on"]??false) ? "Enabled" : "Disabled");
+            $opcacheConfig = opcache_get_configuration();
+            if($opcacheConfig !== false){
+                $jit_opt = (($jit === "Enabled") ? (($opcacheConfig["directives"]??[])["opcache.jit"]??"N/A") : "N/A");
+            }
+        }
+        $z->addFromString("metadata.txt", <<<META
+/*
+ * DiscordBot, PocketMine-MP Plugin.
+ *
+ * Licensed under the Open Software License version 3.0 (OSL-3.0)
+ * Copyright (C) 2020-2021 JaxkDev
+ *
+ * Twitter :: @JaxkDev
+ * Discord :: JaxkDev#2698
+ * Email   :: JaxkDev@gmail.com
+ */
+ 
+Version    | {$ver}
+Timestamp  | {$time}
+
+PocketMine | {$pmmp}
+PHP        | {$php}
+JIT        | {$jit} [$jit_opt]
+OS         | {$os}
+META);
+        $z->close();
+
+        $time = round(microtime(true)-$startTime, 3);
+        $sender->sendMessage(TextFormat::GREEN."Successfully generated debug data in {$time}s, saved file to '$path'");
         return true;
     }
 
