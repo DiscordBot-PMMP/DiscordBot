@@ -119,6 +119,10 @@ class Attachment implements \Serializable{
         $this->height = $height;
     }
 
+    public function isSpoiler(): bool{
+        return (strpos($this->file_name, "SPOILER_") === 0);
+    }
+
     //----- Serialization -----//
 
     public function serialize(): ?string{
