@@ -3,7 +3,7 @@
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
- * Copyright (C) 2020 JaxkDev
+ * Copyright (C) 2020-2021 JaxkDev
  *
  * Twitter :: @JaxkDev
  * Discord :: JaxkDev#2698
@@ -14,70 +14,88 @@ namespace JaxkDev\DiscordBot\Communication;
 
 use AttachableThreadedLogger;
 use JaxkDev\DiscordBot\Bot\Client;
-use JaxkDev\DiscordBot\Utils;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use pocketmine\Thread;
 use pocketmine\utils\MainLogger;
 use Volatile;
 
-class BotThread extends Thread {
+class BotThread extends Thread{
 
-	/**
-	 * @var AttachableThreadedLogger
-	 */
-	private $logger;
+    const
+        STATUS_STARTING = 0,
+        STATUS_STARTED  = 1,
+        STATUS_READY    = 2,
+        STATUS_CLOSING  = 8,
+        STATUS_CLOSED   = 9;
 
-	/**
-	 * @var array
-	 */
-	private $initialConfig;
+    /** @var MainLogger */
+    private $logger;
 
-	/**
-	 * @var Volatile
-	 */
-	private $inboundData, $outboundData;
+    /**  @var array */
+    private $initialConfig;
 
-	/**
-	 * @var int
-	 */
-	private $status = Protocol::THREAD_STATUS_STARTING;
+    /** @var Volatile */
+    private $inboundData;
+    /** @var Volatile */
+    private $outboundData;
 
-	public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData) {
-		$this->logger = $logger;
-		$this->initialConfig = $initialConfig;
-		$this->inboundData = $inboundData;
-		$this->outboundData = $outboundData;
-	}
+    /** @var int */
+    private $status = self::STATUS_STARTING;
 
-	public function run() {
-		$this->registerClassLoader();
+    public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData){
+        if($logger instanceof MainLogger){
+            $this->logger = $logger;
+        }else{
+            throw new \AssertionError("No MainLogger passed to constructor ?  (Are you using an unofficial pmmp release....)");
+        }
+        $this->initialConfig = $initialConfig;
+        $this->inboundData = $inboundData;
+        $this->outboundData = $outboundData;
+    }
 
-		if($this->logger instanceof MainLogger){
-			$this->logger->registerStatic();
-		}
+    public function run(){
+        $this->logger->setLogDebug(true);
+        $this->logger->registerStatic();
 
-		/** @noinspection PhpIncludeInspection */
-		require_once(\JaxkDev\DiscordBot\COMPOSER);
+        $this->registerClassLoader();
 
-		new Client($this, (array)$this->initialConfig);
-	}
+        /** @noinspection PhpIncludeInspection */
+        require_once(\JaxkDev\DiscordBot\COMPOSER);
 
-	/*
-	 * https://github.com/pmmp/pthreads/blob/fork/examples/fetching-data-from-a-thread.php
-	 */
-	public function readInboundData(int $count = 1): array{
-		return $this->inboundData->chunk($count);
-	}
+        new Client($this, (array)$this->initialConfig);
+    }
 
-	public function writeOutboundData(int $id, array $data): void{
-		$this->outboundData[] = (array)[$id, $data];
-	}
+    public function readInboundData(int $count = 1): array{
+        return array_map(function($data){
+            /** @var Packet $packet */
+            $packet = unserialize($data);
+            if(!$packet instanceof Packet){
+                throw new \AssertionError("Data did not unserialize to a Packet.");
+            }
+            return $packet;
+        }, $this->inboundData->chunk($count, false));
+    }
 
-	public function setStatus(int $status): void{
-		Utils::assert($status >= 0 and $status < 10);
-		$this->status = $status;
-	}
+    public function writeOutboundData(Packet $packet): void{
+        $this->outboundData[] = serialize($packet);
+    }
 
-	public function getStatus(): int{
-		return $this->status;
-	}
+    public function setStatus(int $status): void{
+        if(!in_array($status, [self::STATUS_STARTING, self::STATUS_STARTED, self::STATUS_READY, self::STATUS_CLOSING, self::STATUS_CLOSED])){
+            throw new \AssertionError("Invalid thread status.");
+        }
+        $this->status = $status;
+    }
+
+    public function getStatus(): int{
+        return $this->status;
+    }
+
+    public function getLogger(): MainLogger{
+        return $this->logger;
+    }
+
+    public function getThreadName() : string{
+        return "Discord";
+    }
 }

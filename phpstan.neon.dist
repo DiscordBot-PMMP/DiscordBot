@@ -1,0 +1,16 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    excludePaths:
+        analyse:
+            - vendor
+            - src/JaxkDev/DiscordBot/Libs
+    bootstrapFiles:
+        - test/bootstrap.php
+    checkMissingIterableValueType: false
+    ignoreErrors:
+        -
+            message: "#^Strict comparison using \\=\\=\\= between array\\<int, \\(int\\|string\\)\\> and false will always evaluate to false\\.$#"
+            count: 1
+            path: src/JaxkDev/DiscordBot/Bot/Handlers/CommunicationHandler.php

@@ -1,11 +1,16 @@
 ---
-version: 1
+version: 2
 
 discord:
-  token: "Long Token with random characters here."
+  token: "Long Token here."
+  use_plugin_cacert: true
 
 logging:
   debug: false
-  maxFiles: 28
+  max_files: 28
   directory: "logs"
+
+protocol:
+  packets_per_tick: 50
+  heartbeat_allowance: 60
 ...

@@ -1,0 +1,65 @@
+name: PHPStan
+
+on:
+  push:
+    paths:
+      - '**.php'
+      - '.github/workflows/*'
+      - 'test/github/*'
+
+jobs:
+  get-php:
+    name: Download PHP
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check for PHP cache
+        id: php-cache
+        uses: actions/cache@v2
+        with:
+          path: "./bin"
+          key: "php-cache-${{ hashFiles('./test/github/get-php.sh') }}"
+
+      - name: Download PHP
+        if: steps.php-cache.outputs.cache-hit != 'true'
+        run: ./test/github/get-php.sh
+
+  phpstan:
+    name: PHPStan analysis
+    needs: get-php
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Restore PHP cache
+        id: php-cache
+        uses: actions/cache@v2
+        with:
+          path: "./bin"
+          key: "php-cache-${{ hashFiles('./test/github/get-php.sh') }}"
+
+      - name: Prefix PHP to PATH
+        run: echo "$(pwd)/bin/php7/bin" >> $GITHUB_PATH
+
+      - name: Install Composer
+        run: curl -sS https://getcomposer.org/installer | php
+
+      - name: Restore Composer package cache
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/composer/files
+            ~/.cache/composer/vcs
+            ./vendor
+          key: "composer-v2-cache-${{ hashFiles('./composer.lock') }}"
+          restore-keys: |
+            composer-v2-cache-
+      - name: Install Composer dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: php composer.phar install --no-interaction
+
+      - name: Run PHPStan
+        run: ./vendor/bin/phpstan analyze --no-progress --memory-limit=2G --error-format=github
