@@ -54,6 +54,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdatePresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
@@ -112,6 +113,7 @@ class CommunicationHandler{
         elseif($pk instanceof RequestUpdatePresence) $this->handleUpdatePresence($pk);
         elseif($pk instanceof RequestBroadcastTyping) $this->handleBroadcastTyping($pk);
         elseif($pk instanceof RequestSendMessage) $this->handleSendMessage($pk);
+        elseif($pk instanceof RequestSendFile) $this->handleSendFile($pk);
         elseif($pk instanceof RequestEditMessage) $this->handleEditMessage($pk);
         elseif($pk instanceof RequestAddReaction) $this->handleAddReaction($pk);
         elseif($pk instanceof RequestRemoveReaction) $this->handleRemoveReaction($pk);
@@ -623,6 +625,22 @@ class CommunicationHandler{
         }catch (\Throwable $e){
             $this->resolveRequest($pk->getUID(), false, $e->getMessage());
         }
+    }
+
+    private function handleSendFile(RequestSendFile $pk): void{
+        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+            if(!$channel->allowText()){
+                $this->resolveRequest($pk->getUID(), false, "Failed to send file, Invalid channel - text is not allowed.");
+                $this->logger->debug("Failed to send file ({$pk->getUID()}) - Channel does not allow text.");
+                return;
+            }
+            $channel->sendFile($pk->getFilePath(), $pk->getFileName(), $pk->getMessage())->then(function(DiscordMessage $message) use($pk){
+                $this->resolveRequest($pk->getUID(), true, "Successfully sent file.", [ModelConverter::genModelMessage($message)]);
+            }, function(\Throwable $e) use($pk){
+                $this->resolveRequest($pk->getUID(), false, "Failed to send file.", [$e->getMessage(), $e->getTraceAsString()]);
+                $this->logger->debug("Failed to send file ({$pk->getUID()}) - {$e->getMessage()}");
+            });
+        });
     }
 
     private function handleSendMessage(RequestSendMessage $pk): void{

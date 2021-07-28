@@ -35,6 +35,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
@@ -506,6 +507,30 @@ class Api{
             return rejectPromise(new ApiRejection("Webhook messages cannot be sent, only received."));
         }
         $pk = new RequestSendMessage($message);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Send a local file to a text channel.
+     *
+     * @param string      $channel_id
+     * @param string      $file_path Full file path on disk.
+     * @param string      $message   Optional text/message to send with the file
+     * @param string|null $file_name Optional file_name to show in discord, Prefix with 'SPOILER_' to make as spoiler.
+     * @return PromiseInterface
+     */
+    public function sendFile(string $channel_id, string $file_path, string $message = "", string $file_name = null): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+        }
+        if(!is_file($file_path)){
+            return rejectPromise(new ApiRejection("Invalid file path '$file_path' no such file exists."));
+        }
+        if($file_name === null){
+            $file_name = basename($file_path);
+        }
+        $pk = new RequestSendFile($channel_id, $file_name, $file_path, $message);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
