@@ -66,7 +66,7 @@ abstract class ModelConverter{
             throw new AssertionError("Not handling DM Voice states.");
         }
         return new VoiceState($stateUpdate->session_id, $stateUpdate->channel_id, $stateUpdate->deaf, $stateUpdate->mute,
-            $stateUpdate->self_deaf, $stateUpdate->self_mute, /*$stateUpdate->self_stream, $stateUpdate->self_video, */
+            $stateUpdate->self_deaf, $stateUpdate->self_mute, $stateUpdate->self_stream??false, $stateUpdate->self_video,
             $stateUpdate->suppress);
     }
 
@@ -114,14 +114,14 @@ abstract class ModelConverter{
             }
         }
 
-        $m->setPermissions(new RolePermissions((($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0) ? 2147483647 : $bitwise, false));
+        $m->setPermissions(new RolePermissions((($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0) ? 2147483647 : $bitwise));
         $m->setRoles($roles);
         return $m;
     }
 
     static public function genModelUser(DiscordUser $user): User{
         return new User($user->id, $user->username, $user->discriminator, $user->avatar, $user->bot??false,
-            $user->public_flags??0, false);
+            $user->public_flags??0);
     }
 
     static public function genModelServer(DiscordServer $discordServer): Server{
@@ -138,8 +138,8 @@ abstract class ModelConverter{
     static private function applyPermissionOverwrites(DiscordChannel $dc, $c){
         /** @var DiscordOverwrite $overwrite */
         foreach($dc->overwrites as $overwrite){
-            $allowed = new ChannelPermissions($overwrite->allow->bitwise, false);
-            $denied = new ChannelPermissions($overwrite->deny->bitwise, false);
+            $allowed = new ChannelPermissions($overwrite->allow->bitwise);
+            $denied = new ChannelPermissions($overwrite->deny->bitwise);
             if($overwrite->type === DiscordOverwrite::TYPE_MEMBER){
                 $c->setAllowedMemberPermissions($overwrite->id, $allowed);
                 $c->setDeniedMemberPermissions($overwrite->id, $denied);
@@ -299,7 +299,7 @@ abstract class ModelConverter{
     }
 
     static public function genModelRolePermission(DiscordRolePermission $rolePermission): RolePermissions{
-        return new RolePermissions($rolePermission->bitwise, false);
+        return new RolePermissions($rolePermission->bitwise);
     }
 
     static public function genModelRole(DiscordRole $discordRole): Role{

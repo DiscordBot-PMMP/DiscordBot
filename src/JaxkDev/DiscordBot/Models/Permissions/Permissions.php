@@ -63,17 +63,16 @@ abstract class Permissions implements \Serializable{
     /** @var Array<string, bool> */
     private $permissions = [];
 
-    public function __construct(int $bitwise = 0, bool $recalculate = true){
-        $this->setBitwise($bitwise, $recalculate);
+    public function __construct(int $bitwise = 0){
+        $this->setBitwise($bitwise);
     }
 
     public function getBitwise(): int{
         return $this->bitwise;
     }
 
-    public function setBitwise(int $bitwise, bool $recalculate = true): void{
+    public function setBitwise(int $bitwise): void{
         $this->bitwise = $bitwise;
-        if($recalculate) $this->recalculatePermissions();
     }
 
     /**
@@ -81,14 +80,23 @@ abstract class Permissions implements \Serializable{
      * @return Array<string, bool>
      */
     public function getPermissions(): array{
+        if(sizeof($this->permissions) === 0 and $this->bitwise > 0){
+            $this->recalculatePermissions();
+        }
         return $this->permissions;
     }
 
     public function getPermission(string $permission): ?bool{
+        if(sizeof($this->permissions) === 0 and $this->bitwise > 0){
+            $this->recalculatePermissions();
+        }
         return $this->permissions[$permission] ?? null;
     }
 
     public function setPermission(string $permission, bool $state = true): Permissions{
+        if(sizeof($this->permissions) === 0 and $this->bitwise > 0){
+            $this->recalculatePermissions();
+        }
         $permission = strtolower($permission);
         $posPermissions = $this->getPossiblePermissions();
 
@@ -126,6 +134,5 @@ abstract class Permissions implements \Serializable{
 
     public function unserialize($data): void{
         $this->bitwise = unserialize($data);
-        $this->recalculatePermissions();
     }
 }

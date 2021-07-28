@@ -58,13 +58,13 @@ class User implements \Serializable{
     private $flags = [];
 
     public function __construct(string $id, string $username, string $discriminator, string $avatar_url,
-                                bool $bot = false, int $flags_bitwise = 0, bool $recalculate_flags = true){
+                                bool $bot = false, int $flags_bitwise = 0){
         $this->setId($id);
         $this->setUsername($username);
         $this->setDiscriminator($discriminator);
         $this->setAvatarUrl($avatar_url);
         $this->setBot($bot);
-        $this->setFlagsBitwise($flags_bitwise, $recalculate_flags);
+        $this->setFlagsBitwise($flags_bitwise);
     }
 
     public function getId(): string{
@@ -121,9 +121,8 @@ class User implements \Serializable{
         return $this->flags_bitwise;
     }
 
-    public function setFlagsBitwise(int $flags_bitwise, bool $recalculate = true): void{
+    public function setFlagsBitwise(int $flags_bitwise): void{
         $this->flags_bitwise = $flags_bitwise;
-        if($recalculate) $this->recalculateFlags();
     }
 
     /**
@@ -131,14 +130,23 @@ class User implements \Serializable{
      * @return Array<string, bool>
      */
     public function getFlags(): array{
+        if(sizeof($this->flags) === 0 and $this->flags_bitwise > 0){
+            $this->recalculateFlags();
+        }
         return $this->flags;
     }
 
     public function getFlag(string $flag): ?bool{
+        if(sizeof($this->flags) === 0 and $this->flags_bitwise > 0){
+            $this->recalculateFlags();
+        }
         return $this->flags[$flag] ?? null;
     }
 
     public function setFlag(string $flag, bool $state = true): void{
+        if(sizeof($this->flags) === 0 and $this->flags_bitwise > 0){
+            $this->recalculateFlags();
+        }
         if(!in_array($flag, array_keys(self::FLAGS))){
             throw new \AssertionError("Invalid flag '{$flag}' for a 'user'");
         }
@@ -181,6 +189,5 @@ class User implements \Serializable{
             $this->bot,
             $this->flags_bitwise
         ] = unserialize($data);
-        $this->recalculateFlags();
     }
 }

@@ -45,7 +45,7 @@ class DiscordDataDump extends Packet{
     private $users = [];
 
     /** @var null|User */
-    private $botUser = null;
+    private $bot_user = null;
 
     /** @var int */
     private $timestamp;
@@ -128,11 +128,11 @@ class DiscordDataDump extends Packet{
     }
 
     public function getBotUser(): ?User{
-        return $this->botUser;
+        return $this->bot_user;
     }
 
     public function setBotUser(User $bot): void{
-        $this->botUser = $bot;
+        $this->bot_user = $bot;
     }
 
     public function getTimestamp(): int{
@@ -158,7 +158,7 @@ class DiscordDataDump extends Packet{
             $this->bans,
             $this->members,
             $this->users,
-            $this->botUser,
+            $this->bot_user,
             $this->timestamp
         ]);
     }
@@ -173,7 +173,7 @@ class DiscordDataDump extends Packet{
             $this->bans,
             $this->members,
             $this->users,
-            $this->botUser,
+            $this->bot_user,
             $this->timestamp
         ] = unserialize($data);
     }

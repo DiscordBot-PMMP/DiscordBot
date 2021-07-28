@@ -30,10 +30,16 @@ class RequestInitialiseInvite extends Packet{
     }
 
     public function serialize(): ?string{
-        return serialize([$this->UID, $this->invite]);
+        return serialize([
+            $this->UID,
+            $this->invite
+        ]);
     }
 
     public function unserialize($data): void{
-        [$this->UID, $this->invite] = unserialize($data);
+        [
+            $this->UID,
+            $this->invite
+        ] = unserialize($data);
     }
 }

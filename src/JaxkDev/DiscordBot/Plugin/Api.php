@@ -56,45 +56,8 @@ use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\Role;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
-/*
- * Tested:
- * - Create Webhook
- * - Update Webhook
- * - Delete Webhook
- * - Fetch Webhooks
- * - Fetch Message
- * - Fetch Channel Pins (entire message obj's)
- * - Create Role (https://github.com/discord-php/DiscordPHP/issues/556)
- * - Update Role (^)
- * - Update Channel
- * - Unpin Message
- * - Pin Message
- * - Create Channel
- * - Leave Server
- * - Ban
- * - Unban
- * - Kick
- * - Delete Role
- * - Remove Role
- * - Add Role
- * - Remove Reactions(bulk/user)
- * - Remove Reaction(individual)
- * - Add Reaction
- * - Send Message(+Embed/+Reply)
- * - Edit Message(+Embed/+Reply)
- * - Delete Channel
- * - Delete Message
- * - Delete Invite
- * - Update Nickname
- * - Broadcast Typing
- */
-
 /**
  * For internal and developers use for interacting with the discord bot.
- *
- * Model creation methods are static, note you can initialise your own models but
- * these functions ensure the required fields are present & valid for creation and use..
- *
  *
  * @see Main::getApi() To get instance.
  * @see Storage For all discord data.
@@ -108,6 +71,12 @@ class Api{
         $this->plugin = $plugin;
     }
 
+    /**
+     * Creates a normal webhook inside a channel.
+     *
+     * @param Webhook $webhook
+     * @return PromiseInterface
+     */
     public function createWebhook(Webhook $webhook): PromiseInterface{
         if($webhook->getType() !== Webhook::TYPE_NORMAL){
             return rejectPromise(new ApiRejection("Only normal webhooks can be created right now."));
@@ -123,6 +92,12 @@ class Api{
         return ApiResolver::create($pk->getUID());
     }
 
+    /**
+     * Update a webhooks name or avatar.
+     *
+     * @param Webhook $webhook
+     * @return PromiseInterface
+     */
     public function updateWebhook(Webhook $webhook): PromiseInterface{
         if($webhook->getType() !== Webhook::TYPE_NORMAL){
             return rejectPromise(new ApiRejection("Only normal webhooks can be edited right now."));
@@ -138,6 +113,13 @@ class Api{
         return ApiResolver::create($pk->getUID());
     }
 
+    /**
+     * Delete a webhook
+     *
+     * @param string $channel_id
+     * @param string $webhook_id
+     * @return PromiseInterface
+     */
     public function deleteWebhook(string $channel_id, string $webhook_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($webhook_id)){
             return rejectPromise(new ApiRejection("Invalid webhook ID '$webhook_id'."));
@@ -150,7 +132,7 @@ class Api{
         return ApiResolver::create($pk->getUID());
     }
 
-    //Technically we could make our own servers but that would mean bot has owner permissions (overriding admin) and I don't want that ever.
+    //createServer will not be added due to security issues.
 
     /**
      * Leave a discord server.
@@ -439,7 +421,7 @@ class Api{
      * @param string $status See Member::STATUS_ constants.
      * @return PromiseInterface
      */
-    public function updatePresence(Activity $activity, string $status = Member::STATUS_ONLINE): PromiseInterface{
+    public function updateBotPresence(Activity $activity, string $status = Member::STATUS_ONLINE): PromiseInterface{
         if(!in_array($status, [Member::STATUS_ONLINE, Member::STATUS_IDLE, Member::STATUS_OFFLINE, Member::STATUS_DND])){
             return rejectPromise(new ApiRejection("Invalid status '$status'."));
         }

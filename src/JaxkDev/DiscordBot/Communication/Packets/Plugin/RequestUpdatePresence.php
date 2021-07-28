@@ -38,10 +38,18 @@ class RequestUpdatePresence extends Packet{
     }
 
     public function serialize(): ?string{
-        return serialize([$this->UID, $this->activity, $this->status]);
+        return serialize([
+            $this->UID,
+            $this->activity,
+            $this->status
+        ]);
     }
 
     public function unserialize($data): void{
-        [$this->UID, $this->activity, $this->status] = unserialize($data);
+        [
+            $this->UID,
+            $this->activity,
+            $this->status
+        ] = unserialize($data);
     }
 }

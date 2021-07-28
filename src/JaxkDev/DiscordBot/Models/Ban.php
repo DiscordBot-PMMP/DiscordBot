@@ -26,13 +26,13 @@ class Ban implements \Serializable{
     private $reason;
 
     /** @var int|null Only present on banRequest. */
-    private $daysToDelete;
+    private $days_to_delete;
 
-    public function __construct(string $server_id, string $user_id, ?string $reason = null, ?int $daysToDelete = null){
+    public function __construct(string $server_id, string $user_id, ?string $reason = null, ?int $days_to_delete = null){
         $this->setServerId($server_id);
         $this->setUserId($user_id);
         $this->setReason($reason);
-        $this->setDaysToDelete($daysToDelete);
+        $this->setDaysToDelete($days_to_delete);
     }
 
     public function getId(): string{
@@ -70,14 +70,14 @@ class Ban implements \Serializable{
     }
 
     public function getDaysToDelete(): ?int{
-        return $this->daysToDelete;
+        return $this->days_to_delete;
     }
 
-    public function setDaysToDelete(?int $daysToDelete): void{
-        if($daysToDelete !== null and ($daysToDelete < 0 or $daysToDelete > 7)){
-            throw new \AssertionError("Days to delete '$daysToDelete' is invalid, 0-7 allowed.");
+    public function setDaysToDelete(?int $days_to_delete): void{
+        if($days_to_delete !== null and ($days_to_delete < 0 or $days_to_delete > 7)){
+            throw new \AssertionError("Days to delete '$days_to_delete' is invalid, 0-7 allowed.");
         }
-        $this->daysToDelete = $daysToDelete;
+        $this->days_to_delete = $days_to_delete;
     }
 
     //----- Serialization -----//
@@ -87,7 +87,7 @@ class Ban implements \Serializable{
             $this->server_id,
             $this->user_id,
             $this->reason,
-            $this->daysToDelete
+            $this->days_to_delete
         ]);
     }
 
@@ -96,7 +96,7 @@ class Ban implements \Serializable{
             $this->server_id,
             $this->user_id,
             $this->reason,
-            $this->daysToDelete
+            $this->days_to_delete
         ] = unserialize($data);
     }
 }

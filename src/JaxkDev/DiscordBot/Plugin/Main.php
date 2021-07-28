@@ -255,12 +255,12 @@ META);
         }
 
         if($this->inboundData->count() > 2000){
-            $this->getLogger()->emergency("Too much data coming in from discord, stopping plugin+thread.  (If this issue persists, contact JaxkDev)");
+            $this->getLogger()->emergency("Too much data coming in from discord, stopping plugin+thread.  (If this issue persists, file a new issue at https://github.com/DiscordBot-PMMP/DiscordBot/issues/new)");
             $this->stopAll();
         }
 
         if($this->outboundData->count() > 2000){
-            $this->getLogger()->emergency("Too much data going out, stopping plugin+thread.  (If this issue persists, contact JaxkDev)");
+            $this->getLogger()->emergency("Too much data going out, stopping plugin+thread.  (If this issue persists, file a new issue at https://github.com/DiscordBot-PMMP/DiscordBot/issues/new)");
             $this->stopAll();
         }
     }

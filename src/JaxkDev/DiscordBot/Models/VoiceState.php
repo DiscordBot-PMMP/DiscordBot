@@ -31,24 +31,24 @@ class VoiceState implements \Serializable{
     private $self_deaf;
     /** @var bool */
     private $self_mute;
-    ///** @var bool */
-    //private $self_stream;
-    ///** @var bool */
-    //private $self_video;
+    /** @var bool */
+    private $self_stream;
+    /** @var bool */
+    private $self_video;
 
     /** @var bool */
     private $suppress;
 
     public function __construct(string $session_id, ?string $channel_id, bool $deaf, bool $mute, bool $self_deaf,
-                                bool $self_mute, /*bool $self_stream, bool $self_video,*/ bool $suppress){
+                                bool $self_mute, bool $self_stream, bool $self_video, bool $suppress){
         $this->setSessionId($session_id);
         $this->setChannelId($channel_id);
         $this->setDeaf($deaf);
         $this->setMute($mute);
         $this->setSelfDeaf($self_deaf);
         $this->setSelfMute($self_mute);
-        //$this->setSelfStream($self_stream);
-        //$this->setSelfVideo($self_video);
+        $this->setSelfStream($self_stream);
+        $this->setSelfVideo($self_video);
         $this->setSuppress($suppress);
     }
 
@@ -103,7 +103,7 @@ class VoiceState implements \Serializable{
         $this->self_mute = $self_mute;
     }
 
-    /*public function isSelfStream(): bool{
+    public function isSelfStream(): bool{
         return $this->self_stream;
     }
 
@@ -117,7 +117,7 @@ class VoiceState implements \Serializable{
 
     public function setSelfVideo(bool $self_video): void{
         $this->self_video = $self_video;
-    }*/
+    }
 
     public function isSuppress(): bool{
         return $this->suppress;
@@ -137,8 +137,8 @@ class VoiceState implements \Serializable{
             $this->mute,
             $this->self_deaf,
             $this->self_mute,
-            //$this->self_stream,
-            //$this->self_video,
+            $this->self_stream,
+            $this->self_video,
             $this->suppress
         ]);
     }
@@ -151,10 +151,9 @@ class VoiceState implements \Serializable{
             $this->mute,
             $this->self_deaf,
             $this->self_mute,
-            //$this->self_stream,
-            //$this->self_video,
+            $this->self_stream,
+            $this->self_video,
             $this->suppress
         ] = unserialize($data);
     }
-
 }

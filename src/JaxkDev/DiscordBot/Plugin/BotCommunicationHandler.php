@@ -133,7 +133,7 @@ class BotCommunicationHandler{
     private function handleReady(): void{
         //Default activity, Feel free to change activity after ReadyEvent.
         $ac = new Activity("PocketMine-MP v".\pocketmine\VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION, Activity::TYPE_PLAYING);
-        $this->plugin->getApi()->updatePresence($ac, Member::STATUS_IDLE)->otherwise(function(ApiRejection $a){
+        $this->plugin->getApi()->updateBotPresence($ac, Member::STATUS_IDLE)->otherwise(function(ApiRejection $a){
             $this->plugin->getLogger()->logException($a);
         });
 
@@ -446,8 +446,7 @@ class BotCommunicationHandler{
     }
 
     public function sendHeartbeat(): void{
-        $p = new HeartbeatPacket(microtime(true));
-        $this->plugin->writeOutboundData($p);
+        $this->plugin->writeOutboundData(new HeartbeatPacket(microtime(true)));
     }
 
     public function getLastHeartbeat(): ?float{

@@ -30,10 +30,14 @@ class RequestInitialiseBan extends Packet{
     }
 
     public function serialize(): ?string{
-        return serialize([$this->UID, $this->ban]);
+        return serialize([
+            $this->UID, $this->ban
+        ]);
     }
 
     public function unserialize($data): void{
-        [$this->UID, $this->ban] = unserialize($data);
+        [
+            $this->UID, $this->ban
+        ] = unserialize($data);
     }
 }

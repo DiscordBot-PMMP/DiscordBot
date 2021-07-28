@@ -30,10 +30,16 @@ class RequestEditMessage extends Packet{
     }
 
     public function serialize(): ?string{
-        return serialize([$this->UID, $this->message]);
+        return serialize([
+            $this->UID,
+            $this->message
+        ]);
     }
 
     public function unserialize($data): void{
-        [$this->UID, $this->message] = unserialize($data);
+        [
+            $this->UID,
+            $this->message
+        ] = unserialize($data);
     }
 }
