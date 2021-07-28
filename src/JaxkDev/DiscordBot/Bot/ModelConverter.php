@@ -243,7 +243,7 @@ abstract class ModelConverter{
             }
         }elseif($discordMessage->type === DiscordMessage::TYPE_REPLY){
             if($discordMessage->referenced_message === null){
-                throw new AssertionError("Error code 0x003 no ref on reply message, if your seeing this please report it on github.");
+                throw new AssertionError("No referenced message on a REPLY message.");
             }
             $e = $discordMessage->embeds->first();
             if($e !== null){
