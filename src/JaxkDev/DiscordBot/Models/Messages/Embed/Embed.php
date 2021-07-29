@@ -30,7 +30,7 @@ class Embed implements \Serializable{
     /** @var null|string */
     private $type;
 
-    /** @var null|string 2048 characters */
+    /** @var null|string 4096 characters */
     private $description;
 
     /** @var null|string */
@@ -122,8 +122,8 @@ class Embed implements \Serializable{
     }
 
     public function setDescription(?string $description): void{
-        if($description !== null and strlen($description) > 2048){
-            throw new \AssertionError("Embed description can only have up to 2048 characters.");
+        if($description !== null and strlen($description) > 4096){
+            throw new \AssertionError("Embed description can only have up to 4096 characters.");
         }
         $this->description = $description;
     }
