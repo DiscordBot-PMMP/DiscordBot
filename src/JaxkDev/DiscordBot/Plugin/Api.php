@@ -488,6 +488,9 @@ class Api{
             //You can execute webhooks yourself using Api::fetchWebhooks() and use its token.
             return rejectPromise(new ApiRejection("Webhook messages cannot be sent, only received."));
         }
+        if(strlen($message->getContent()) > 2000){
+            return rejectPromise(new ApiRejection("Message content cannot be larger than 2000 characters for bots."));
+        }
         $pk = new RequestSendMessage($message);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
@@ -509,6 +512,9 @@ class Api{
         if(!is_file($file_path)){
             return rejectPromise(new ApiRejection("Invalid file path '$file_path' no such file exists."));
         }
+        if(strlen($message) > 2000){
+            return rejectPromise(new ApiRejection("Message cannot be larger than 2000 characters for bots."));
+        }
         if($file_name === null){
             $file_name = basename($file_path);
         }
@@ -528,6 +534,9 @@ class Api{
     public function editMessage(Message $message): PromiseInterface{
         if($message->getId() === null){
             return rejectPromise(new ApiRejection("Message must have a valid ID to be able to edit it."));
+        }
+        if(strlen($message->getContent()) > 2000){
+            return rejectPromise(new ApiRejection("Message content cannot be larger than 2000 characters for bots."));
         }
         $pk = new RequestEditMessage($message);
         $this->plugin->writeOutboundData($pk);

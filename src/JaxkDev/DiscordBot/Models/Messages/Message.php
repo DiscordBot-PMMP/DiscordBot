@@ -20,7 +20,7 @@ class Message implements \Serializable{
     /** @var ?string Null when sending message. */
     protected $id;
 
-    /** @var string (<=2000) Possibly empty with attachments/embeds. */
+    /** @var string (<=2000 characters for bots/users. <=4000 for nitro users) Possibly empty with attachments/embeds. */
     protected $content = "";
 
     /** @var ?Embed Note gateway v9 / dphp7 supports several embeds and attachments in normal messages. (merge with webhook handling) */
@@ -100,8 +100,8 @@ class Message implements \Serializable{
     }
 
     public function setContent(string $content): void{
-        if(strlen($content) > 2000){
-            throw new \AssertionError("Message content cannot exceed 2000 characters.");
+        if(strlen($content) > 4000){
+            throw new \AssertionError("Message content cannot exceed 4000 characters.");
         }
         $this->content = $content;
     }
