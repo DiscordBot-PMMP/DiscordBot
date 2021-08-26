@@ -12,9 +12,9 @@
 
 namespace JaxkDev\DiscordBot\Bot;
 
-use Discord\Discord;
 use Discord\Exceptions\IntentException;
 use Discord\WebSockets\Intents;
+use Discord\WebSockets\Op;
 use Error;
 use ErrorException;
 use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
@@ -164,6 +164,7 @@ class Client{
             $this->discordEventHandler->onReady();
         });
 
+        $this->client->on('ws_closed', [$this, 'webSocketHandler']);
         $this->client->on('error', [$this, 'discordErrorHandler']);
         $this->client->on('closed', [$this, 'close']);
     }
@@ -216,6 +217,23 @@ class Client{
     public function sysErrorHandler(int $severity, string $message, string $file, int $line): bool{
         $this->close(new ErrorException($message, 0, $severity, $file, $line));
         return true;
+    }
+
+    public function websocketHandler(int $op, string $reason): void{
+        switch($op){
+            case 4014:
+                $this->thread->getLogger()->emergency("Disallowed intents detected, Please follow the wiki provided ".
+                    "(https://github.com/DiscordBot-PMMP/DiscordBot/wiki/Creating-your-discord-bot) and ensure both privileged intents are enabled.");
+                break;
+            case 4013:
+                //Should never happen considering were set to a specific version of the gateway
+                $this->thread->getLogger()->emergency("Invalid intents specified, Please create a new issue on github ".
+                    "(https://github.com/DiscordBot-PMMP/DiscordBot/issues/new) quoting the text `op:4013 - {$reason}`.");
+                break;
+        }
+        if(in_array($op, Op::getCriticalCloseCodes())) {
+            $this->close($reason);
+        }
     }
 
     /** @var array $data */
