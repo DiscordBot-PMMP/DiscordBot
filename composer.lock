@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f9bd2207022a3414a45a32d2e2c8cf86",
+    "content-hash": "8baa505801ce46cb64524d2e3562cd2e",
     "packages": [
         {
             "name": "discord-php/http",
@@ -2158,16 +2158,16 @@
         },
         {
             "name": "team-reflex/discord-php",
-            "version": "dev-master",
+            "version": "v6.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/discord-php/DiscordPHP.git",
-                "reference": "78c8bc408b29adb611f358278896debcadb509cd"
+                "reference": "f7e8fdc75fcbf3a704825599881ab08789cffece"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/78c8bc408b29adb611f358278896debcadb509cd",
-                "reference": "78c8bc408b29adb611f358278896debcadb509cd",
+                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/f7e8fdc75fcbf3a704825599881ab08789cffece",
+                "reference": "f7e8fdc75fcbf3a704825599881ab08789cffece",
                 "shasum": ""
             },
             "require": {
@@ -2198,7 +2198,6 @@
                 "ext-mbstring": "For accurate calculations of string length when handling non-english characters.",
                 "ext-uv": "For a faster, and more performant loop. Preferred."
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -2208,17 +2207,7 @@
                     "Discord\\": "src/Discord"
                 }
             },
-            "scripts": {
-                "cs": [
-                    "./vendor/bin/php-cs-fixer fix"
-                ],
-                "unit": [
-                    "./vendor/bin/phpunit --testdox"
-                ],
-                "coverage": [
-                    "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-html coverage --testdox"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2230,10 +2219,10 @@
             ],
             "description": "An unofficial API to interact with the voice and text service Discord.",
             "support": {
-                "source": "https://github.com/discord-php/DiscordPHP/tree/master",
-                "issues": "https://github.com/discord-php/DiscordPHP/issues"
+                "issues": "https://github.com/discord-php/DiscordPHP/issues",
+                "source": "https://github.com/discord-php/DiscordPHP/tree/v6.0.2"
             },
-            "time": "2021-08-24T23:40:43+00:00"
+            "time": "2021-08-30T09:20:30+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",
@@ -2921,7 +2910,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "team-reflex/discord-php": 20,
         "react/promise": 20
     },
     "prefer-stable": false,
