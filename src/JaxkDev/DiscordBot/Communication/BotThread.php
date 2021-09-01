@@ -57,13 +57,14 @@ class BotThread extends Thread{
         $this->logger->setLogDebug(true);
         $this->logger->registerStatic();
 
-        $this->registerClassLoader();
-
-        /** @noinspection PhpIncludeInspection */
+        //Ignores all third party plugins essentially making this thread COMPLETELY independent of other plugins
+        require_once(\pocketmine\COMPOSER_AUTOLOADER_PATH);
         require_once(\JaxkDev\DiscordBot\COMPOSER);
 
         new Client($this, (array)$this->initialConfig);
     }
+
+    public function registerClassLoader(){}
 
     public function readInboundData(int $count = 1): array{
         return array_map(function($data){
