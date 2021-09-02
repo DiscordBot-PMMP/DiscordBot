@@ -12,17 +12,19 @@ version: 2                        DO NOT EVER TOUCH THIS.
 
 discord:
   token: "ABCD123"                DO NOT EVER SHOW THIS TOKEN TO ANYBODY !!! Paste your discord bots token into here,
-                                  for how to get/setup the bot and get token, see beginning of file.
+                                  for help on how to set up the bot and get the token, see the beginning of this file.
   use_plugin_cacert: true|false   DO NOT modify this without being told to explicitly, You have been warned...
 
 logging:
-  debug: false|true               Log all discord thread information to screen/console, all messages are logged to server.log and DiscordBot/logs by default.
+  debug: false|true               Log all discord thread information to screen/console,
+                                  messages are logged to server.log and DiscordBot/logs by default.
   max_files: 28                   How many log files to keep on disk at any one time.
   directory: "logs"               What directory to keep log files in, relative from plugin_data/DiscordBot/
 
 protocol:
   packets_per_tick: 50            How many packets can be processed per tick.
   heartbeat_allowance: 60         How many seconds after last heartbeat received before the plugin/thread is declared dead.
+
                                   DO NOT modify the protocol fields without being told to explicitly, You have been warned...
 
 ===========================================================================================

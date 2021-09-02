@@ -68,8 +68,7 @@ class Main extends PluginBase{
             mkdir($this->getDataFolder()."logs");
         }
 
-        $this->saveResource("config.yml");
-
+        $this->saveDefaultConfig();
         $this->saveResource("HELP_ENG.txt", true); //Always keep these up-to-date.
         $this->saveResource("cacert.pem", true);
 
@@ -139,10 +138,10 @@ class Main extends PluginBase{
         //Config file, (USE $this->config, token is redacted in this but not on file.) (yaml_emit to avoid any comments that include sensitive data)
         $z->addFromString("config.yml", yaml_emit($this->config));
 
-        //Server log, includes *all* discord threaded logs as well
+        //Server log.
         $z->addFile($this->getServer()->getDataPath()."server.log", "server.log");
 
-        //Add Discord thread logs in case it failed to hack its way into server.log
+        //Add Discord thread logs.
         $dir = scandir($this->getDataFolder()."logs");
         if($dir !== false){
             foreach($dir as $file){
@@ -157,7 +156,7 @@ class Main extends PluginBase{
             $z->addFromString("storage.serialized", Storage::serializeStorage());
         }
 
-        //Some metadata, instead of users having no clue of anything I ask, generate this information before hand.
+        //Some metadata, instead of users having no clue of anything I ask, generate this information beforehand.
         $time = date('d-m-Y H:i:s');
         $ver = $this->getDescription()->getVersion();
         /** @phpstan-ignore-next-line Constant default means ternary condition is always false on analysis. */
@@ -255,12 +254,12 @@ META);
         }
 
         if($this->inboundData->count() > 2000){
-            $this->getLogger()->emergency("Too much data coming in from discord, stopping plugin+thread.  (If this issue persists, file a new issue at https://github.com/DiscordBot-PMMP/DiscordBot/issues/new)");
+            $this->getLogger()->emergency("Too much data coming in from discord, stopping plugin+thread.  (If this issue persists, create a issue at https://github.com/DiscordBot-PMMP/DiscordBot/issues/new)");
             $this->stopAll();
         }
 
         if($this->outboundData->count() > 2000){
-            $this->getLogger()->emergency("Too much data going out, stopping plugin+thread.  (If this issue persists, file a new issue at https://github.com/DiscordBot-PMMP/DiscordBot/issues/new)");
+            $this->getLogger()->emergency("Too much data going out, stopping plugin+thread.  (If this issue persists, create a issue at https://github.com/DiscordBot-PMMP/DiscordBot/issues/new)");
             $this->stopAll();
         }
     }
@@ -291,6 +290,9 @@ META);
         return $this->api;
     }
 
+    /**
+     * @return never-return
+     */
     public function getConfig(): Config{
         throw new PluginException("getConfig() is not used, see Main::getPluginConfig()");
     }
@@ -298,6 +300,10 @@ META);
     public function getPluginConfig(): array{
         return $this->config;
     }
+
+    // Don't allow this.
+    public function reloadConfig(){}
+    public function saveConfig(){}
 
     public function stopAll(bool $stopPlugin = true): void{
         if($this->tickTask !== null){
