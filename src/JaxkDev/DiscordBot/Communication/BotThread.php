@@ -74,7 +74,12 @@ class BotThread extends Thread{
             $this->setStatus(self::STATUS_CLOSED);
             throw new \RuntimeException("Failed to check dependency conflicts with pocketmine, cannot find file at '$file'.");
         }
-        $installed = json_decode(file_get_contents($file), true);
+        $data = file_get_contents($file);
+        if($data === false){
+            $this->setStatus(self::STATUS_CLOSED);
+            throw new \RuntimeException("Failed to check dependency conflicts with pocketmine, failed to get file contents from '$file'.");
+        }
+        $installed = json_decode($data, true);
         if($installed === null){
             $this->setStatus(self::STATUS_CLOSED);
             throw new \RuntimeException("Failed to check dependency conflicts with pocketmine, unable to parse composer installed.json at '$file'.");
@@ -88,7 +93,12 @@ class BotThread extends Thread{
             $this->setStatus(self::STATUS_CLOSED);
             throw new \RuntimeException("Failed to check dependency conflicts with pocketmine, cannot find file at '$file'.");
         }
-        $installed = json_decode(file_get_contents($file), true);
+        $data = file_get_contents($file);
+        if($data === false){
+            $this->setStatus(self::STATUS_CLOSED);
+            throw new \RuntimeException("Failed to check dependency conflicts with pocketmine, failed to get file contents from '$file'.");
+        }
+        $installed = json_decode($data, true);
         if($installed === null){
             $this->setStatus(self::STATUS_CLOSED);
             throw new \RuntimeException("Failed to check dependency conflicts with pocketmine, unable to parse composer installed.json at '$file'.");
