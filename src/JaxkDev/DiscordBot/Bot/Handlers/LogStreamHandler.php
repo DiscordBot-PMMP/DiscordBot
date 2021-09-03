@@ -51,6 +51,6 @@ class LogStreamHandler extends AbstractHandler{
             $this->logger->log(strtolower($record['level_name']), trim($record['message']));
         }
 
-        return true;
+        return false;
     }
 }
