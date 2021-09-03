@@ -277,6 +277,7 @@ class Client{
             }
         }
         $this->logger->debug("Client closed.");
+        $this->logger->close();
         exit(0);
     }
 }
