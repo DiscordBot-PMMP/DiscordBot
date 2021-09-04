@@ -114,7 +114,19 @@ class Main extends PluginBase{
     }
 
     public function onDisable(){
-        $this->stopAll(false);
+        (new DiscordClosed($this))->call();
+
+        if($this->tickTask !== null and !$this->tickTask->isCancelled()){
+            $this->tickTask->cancel();
+        }
+
+        if($this->discordBot !== null and $this->discordBot->isRunning()){
+            $this->discordBot->setStatus(BotThread::STATUS_CLOSING);
+            $this->getLogger()->info("Stopping discord thread gracefully, waiting for discord thread to stop...");
+            //Never had a condition where it hangs more than 1s (only long period of wait should be during the data dump.)
+            $this->discordBot->join();
+            $this->getLogger()->info("Thread stopped.");
+        }
     }
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool{
@@ -249,18 +261,18 @@ META);
                 $this->botCommsHandler->sendHeartbeat();
             }
             if($this->discordBot->getStatus() === BotThread::STATUS_CLOSED){
-                $this->stopAll();
+                $this->getServer()->getPluginManager()->disablePlugin($this);
             }
         }
 
         if($this->inboundData->count() > 2000){
             $this->getLogger()->emergency("Too much data coming in from discord, stopping plugin+thread.  (If this issue persists, create a issue at https://github.com/DiscordBot-PMMP/DiscordBot/issues/new)");
-            $this->stopAll();
+            $this->getServer()->getPluginManager()->disablePlugin($this);
         }
 
         if($this->outboundData->count() > 2000){
             $this->getLogger()->emergency("Too much data going out, stopping plugin+thread.  (If this issue persists, create a issue at https://github.com/DiscordBot-PMMP/DiscordBot/issues/new)");
-            $this->stopAll();
+            $this->getServer()->getPluginManager()->disablePlugin($this);
         }
     }
 
@@ -304,23 +316,4 @@ META);
     // Don't allow this.
     public function reloadConfig(){}
     public function saveConfig(){}
-
-    public function stopAll(bool $stopPlugin = true): void{
-        if($this->tickTask !== null){
-            if(!$this->tickTask->isCancelled()){
-                $this->tickTask->cancel();
-            }
-        }
-        if($this->discordBot !== null and $this->discordBot->isRunning()){
-            $this->discordBot->setStatus(BotThread::STATUS_CLOSING);
-            $this->getLogger()->warning("Closing discord thread.");
-            //^ Stopping while bot is not ready (midway through data dump) causes it to wait for it to finish.
-            //$this->discordBot->quit();  // Joins thread, leave it to 'exit' by itself.
-            //$this->getLogger()->info("Thread closed.");
-            (new DiscordClosed($this))->call();
-        }
-        if($stopPlugin){
-            $this->getServer()->getPluginManager()->disablePlugin($this);
-        }
-    }
 }

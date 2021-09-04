@@ -189,10 +189,13 @@ array(5) {
      */
 
     public function onReady(): void{
-        if($this->client->getThread()->getStatus() !== BotThread::STATUS_STARTED){
-            $this->logger->warning("Closing thread, unexpected state change.");
-            $this->client->close();
-        }
+        //Checked frequently during data dump as this is the only time when it can cause the thread to hang during disable.
+        $statusCheck = function(){
+            if($this->client->getThread()->getStatus() !== BotThread::STATUS_STARTED){
+                $this->logger->warning("Closing thread, unexpected state change.");
+                $this->client->close();
+            }
+        };
 
         // Register all other events.
         $this->registerEvents();
@@ -209,6 +212,8 @@ array(5) {
 
         /** @var DiscordGuild $guild */
         foreach($client->guilds as $guild){
+            $statusCheck();
+
             $pk->addServer(ModelConverter::genModelServer($guild));
 
             /** @var DiscordRolePermission $permissions */
@@ -246,6 +251,8 @@ array(5) {
                 $pk->addRole(ModelConverter::genModelRole($role));
             }
 
+            $statusCheck();
+
             if($permissions->manage_guild){
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $guild->invites->freshen()->done(function() use ($guild){
@@ -273,21 +280,20 @@ array(5) {
             }
         }
 
+        $statusCheck();
+
         /** @var DiscordUser $user */
         foreach($client->users as $user){
             $pk->addUser(ModelConverter::genModelUser($user));
         }
 
+        //Very important to check status before overwriting, can cause dangerous behaviour.
+        $statusCheck();
+
         $pk->setBotUser(ModelConverter::genModelUser($client->user));
 
         $this->logger->debug("Data pack took: ".round(microtime(true)-$t, 5)."s & ".
             round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
-
-        //Very important to check status before overwriting, can cause dangerous behaviour.
-        if($this->client->getThread()->getStatus() !== BotThread::STATUS_STARTED){
-            $this->logger->warning("Closing thread, unexpected state change.");
-            $this->client->close();
-        }
 
         $this->client->getThread()->writeOutboundData($pk);
 
