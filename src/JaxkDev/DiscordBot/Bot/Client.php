@@ -276,7 +276,7 @@ class Client{
                 $this->logger->debug("Failed to close client, probably not started.");
             }
         }
-        $this->logger->debug("Client closed.");
+        $this->logger->notice("Discord thread closed.");
         $this->logger->close();
         exit(0);
     }

@@ -313,10 +313,10 @@ META);
         }
         if($this->discordBot !== null and $this->discordBot->isRunning()){
             $this->discordBot->setStatus(BotThread::STATUS_CLOSING);
-            $this->getLogger()->warning("Closing discord thread, This can take a several seconds.");
+            $this->getLogger()->warning("Closing discord thread.");
             //^ Stopping while bot is not ready (midway through data dump) causes it to wait for it to finish.
-            $this->discordBot->quit();  // Joins thread
-            $this->getLogger()->info("Thread closed.");
+            //$this->discordBot->quit();  // Joins thread, leave it to 'exit' by itself.
+            //$this->getLogger()->info("Thread closed.");
             (new DiscordClosed($this))->call();
         }
         if($stopPlugin){
