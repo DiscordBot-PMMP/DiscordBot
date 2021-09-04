@@ -41,7 +41,7 @@ class Main extends PluginBase{
     private $tickTask;
 
     /** @var BotCommunicationHandler */
-    private $botCommsHandler;
+    private $communicationHandler;
 
     /** @var Api */
     private $api;
@@ -99,7 +99,7 @@ class Main extends PluginBase{
         }
 
         $this->api = new Api($this);
-        $this->botCommsHandler = new BotCommunicationHandler($this);
+        $this->communicationHandler = new BotCommunicationHandler($this);
 
         $this->getLogger()->debug("Starting DiscordBot Thread...");
         $this->discordBot = new BotThread($this->getServer()->getLogger(), $this->config, $this->outboundData, $this->inboundData);
@@ -168,7 +168,7 @@ class Main extends PluginBase{
             $z->addFromString("storage.serialized", Storage::serializeStorage());
         }
 
-        //Some metadata, instead of users having no clue of anything I ask, generate this information beforehand.
+        //Some metadata, instead of users having no clue of anything I ask, therefore generate this information beforehand.
         $time = date('d-m-Y H:i:s');
         $ver = $this->getDescription()->getVersion();
         /** @phpstan-ignore-next-line Constant default means ternary condition is always false on analysis. */
@@ -251,14 +251,14 @@ META);
 
         /** @var Packet $d */
         foreach($data as $d){
-            $this->botCommsHandler->handle($d);
+            $this->communicationHandler->handle($d);
         }
 
         if(($currentTick % 20) === 0){
             //Run every second. [Faster/More accurate over bots tick]
             if($this->discordBot->getStatus() === BotThread::STATUS_READY){
-                $this->botCommsHandler->checkHeartbeat();
-                $this->botCommsHandler->sendHeartbeat();
+                $this->communicationHandler->checkHeartbeat();
+                $this->communicationHandler->sendHeartbeat();
             }
             if($this->discordBot->getStatus() === BotThread::STATUS_CLOSED){
                 $this->getServer()->getPluginManager()->disablePlugin($this);
@@ -295,7 +295,7 @@ META);
     }
 
     public function getBotCommunicationHandler(): BotCommunicationHandler{
-        return $this->botCommsHandler;
+        return $this->communicationHandler;
     }
 
     public function getApi(): Api{
