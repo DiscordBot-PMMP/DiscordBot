@@ -441,7 +441,7 @@ class BotCommunicationHandler{
         if($this->lastHeartbeat === null) return;
         if(($diff = microtime(true) - $this->lastHeartbeat) > $this->plugin->getPluginConfig()["protocol"]["heartbeat_allowance"]){
             $this->plugin->getLogger()->emergency("DiscordBot has not responded for {$diff} seconds, disabling plugin.");
-            $this->plugin->stopAll();
+            $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
         }
     }
 
