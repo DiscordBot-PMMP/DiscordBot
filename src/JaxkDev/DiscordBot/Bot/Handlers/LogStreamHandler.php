@@ -15,7 +15,6 @@ namespace JaxkDev\DiscordBot\Bot\Handlers;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Logger;
-use pocketmine\utils\MainLogger;
 use pocketmine\utils\TextFormat;
 
 /**
@@ -25,7 +24,7 @@ class LogStreamHandler extends AbstractHandler{
 
     const FORMAT = TextFormat::AQUA . "[%s] " . TextFormat::RESET . "%s[%s/%s]: %s" . TextFormat::RESET;
 
-    /** @var MainLogger|null */
+    /** @var \AttachableThreadedLogger|null */
     private $logger;
 
     /** @var LineFormatter */
@@ -34,7 +33,7 @@ class LogStreamHandler extends AbstractHandler{
     /** @var bool */
     private $debug;
 
-    public function __construct(MainLogger $logger, bool $debug, $level = Logger::DEBUG, bool $bubble = true){
+    public function __construct(\AttachableThreadedLogger $logger, bool $debug, $level = Logger::DEBUG, bool $bubble = true){
         $this->debug = $debug;
         $this->logger = $logger;
         $this->formatter = new LineFormatter("%message% %context%");

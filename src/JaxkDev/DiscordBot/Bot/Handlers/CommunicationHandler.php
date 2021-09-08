@@ -723,7 +723,7 @@ class CommunicationHandler{
             }
             $dMessage->channel->messages->save($dMessage)->done(function(DiscordMessage $dMessage) use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Message edited.", [ModelConverter::genModelMessage($dMessage)]);
-            }, function(\ThreadException $e) use ($pk){
+            }, function(\Throwable $e) use ($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to edit message.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to edit message ({$pk->getUID()}) - {$e->getMessage()}");
             });
@@ -734,7 +734,7 @@ class CommunicationHandler{
         $this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $dMessage) use($pk){
             $dMessage->delete()->done(function() use ($pk){
                 $this->resolveRequest($pk->getUID());
-            }, function(\ThreadException $e) use ($pk){
+            }, function(\Throwable $e) use ($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to delete message.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to delete message ({$pk->getUID()}) - {$e->getMessage()}");
             });

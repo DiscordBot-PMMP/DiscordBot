@@ -15,12 +15,15 @@ namespace JaxkDev\DiscordBot\Plugin;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Libs\React\Promise\Deferred;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
-use pocketmine\utils\MainLogger;
+use pocketmine\Server;
 
 /**
  * @internal
  */
 abstract class ApiResolver{
+
+    /** @var \AttachableLogger */
+    static private $logger;
 
     /** @var Array<int, Deferred> */
     static private $map = [];
@@ -48,7 +51,15 @@ abstract class ApiResolver{
             }
             unset(self::$map[$packet->getPid()]);
         }else{
-            MainLogger::getLogger()->debug("A unidentified resolution has been received, ID: {$packet->getPid()}, Successful: {$packet->wasSuccessful()}, Message: {$packet->getResponse()}");
+            if(self::$logger === null){
+                $pl = Server::getInstance()->getPluginManager()->getPlugin("DiscordBot");
+                if($pl instanceof Main){
+                    self::$logger = $pl->getLogger();
+                }else{
+                    throw new \RuntimeException("Failed to fetch DiscordBot logger.");
+                }
+            }
+            self::$logger->debug("A unidentified resolution has been received, ID: {$packet->getPid()}, Successful: {$packet->wasSuccessful()}, Message: {$packet->getResponse()}");
         }
     }
 }

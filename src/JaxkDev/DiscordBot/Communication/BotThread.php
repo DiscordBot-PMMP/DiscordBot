@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Communication;
 use AttachableThreadedLogger;
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use pocketmine\Thread;
+use pocketmine\thread\Thread;
 use pocketmine\utils\MainLogger;
 use Volatile;
 
@@ -28,7 +28,7 @@ class BotThread extends Thread{
         STATUS_CLOSING  = 8,
         STATUS_CLOSED   = 9;
 
-    /** @var MainLogger */
+    /** @var AttachableThreadedLogger */
     private $logger;
 
     /**  @var array */
@@ -43,20 +43,16 @@ class BotThread extends Thread{
     private $status = self::STATUS_STARTING;
 
     public function __construct(AttachableThreadedLogger $logger, array $initialConfig, Volatile $inboundData, Volatile $outboundData){
-        if($logger instanceof MainLogger){
-            $this->logger = $logger;
-        }else{
-            $this->setStatus(self::STATUS_CLOSED);
-            throw new \AssertionError("No MainLogger passed to constructor ?  (Are you using an unofficial pmmp release....)");
-        }
+        $this->logger = $logger;
         $this->initialConfig = $initialConfig;
         $this->inboundData = $inboundData;
         $this->outboundData = $outboundData;
     }
 
-    public function run(){
-        //$this->logger->setLogDebug(true);
-        $this->logger->registerStatic();
+    public function onRun(): void{
+        if($this->logger instanceof MainLogger){
+            $this->logger->setLogDebug(true);
+        }
 
         //Check for conflicts between pocketmines vendor and mine.
         $this->checkDependencyConflicts();
@@ -114,7 +110,7 @@ class BotThread extends Thread{
         }
     }
 
-    public function registerClassLoader(){}
+    public function registerClassLoader(): void{}
 
     public function readInboundData(int $count = 1): array{
         return array_map(function($data){
@@ -142,7 +138,7 @@ class BotThread extends Thread{
         return $this->status;
     }
 
-    public function getLogger(): MainLogger{
+    public function getLogger(): AttachableThreadedLogger{
         return $this->logger;
     }
 

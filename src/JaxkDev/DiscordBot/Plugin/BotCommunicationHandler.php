@@ -76,6 +76,7 @@ use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberJoined as VoiceChannelMem
 use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberLeft as VoiceChannelMemberLeftEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberMoved as VoiceChannelMemberMovedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceStateUpdated as VoiceStateUpdatedEvent;
+use pocketmine\VersionInfo;
 
 class BotCommunicationHandler{
 
@@ -132,7 +133,7 @@ class BotCommunicationHandler{
 
     private function handleReady(): void{
         //Default activity, Feel free to change activity after ReadyEvent.
-        $ac = new Activity("PocketMine-MP v".\pocketmine\VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION, Activity::TYPE_PLAYING);
+        $ac = new Activity(VersionInfo::NAME." v".VersionInfo::BASE_VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION, Activity::TYPE_PLAYING);
         $this->plugin->getApi()->updateBotPresence($ac, Member::STATUS_IDLE)->otherwise(function(ApiRejection $a){
             $this->plugin->getLogger()->logException($a);
         });

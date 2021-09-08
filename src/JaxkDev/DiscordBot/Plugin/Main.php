@@ -49,7 +49,7 @@ class Main extends PluginBase{
     /** @var array */
     private $config;
 
-    public function onLoad(){
+    protected function onLoad(): void{
         if(($phar = Phar::running(true)) === ""){
             throw new PluginException("Cannot be run from source.");
         }
@@ -76,7 +76,7 @@ class Main extends PluginBase{
         $this->outboundData = new Volatile();
     }
 
-    public function onEnable(){
+    protected function onEnable(): void{
         if(!$this->loadConfig()) return;
         if(is_file($this->getDataFolder()."events.yml")){
             // Don't delete file, DiscordChat will transfer it then delete it.
@@ -92,11 +92,6 @@ class Main extends PluginBase{
                 return;
             }
         }
-        if($this->getServer()->getTick() !== 0 and PHP_VERSION_ID >= 80000 and PHP_OS === "Darwin"){
-            $this->getLogger()->emergency("Plugin not loaded on server start, self disabling to prevent crashes on MacOS running PHP8.");
-            $this->getServer()->getPluginManager()->disablePlugin($this);
-            return;
-        }
 
         $this->api = new Api($this);
         $this->communicationHandler = new BotCommunicationHandler($this);
@@ -108,12 +103,12 @@ class Main extends PluginBase{
         //Redact token.
         $this->config["discord"]["token"] = preg_replace('([a-zA-Z0-9])','*', $this->config["discord"]["token"]);
 
-        $this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(int $currentTick): void{
-            $this->tick($currentTick);
+        $this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void{
+            $this->tick($this->getServer()->getTick());
         }), 1);
     }
 
-    public function onDisable(){
+    protected function onDisable(): void{
         (new DiscordClosed($this))->call();
 
         if($this->tickTask !== null and !$this->tickTask->isCancelled()){
@@ -171,8 +166,7 @@ class Main extends PluginBase{
         //Some metadata, instead of users having no clue of anything I ask, therefore generate this information beforehand.
         $time = date('d-m-Y H:i:s');
         $ver = $this->getDescription()->getVersion();
-        /** @phpstan-ignore-next-line Constant default means ternary condition is always false on analysis. */
-        $pmmp = $this->getServer()->getPocketMineVersion().", ".$this->getServer()->getVersion()." [".(\pocketmine\IS_DEVELOPMENT_BUILD ? "DEVELOPMENT" : "RELEASE")." | ".\pocketmine\GIT_COMMIT."]";
+        $pmmp = $this->getServer()->getPocketMineVersion()." | ".$this->getServer()->getVersion();
         $os = php_uname();
         $php = PHP_VERSION;
         $jit = "N/A";
@@ -314,6 +308,6 @@ META);
     }
 
     // Don't allow this.
-    public function reloadConfig(){}
-    public function saveConfig(){}
+    public function reloadConfig(): void{}
+    public function saveConfig(): void{}
 }
