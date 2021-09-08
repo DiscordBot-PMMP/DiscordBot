@@ -12,20 +12,16 @@
 
 namespace JaxkDev\DiscordBot\Bot\Handlers;
 
+use JaxkDev\DiscordBot\Bot\Pocketmine\Terminal;
+use JaxkDev\DiscordBot\Bot\Pocketmine\TextFormat;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Logger;
-use pocketmine\utils\TextFormat;
 
 /**
  * Sends all messages(aka records) from monolog logger to PocketMines log if running in debug mode.
  */
 class LogStreamHandler extends AbstractHandler{
-
-    const FORMAT = TextFormat::AQUA . "[%s] " . TextFormat::RESET . "%s[%s/%s]: %s" . TextFormat::RESET;
-
-    /** @var \AttachableThreadedLogger|null */
-    private $logger;
 
     /** @var LineFormatter */
     private $formatter;
@@ -33,21 +29,21 @@ class LogStreamHandler extends AbstractHandler{
     /** @var bool */
     private $debug;
 
-    public function __construct(\AttachableThreadedLogger $logger, bool $debug, $level = Logger::DEBUG, bool $bubble = true){
+    public function __construct(bool $debug, $level = Logger::DEBUG, bool $bubble = true){
         $this->debug = $debug;
-        $this->logger = $logger;
         $this->formatter = new LineFormatter("%message% %context%");
+        Terminal::init();
         parent::__construct($level, $bubble);
     }
 
     public function close(): void{}
 
     public function handle(array $record): bool{
-        if($this->logger === null) return false;
         $record['message'] = str_replace(" []\X1","",$this->formatter->format($record)."\X1");
 
-        if($this->debug or in_array(strtolower($record['level_name']), ["error", "critical", "emergency", "alert"])){
-            $this->logger->log(strtolower($record['level_name']), trim($record['message']));
+        if($this->debug or in_array(strtolower($record['level_name']), ["warning", "error", "critical", "emergency", "alert"])){
+            Terminal::writeLine(TextFormat::AQUA."[".(new \DateTime('now'))->format("H:i:s.v")."] ".
+                TextFormat::RED."[Discord thread/".strtoupper($record['level_name']).": ".trim($record['message']));
         }
 
         return false;

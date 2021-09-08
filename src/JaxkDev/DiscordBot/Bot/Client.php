@@ -20,11 +20,11 @@ use ErrorException;
 use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\Bot\Handlers\CommunicationHandler;
 use JaxkDev\DiscordBot\Bot\Handlers\LogStreamHandler;
+use JaxkDev\DiscordBot\Bot\Pocketmine\Utils;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
-use pocketmine\utils\Utils;
 use React\EventLoop\TimerInterface;
 use Throwable;
 
@@ -79,7 +79,7 @@ class Client{
         $handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['max_files'], Logger::DEBUG);
         $handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
         $this->logger->setHandlers(array($handler));
-        $this->logger->pushHandler(new LogStreamHandler($this->thread->getLogger(), $config["logging"]["debug"]));
+        $this->logger->pushHandler(new LogStreamHandler($config["logging"]["debug"]));
 
         $socket_opts = [];
         if($config["discord"]["use_plugin_cacert"]){
@@ -222,12 +222,12 @@ class Client{
     public function websocketHandler(int $op, string $reason): void{
         switch($op){
             case 4014:
-                $this->thread->getLogger()->emergency("Disallowed intents detected, Please follow the wiki provided ".
+                $this->logger->emergency("Disallowed intents detected, Please follow the wiki provided ".
                     "(https://github.com/DiscordBot-PMMP/DiscordBot/wiki/Creating-your-discord-bot) and ensure both privileged intents are enabled.");
                 break;
             case 4013:
                 //Should never happen considering were set to a specific version of the gateway
-                $this->thread->getLogger()->emergency("Invalid intents specified, Please create a new issue on github ".
+                $this->logger->emergency("Invalid intents specified, Please create a new issue on github ".
                     "(https://github.com/DiscordBot-PMMP/DiscordBot/issues/new) quoting the text `op:4013 - {$reason}`.");
                 break;
         }
@@ -273,7 +273,7 @@ class Client{
             try{
                 $this->client->close(true);
             }catch (Error $e){
-                $this->logger->debug("Failed to close client, probably not started.");
+                $this->logger->debug("Failed to close client, probably not started. ({$e->getMessage()})");
             }
         }
         $this->logger->notice("Discord thread closed.");

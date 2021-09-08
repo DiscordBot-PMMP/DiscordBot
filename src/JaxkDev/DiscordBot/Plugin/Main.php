@@ -97,7 +97,7 @@ class Main extends PluginBase{
         $this->communicationHandler = new BotCommunicationHandler($this);
 
         $this->getLogger()->debug("Starting DiscordBot Thread...");
-        $this->discordBot = new BotThread($this->getServer()->getLogger(), $this->config, $this->outboundData, $this->inboundData);
+        $this->discordBot = new BotThread($this->config, $this->outboundData, $this->inboundData);
         $this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
 
         //Redact token.
@@ -298,6 +298,7 @@ META);
 
     /**
      * @return never-return
+     * @noinspection PhpDocSignatureInspection
      */
     public function getConfig(): Config{
         throw new PluginException("getConfig() is not used, see Main::getPluginConfig()");
