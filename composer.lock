@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b187b4d97d243cea44a4a34ead0fd5e7",
+    "content-hash": "3de561a3e9e6495eab8f123cc45bdcce",
     "packages": [
         {
             "name": "discord-php/http",
@@ -346,12 +346,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "ba868db3b9419015be51f83b3e7b743639ec0bed"
+                "reference": "91d9be4659f18113289fecd4b8d5949bbab0a5b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/ba868db3b9419015be51f83b3e7b743639ec0bed",
-                "reference": "ba868db3b9419015be51f83b3e7b743639ec0bed",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/91d9be4659f18113289fecd4b8d5949bbab0a5b2",
+                "reference": "91d9be4659f18113289fecd4b8d5949bbab0a5b2",
                 "shasum": ""
             },
             "require": {
@@ -433,7 +433,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-09-06T10:43:58+00:00"
+            "time": "2021-09-10T13:21:00+00:00"
         },
         {
             "name": "psr/http-message",
@@ -1703,12 +1703,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/options-resolver.git",
-                "reference": "f1b99f10ea04aa9d0aafddcd8ba3d65545403bab"
+                "reference": "cd63dbab0428a47f8576e4e58148aeae2e32e91c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/options-resolver/zipball/f1b99f10ea04aa9d0aafddcd8ba3d65545403bab",
-                "reference": "f1b99f10ea04aa9d0aafddcd8ba3d65545403bab",
+                "url": "https://api.github.com/repos/symfony/options-resolver/zipball/cd63dbab0428a47f8576e4e58148aeae2e32e91c",
+                "reference": "cd63dbab0428a47f8576e4e58148aeae2e32e91c",
                 "shasum": ""
             },
             "require": {
@@ -1764,7 +1764,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-17T14:20:01+00:00"
+            "time": "2021-09-09T08:06:01+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -2017,12 +2017,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation.git",
-                "reference": "c9b1032a9fcd3fc64d4b4d6890c8d6f161480aca"
+                "reference": "815ec5d1c49358e253bb7160b0584d4f9db9ea5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/c9b1032a9fcd3fc64d4b4d6890c8d6f161480aca",
-                "reference": "c9b1032a9fcd3fc64d4b4d6890c8d6f161480aca",
+                "url": "https://api.github.com/repos/symfony/translation/zipball/815ec5d1c49358e253bb7160b0584d4f9db9ea5f",
+                "reference": "815ec5d1c49358e253bb7160b0584d4f9db9ea5f",
                 "shasum": ""
             },
             "require": {
@@ -2106,7 +2106,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-09-07T15:12:45+00:00"
+            "time": "2021-09-10T10:26:24+00:00"
         },
         {
             "name": "symfony/translation-contracts",
@@ -3875,7 +3875,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.0.3"
+        "php": "^7.4|^8.0.3"
     },
     "platform-dev": [],
     "plugin-api-version": "2.0.0"

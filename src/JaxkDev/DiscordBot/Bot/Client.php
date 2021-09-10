@@ -19,8 +19,6 @@ use Error;
 use ErrorException;
 use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\Bot\Handlers\CommunicationHandler;
-use JaxkDev\DiscordBot\Bot\Handlers\LogStreamHandler;
-use JaxkDev\DiscordBot\Bot\Pocketmine\Utils;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use Monolog\Logger;
@@ -66,6 +64,7 @@ class Client{
 
         error_reporting(E_ALL & ~E_NOTICE);
         set_error_handler([$this, 'sysErrorHandler']);
+        set_exception_handler([$this, 'close']);
         register_shutdown_function([$this, 'close']);
 
         // Mono logger can have issues with other timezones, for now use UTC.
@@ -79,7 +78,6 @@ class Client{
         $handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['max_files'], Logger::DEBUG);
         $handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
         $this->logger->setHandlers(array($handler));
-        $this->logger->pushHandler(new LogStreamHandler($config["logging"]["debug"]));
 
         $socket_opts = [];
         if($config["discord"]["use_plugin_cacert"]){
@@ -265,7 +263,7 @@ class Client{
             ];
             $errno = $errorConversion[$error->getCode()]??$error->getCode();
             $this->logger->critical(get_class($error) . ": \"{$error->getMessage()}\" ({$errno}) in \"{$error->getFile()}\" at line {$error->getLine()}");
-            foreach(Utils::printableTrace($error->getTrace()) as $line){
+            foreach(self::printableTrace($error->getTrace()) as $line){
                 $this->logger->critical($line);
             }
         }
@@ -279,5 +277,64 @@ class Client{
         $this->logger->notice("Discord thread closed.");
         $this->logger->close();
         exit(0);
+    }
+
+    private static function cleanPath(string $path): string{
+        $result = str_replace([DIRECTORY_SEPARATOR, ".php", "phar://"], ["/", "", ""], $path);
+        $cleanPath = rtrim(str_replace([DIRECTORY_SEPARATOR, "phar://"], ["/", ""], \pocketmine\PATH), "/");
+        return str_starts_with($result, $cleanPath) ? ltrim(str_replace($cleanPath, "pmsrc", $result), "/") : $result;
+    }
+
+    /**
+     * PocketMine's prinatableTrace function.
+     *
+     * @param mixed[][] $trace
+     * @phpstan-param list<array<string, mixed>> $trace
+     *
+     * @return string[]
+     */
+    private static function printableTrace(array $trace, int $maxStringLength = 80) : array{
+        $messages = [];
+        for($i = 0; isset($trace[$i]); ++$i){
+            $params = "";
+            if(isset($trace[$i]["args"]) or isset($trace[$i]["params"])){
+                if(isset($trace[$i]["args"])){
+                    $args = $trace[$i]["args"];
+                }else{
+                    $args = $trace[$i]["params"];
+                }
+
+                $params = implode(", ", array_map(function($value) use($maxStringLength) : string{
+                    if(is_object($value)){
+                        try{
+                            $reflect = new \ReflectionClass($value);
+                            if($reflect->isAnonymous()){
+                                $name = "anonymous@" . ($reflect->getFileName() !== false ?
+                                        self::cleanPath($reflect->getFileName()) . "#L" . $reflect->getStartLine() :
+                                        "internal"
+                                    );
+                            }else{
+                                $name = $reflect->getName();
+                            }
+                        }catch(\ReflectionException $e){
+                            $name = "Unknown";
+                        }
+                        return "object " . $name . "#" . spl_object_id($value);
+                    }
+                    if(is_array($value)){
+                        return "array[" . count($value) . "]";
+                    }
+                    if(is_string($value)){
+                        return "string[" . strlen($value) . "] " . substr((preg_replace('#([^\x20-\x7E])#', '.', $value)??""), 0, $maxStringLength);
+                    }
+                    if(is_bool($value)){
+                        return $value ? "true" : "false";
+                    }
+                    return gettype($value) . " " . (preg_replace('#([^\x20-\x7E])#', '.', (string)$value)??"");
+                }, $args));
+            }
+            $messages[] = "#$i " . (isset($trace[$i]["file"]) ? self::cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . (preg_replace('#([^\x20-\x7E])#', '.', $params)??"") . ")";
+        }
+        return $messages;
     }
 }

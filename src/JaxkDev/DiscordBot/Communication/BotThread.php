@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Communication;
 
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use pocketmine\thread\Thread;
+use Thread;
 use Volatile;
 
 class BotThread extends Thread{
@@ -43,13 +43,11 @@ class BotThread extends Thread{
         $this->outboundData = $outboundData;
     }
 
-    public function onRun(): void{
-        new Client($this, (array)$this->initialConfig);
-    }
-
-    public function registerClassLoaders(): void{
+    public function run(): void{
         //Ignores everything outside our own files.
         require_once(\JaxkDev\DiscordBot\COMPOSER);
+
+        new Client($this, (array)$this->initialConfig);
     }
 
     public function readInboundData(int $count = 1): array{
@@ -76,9 +74,5 @@ class BotThread extends Thread{
 
     public function getStatus(): int{
         return $this->status;
-    }
-
-    public function getThreadName() : string{
-        return "Discord";
     }
 }
