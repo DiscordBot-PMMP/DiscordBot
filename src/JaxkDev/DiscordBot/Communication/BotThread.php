@@ -55,7 +55,7 @@ class BotThread extends Thread{
     }
 
     public function run(){
-        $this->logger->setLogDebug(true);
+        //$this->logger->setLogDebug(true);
         $this->logger->registerStatic();
 
         //Check for conflicts between pocketmines vendor and mine.

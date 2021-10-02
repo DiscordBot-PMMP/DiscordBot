@@ -312,9 +312,8 @@ array(5) {
 
     public function onPresenceUpdate(DiscordPresenceUpdate $presenceUpdate): void{
         $clientStatus = [
-            /** @phpstan-ignore-next-line Undocumented property client_status */
-            "desktop" => $presenceUpdate->client_status->desktop??null, /** @phpstan-ignore-next-line */
-            "mobile" => $presenceUpdate->client_status->mobile??null, /** @phpstan-ignore-next-line */
+            "desktop" => $presenceUpdate->client_status->desktop??null,
+            "mobile" => $presenceUpdate->client_status->mobile??null,
             "web" => $presenceUpdate->client_status->web??null
         ];
         $activities = [];
