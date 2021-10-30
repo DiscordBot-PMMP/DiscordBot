@@ -69,7 +69,7 @@ class Client{
 
         // Mono logger can have issues with other timezones, for now use UTC.
         // Must be set globally due to internal methods in the rotating file handler.
-        // Note, this does not effect outside thread config.
+        // Note, this does not affect outside thread config.
         ini_set("date.timezone", "UTC");
 
         Packet::$UID_COUNT = 1;
@@ -119,7 +119,7 @@ class Client{
 
     private function registerTimers(): void{
         // Handles shutdown, rather than a SHUTDOWN const to send through internal communication, set flag to closed.
-        // Saves time & will guarantee closure ASAP rather then waiting in line through ^
+        // Saves time & will guarantee closure ASAP rather than waiting in line through ^
         $this->client->getLoop()->addPeriodicTimer(1, function(){
             if($this->thread->getStatus() === BotThread::STATUS_CLOSING){
                 $this->close();
@@ -137,7 +137,6 @@ class Client{
                     }
                 });
             }else{
-                //Should never happen unless your internet speed is like <10kb/s
                 $this->logger->critical("Client failed to login/connect within 30 seconds, See log file for details.");
                 $this->close();
             }
