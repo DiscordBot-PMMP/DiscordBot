@@ -61,7 +61,7 @@ class Main extends PluginBase{
         }
         if (!function_exists('JaxkDev\DiscordBot\Libs\React\Promise\resolve')) {
             /** @noinspection PhpIncludeInspection */
-            require $phar.'/src/JaxkDev/DiscordBot/Libs/React/Promise/functions.php';
+            require $phar.'/src/Libs/React/Promise/functions.php';
         }
 
         if(!is_dir($this->getDataFolder()."logs")){

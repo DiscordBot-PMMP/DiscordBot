@@ -189,6 +189,7 @@ final class Promise implements PromiseInterface
         // Explicitly overwrite argument with null value. This ensure that this
         // argument does not show up in the stack trace in PHP 7+ only.
         $callback = $cb;
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $cb = null;
 
         // Use reflection to inspect number of arguments expected by this callback.

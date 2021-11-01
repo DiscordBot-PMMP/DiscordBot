@@ -315,7 +315,7 @@ class Client{
                             }else{
                                 $name = $reflect->getName();
                             }
-                        }catch(\ReflectionException $e){
+                        }/** @noinspection PhpUnusedLocalVariableInspection */catch(\ReflectionException $e){
                             $name = "Unknown";
                         }
                         return "object " . $name . "#" . spl_object_id($value);

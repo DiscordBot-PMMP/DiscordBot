@@ -317,7 +317,7 @@ function fatalError($error): void
 {
     try {
         \trigger_error($error, E_USER_ERROR);
-    } catch (\Throwable $e) {
+    }/** @noinspection PhpUnusedLocalVariableInspection */catch (\Throwable $e) {
         \set_error_handler(null);
         \trigger_error($error, E_USER_ERROR);
     }
@@ -350,7 +350,6 @@ function _checkTypehint(callable $callback, \Throwable $reason): bool
 
     $types = [$type];
 
-    /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
     if (PHP_VERSION_ID > 80000 and $type instanceof \ReflectionUnionType) {
         $types = $type->getTypes();
     }

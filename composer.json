@@ -11,7 +11,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "JaxkDev\\DiscordBot\\": "src/JaxkDev/DiscordBot"
+            "JaxkDev\\DiscordBot\\": "src"
         }
     },
     "repositories": [
@@ -26,8 +26,8 @@
         "react/promise": "v2.x-dev#c2525d2de231f0a4e565647f9a8f06b521ca658b"
     },
     "require-dev": {
-        "phpstan/phpstan": "0.12.98",
-        "pocketmine/pocketmine-mp": "4.0.0-BETA2"
+        "phpstan/phpstan": "^1.0",
+        "pocketmine/pocketmine-mp": "4.0.0-BETA8"
     },
     "minimum-stability": "dev"
 }
