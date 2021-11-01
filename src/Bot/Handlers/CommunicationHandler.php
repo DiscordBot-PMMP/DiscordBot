@@ -309,10 +309,10 @@ class CommunicationHandler{
             }, $arr));
             $val = array_keys($arr);
             $data = array_combine($keys, $val);
-            if($data === false){
+            /*if($data === false){
                 $promise->reject(new ApiRejection("Internal error occurred while updating role positions."));
                 throw new \AssertionError("Keys do not match the associated ID's of the role positions.  (If you see this please open a github issue.)");
-            }
+            }*/
             /** @var DiscordRole|null $k */
             $k = $arr[$role->getId()];
             if($k === null){

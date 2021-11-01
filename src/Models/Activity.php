@@ -351,6 +351,10 @@ class Activity implements \Serializable{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->name,
             $this->type,
@@ -374,6 +378,6 @@ class Activity implements \Serializable{
             $this->match_secret,*/
             $this->instance,
             $this->flags
-        ] = unserialize($data);
+        ] = $data;
     }
 }

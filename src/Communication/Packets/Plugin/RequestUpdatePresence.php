@@ -46,10 +46,14 @@ class RequestUpdatePresence extends Packet{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->UID,
             $this->activity,
             $this->status
-        ] = unserialize($data);
+        ] = $data;
     }
 }

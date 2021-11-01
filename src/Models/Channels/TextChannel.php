@@ -95,6 +95,10 @@ class TextChannel extends ServerChannel{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->id,
             $this->name,
@@ -106,6 +110,6 @@ class TextChannel extends ServerChannel{
             $this->nsfw,
             $this->rate_limit,
             $this->category_id
-        ] = unserialize($data);
+        ] = $data;
     }
 }

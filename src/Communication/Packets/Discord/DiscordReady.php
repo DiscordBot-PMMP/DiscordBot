@@ -21,6 +21,10 @@ class DiscordReady extends Packet{
     }
 
     public function unserialize($data): void{
-        $this->UID = unserialize($data);
+        $data = unserialize($data);
+        if(!is_int($data)){
+            throw new \AssertionError("Failed to unserialize packet UID to int, got '".gettype($data)."' instead.");
+        }
+        $this->UID = $data;
     }
 }

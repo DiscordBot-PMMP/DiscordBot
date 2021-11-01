@@ -144,6 +144,10 @@ class VoiceState implements \Serializable{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->session_id,
             $this->channel_id,
@@ -154,6 +158,6 @@ class VoiceState implements \Serializable{
             $this->self_stream,
             $this->self_video,
             $this->suppress
-        ] = unserialize($data);
+        ] = $data;
     }
 }

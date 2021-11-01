@@ -583,7 +583,7 @@
     <inspection_tool class="PhpPromotedFieldUsageInspection" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="PhpPropertyNamingConventionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PhpPropertyOnlyWrittenInspection" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="PhpPureAttributeCanBeAddedInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpPureAttributeCanBeAddedInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="PhpPureFunctionMayProduceSideEffectsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpRedundantAssignmentToPromotedFieldInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpRedundantAttributeParenthesisInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />

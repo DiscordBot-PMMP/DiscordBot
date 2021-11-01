@@ -164,6 +164,10 @@ class Invite implements \Serializable{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->code,
             $this->server_id,
@@ -174,6 +178,6 @@ class Invite implements \Serializable{
             $this->uses,
             $this->max_uses,
             $this->creator
-        ] = unserialize($data);
+        ] = $data;
     }
 }

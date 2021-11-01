@@ -133,6 +133,10 @@ abstract class Permissions implements \Serializable{
     }
 
     public function unserialize($data): void{
-        $this->bitwise = unserialize($data);
+        $data = unserialize($data);
+        if(!is_int($data)){
+            throw new \AssertionError("Failed to unserialize permission bitwise to int, got '".gettype($data)."' instead.");
+        }
+        $this->bitwise = $data;
     }
 }

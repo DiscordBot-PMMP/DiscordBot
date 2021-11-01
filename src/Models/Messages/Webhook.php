@@ -100,6 +100,10 @@ class Webhook extends Message{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->id,
             $this->content,
@@ -114,6 +118,6 @@ class Webhook extends Message{
             $this->roles_mentioned,
             $this->channels_mentioned,
             $this->webhook_id
-        ] = unserialize($data);
+        ] = $data;
     }
 }

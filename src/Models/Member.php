@@ -223,6 +223,10 @@ class Member implements \Serializable{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->user_id,
             $this->nickname,
@@ -235,6 +239,6 @@ class Member implements \Serializable{
             $this->client_status,
             $this->activities,
             $this->voice_state
-        ] = unserialize($data);
+        ] = $data;
     }
 }

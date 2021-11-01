@@ -181,6 +181,10 @@ class User implements \Serializable{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->id,
             $this->username,
@@ -188,6 +192,6 @@ class User implements \Serializable{
             $this->avatar_url,
             $this->bot,
             $this->flags_bitwise
-        ] = unserialize($data);
+        ] = $data;
     }
 }

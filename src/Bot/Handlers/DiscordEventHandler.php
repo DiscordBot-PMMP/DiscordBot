@@ -19,7 +19,6 @@ use Discord\Parts\Guild\Ban as DiscordBan;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
-use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
@@ -216,8 +215,12 @@ array(5) {
 
             $pk->addServer(ModelConverter::genModelServer($guild));
 
-            /** @var DiscordRolePermission $permissions */
-            $permissions = $guild->members->offsetGet($client->id)->getPermissions();
+            /** @var DiscordMember|null $m */
+            $m = $guild->members->offsetGet($client->id);
+            if($m === null){
+                throw new \AssertionError("Client member not found in guild '$guild->id'.");
+            }
+            $permissions = $m->getPermissions();
 
             if($permissions->ban_members){
                 /** @noinspection PhpUnhandledExceptionInspection */
@@ -338,11 +341,7 @@ array(5) {
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    /**
-     * @param DiscordMessage|\stdClass $data
-     * @param Discord                  $discord
-     */
-    public function onMessageDelete($data, Discord $discord): void{
+    public function onMessageDelete(DiscordMessage|\stdClass $data, Discord $discord): void{
         if($data instanceof DiscordMessage){
             $message = ModelConverter::genModelMessage($data);
         }else{

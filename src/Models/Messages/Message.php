@@ -269,6 +269,10 @@ class Message implements \Serializable{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->id,
             $this->content,
@@ -282,6 +286,6 @@ class Message implements \Serializable{
             $this->users_mentioned,
             $this->roles_mentioned,
             $this->channels_mentioned
-        ] = unserialize($data);
+        ] = $data;
     }
 }

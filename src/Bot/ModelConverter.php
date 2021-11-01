@@ -97,7 +97,12 @@ abstract class ModelConverter{
         $m = new Member($discordMember->id, $discordMember->joined_at === null ? 0 : $discordMember->joined_at->getTimestamp(),
             $discordMember->guild_id, [], $discordMember->nick, $discordMember->premium_since === null ? null : $discordMember->premium_since->getTimestamp());
 
-        $bitwise = $discordMember->guild->roles->offsetGet($discordMember->guild_id)->permissions->bitwise; //Everyone perms.
+        /** @var DiscordRole|null $r */
+        $r = $discordMember->guild->roles->offsetGet($discordMember->guild_id);
+        if($r === null){
+            throw new AssertionError("Everyone role not found for server '".$discordMember->guild_id."'.");
+        }
+        $bitwise = $r->permissions->bitwise; //Everyone perms.
         $roles = [];
 
         //O(2n) -> O(n) by using same loop for permissions to add roles.
@@ -210,6 +215,7 @@ abstract class ModelConverter{
             $discordChannel->parent_id, $discordChannel->id));
     }
 
+    //TODO Investigate several embeds in a single message.
     static public function genModelMessage(DiscordMessage $discordMessage): Message{
         if($discordMessage->author === null){
             throw new AssertionError("Discord message does not have a author, cannot generate model message.");
@@ -221,6 +227,7 @@ abstract class ModelConverter{
         $guild_id = $discordMessage->guild_id??($discordMessage->author instanceof DiscordMember ? $discordMessage->author->guild_id : null);
         if($discordMessage->type === DiscordMessage::TYPE_NORMAL){
             if($discordMessage->webhook_id === null){
+                /** @var DiscordEmbed|null $e */
                 $e = $discordMessage->embeds->first();
                 if($e !== null){
                     $e = self::genModelEmbed($e);
@@ -245,6 +252,7 @@ abstract class ModelConverter{
             if($discordMessage->referenced_message === null){
                 throw new AssertionError("No referenced message on a REPLY message.");
             }
+            /** @var DiscordEmbed|null $e */
             $e = $discordMessage->embeds->first();
             if($e !== null){
                 $e = self::genModelEmbed($e);

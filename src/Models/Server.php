@@ -129,6 +129,10 @@ class Server implements \Serializable{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->id,
             $this->name,
@@ -137,6 +141,6 @@ class Server implements \Serializable{
             $this->owner_id,
             $this->large,
             $this->member_count
-        ] = unserialize($data);
+        ] = $data;
     }
 }

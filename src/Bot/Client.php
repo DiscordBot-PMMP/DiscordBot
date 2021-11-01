@@ -258,7 +258,7 @@ class Client{
                 E_USER_DEPRECATED => "E_USER_DEPRECATED"
             ];
             $errno = $errorConversion[$error->getCode()]??$error->getCode();
-            $this->logger->critical(get_class($error) . ": \"{$error->getMessage()}\" ({$errno}) in \"{$error->getFile()}\" at line {$error->getLine()}");
+            $this->logger->critical(get_class($error) . ": \"{$error->getMessage()}\" (".strval($errno).") in \"{$error->getFile()}\" at line {$error->getLine()}");
             foreach(self::printableTrace($error->getTrace()) as $line){
                 $this->logger->critical($line);
             }
@@ -299,6 +299,9 @@ class Client{
                 }else{
                     $args = $trace[$i]["params"];
                 }
+                if(!is_array($args)){
+                    $args = [$args];
+                }
 
                 $params = implode(", ", array_map(function($value) use($maxStringLength) : string{
                     if(is_object($value)){
@@ -326,10 +329,10 @@ class Client{
                     if(is_bool($value)){
                         return $value ? "true" : "false";
                     }
-                    return gettype($value) . " " . (preg_replace('#([^\x20-\x7E])#', '.', (string)$value)??"");
+                    return gettype($value) . " " . (preg_replace('#([^\x20-\x7E])#', '.', strval($value))??"");
                 }, $args));
             }
-            $messages[] = "#$i " . (isset($trace[$i]["file"]) ? self::cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . (preg_replace('#([^\x20-\x7E])#', '.', $params)??"") . ")";
+            $messages[] = "#$i " . ((isset($trace[$i]["file"]) && is_string($trace[$i]["file"])) ? self::cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . (preg_replace('#([^\x20-\x7E])#', '.', $params)??"") . ")";
         }
         return $messages;
     }

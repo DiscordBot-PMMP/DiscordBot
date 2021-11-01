@@ -208,6 +208,7 @@ META);
     private function loadConfig(): bool{
         $this->getLogger()->debug("Loading configuration...");
 
+        /** @var array<string, mixed>|false $config */
         $config = yaml_parse_file($this->getDataFolder()."config.yml");
         if($config === false or !is_int($config["version"]??"")){
             $this->getLogger()->critical("Failed to parse config.yml");
@@ -215,8 +216,8 @@ META);
             return false;
         }
 
-        if($config["version"] !== ConfigUtils::VERSION){
-            $this->getLogger()->info("Updating your config from v{$config["version"]} to v".ConfigUtils::VERSION);
+        if(intval($config["version"]) !== ConfigUtils::VERSION){
+            $this->getLogger()->info("Updating your config from v".intval($config["version"])." to v".ConfigUtils::VERSION);
             ConfigUtils::update($config);
             rename($this->getDataFolder()."config.yml", $this->getDataFolder()."config.yml.old");
             yaml_emit_file($this->getDataFolder()."config.yml", $config);

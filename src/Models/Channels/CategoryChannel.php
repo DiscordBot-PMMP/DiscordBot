@@ -40,6 +40,10 @@ class CategoryChannel extends ServerChannel{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->id,
             $this->name,
@@ -47,6 +51,6 @@ class CategoryChannel extends ServerChannel{
             $this->member_permissions,
             $this->role_permissions,
             $this->server_id
-        ] = unserialize($data);
+        ] = $data;
     }
 }

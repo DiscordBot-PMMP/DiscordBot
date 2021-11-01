@@ -145,6 +145,10 @@ class Role implements \Serializable{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->id,
             $this->name,
@@ -154,6 +158,6 @@ class Role implements \Serializable{
             $this->hoisted,
             $this->hoisted_position,
             $this->server_id
-        ] = unserialize($data);
+        ] = $data;
     }
 }

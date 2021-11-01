@@ -45,10 +45,14 @@ class RequestKickMember extends Packet{
     }
 
     public function unserialize($data): void{
+        $data = unserialize($data);
+        if(!is_array($data)){
+            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+        }
         [
             $this->UID,
             $this->server_id,
             $this->user_id
-        ] = unserialize($data);
+        ] = $data;
     }
 }
