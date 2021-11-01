@@ -173,7 +173,7 @@ class Message implements \Serializable{
     /**
      * Notice, these will not work when sending/updating messages, its for INBOUND ONLY.
      *
-     * @var Attachment[] $attachments
+     * @param Attachment[] $attachments
      */
     public function setAttachments(array $attachments): void{
         foreach($attachments as $attachment){

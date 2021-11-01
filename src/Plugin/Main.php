@@ -298,6 +298,7 @@ META);
 
     /**
      * @return never-return
+     * @noinspection PhpDocSignatureInspection
      */
     public function getConfig(): Config{
         throw new PluginException("getConfig() is not used, see Main::getPluginConfig()");

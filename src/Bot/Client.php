@@ -45,11 +45,9 @@ class Client{
 
     /** @var TimerInterface|null */
     private $readyTimer;
-    /** @var TimerInterface|null */
-    private $tickTimer;
 
     /** @var int */
-    private $tickCount;
+    private $tickCount = 0;
     /** @var int */
     private $lastGCCollection = 0;
 
@@ -142,7 +140,7 @@ class Client{
             }
         });
 
-        $this->tickTimer = $this->client->getLoop()->addPeriodicTimer(1/20, function(){
+        $this->client->getLoop()->addPeriodicTimer(1/20, function(){
             // Note this is not accurate/fixed dynamically to 1/20th of a second.
             $this->tick();
         });
@@ -233,7 +231,6 @@ class Client{
         }
     }
 
-    /** @var array $data */
     public function discordErrorHandler(array $data): void{
         $this->close($data[0]??null);
     }

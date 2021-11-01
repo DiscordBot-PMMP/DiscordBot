@@ -373,7 +373,7 @@ array(5) {
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    /** @var \stdClass{"message_id": string, "emoji": \stdClass{"name": string}, "channel_id": string, "guild_id": string} $data */
+    /* \stdClass{"message_id": string, "emoji": \stdClass{"name": string}, "channel_id": string, "guild_id": string} */
     public function onMessageReactionRemoveEmoji(\stdClass $data): void{
         $this->client->getThread()->writeOutboundData(new MessageReactionRemoveEmojiPacket($data->message_id, $data->channel_id, $data->emoji->name));
     }
