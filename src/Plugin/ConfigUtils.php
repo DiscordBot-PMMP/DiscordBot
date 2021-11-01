@@ -15,17 +15,18 @@ namespace JaxkDev\DiscordBot\Plugin;
 
 abstract class ConfigUtils{
 
-    const VERSION = 2;
+    const VERSION = 3;
 
     // Map all versions to a static function.
     private const _PATCH_MAP = [
-        1 => "patch_1"
+        1 => "patch_1",
+        2 => "patch_2"
     ];
 
     static public function update(array &$config): void{
         for($i = (int)$config["version"]; $i < self::VERSION; $i += 1){
-            $f = self::_PATCH_MAP[$i];
-            $config = forward_static_call([self::class, $f], $config);
+            /** @phpstan-ignore-next-line */
+            $config = forward_static_call([self::class, self::_PATCH_MAP[$i]], $config);
         }
     }
 
@@ -56,6 +57,12 @@ abstract class ConfigUtils{
                 "heartbeat_allowance" => 60
             ];
         }
+        return $config;
+    }
+
+    static private function patch_2(array $config): array{
+        $config["version"] = 3;
+        unset($config["logging"]["debug"]);
         return $config;
     }
 
@@ -97,14 +104,6 @@ abstract class ConfigUtils{
         if(!array_key_exists("logging", $config) or $config["logging"] === null){
             $result[] = "No 'logging' field found.";
         }else{
-            if(!array_key_exists("debug", $config["logging"])  or $config["logging"]["debug"] === null){
-                $result[] = "No 'logging.debug' value found.";
-            }else{
-                if(!is_bool($config["logging"]["debug"])){
-                    $result[] = "Invalid 'logging.debug' ({$config["logging"]["debug"]}), should be true or false.";
-                }
-            }
-
             if(!array_key_exists("max_files", $config["logging"]) or $config["logging"]["max_files"] === null){
                 $result[] = "No 'logging.max_files' field found.";
             }else{

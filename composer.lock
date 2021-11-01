@@ -2662,12 +2662,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/BedrockProtocol.git",
-                "reference": "146498c279b3dc645ab6b8cdf45f7b96d8a33f8b"
+                "reference": "c76e31fc948f58ad2b788679c84335684396d025"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/BedrockProtocol/zipball/146498c279b3dc645ab6b8cdf45f7b96d8a33f8b",
-                "reference": "146498c279b3dc645ab6b8cdf45f7b96d8a33f8b",
+                "url": "https://api.github.com/repos/pmmp/BedrockProtocol/zipball/c76e31fc948f58ad2b788679c84335684396d025",
+                "reference": "c76e31fc948f58ad2b788679c84335684396d025",
                 "shasum": ""
             },
             "require": {
@@ -2681,9 +2681,9 @@
                 "ramsey/uuid": "^4.1"
             },
             "require-dev": {
-                "phpstan/phpstan": "0.12.99",
-                "phpstan/phpstan-phpunit": "^0.12.21",
-                "phpstan/phpstan-strict-rules": "^0.12.10",
+                "phpstan/phpstan": "1.0.0",
+                "phpstan/phpstan-phpunit": "^1.0.0",
+                "phpstan/phpstan-strict-rules": "^1.0.0",
                 "phpunit/phpunit": "^9.5"
             },
             "default-branch": true,
@@ -2702,7 +2702,7 @@
                 "issues": "https://github.com/pmmp/BedrockProtocol/issues",
                 "source": "https://github.com/pmmp/BedrockProtocol/tree/master"
             },
-            "time": "2021-11-01T15:46:55+00:00"
+            "time": "2021-11-01T18:59:44+00:00"
         },
         {
             "name": "pocketmine/binaryutils",
@@ -2800,12 +2800,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/ClassLoader.git",
-                "reference": "80226e0917be79ac3230606113e25134a31e6a85"
+                "reference": "8027a61395c08cee128ebd8e8fe30b655b9f1475"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/ClassLoader/zipball/80226e0917be79ac3230606113e25134a31e6a85",
-                "reference": "80226e0917be79ac3230606113e25134a31e6a85",
+                "url": "https://api.github.com/repos/pmmp/ClassLoader/zipball/8027a61395c08cee128ebd8e8fe30b655b9f1475",
+                "reference": "8027a61395c08cee128ebd8e8fe30b655b9f1475",
                 "shasum": ""
             },
             "require": {
@@ -2837,7 +2837,7 @@
                 "issues": "https://github.com/pmmp/ClassLoader/issues",
                 "source": "https://github.com/pmmp/ClassLoader/tree/master"
             },
-            "time": "2021-05-29T23:09:32+00:00"
+            "time": "2021-11-01T19:17:10+00:00"
         },
         {
             "name": "pocketmine/color",

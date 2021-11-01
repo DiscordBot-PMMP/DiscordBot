@@ -16,8 +16,6 @@ discord:
   use_plugin_cacert: true|false   DO NOT modify this without being told to explicitly, You have been warned...
 
 logging:
-  debug: false|true               UNUSED OPTION WILL BE REMOVED IN V3
-                                  messages are logged to plugin_data/DiscordBot/logs by default.
   max_files: 28                   How many log files to keep on disk at any one time.
   directory: "logs"               What directory to keep log files in, relative from plugin_data/DiscordBot/
 
