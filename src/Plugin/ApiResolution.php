@@ -18,7 +18,7 @@ class ApiResolution{
     private $data;
 
     public function __construct(array $data = []){
-        if(sizeof($data) === 0){
+        if(sizeof($data) === 0 or !is_string($data[0])){
             throw new \AssertionError("Expected data for ApiResolution to contain at least a message.");
         }
         $this->data = $data;
