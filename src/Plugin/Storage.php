@@ -80,6 +80,13 @@ class Storage{
     /** @var int */
     private static $timestamp = 0;
 
+    /**
+     * @return Server[]
+     */
+    public static function getServers(): array{
+        return array_values(self::$server_map);
+    }
+
     public static function getServer(string $id): ?Server{
         return self::$server_map[$id] ?? null;
     }
@@ -117,7 +124,7 @@ class Storage{
         unset(self::$channel_server_map[$server_id]);
         //Remove servers category's.
         foreach(self::$category_server_map[$server_id] as $cid){
-            unset(self::$channel_map[$cid]); //Category's are channels.
+            unset(self::$channel_map[$cid]); //Categories are channels.
         }
         unset(self::$channel_server_map[$server_id]);
         //Remove servers members.
@@ -280,12 +287,31 @@ class Storage{
         array_splice(self::$member_server_map[$server_id], $i, 1);
     }
 
+    /**
+     * @return User[]
+     */
+    public static function getUsers(): array{
+        return array_values(self::$user_map);
+    }
+
     public static function getUser(string $id): ?User{
         return self::$user_map[$id] ?? null;
     }
 
     public static function addUser(User $user): void{
         self::$user_map[$user->getId()] = $user;
+    }
+
+    /**
+     * Same function as addUser because no links are kept for users.
+     * @param User $user
+     */
+    public static function updateUser(User $user): void{
+        self::addUser($user);
+    }
+
+    public static function removeUser(string $user_id): void{
+        unset(self::$user_map[$user_id]);
     }
 
     /**
@@ -315,19 +341,6 @@ class Storage{
      */
     public static function unsetMembersVoiceChannel(string $member_id): void{
         unset(self::$voiceChannelmember_map[$member_id]);
-    }
-
-    /**
-     * Same function as addUser because no links are kept for users.
-     * @param User $user
-     */
-    public static function updateUser(User $user): void{
-        //No links can overwrite.
-        self::addUser($user);
-    }
-
-    public static function removeUser(string $user_id): void{
-        unset(self::$user_map[$user_id]);
     }
 
     public static function getRole(string $id): ?Role{
@@ -384,10 +397,18 @@ class Storage{
     }
 
     /**
+     * @deprecated Will be removed in v3.0, use Storage::getBansByServer() instead.
+     * @see Storage::getBansByServer()
+     */
+    public static function getServerBans(string $server_id): array{
+        return self::getBansByServer($server_id);
+    }
+
+    /**
      * @param string $server_id
      * @return Ban[]
      */
-    public static function getServerBans(string $server_id): array{
+    public static function getBansByServer(string $server_id): array{
         $bans = [];
         foreach((self::$ban_server_map[$server_id]??[]) as $member){
             $b = self::getBan($member);
