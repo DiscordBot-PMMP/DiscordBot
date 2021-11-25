@@ -27,7 +27,7 @@
     },
     "require-dev": {
         "phpstan/phpstan": "^1.0",
-        "pocketmine/pocketmine-mp": "4.0.0-BETA8"
+        "pocketmine/pocketmine-mp": "4.0.0-BETA13"
     },
     "minimum-stability": "dev"
 }

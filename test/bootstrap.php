@@ -19,3 +19,8 @@
 define('JaxkDev\DiscordBot\COMPOSER', "");
 define('JaxkDev\DiscordBot\VERSION', "");
 define('JaxkDev\DiscordBot\DATA_PATH', "");
+
+//JIT Should also be disabled for PHPStan analysis as it hangs on analysis.
+
+//OPCache should also be disabled because of https://github.com/phpstan/phpstan/issues/5503
+ini_set('opcache.enable', 'off');
