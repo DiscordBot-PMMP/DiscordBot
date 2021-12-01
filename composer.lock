@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ec53afb798617234c172de54476f4a6",
+    "content-hash": "9082bdc54a883dfa74973d347c3dca0f",
     "packages": [
         {
             "name": "discord-php/http",
@@ -1449,16 +1449,16 @@
         },
         {
             "name": "react/socket",
-            "version": "v1.9.0",
+            "version": "v1.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "aa6e3f8ebcd6dec3ad1ee92a449b4cc341994001"
+                "reference": "d132fde589ea97f4165f2d94b5296499eac125ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/aa6e3f8ebcd6dec3ad1ee92a449b4cc341994001",
-                "reference": "aa6e3f8ebcd6dec3ad1ee92a449b4cc341994001",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/d132fde589ea97f4165f2d94b5296499eac125ec",
+                "reference": "d132fde589ea97f4165f2d94b5296499eac125ec",
                 "shasum": ""
             },
             "require": {
@@ -1517,7 +1517,7 @@
             ],
             "support": {
                 "issues": "https://github.com/reactphp/socket/issues",
-                "source": "https://github.com/reactphp/socket/tree/v1.9.0"
+                "source": "https://github.com/reactphp/socket/tree/v1.10.0"
             },
             "funding": [
                 {
@@ -1529,7 +1529,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-08-03T12:37:06+00:00"
+            "time": "2021-11-29T10:08:24+00:00"
         },
         {
             "name": "react/stream",
@@ -1762,6 +1762,7 @@
                 "symfony/polyfill-php73": "~1.0",
                 "symfony/polyfill-php80": "^1.16"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -1793,7 +1794,7 @@
                 "options"
             ],
             "support": {
-                "source": "https://github.com/symfony/options-resolver/tree/5.4"
+                "source": "https://github.com/symfony/options-resolver/tree/v5.4.0"
             },
             "funding": [
                 {
@@ -1817,12 +1818,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "11b9acb5e8619aef6455735debf77dde8825795c"
+                "reference": "0abb51d2f102e00a4eefcf46ba7fec406d245825"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/11b9acb5e8619aef6455735debf77dde8825795c",
-                "reference": "11b9acb5e8619aef6455735debf77dde8825795c",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/0abb51d2f102e00a4eefcf46ba7fec406d245825",
+                "reference": "0abb51d2f102e00a4eefcf46ba7fec406d245825",
                 "shasum": ""
             },
             "require": {
@@ -1893,7 +1894,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-10-20T20:35:02+00:00"
+            "time": "2021-11-30T18:21:41+00:00"
         },
         {
             "name": "symfony/polyfill-php73",
@@ -2065,12 +2066,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation.git",
-                "reference": "a8d3ff260f433bd4ad5c13d909cbcffa4d59d64f"
+                "reference": "6fe32b10e912a518805bc9eafc2a87145773cf13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/a8d3ff260f433bd4ad5c13d909cbcffa4d59d64f",
-                "reference": "a8d3ff260f433bd4ad5c13d909cbcffa4d59d64f",
+                "url": "https://api.github.com/repos/symfony/translation/zipball/6fe32b10e912a518805bc9eafc2a87145773cf13",
+                "reference": "6fe32b10e912a518805bc9eafc2a87145773cf13",
                 "shasum": ""
             },
             "require": {
@@ -2109,6 +2110,7 @@
                 "symfony/config": "",
                 "symfony/yaml": ""
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -2138,7 +2140,7 @@
             "description": "Provides tools to internationalize your application",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/translation/tree/5.4"
+                "source": "https://github.com/symfony/translation/tree/v5.4.0"
             },
             "funding": [
                 {
@@ -2154,7 +2156,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-11-23T15:25:16+00:00"
+            "time": "2021-11-29T15:30:56+00:00"
         },
         {
             "name": "symfony/translation-contracts",
@@ -2599,12 +2601,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "76bb6d2565415683718a6b5f447336b79ca9ff56"
+                "reference": "ac62ac72759c053f79fb7692f9e84dad646bd443"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/76bb6d2565415683718a6b5f447336b79ca9ff56",
-                "reference": "76bb6d2565415683718a6b5f447336b79ca9ff56",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/ac62ac72759c053f79fb7692f9e84dad646bd443",
+                "reference": "ac62ac72759c053f79fb7692f9e84dad646bd443",
                 "shasum": ""
             },
             "require": {
@@ -2621,7 +2623,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.2-dev"
+                    "dev-master": "1.3-dev"
                 }
             },
             "autoload": {
@@ -2656,20 +2658,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-11-24T09:30:59+00:00"
+            "time": "2021-12-01T16:18:59+00:00"
         },
         {
             "name": "pocketmine/bedrock-data",
-            "version": "1.4.0+bedrock-1.17.40",
+            "version": "1.5.0+bedrock-1.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/BedrockData.git",
-                "reference": "f29b7be8fa3046d2ee4c6421485b97b3f5b07774"
+                "reference": "482c679aa5ed0b81c088c2b1ff0b8110a94c8a6c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/BedrockData/zipball/f29b7be8fa3046d2ee4c6421485b97b3f5b07774",
-                "reference": "f29b7be8fa3046d2ee4c6421485b97b3f5b07774",
+                "url": "https://api.github.com/repos/pmmp/BedrockData/zipball/482c679aa5ed0b81c088c2b1ff0b8110a94c8a6c",
+                "reference": "482c679aa5ed0b81c088c2b1ff0b8110a94c8a6c",
                 "shasum": ""
             },
             "type": "library",
@@ -2680,22 +2682,22 @@
             "description": "Blobs of data generated from Minecraft: Bedrock Edition, used by PocketMine-MP",
             "support": {
                 "issues": "https://github.com/pmmp/BedrockData/issues",
-                "source": "https://github.com/pmmp/BedrockData/tree/bedrock-1.17.40"
+                "source": "https://github.com/pmmp/BedrockData/tree/bedrock-1.18.0"
             },
-            "time": "2021-10-19T16:55:41+00:00"
+            "time": "2021-11-30T18:30:46+00:00"
         },
         {
             "name": "pocketmine/bedrock-protocol",
-            "version": "6.0.0+bedrock-1.17.40",
+            "version": "7.0.0+bedrock-1.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/BedrockProtocol.git",
-                "reference": "906bafec4fc41f548749ce01d120902b25c1bbfe"
+                "reference": "040a883a4abb8c9b93114d5278cb5fecc635da82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/BedrockProtocol/zipball/906bafec4fc41f548749ce01d120902b25c1bbfe",
-                "reference": "906bafec4fc41f548749ce01d120902b25c1bbfe",
+                "url": "https://api.github.com/repos/pmmp/BedrockProtocol/zipball/040a883a4abb8c9b93114d5278cb5fecc635da82",
+                "reference": "040a883a4abb8c9b93114d5278cb5fecc635da82",
                 "shasum": ""
             },
             "require": {
@@ -2727,9 +2729,9 @@
             "description": "An implementation of the Minecraft: Bedrock Edition protocol in PHP",
             "support": {
                 "issues": "https://github.com/pmmp/BedrockProtocol/issues",
-                "source": "https://github.com/pmmp/BedrockProtocol/tree/6.0.0+bedrock-1.17.40"
+                "source": "https://github.com/pmmp/BedrockProtocol/tree/7.0.0+bedrock-1.18.0"
             },
-            "time": "2021-11-21T20:56:18+00:00"
+            "time": "2021-11-30T19:02:41+00:00"
         },
         {
             "name": "pocketmine/binaryutils",
@@ -2944,16 +2946,16 @@
         },
         {
             "name": "pocketmine/locale-data",
-            "version": "2.0.18",
+            "version": "2.0.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/Language.git",
-                "reference": "fd091545149a80250f7717d27cc477afece1a81b"
+                "reference": "a6e4eb22587e0014f6d658732cf633262723f8d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/Language/zipball/fd091545149a80250f7717d27cc477afece1a81b",
-                "reference": "fd091545149a80250f7717d27cc477afece1a81b",
+                "url": "https://api.github.com/repos/pmmp/Language/zipball/a6e4eb22587e0014f6d658732cf633262723f8d3",
+                "reference": "a6e4eb22587e0014f6d658732cf633262723f8d3",
                 "shasum": ""
             },
             "type": "library",
@@ -2961,9 +2963,9 @@
             "description": "Language resources used by PocketMine-MP",
             "support": {
                 "issues": "https://github.com/pmmp/Language/issues",
-                "source": "https://github.com/pmmp/Language/tree/2.0.18"
+                "source": "https://github.com/pmmp/Language/tree/2.0.20"
             },
-            "time": "2021-11-21T21:12:17+00:00"
+            "time": "2021-11-25T20:56:12+00:00"
         },
         {
             "name": "pocketmine/log",
@@ -3135,22 +3137,22 @@
         },
         {
             "name": "pocketmine/pocketmine-mp",
-            "version": "4.0.0-BETA13",
+            "version": "4.0.0-BETA15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "9338d427429393f701f2b506178434cf46ed5023"
+                "reference": "d560cf17fc2496161c375324ec3fb52f17057c25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/9338d427429393f701f2b506178434cf46ed5023",
-                "reference": "9338d427429393f701f2b506178434cf46ed5023",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/d560cf17fc2496161c375324ec3fb52f17057c25",
+                "reference": "d560cf17fc2496161c375324ec3fb52f17057c25",
                 "shasum": ""
             },
             "require": {
                 "adhocore/json-comment": "^1.1",
                 "composer-runtime-api": "^2.0",
-                "ext-chunkutils2": "^0.3.0",
+                "ext-chunkutils2": "^0.3.1",
                 "ext-crypto": "^0.3.1",
                 "ext-ctype": "*",
                 "ext-curl": "*",
@@ -3177,8 +3179,8 @@
                 "netresearch/jsonmapper": "^4.0",
                 "php": "^8.0",
                 "php-64bit": "*",
-                "pocketmine/bedrock-data": "^1.4.0+bedrock-1.17.40",
-                "pocketmine/bedrock-protocol": "^6.0.0+bedrock-1.17.40",
+                "pocketmine/bedrock-data": "^1.5.0+bedrock-1.18.0",
+                "pocketmine/bedrock-protocol": "^7.0.0+bedrock-1.18.0",
                 "pocketmine/binaryutils": "^0.2.1",
                 "pocketmine/callback-validator": "^1.0.2",
                 "pocketmine/classloader": "^0.2.0",
@@ -3218,7 +3220,7 @@
             "homepage": "https://pmmp.io",
             "support": {
                 "issues": "https://github.com/pmmp/PocketMine-MP/issues",
-                "source": "https://github.com/pmmp/PocketMine-MP/tree/4.0.0-BETA13"
+                "source": "https://github.com/pmmp/PocketMine-MP/tree/4.0.0-BETA15"
             },
             "funding": [
                 {
@@ -3230,7 +3232,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-11-25T00:40:40+00:00"
+            "time": "2021-11-30T19:27:04+00:00"
         },
         {
             "name": "pocketmine/raklib",
