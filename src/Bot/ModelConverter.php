@@ -82,7 +82,7 @@ abstract class ModelConverter{
         $party = $discordActivity->party;
         /** @var \stdClass{"large_image" => string|null, "large_text" => string|null, "small_image" => string|null, "small_text" => string|null} $assets */
         $assets = $discordActivity->assets;
-        //** @var \stdClass{"join" => string|null, "spectate" => string|null, "match" => string|null} $secrets  TODO, Cant confirm this. no one has any secrets so I cant see any valid data. */
+        //** @var \stdClass{"join" => string|null, "spectate" => string|null, "match" => string|null} $secrets  TODO, Still cant confirm this. no one has any secrets so I cant see any valid data. */
         //$secrets = $discordActivity->secrets;
         return new Activity($discordActivity->name, $discordActivity->type, $discordActivity->created_at->getTimestamp(),
             $discordActivity->url, $timestamps->start??null, $timestamps->end??null,
@@ -215,7 +215,7 @@ abstract class ModelConverter{
             $discordChannel->parent_id, $discordChannel->id));
     }
 
-    //TODO Investigate several embeds in a single message.
+    //TODO allow several embeds in a single normal message.
     static public function genModelMessage(DiscordMessage $discordMessage): Message{
         if($discordMessage->author === null){
             throw new AssertionError("Discord message does not have a author, cannot generate model message.");
