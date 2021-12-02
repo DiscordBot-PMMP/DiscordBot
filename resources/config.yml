@@ -1,12 +1,11 @@
 ---
-version: 2
+version: 3
 
 discord:
   token: "Long Token here."
   use_plugin_cacert: true
 
 logging:
-  debug: false
   max_files: 28
   directory: "logs"
 

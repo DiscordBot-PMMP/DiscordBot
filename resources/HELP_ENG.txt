@@ -16,8 +16,6 @@ discord:
   use_plugin_cacert: true|false   DO NOT modify this without being told to explicitly, You have been warned...
 
 logging:
-  debug: false|true               Log all discord thread information to screen/console,
-                                  messages are logged to server.log and DiscordBot/logs by default.
   max_files: 28                   How many log files to keep on disk at any one time.
   directory: "logs"               What directory to keep log files in, relative from plugin_data/DiscordBot/
 

@@ -1,15 +1,20 @@
 name: DiscordBot
-version: 2.0.4
+version: 2.1.0
 author: JaxkDev
+src-namespace-prefix: JaxkDev\DiscordBot
 main: JaxkDev\DiscordBot\Plugin\Main
 description: Plugin to host a discord bot using DiscordPHP with a react\promise API !
 website: https://github.com/DiscordBot-PMMP/DiscordBot
 
-api: 3.7.0
+api: 4.0.0
 extensions:
-  core: ">=7.4" #aka PHP Version.
+  core: ">=8.0.3" #aka PHP Version.
 
 commands:
   debugdiscord:
-    permission: op
+    permission: discordbot.debugdiscord
     description: Debug use only, provides a single file to attach to issues etc helpful when debugging issues.
+
+permissions:
+  discordbot.debugdiscord:
+    default: op

@@ -3,7 +3,7 @@
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
- * Copyright (C) 2020-2021 JaxkDev
+ * Copyright (C) 2020-present JaxkDev
  *
  * Twitter :: @JaxkDev
  * Discord :: JaxkDev#2698
@@ -20,6 +20,7 @@ define('JaxkDev\DiscordBot\COMPOSER', "");
 define('JaxkDev\DiscordBot\VERSION', "");
 define('JaxkDev\DiscordBot\DATA_PATH', "");
 
-define("pocketmine\COMPOSER_AUTOLOADER_PATH", "");
-define("pocketmine\VERSION", "");
-define("pocketmine\GIT_COMMIT", "");
+//JIT Should also be disabled for PHPStan analysis as it hangs on analysis.
+
+//OPCache should also be disabled because of https://github.com/phpstan/phpstan/issues/5503
+ini_set('opcache.enable', 'off');
