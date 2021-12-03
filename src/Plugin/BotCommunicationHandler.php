@@ -151,7 +151,7 @@ class BotCommunicationHandler{
         if($state->getChannelId() === null){
             $channel = Storage::getMembersVoiceChannel($packet->getMemberId());
             if($channel === null){
-                throw new \AssertionError("Voice Channel '{$state->getChannelId()}' not found in storage.");
+                throw new \AssertionError("Voice Channel for leaving member '{$packet->getMemberId()}' not found in storage.");
             }
             (new VoiceChannelMemberLeftEvent($this->plugin, $member, $channel))->call();
             $member->setVoiceState(null);
@@ -412,6 +412,11 @@ class BotCommunicationHandler{
         }
         foreach($packet->getChannels() as $channel){
             Storage::addChannel($channel);
+            if($channel instanceof VoiceChannel){
+                foreach($channel->getMembers() as $member){
+                    Storage::setMembersVoiceChannel($member, $channel->getId());
+                }
+            }
         }
         foreach($packet->getRoles() as $role){
             Storage::addRole($role);

@@ -45,7 +45,7 @@ class Storage{
     private static $category_server_map = [];
 
     /** @var Array<string, string> Link member to voice channel they're currently in. */
-    private static $voiceChannelmember_map = [];
+    private static $voiceChannel_member_map = [];
 
     /** @var Array<string, Member> */
     private static $member_map = [];
@@ -321,7 +321,7 @@ class Storage{
         if(!((self::$channel_map[$voice_channel_id]??null) instanceof VoiceChannel)){
             throw new \AssertionError("Voice channel '$voice_channel_id' does not exist in storage.");
         }
-        self::$voiceChannelmember_map[$member_id] = $voice_channel_id;
+        self::$voiceChannel_member_map[$member_id] = $voice_channel_id;
     }
 
     /**
@@ -331,7 +331,7 @@ class Storage{
      * @return VoiceChannel|null
      */
     public static function getMembersVoiceChannel(string $member_id): ?VoiceChannel{
-        if(($id = self::$voiceChannelmember_map[$member_id]??null) === null) return null;
+        if(($id = self::$voiceChannel_member_map[$member_id]??null) === null) return null;
         $c = self::$channel_map[$id];
         return ($c instanceof VoiceChannel) ? $c : null;
     }
@@ -340,7 +340,7 @@ class Storage{
      * @internal
      */
     public static function unsetMembersVoiceChannel(string $member_id): void{
-        unset(self::$voiceChannelmember_map[$member_id]);
+        unset(self::$voiceChannel_member_map[$member_id]);
     }
 
     public static function getRole(string $id): ?Role{
