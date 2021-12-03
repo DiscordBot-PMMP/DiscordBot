@@ -414,7 +414,7 @@ class BotCommunicationHandler{
             Storage::addChannel($channel);
             if($channel instanceof VoiceChannel){
                 foreach($channel->getMembers() as $member){
-                    Storage::setMembersVoiceChannel($member, $channel->getId());
+                    Storage::setMembersVoiceChannel($member, $channel->getId()??"Never null here");
                 }
             }
         }
