@@ -2,7 +2,7 @@
 
 Would love to have this as a github site, However i don't have the time.
 
-**Version 2.0.x documentation.**
+**Version 2.x documentation.**
 
 ---
 
