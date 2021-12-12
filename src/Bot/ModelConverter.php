@@ -249,16 +249,13 @@ abstract class ModelConverter{
                     array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));
             }
         }elseif($discordMessage->type === DiscordMessage::TYPE_REPLY){
-            if($discordMessage->referenced_message === null){
-                throw new AssertionError("No referenced message on a REPLY message.");
-            }
             /** @var DiscordEmbed|null $e */
             $e = $discordMessage->embeds->first();
             if($e !== null){
                 $e = self::genModelEmbed($e);
             }
             $author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
-            return new ReplyMessage($discordMessage->channel_id, $discordMessage->referenced_message->id, $discordMessage->id,
+            return new ReplyMessage($discordMessage->channel_id, $discordMessage->referenced_message?->id, $discordMessage->id,
                 $discordMessage->content, $e, $author, $guild_id, $discordMessage->timestamp->getTimestamp(), $attachments,
                 $discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
                 array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));
