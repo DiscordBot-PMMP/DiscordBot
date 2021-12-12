@@ -22,7 +22,7 @@
     ],
     "require": {
         "php": "^8.0.3",
-        "team-reflex/discord-php": "v6.0.2",
+        "team-reflex/discord-php": "v6.0.3",
         "react/promise": "v2.x-dev#c2525d2de231f0a4e565647f9a8f06b521ca658b"
     },
     "require-dev": {
