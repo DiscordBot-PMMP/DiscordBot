@@ -157,10 +157,16 @@ class Activity implements \Serializable{
     }
 
     public function setUrl(?string $url): void{
-        if($url !== null){
-            if(strpos($url, "https://twitch.tv/") !== 0 and strpos($url, "https://youtube.com/") !== 0){
+        /*
+        // Discord says it checks when type is streaming, but it seems it doesn't, both inbound and outbound...
+        if($url !== null and $this->type === self::TYPE_STREAMING){
+            if(!str_starts_with($url, "https://twitch.tv/") and !str_starts_with($url, "https://youtube.com/")){
                 throw new \AssertionError("Invalid url '$url'.");
             }
+        }
+        */
+        if($url !== null and !str_starts_with($url, "https://")){
+            throw new \AssertionError("Invalid url '$url'.");
         }
         $this->url = $url;
     }
