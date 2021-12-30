@@ -1,3 +1,6 @@
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
 parameters:
     level: max
     paths:
@@ -8,5 +11,4 @@ parameters:
             - src/Libs
     bootstrapFiles:
         - test/bootstrap.php
-
     checkMissingIterableValueType: false
