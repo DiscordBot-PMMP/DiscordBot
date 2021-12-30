@@ -47,12 +47,12 @@ class BotThread extends Thread{
         //Ignores everything outside our own files.
         require_once(\JaxkDev\DiscordBot\COMPOSER);
 
+        /* @phpstan-ignore-next-line phpstan-strict-rules initialConfig is volatile not array */
         new Client($this, (array)$this->initialConfig);
     }
 
     public function readInboundData(int $count = 1): array{
         return array_map(function($data){
-            /** @var Packet $packet */
             $packet = unserialize($data);
             if(!$packet instanceof Packet){
                 throw new \AssertionError("Data did not unserialize to a Packet.");
@@ -66,7 +66,7 @@ class BotThread extends Thread{
     }
 
     public function setStatus(int $status): void{
-        if(!in_array($status, [self::STATUS_STARTING, self::STATUS_STARTED, self::STATUS_READY, self::STATUS_CLOSING, self::STATUS_CLOSED])){
+        if(!in_array($status, [self::STATUS_STARTING, self::STATUS_STARTED, self::STATUS_READY, self::STATUS_CLOSING, self::STATUS_CLOSED], true)){
             throw new \AssertionError("Invalid thread status.");
         }
         $this->status = $status;

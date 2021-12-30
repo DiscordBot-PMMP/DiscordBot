@@ -98,9 +98,10 @@ abstract class Permissions implements \Serializable{
             $this->recalculatePermissions();
         }
         $permission = strtolower($permission);
+        /** @phpstan-ignore-next-line phpstan-strict-rules dynamically calling static function. */
         $posPermissions = $this->getPossiblePermissions();
 
-        if(!in_array($permission, array_keys($posPermissions))){
+        if(!in_array($permission, array_keys($posPermissions), true)){
             throw new \AssertionError("Invalid permission '{$permission}' for a '".get_parent_class($this)."'");
         }
 
@@ -115,6 +116,7 @@ abstract class Permissions implements \Serializable{
      */
     private function recalculatePermissions(): void{
         $this->permissions = [];
+        /** @phpstan-ignore-next-line phpstan-strict-rules dynamically calling static function. */
         $possiblePerms = $this->getPossiblePermissions();
         foreach($possiblePerms as $name => $v){
             $this->permissions[$name] = (($this->bitwise & $v) !== 0);

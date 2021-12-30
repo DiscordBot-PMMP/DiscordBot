@@ -239,7 +239,7 @@ class Storage{
             $i = array_search($channel_id, self::$category_server_map[$server_id], true);
             if($i === false || is_string($i)) return; //Not in this servers category map.
             array_splice(self::$category_server_map[$server_id], $i, 1);
-        }elseif($channel instanceof ServerChannel){
+        }else{
             $i = array_search($channel_id, self::$channel_server_map[$server_id], true);
             if($i === false || is_string($i)) return; //Not in this servers channel map.
             array_splice(self::$channel_server_map[$server_id], $i, 1);
@@ -464,14 +464,14 @@ class Storage{
             throw new \AssertionError("Failed to update invite in storage, Code not found.");
         }
         if(!isset(self::$invite_map[$invite->getCode()])){
-            self::addinvite($invite);
+            self::addInvite($invite);
         }else{
             self::$invite_map[$invite->getCode()] = $invite;
         }
     }
 
     public static function removeInvite(string $code): void{
-        $invite = self::getinvite($code);
+        $invite = self::getInvite($code);
         if($invite === null) return; //Already deleted or not added.
         $server_id = $invite->getServerId();
         unset(self::$invite_map[$code]);

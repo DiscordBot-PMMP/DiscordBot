@@ -226,7 +226,7 @@ class Client{
                     "(https://github.com/DiscordBot-PMMP/DiscordBot/issues/new) quoting the text `op:4013 - {$reason}`.");
                 break;
         }
-        if(in_array($op, Op::getCriticalCloseCodes())) {
+        if(in_array($op, Op::getCriticalCloseCodes(), true)) {
             $this->close($reason);
         }
     }
@@ -263,6 +263,7 @@ class Client{
                 $this->logger->critical($line);
             }
         }
+        /** @phpstan-ignore-next-line phpstan-strict-rules, client could be undefined */
         if($this->client instanceof Discord){
             try{
                 $this->client->close(true);

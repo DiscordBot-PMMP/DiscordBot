@@ -147,7 +147,7 @@ class User implements \Serializable{
         if(sizeof($this->flags) === 0 and $this->flags_bitwise > 0){
             $this->recalculateFlags();
         }
-        if(!in_array($flag, array_keys(self::FLAGS))){
+        if(!in_array($flag, array_keys(self::FLAGS), true)){
             throw new \AssertionError("Invalid flag '{$flag}' for a 'user'");
         }
 

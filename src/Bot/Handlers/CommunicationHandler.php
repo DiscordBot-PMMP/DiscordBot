@@ -778,7 +778,7 @@ class CommunicationHandler{
     private function handleInitialiseInvite(RequestInitialiseInvite $pk): void{
         $invite = $pk->getInvite();
         $this->getChannel($pk, $invite->getChannelId(), function(DiscordChannel $channel) use($pk, $invite){
-            /** @phpstan-ignore-next-line Poorly documented function on discord.php's side. */
+            /** @phpstan-ignore-next-line Poorly documented function on discordphp side. */
             $channel->createInvite([
                 "max_age" => $invite->getMaxAge(), "max_uses" => $invite->getMaxUses(), "temporary" => $invite->isTemporary(), "unique" => true
             ])->done(function(DiscordInvite $dInvite) use($pk){

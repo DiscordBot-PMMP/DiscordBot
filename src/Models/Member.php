@@ -179,6 +179,7 @@ class Member implements \Serializable{
 
     /** @param null|array{"mobile": string|null, "desktop": string|null, "web": string|null} $client_status*/
     public function setClientStatus(?array $client_status): void{
+        //TODO Validate.
         $this->client_status = $client_status;
     }
 
@@ -190,6 +191,7 @@ class Member implements \Serializable{
     /** @param null|Activity[] $activities */
     public function setActivities(?array $activities): void{
         foreach($activities??[] as $activity){
+            /** @phpstan-ignore-next-line phpstan-strict-rules treatPhpDocTypesAsCertain doesn't work with this :( */
             if(!$activity instanceof Activity){
                 throw new \AssertionError("Activity not valid.");
             }

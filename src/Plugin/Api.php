@@ -422,7 +422,7 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function updateBotPresence(Activity $activity, string $status = Member::STATUS_ONLINE): PromiseInterface{
-        if(!in_array($status, [Member::STATUS_ONLINE, Member::STATUS_IDLE, Member::STATUS_OFFLINE, Member::STATUS_DND])){
+        if(!in_array($status, [Member::STATUS_ONLINE, Member::STATUS_IDLE, Member::STATUS_OFFLINE, Member::STATUS_DND], true)){
             return rejectPromise(new ApiRejection("Invalid status '$status'."));
         }
         $pk = new RequestUpdatePresence($activity, $status);

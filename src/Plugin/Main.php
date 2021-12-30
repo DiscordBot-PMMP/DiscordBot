@@ -273,7 +273,6 @@ META);
 
     private function readInboundData(int $count = 1): array{
         return array_map(function($data){
-            /** @var Packet $packet */
             $packet = unserialize($data);
             if(!$packet instanceof Packet){
                 throw new \AssertionError("Data did not unserialize to a Packet.");

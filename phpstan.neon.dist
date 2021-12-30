@@ -12,3 +12,4 @@ parameters:
     bootstrapFiles:
         - test/bootstrap.php
     checkMissingIterableValueType: false
+    treatPhpDocTypesAsCertain: false

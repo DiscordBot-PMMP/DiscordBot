@@ -156,7 +156,7 @@ class BotCommunicationHandler{
             (new VoiceChannelMemberLeftEvent($this->plugin, $member, $channel))->call();
             $member->setVoiceState(null);
             $members = $channel->getMembers();
-            if(($key = array_search($packet->getMemberId(), $members)) !== false) {
+            if(($key = array_search($packet->getMemberId(), $members, true)) !== false) {
                 unset($members[$key]);
             }
             $channel->setMembers($members);
@@ -171,7 +171,7 @@ class BotCommunicationHandler{
             if(!$channel instanceof VoiceChannel){
                 throw new \AssertionError("Channel '{$state->getChannelId()}' not a voice channel.");
             }
-            if(in_array($packet->getMemberId(), $channel->getMembers())){
+            if(in_array($packet->getMemberId(), $channel->getMembers(), true)){
                 //Member did not leave/join/transfer voice channel but muted/deaf/self_muted/self_deafen etc.
                 (new VoiceStateUpdatedEvent($this->plugin, $member, $state))->call();
                 $member->setVoiceState($packet->getVoiceState());
@@ -185,7 +185,7 @@ class BotCommunicationHandler{
                 if($previous !== null and $previous->getId() !== $state->getChannelId()){
                     (new VoiceChannelMemberMovedEvent($this->plugin, $member, $previous, $channel, $state))->call();
                     $members = $previous->getMembers();
-                    if(($key = array_search($packet->getMemberId(), $members)) !== false) {
+                    if(($key = array_search($packet->getMemberId(), $members, true)) !== false) {
                         unset($members[$key]);
                     }
                     $previous->setMembers($members);
@@ -207,7 +207,7 @@ class BotCommunicationHandler{
     private function handlePresenceUpdate(PresenceUpdatePacket $packet): void{
         $member = Storage::getMember($packet->getMemberId());
         if($member === null){
-            throw new \AssertionError("Member '{$packet->getMemberID()}' not found in storage.");
+            throw new \AssertionError("Member '{$packet->getMemberId()}' not found in storage.");
         }
         (new PresenceUpdatedEvent($this->plugin, $member, $packet->getStatus(), $packet->getClientStatus(), $packet->getActivities()))->call();
         $member->setStatus($packet->getStatus());

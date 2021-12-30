@@ -111,7 +111,7 @@ class Embed implements \Serializable{
     }
 
     public function setType(?string $type): void{
-        if($type !== null and (!in_array($type, [self::TYPE_LINK, self::TYPE_ARTICLE, self::TYPE_GIFV, self::TYPE_VIDEO, self::TYPE_IMAGE, self::TYPE_RICH]))){
+        if($type !== null and (!in_array($type, [self::TYPE_LINK, self::TYPE_ARTICLE, self::TYPE_GIFV, self::TYPE_VIDEO, self::TYPE_IMAGE, self::TYPE_RICH], true))){
             throw new \AssertionError("Invalid embed type '{$type}' provided.");
         }
         $this->type = $type;
