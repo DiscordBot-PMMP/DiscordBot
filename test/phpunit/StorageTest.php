@@ -70,6 +70,52 @@ final class StorageTest extends TestCase{
         $this->assertNull(Storage::getServer("Invalid ID"));
     }
 
+    public function testAddUser(): void{
+        $u = new User("282819886198030336", "Username", "1234", "https://discord.com/");
+        Storage::addUser($u);
+        $this->assertCount(1, Storage::getUsers());
+    }
+
+    /**
+     * @depends testAddUser
+     */
+    public function testGetUser(): User{
+        $user = Storage::getUser("282819886198030336");
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertNull(Storage::getUser("282819886198030337"));
+        return $user;
+    }
+
+    /**
+     * @depends testGetUser
+     */
+    public function testGetUsers(): void{
+        $data = Storage::getUsers();
+        $this->assertIsArray($data);
+        foreach($data as $d){
+            $this->assertInstanceOf(User::class, $d);
+        }
+    }
+
+    /**
+     * @depends testGetUser
+     */
+    public function testUpdateUser(User $user): void{
+        $count = count(Storage::getUsers());
+        $user->setUsername("Test Username 2");
+        Storage::updateUser($user);
+        $this->assertCount($count, Storage::getUsers());
+    }
+
+    /**
+     * @depends testGetUser
+     */
+    public function testRemoveUser(User $user): void{
+        $count = count(Storage::getUsers());
+        Storage::removeUser($user->getId());
+        $this->assertCount($count - 1, Storage::getUsers());
+    }
+
     public function testGetTimestamp(): void{
         $this->assertGreaterThanOrEqual(0, Storage::getTimestamp());
     }
@@ -120,27 +166,5 @@ final class StorageTest extends TestCase{
     public function testGetBotMembersByServer(): void{
         $this->assertNull(Storage::getBotMemberByServer(""));
         //TODO Check if this returns member when member exists.
-    }
-
-    public function testAddUser(): void{
-        $u = new User("282819886198030336", "Username", "1234", "https://discord.com/");
-        Storage::addUser($u);
-        $this->assertCount(1, Storage::getUsers());
-    }
-
-    /**
-     * @depends testAddUser
-     */
-    public function testGetUser(): void{
-        $this->assertInstanceOf(User::class, Storage::getUser("282819886198030336"));
-        $this->assertNull(Storage::getUser("282819886198030337"));
-    }
-
-    public function testGetUsers(): void{
-        $data = Storage::getUsers();
-        $this->assertIsArray($data);
-        foreach($data as $d){
-            $this->assertInstanceOf(User::class, $d);
-        }
     }
 }
