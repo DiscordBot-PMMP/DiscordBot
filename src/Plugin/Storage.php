@@ -499,6 +499,9 @@ class Storage{
     }
 
     public static function setTimestamp(int $timestamp): void{
+        if($timestamp < 0){
+            throw new \InvalidArgumentException("Timestamp must be greater than or equal to 0.");
+        }
         self::$timestamp = $timestamp;
     }
 

@@ -62,4 +62,16 @@ final class StorageTest extends TestCase{
         $this->assertNull(Storage::getServer("111111111111111111"));
         $this->assertNull(Storage::getServer("Invalid ID"));
     }
+
+    public function testGetTimestamp(): void{
+        $this->assertGreaterThanOrEqual(0, Storage::getTimestamp());
+    }
+
+    public function testSetTimestamp(): void{
+        Storage::setTimestamp(0);
+        Storage::setTimestamp(time());
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Timestamp must be greater than or equal to 0.");
+        Storage::setTimestamp(-1);
+    }
 }
