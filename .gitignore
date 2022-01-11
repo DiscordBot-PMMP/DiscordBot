@@ -1,5 +1,7 @@
 /vendor/
 /dist/
+/.cache/
+/code-coverage/
 
 *.phar
 *.txt
@@ -8,3 +10,5 @@
 TEST.php
 PHPSTAN.php
 phpstan.neon
+phpunit.xml
+.phpunit.result.cache
