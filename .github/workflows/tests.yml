@@ -1,4 +1,4 @@
-name: PHPStan
+name: Github Tests
 
 on:
   push:
@@ -63,3 +63,11 @@ jobs:
 
       - name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-progress --memory-limit=2G --error-format=github
+
+  phpunit:
+    name: PHPUnit tests
+    needs: get-php
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Run PHPUnit
+        run: ./vendor/bin/phpunit --verbose --debug ./test/phpunit
