@@ -13,6 +13,7 @@
 declare(strict_types=1);
 
 use JaxkDev\DiscordBot\Models\Server;
+use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Plugin\Storage;
 use PHPUnit\Framework\TestCase;
 
@@ -20,13 +21,8 @@ use PHPUnit\Framework\TestCase;
 //TODO Better model usage.
 final class StorageTest extends TestCase{
 
-    public function testGetServers(): void{
-        $this->assertEmpty(Storage::getServers(), "If this triggers, the plugin has died :)");
-    }
-
     /**
      * //TODO Depends on Server Creation.
-     * @depends testGetServers
      */
     public function testAddServer(): void{
         $s = new Server("554059221847638040", "Test Server", "UK", "282819886198030336", false, 10);
@@ -53,6 +49,17 @@ final class StorageTest extends TestCase{
     }
 
     /**
+     * @depends testAddServer
+     */
+    public function testGetServers(): void{
+        $data = Storage::getServers();
+        $this->assertIsArray($data);
+        foreach($data as $d){
+            $this->assertInstanceOf(Server::class, $d);
+        }
+    }
+
+    /**
      * @depends testGetServers
      * @depends testUpdateServer
      */
@@ -73,5 +80,67 @@ final class StorageTest extends TestCase{
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Timestamp must be greater than or equal to 0.");
         Storage::setTimestamp(-1);
+    }
+
+    public function testSerializeStorage(): void{
+        $data = Storage::serializeStorage();
+        $this->assertIsString($data);
+        //TODO, Could check via un-serializing the data.
+    }
+
+    public function testEmptyGetBotUser(): void{
+        $this->assertNull(Storage::getBotUser());
+    }
+
+    /**
+     * @depends testEmptyGetBotUser
+     */
+    public function testEmptyGetBotMemberByServer(): void{
+        $this->assertNull(Storage::getBotMemberByServer(""));
+    }
+
+    public function testSetBotUser(): void{
+        $u = new User("282819886198030336", "Username", "1234", "https://discord.com/");
+        Storage::setBotUser($u);
+        //TODO Actual assertions (next Non-BC Release)
+        //Shouldn't have this assertion:
+        $this->assertInstanceOf(User::class, Storage::getBotUser()); //Hack for code-coverage.
+    }
+
+    /**
+     * @depends testSetBotUser
+     */
+    public function testGetBotUser(): void{
+        $this->assertInstanceOf(User::class, Storage::getBotUser());
+    }
+
+    /**
+     * @depends testGetBotUser
+     */
+    public function testGetBotMembersByServer(): void{
+        $this->assertNull(Storage::getBotMemberByServer(""));
+        //TODO Check if this returns member when member exists.
+    }
+
+    public function testAddUser(): void{
+        $u = new User("282819886198030336", "Username", "1234", "https://discord.com/");
+        Storage::addUser($u);
+        $this->assertCount(1, Storage::getUsers());
+    }
+
+    /**
+     * @depends testAddUser
+     */
+    public function testGetUser(): void{
+        $this->assertInstanceOf(User::class, Storage::getUser("282819886198030336"));
+        $this->assertNull(Storage::getUser("282819886198030337"));
+    }
+
+    public function testGetUsers(): void{
+        $data = Storage::getUsers();
+        $this->assertIsArray($data);
+        foreach($data as $d){
+            $this->assertInstanceOf(User::class, $d);
+        }
     }
 }
