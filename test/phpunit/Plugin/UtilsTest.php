@@ -12,7 +12,7 @@
 
 declare(strict_types=1);
 
-use JaxkDev\DiscordBot\Plugin\Utils as Utils;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use PHPUnit\Framework\TestCase;
 
 final class UtilsTest extends TestCase{
