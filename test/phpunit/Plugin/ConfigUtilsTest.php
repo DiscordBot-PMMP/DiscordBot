@@ -46,11 +46,11 @@ final class ConfigUtilsTest extends TestCase{
     public function testUpdate(): void{
         $data = ["version" => 1];
         ConfigUtils::update($data);
-        $this->assertSame(self::$latest, $data);
+        $this->assertEqualsCanonicalizing(self::$latest, $data);
         $data = ["version" => 1, "discord" => ["token" => "Long Token here.", "usePluginCacert" => true], "logging" => ["debug" => false,  "directory" => "logs", "maxFiles" => 28]];
         ConfigUtils::update($data);
         //Array order gets mismatched with Same, TODO This needs fixing sameSize will always be true (ish)
-        $this->assertSameSize(self::$latest, $data);
+        $this->assertEqualsCanonicalizing(self::$latest, $data);
     }
 
     public function testDefaultVerify(): void{

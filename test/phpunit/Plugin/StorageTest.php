@@ -54,9 +54,7 @@ final class StorageTest extends TestCase{
     public function testGetServers(): void{
         $data = Storage::getServers();
         $this->assertIsArray($data);
-        foreach($data as $d){
-            $this->assertInstanceOf(Server::class, $d);
-        }
+        $this->assertContainsOnlyInstancesOf(Server::class, $data);
     }
 
     /**
@@ -92,9 +90,7 @@ final class StorageTest extends TestCase{
     public function testGetUsers(): void{
         $data = Storage::getUsers();
         $this->assertIsArray($data);
-        foreach($data as $d){
-            $this->assertInstanceOf(User::class, $d);
-        }
+        $this->assertContainsOnlyInstancesOf(User::class, $data);
     }
 
     /**

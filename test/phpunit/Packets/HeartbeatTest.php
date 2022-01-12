@@ -45,7 +45,7 @@ final class HeartbeatTest extends TestCase{
      * @depends testConstructor
      */
     public function testGetHeartbeat(Heartbeat $packet): void{
-        $this->assertEquals($this->timestamp, $packet->getHeartbeat());
+        $this->assertSame($this->timestamp, $packet->getHeartbeat());
     }
 
     /**
@@ -63,9 +63,12 @@ final class HeartbeatTest extends TestCase{
     public function testUnserialize(string $data): void{
         $data = unserialize($data);
         $this->assertInstanceOf(Heartbeat::class, $data);
-        $this->assertEquals($this->timestamp, $data->getHeartbeat());
+        $this->assertSame($this->timestamp, $data->getHeartbeat());
     }
 
+    /**
+     * @depends testConstructor
+     */
     public function testInvalidUnserialize(): void{
         $data = serialize(new testHeartbeat(5.0));
         $this->expectError();

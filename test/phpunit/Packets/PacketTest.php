@@ -30,6 +30,6 @@ final class PacketTest extends TestCase{
      * @depends testConstructor
      */
     public function testGetUID(Packet $packet): void{
-        $this->assertEquals(Packet::$UID_COUNT, $packet->getUID());
+        $this->assertSame(Packet::$UID_COUNT, $packet->getUID());
     }
 }
