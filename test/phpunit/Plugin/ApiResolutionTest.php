@@ -18,12 +18,14 @@ class ApiResolutionTest extends TestCase{
     private $data = [1, 2, 3];
 
     public function testEmptyConstructor(): void{
-        $this->expectExceptionMessage("Expected data for ApiResolution to contain at least a message.");
+        $this->expectError();
+        $this->expectErrorMessageMatches("/.*Expected data for ApiResolution to contain at least a message.*/i");
         new ApiResolution([]);
     }
 
     public function testNonStringConstructor(): void{
-        $this->expectExceptionMessage("Expected data for ApiResolution to contain at least a message.");
+        $this->expectError();
+        $this->expectErrorMessageMatches("/.*Expected data for ApiResolution to contain at least a message.*/i");
         new ApiResolution([123]);
     }
 

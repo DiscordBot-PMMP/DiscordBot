@@ -27,7 +27,7 @@ final class HeartbeatTest extends TestCase{
 
     public function testInvalidConstructor(): void{
         $this->expectError();
-        $this->expectErrorMessage("JaxkDev\DiscordBot\Communication\Packets\Heartbeat::__construct(): Argument #1 (\$heartbeat) must be of type float, string given");
+        $this->expectErrorMessageMatches("/.*Argument #1 \\([^)]*\\) must be of type [a-zA-Z]+, string given/i");
         /** @noinspection PhpStrictTypeCheckingInspection */
         (new Heartbeat("4"));
     }
@@ -72,7 +72,7 @@ final class HeartbeatTest extends TestCase{
     public function testInvalidUnserialize(): void{
         $data = serialize(new testHeartbeat(5.0));
         $this->expectError();
-        $this->expectErrorMessage("Failed to unserialize data to array, got '".gettype("")."' instead.");
+        $this->expectErrorMessageMatches("/.*Failed to unserialize.*/i");
         unserialize($data);
     }
 }
