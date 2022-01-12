@@ -52,7 +52,10 @@ abstract class ApiResolver{
             unset(self::$map[$packet->getPid()]);
         }else{
             if(self::$logger === null){
-                $pl = Server::getInstance()->getPluginManager()->getPlugin("DiscordBot");
+                $pl = null;
+                try{
+                    $pl = Server::getInstance()->getPluginManager()->getPlugin("DiscordBot");
+                }catch(\RuntimeException $e){}
                 if($pl instanceof Main){
                     self::$logger = $pl->getLogger();
                 }else{
