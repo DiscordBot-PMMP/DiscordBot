@@ -10,6 +10,6 @@ parameters:
             - vendor
             - src/Libs
     bootstrapFiles:
-        - test/bootstrap.php
+        - test/phpstan/bootstrap.php
     checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
