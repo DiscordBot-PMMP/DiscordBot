@@ -34,7 +34,7 @@ abstract class ConfigUtils{
         $config["version"] = 2;
         if(!isset($config["discord"])){
             $config["discord"] = [
-                "token" => "Long token here",
+                "token" => "Long Token here.",
                 "use_plugin_cacert" => true
             ];
         }else{
@@ -135,7 +135,7 @@ abstract class ConfigUtils{
                 $result[] = "No 'protocol.heartbeat_allowance' field found.";
             }else{
                 if(!is_int($config["protocol"]["heartbeat_allowance"]) or $config["protocol"]["heartbeat_allowance"] < 2){
-                    $result[] = "Invalid 'protocol.heartbeat_allowance' ({$config["protocol"]["use_plugin_cacert"]}),  Do not touch this without being told to explicitly by JaxkDev";
+                    $result[] = "Invalid 'protocol.heartbeat_allowance' ({$config["protocol"]["heartbeat_allowance"]}),  Do not touch this without being told to explicitly by JaxkDev";
                 }
             }
         }
