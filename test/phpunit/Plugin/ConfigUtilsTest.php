@@ -71,6 +71,9 @@ final class ConfigUtilsTest extends TestCase{
         $this->assertContains("No 'protocol' field found.", $data);
     }
 
+    /**
+     * @depends testEmptyVerify
+     */
     public function testSubEmptyVerify(): void{
         $data = ConfigUtils::verify(["version" => 1, "discord" => [], "logging" => [], "protocol" => []]);
         $this->assertCount(6, $data);
@@ -82,6 +85,9 @@ final class ConfigUtilsTest extends TestCase{
         $this->assertContains("No 'protocol.heartbeat_allowance' field found.", $data);
     }
 
+    /**
+     * @depends testSubEmptyVerify
+     */
     public function testInvalidTypeVerify(): void{
         $data = self::$latest;
         $data["version"] = strval(ConfigUtils::VERSION);
@@ -102,6 +108,9 @@ final class ConfigUtilsTest extends TestCase{
         $this->assertContains("Invalid 'protocol.heartbeat_allowance' ({$data["protocol"]["heartbeat_allowance"]}),  Do not touch this without being told to explicitly by JaxkDev", $res);
     }
 
+    /**
+     * @depends testInvalidTypeVerify
+     */
     public function testInvalidValueVerify(): void{
         $data = self::$latest;
         $data["version"] = ConfigUtils::VERSION+1;
