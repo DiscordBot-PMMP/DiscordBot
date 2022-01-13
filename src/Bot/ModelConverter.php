@@ -313,6 +313,13 @@ abstract class ModelConverter{
     }
 
     static public function genModelInvite(DiscordInvite $invite): Invite{
+        try{
+            $temp = $invite->inviter->id;
+        }catch(\Exception $e){
+            var_dump($invite->getRawAttributes());
+            return new Invite($invite->guild_id, $invite->channel_id, $invite->max_age, $invite->max_uses, $invite->temporary,
+                $invite->code, $invite->created_at->getTimestamp(), null, $invite->uses);
+        }
         return new Invite($invite->guild_id, $invite->channel_id, $invite->max_age, $invite->max_uses, $invite->temporary,
         $invite->code, $invite->created_at->getTimestamp(), $invite->guild_id.".".$invite->inviter->id, $invite->uses);
     }
