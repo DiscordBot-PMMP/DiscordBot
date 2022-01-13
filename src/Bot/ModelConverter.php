@@ -313,15 +313,13 @@ abstract class ModelConverter{
     }
 
     static public function genModelInvite(DiscordInvite $invite): Invite{
-        try{
-            $temp = $invite->inviter->id;
-        }catch(\Exception $e){
-            var_dump($invite->getRawAttributes());
-            return new Invite($invite->guild_id, $invite->channel_id, $invite->max_age, $invite->max_uses, $invite->temporary,
-                $invite->code, $invite->created_at->getTimestamp(), null, $invite->uses);
+        //Workaround while pending debug data (#52) - Issue needs fixing in DiscordPHP.
+        $inviter = null;
+        if(in_array("inviter", array_keys($invite->getRawAttributes()))){
+            $inviter = $invite->inviter instanceof DiscordUser ? $invite->inviter->id : null;
         }
         return new Invite($invite->guild_id, $invite->channel_id, $invite->max_age, $invite->max_uses, $invite->temporary,
-        $invite->code, $invite->created_at->getTimestamp(), $invite->guild_id.".".$invite->inviter->id, $invite->uses);
+        $invite->code, $invite->created_at->getTimestamp(), $inviter === null ? null : $invite->guild_id.".".$inviter, $invite->uses);
     }
 
     static public function genModelBan(DiscordBan $ban): Ban{
