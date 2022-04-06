@@ -3,7 +3,7 @@ version: 2.1.2
 author: JaxkDev
 src-namespace-prefix: JaxkDev\DiscordBot
 main: JaxkDev\DiscordBot\Plugin\Main
-description: Plugin to host a discord bot using DiscordPHP with a react\promise API !
+description: Plugin to host a discord bot using DiscordPHP and react\promise API !
 website: https://github.com/DiscordBot-PMMP/DiscordBot
 
 api: 4.0.0
