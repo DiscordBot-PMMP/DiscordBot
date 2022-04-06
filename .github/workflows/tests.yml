@@ -26,7 +26,7 @@ jobs:
         run: ./test/github/get-php.sh
 
   Analysis:
-    name: PHPStan & PHPUnit
+    name: PHPStan
     needs: get-php
     runs-on: ubuntu-20.04
 
@@ -63,6 +63,3 @@ jobs:
 
       - name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-progress --memory-limit=2G --error-format=github
-
-      - name: Run PHPUnit
-        run: ./vendor/bin/phpunit --verbose --debug -c phpunit.xml.dist
