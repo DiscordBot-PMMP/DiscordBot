@@ -313,9 +313,9 @@ abstract class ModelConverter{
     }
 
     static public function genModelInvite(DiscordInvite $invite): Invite{
-        //Workaround while pending debug data (#52) - Issue needs fixing in DiscordPHP.
         $inviter = null;
         if(in_array("inviter", array_keys($invite->getRawAttributes()), true)){
+            //Workaround for #52, can be removed once using DiscordPHP >= 7.0.0
             $inviter = $invite->inviter instanceof DiscordUser ? $invite->inviter->id : null; /** @phpstan-ignore-line */
         }
         return new Invite($invite->guild_id, $invite->channel_id, $invite->max_age, $invite->max_uses, $invite->temporary,

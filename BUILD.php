@@ -61,12 +61,12 @@ function preg_quote_array(array $strings, string $delim = null) : array{
  *
  * @return Generator|string[]
  */
-function buildPhar(string $pharPath, string $basePath, array $includedPaths, array $excludedPaths, array $metadata, string $stub, int $signatureAlgo = Phar::SHA1){
+function buildPhar(string $pharPath, string $basePath, array $includedPaths, array $excludedPaths, array $metadata, string $stub, int $signatureAlgo = Phar::SHA1): array|Generator{
     if(file_exists($pharPath)){
         yield "Phar file already exists, overwriting...";
         try{
             Phar::unlinkArchive($pharPath);
-        } /** @noinspection PhpRedundantCatchClauseInspection */ catch(PharException $e){
+        }catch(PharException){
             //unlinkArchive() doesn't like dodgy phars
             unlink($pharPath);
         }

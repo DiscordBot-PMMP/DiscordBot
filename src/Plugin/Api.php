@@ -132,7 +132,8 @@ class Api{
         return ApiResolver::create($pk->getUID());
     }
 
-    //createServer will not be added due to security issues.
+    //createServer will not be added due to security issues,
+    //If you find a genuine use for createServer please open an issue.
 
     /**
      * Leave a discord server.

@@ -19,7 +19,6 @@ class ApiRejection extends \Exception{
 
     public function __construct(string $message, array $data = []){
         parent::__construct($message);
-        //TODO Verify data is valid (0-2 in length, strings only) (+Unit tests adjusted to reflect this)
         $this->data = $data;
     }
 
