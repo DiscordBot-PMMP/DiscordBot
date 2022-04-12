@@ -22,7 +22,7 @@ class Attachment implements \Serializable{
     /** @var string */
     private $file_name;
 
-    /** @var string https://en.wikipedia.org/wiki/Media_type */
+    /** @var string|null https://en.wikipedia.org/wiki/Media_type */
     private $content_type;
 
     /** @var int Size of the resource in bytes */
@@ -37,7 +37,7 @@ class Attachment implements \Serializable{
     /** @var int|null Image height, null if not an image. */
     private $height;
 
-    public function __construct(string $id, string $file_name, string $content_type, int $size, string $url,
+    public function __construct(string $id, string $file_name, ?string $content_type, int $size, string $url,
                                 ?int $width = null, ?int $height = null){
         $this->setId($id);
         $this->setFileName($file_name);
@@ -68,10 +68,10 @@ class Attachment implements \Serializable{
     }
 
     public function getContentType(): string{
-        return $this->content_type;
+        return $this->content_type??"Unknown"; //Maintain BC, TODO change to null in v3.0
     }
 
-    public function setContentType(string $content_type): void{
+    public function setContentType(?string $content_type): void{
         $this->content_type = $content_type;
     }
 
@@ -91,7 +91,7 @@ class Attachment implements \Serializable{
     }
 
     public function setUrl(string $url): void{
-        if(strpos($url, "https://") !== 0){
+        if(!str_starts_with($url, "https://")){
             throw new \AssertionError("URL '$url' is invalid, must be prefixed 'https://'.");
         }
         $this->url = $url;
@@ -120,7 +120,7 @@ class Attachment implements \Serializable{
     }
 
     public function isSpoiler(): bool{
-        return (strpos($this->file_name, "SPOILER_") === 0);
+        return str_starts_with($this->file_name, "SPOILER_");
     }
 
     //----- Serialization -----//

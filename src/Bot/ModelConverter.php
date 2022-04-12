@@ -264,8 +264,8 @@ abstract class ModelConverter{
     }
 
     static public function genModelAttachment(\stdClass $attachment): Attachment{
-        return new Attachment($attachment->id, $attachment->filename, $attachment->content_type, $attachment->size,
-            $attachment->url, $attachment->width??null, $attachment->height??null);
+        return new Attachment($attachment->id, $attachment->filename, $attachment->content_type??null,
+            $attachment->size, $attachment->url, $attachment->width??null, $attachment->height??null);
     }
 
     static public function genModelEmbed(DiscordEmbed $discordEmbed): Embed{
