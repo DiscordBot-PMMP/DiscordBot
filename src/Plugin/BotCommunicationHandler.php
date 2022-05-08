@@ -177,10 +177,6 @@ class BotCommunicationHandler{
                 $member->setVoiceState($packet->getVoiceState());
                 Storage::updateMember($member);
             }else{
-                if($channel->getMemberLimit() !== 0 and sizeof($channel->getMembers()) >= $channel->getMemberLimit()){
-                    //Shouldn't ever happen.
-                    throw new \AssertionError("Channel '{$state->getChannelId()}' shouldn't have room for this member.");
-                }
                 $previous = Storage::getMembersVoiceChannel($packet->getMemberId());
                 if($previous !== null and $previous->getId() !== $state->getChannelId()){
                     (new VoiceChannelMemberMovedEvent($this->plugin, $member, $previous, $channel, $state))->call();

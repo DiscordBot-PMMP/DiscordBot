@@ -19,7 +19,7 @@ class VoiceChannel extends ServerChannel{
     /** @var int */
     private $bitrate;
 
-    /** @var int The max amount of members that can join. */
+    /** @var int The max amount of members that can join - NOTE Admins(TBC)/Owner can still join if full. */
     private $member_limit;
 
     /** @var string[] Members in the channel (ID's only). */
