@@ -32,7 +32,7 @@ class BotThread extends Thread{
     /** @var Volatile */
     private $inboundData;
     /** @var Volatile */
-    private $outboundData;
+    private $outboundData; //@phpstan-ignore-line Write only.
 
     /** @var int */
     private $status = self::STATUS_STARTING;

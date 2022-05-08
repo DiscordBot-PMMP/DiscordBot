@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9523a19c2bdcc25ea70101ece9dacf53",
+    "content-hash": "2b0520ca28364ad2cd31c426dab7d952",
     "packages": [
         {
             "name": "discord-php/http",
@@ -320,16 +320,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "2.4.0",
+            "version": "2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "d7fd7450628561ba697b7097d86db72662f54aef"
+                "reference": "4192345e260f1d51b365536199744b987e160edc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/d7fd7450628561ba697b7097d86db72662f54aef",
-                "reference": "d7fd7450628561ba697b7097d86db72662f54aef",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/4192345e260f1d51b365536199744b987e160edc",
+                "reference": "4192345e260f1d51b365536199744b987e160edc",
                 "shasum": ""
             },
             "require": {
@@ -403,7 +403,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Seldaek/monolog/issues",
-                "source": "https://github.com/Seldaek/monolog/tree/2.4.0"
+                "source": "https://github.com/Seldaek/monolog/tree/2.5.0"
             },
             "funding": [
                 {
@@ -415,20 +415,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-14T12:44:37+00:00"
+            "time": "2022-04-08T15:43:54+00:00"
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.57.0",
+            "version": "2.58.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "4a54375c21eea4811dbd1149fe6b246517554e78"
+                "reference": "97a34af22bde8d0ac20ab34b29d7bfe360902055"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/4a54375c21eea4811dbd1149fe6b246517554e78",
-                "reference": "4a54375c21eea4811dbd1149fe6b246517554e78",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/97a34af22bde8d0ac20ab34b29d7bfe360902055",
+                "reference": "97a34af22bde8d0ac20ab34b29d7bfe360902055",
                 "shasum": ""
             },
             "require": {
@@ -446,7 +446,8 @@
                 "phpmd/phpmd": "^2.9",
                 "phpstan/extension-installer": "^1.0",
                 "phpstan/phpstan": "^0.12.54 || ^1.0",
-                "phpunit/phpunit": "^7.5.20 || ^8.5.14",
+                "phpunit/php-file-iterator": "^2.0.5",
+                "phpunit/phpunit": "^7.5.20 || ^8.5.23",
                 "squizlabs/php_codesniffer": "^3.4"
             },
             "bin": [
@@ -511,7 +512,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-02-13T18:13:33+00:00"
+            "time": "2022-04-25T19:31:17+00:00"
         },
         {
             "name": "psr/http-factory",
@@ -2192,16 +2193,16 @@
         },
         {
             "name": "symfony/translation",
-            "version": "v6.0.7",
+            "version": "v6.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation.git",
-                "reference": "b2792b39d74cf41ea3065f27fd2ddf0b556ac7a1"
+                "reference": "3d38cf8f8834148c4457681d539bc204de701501"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/b2792b39d74cf41ea3065f27fd2ddf0b556ac7a1",
-                "reference": "b2792b39d74cf41ea3065f27fd2ddf0b556ac7a1",
+                "url": "https://api.github.com/repos/symfony/translation/zipball/3d38cf8f8834148c4457681d539bc204de701501",
+                "reference": "3d38cf8f8834148c4457681d539bc204de701501",
                 "shasum": ""
             },
             "require": {
@@ -2267,7 +2268,7 @@
             "description": "Provides tools to internationalize your application",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/translation/tree/v6.0.7"
+                "source": "https://github.com/symfony/translation/tree/v6.0.8"
             },
             "funding": [
                 {
@@ -2283,7 +2284,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-31T17:18:25+00:00"
+            "time": "2022-04-22T08:18:02+00:00"
         },
         {
             "name": "symfony/translation-contracts",
@@ -2724,20 +2725,20 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.3.0",
+            "version": "1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "ffc5aee6019eeae4ea618d97dd290ab95e77be59"
+                "reference": "b480ba2ae0699a72d43a340c20b9c00ede91ee3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/ffc5aee6019eeae4ea618d97dd290ab95e77be59",
-                "reference": "ffc5aee6019eeae4ea618d97dd290ab95e77be59",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b480ba2ae0699a72d43a340c20b9c00ede91ee3e",
+                "reference": "b480ba2ae0699a72d43a340c20b9c00ede91ee3e",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1|^8.0"
+                "php": "^7.2|^8.0"
             },
             "conflict": {
                 "phpstan/phpstan-shim": "*"
@@ -2747,11 +2748,6 @@
                 "phpstan.phar"
             ],
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.3-dev"
-                }
-            },
             "autoload": {
                 "files": [
                     "bootstrap.php"
@@ -2764,7 +2760,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.3.0"
+                "source": "https://github.com/phpstan/phpstan/tree/1.6.0"
             },
             "funding": [
                 {
@@ -2784,7 +2780,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-12-29T17:03:31+00:00"
+            "time": "2022-04-26T05:43:03+00:00"
         },
         {
             "name": "phpstan/phpstan-strict-rules",
@@ -2839,42 +2835,42 @@
         },
         {
             "name": "pocketmine/bedrock-data",
-            "version": "1.6.0+bedrock-1.18.10",
+            "version": "1.7.0+bedrock-1.18.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/BedrockData.git",
-                "reference": "e98c511584a7bd58a95986374d2df4b04c6a2ba0"
+                "reference": "c8f323ff0cbdb36a5d95e7e4a23969f562445be0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/BedrockData/zipball/e98c511584a7bd58a95986374d2df4b04c6a2ba0",
-                "reference": "e98c511584a7bd58a95986374d2df4b04c6a2ba0",
+                "url": "https://api.github.com/repos/pmmp/BedrockData/zipball/c8f323ff0cbdb36a5d95e7e4a23969f562445be0",
+                "reference": "c8f323ff0cbdb36a5d95e7e4a23969f562445be0",
                 "shasum": ""
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL-3.0"
+                "CC0-1.0"
             ],
             "description": "Blobs of data generated from Minecraft: Bedrock Edition, used by PocketMine-MP",
             "support": {
                 "issues": "https://github.com/pmmp/BedrockData/issues",
-                "source": "https://github.com/pmmp/BedrockData/tree/bedrock-1.18.10"
+                "source": "https://github.com/pmmp/BedrockData/tree/bedrock-1.18.30"
             },
-            "time": "2022-02-08T19:13:47+00:00"
+            "time": "2022-04-20T12:40:59+00:00"
         },
         {
             "name": "pocketmine/bedrock-protocol",
-            "version": "8.0.2+bedrock-1.18.10",
+            "version": "9.0.1+bedrock-1.18.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/BedrockProtocol.git",
-                "reference": "d1f1afdbb4ea61ea52eb511a79ee1ca561da349c"
+                "reference": "9d3cc87c4d26c002dd42aa9af20c0cd47a72018e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/BedrockProtocol/zipball/d1f1afdbb4ea61ea52eb511a79ee1ca561da349c",
-                "reference": "d1f1afdbb4ea61ea52eb511a79ee1ca561da349c",
+                "url": "https://api.github.com/repos/pmmp/BedrockProtocol/zipball/9d3cc87c4d26c002dd42aa9af20c0cd47a72018e",
+                "reference": "9d3cc87c4d26c002dd42aa9af20c0cd47a72018e",
                 "shasum": ""
             },
             "require": {
@@ -2888,7 +2884,7 @@
                 "ramsey/uuid": "^4.1"
             },
             "require-dev": {
-                "phpstan/phpstan": "1.5.3",
+                "phpstan/phpstan": "1.5.7",
                 "phpstan/phpstan-phpunit": "^1.0.0",
                 "phpstan/phpstan-strict-rules": "^1.0.0",
                 "phpunit/phpunit": "^9.5"
@@ -2906,9 +2902,9 @@
             "description": "An implementation of the Minecraft: Bedrock Edition protocol in PHP",
             "support": {
                 "issues": "https://github.com/pmmp/BedrockProtocol/issues",
-                "source": "https://github.com/pmmp/BedrockProtocol/tree/8.0.2+bedrock-1.18.10"
+                "source": "https://github.com/pmmp/BedrockProtocol/tree/9.0.1+bedrock-1.18.30"
             },
-            "time": "2022-04-01T21:55:10+00:00"
+            "time": "2022-04-23T14:48:16+00:00"
         },
         {
             "name": "pocketmine/binaryutils",
@@ -3126,16 +3122,16 @@
         },
         {
             "name": "pocketmine/locale-data",
-            "version": "2.4.3",
+            "version": "2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/Language.git",
-                "reference": "4d0b081f1a79407e087968ea76aaf330db6ea2b5"
+                "reference": "df6fc7f2b48850b306c60466a11f7a27bb8fe1de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/Language/zipball/4d0b081f1a79407e087968ea76aaf330db6ea2b5",
-                "reference": "4d0b081f1a79407e087968ea76aaf330db6ea2b5",
+                "url": "https://api.github.com/repos/pmmp/Language/zipball/df6fc7f2b48850b306c60466a11f7a27bb8fe1de",
+                "reference": "df6fc7f2b48850b306c60466a11f7a27bb8fe1de",
                 "shasum": ""
             },
             "type": "library",
@@ -3143,9 +3139,9 @@
             "description": "Language resources used by PocketMine-MP",
             "support": {
                 "issues": "https://github.com/pmmp/Language/issues",
-                "source": "https://github.com/pmmp/Language/tree/2.4.3"
+                "source": "https://github.com/pmmp/Language/tree/2.5.0"
             },
-            "time": "2022-01-25T23:18:24+00:00"
+            "time": "2022-04-01T22:36:58+00:00"
         },
         {
             "name": "pocketmine/log",
@@ -3317,16 +3313,16 @@
         },
         {
             "name": "pocketmine/pocketmine-mp",
-            "version": "4.2.6",
+            "version": "4.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "26aee7ff73a982dd45abf8184c715f290ce23fdb"
+                "reference": "f7dce4af8802ce28a8286e1c8002af19cf986c62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/26aee7ff73a982dd45abf8184c715f290ce23fdb",
-                "reference": "26aee7ff73a982dd45abf8184c715f290ce23fdb",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/f7dce4af8802ce28a8286e1c8002af19cf986c62",
+                "reference": "f7dce4af8802ce28a8286e1c8002af19cf986c62",
                 "shasum": ""
             },
             "require": {
@@ -3359,14 +3355,14 @@
                 "netresearch/jsonmapper": "^4.0",
                 "php": "^8.0",
                 "php-64bit": "*",
-                "pocketmine/bedrock-data": "~1.6.0+bedrock-1.18.10",
-                "pocketmine/bedrock-protocol": "~8.0.2+bedrock-1.18.10",
+                "pocketmine/bedrock-data": "~1.7.0+bedrock-1.18.30",
+                "pocketmine/bedrock-protocol": "~9.0.0+bedrock-1.18.30",
                 "pocketmine/binaryutils": "^0.2.1",
                 "pocketmine/callback-validator": "^1.0.2",
                 "pocketmine/classloader": "^0.2.0",
                 "pocketmine/color": "^0.2.0",
                 "pocketmine/errorhandler": "^0.6.0",
-                "pocketmine/locale-data": "~2.4.2",
+                "pocketmine/locale-data": "~2.5.0",
                 "pocketmine/log": "^0.4.0",
                 "pocketmine/log-pthreads": "^0.4.0",
                 "pocketmine/math": "^0.4.0",
@@ -3378,7 +3374,7 @@
                 "webmozart/path-util": "^2.3"
             },
             "require-dev": {
-                "phpstan/phpstan": "1.5.3",
+                "phpstan/phpstan": "1.5.7",
                 "phpstan/phpstan-phpunit": "^1.1.0",
                 "phpstan/phpstan-strict-rules": "^1.0.0",
                 "phpunit/phpunit": "^9.2"
@@ -3400,7 +3396,7 @@
             "homepage": "https://pmmp.io",
             "support": {
                 "issues": "https://github.com/pmmp/PocketMine-MP/issues",
-                "source": "https://github.com/pmmp/PocketMine-MP/tree/4.2.6"
+                "source": "https://github.com/pmmp/PocketMine-MP/tree/4.3.1"
             },
             "funding": [
                 {
@@ -3412,20 +3408,20 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2022-04-01T22:01:15+00:00"
+            "time": "2022-04-23T15:03:14+00:00"
         },
         {
             "name": "pocketmine/raklib",
-            "version": "0.14.3",
+            "version": "0.14.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/RakLib.git",
-                "reference": "4798576fec0364266dce23b368a7fec5e5de7927"
+                "reference": "1ea8e3b95a1b6bf785dc27d76578657be4185f42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/RakLib/zipball/4798576fec0364266dce23b368a7fec5e5de7927",
-                "reference": "4798576fec0364266dce23b368a7fec5e5de7927",
+                "url": "https://api.github.com/repos/pmmp/RakLib/zipball/1ea8e3b95a1b6bf785dc27d76578657be4185f42",
+                "reference": "1ea8e3b95a1b6bf785dc27d76578657be4185f42",
                 "shasum": ""
             },
             "require": {
@@ -3437,7 +3433,7 @@
                 "pocketmine/log": "^0.3.0 || ^0.4.0"
             },
             "require-dev": {
-                "phpstan/phpstan": "1.3.3",
+                "phpstan/phpstan": "1.5.4",
                 "phpstan/phpstan-strict-rules": "^1.0"
             },
             "type": "library",
@@ -3453,9 +3449,9 @@
             "description": "A RakNet server implementation written in PHP",
             "support": {
                 "issues": "https://github.com/pmmp/RakLib/issues",
-                "source": "https://github.com/pmmp/RakLib/tree/0.14.3"
+                "source": "https://github.com/pmmp/RakLib/tree/0.14.4"
             },
-            "time": "2022-01-10T21:29:48+00:00"
+            "time": "2022-04-17T18:42:17+00:00"
         },
         {
             "name": "pocketmine/raklib-ipc",
