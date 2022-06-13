@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin\Events;
 use pocketmine\event\plugin\PluginEvent;
 
 /**
- * All events are non cancellable.
+ * All events are non-cancellable.
  *
  * Please note that the change to Storage will not be reflected until after the event so in event `DiscordMemberDeleted`
  * for example the storage will still have the full member/user model.

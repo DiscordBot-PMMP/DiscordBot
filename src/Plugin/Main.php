@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
+use JaxkDev\DiscordBot\Plugin\Tasks\DebugData;
 use Phar;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -25,7 +26,6 @@ use pocketmine\scheduler\TaskHandler;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use Volatile;
-use ZipArchive;
 
 class Main extends PluginBase{
 
@@ -50,7 +50,7 @@ class Main extends PluginBase{
     private $config;
 
     protected function onLoad(): void{
-        if(($phar = Phar::running(true)) === ""){
+        if(($phar = Phar::running()) === ""){
             throw new PluginException("Cannot be run from source.");
         }
 
@@ -60,7 +60,6 @@ class Main extends PluginBase{
             define("JaxkDev\DiscordBot\COMPOSER", $phar."/vendor/autoload.php");
         }
         if (!function_exists('JaxkDev\DiscordBot\Libs\React\Promise\resolve')) {
-            /** @noinspection PhpIncludeInspection */
             require $phar.'/src/Libs/React/Promise/functions.php';
         }
 
@@ -132,80 +131,11 @@ class Main extends PluginBase{
         if($command->getName() !== "debugdiscord") return false;
         if(!$command->testPermission($sender)) return true;
 
-        $sender->sendMessage(TextFormat::YELLOW."Building debug file please be patient.");
-        $startTime = microtime(true);
+        $sender->sendMessage(TextFormat::YELLOW."Building debug file, please be patient this can take several seconds.");
 
-        if(!is_dir($this->getDataFolder()."debug")){
-            if(!mkdir($this->getDataFolder()."debug")){
-                $sender->sendMessage(TextFormat::RED."Failed to create folder '".$this->getDataFolder()."debug/'");
-                return true;
-            }
-        }
+        $task = new DebugData($this, $sender);
+        $this->getServer()->getAsyncPool()->submitTask($task);
 
-        $path = $this->getDataFolder()."debug/"."discordbot_".time().".zip";
-        $z = new ZipArchive();
-        $z->open($path, ZIPARCHIVE::CREATE);
-
-        //Config file, (USE $this->config, token is redacted in this but not on file.) (yaml_emit to avoid any comments that include sensitive data)
-        $z->addFromString("config.yml", yaml_emit($this->config));
-
-        //Server log.
-        $z->addFile($this->getServer()->getDataPath()."server.log", "server.log");
-
-        //Add Discord thread logs.
-        $dir = scandir($this->getDataFolder()."logs");
-        if($dir !== false){
-            foreach($dir as $file){
-                if($file !== "." and $file !== ".."){
-                    $z->addFile($this->getDataFolder()."logs/".$file, "thread_logs/".$file);
-                }
-            }
-        }
-
-        //Add Storage.
-        if(Storage::getTimestamp() !== 0){
-            $z->addFromString("storage.serialized", Storage::serializeStorage());
-        }
-
-        //Some metadata, instead of users having no clue of anything I ask, therefore generate this information beforehand.
-        $time = date('d-m-Y H:i:s');
-        $ver = $this->getDescription()->getVersion();
-        $pmmp = $this->getServer()->getPocketMineVersion()." | ".$this->getServer()->getVersion();
-        $os = php_uname();
-        $php = PHP_VERSION;
-        $jit = "N/A";
-        $jit_opt = "N/A";
-        if(function_exists('opcache_get_status') and (($opcacheStatus = opcache_get_status(false)) !== false)){
-            $jit = ((($opcacheStatus["jit"]??[])["on"]??false) ? "Enabled" : "Disabled");
-            $opcacheConfig = opcache_get_configuration();
-            if($opcacheConfig !== false){
-                $jit_opt = (($jit === "Enabled") ? (($opcacheConfig["directives"]??[])["opcache.jit"]??"N/A") : "N/A");
-            }
-        }
-        $z->addFromString("metadata.txt", <<<META
-/*
- * DiscordBot, PocketMine-MP Plugin.
- *
- * Licensed under the Open Software License version 3.0 (OSL-3.0)
- * Copyright (C) 2020-present JaxkDev
- *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
- * Email   :: JaxkDev@gmail.com
- */
- 
-Version    | {$ver}
-Timestamp  | {$time}
-
-PocketMine | {$pmmp}
-PHP        | {$php}
-JIT        | {$jit} [$jit_opt]
-OS         | {$os}
-META);
-        $z->close();
-
-        $time = round(microtime(true)-$startTime, 3);
-        $sender->sendMessage(TextFormat::GREEN."Successfully generated debug data in {$time} seconds, saved file to '$path'");
         return true;
     }
 
