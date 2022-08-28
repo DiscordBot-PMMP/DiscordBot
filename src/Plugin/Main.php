@@ -82,14 +82,11 @@ class Main extends PluginBase{
             $this->getLogger()->alert("DiscordBot v1 events.yml file found, please note this has been stripped out of ".
                 "the DiscordBot core, see https://github.com/DiscordBot-PMMP/DiscordChat for similar features.");
         }
-        if(extension_loaded("xdebug")){
-            if(ini_get("xdebug.output_dir") === $this->getDataFolder()){
-                $this->getLogger()->warning("X-Debug is running, this will cause data pack to be several minutes long.");
-            }else{
-                $this->getLogger()->emergency("Plugin will not run with xdebug due to the performance drops.");
-                $this->getServer()->getPluginManager()->disablePlugin($this);
-                return;
-            }
+
+        /** @noinspection PhpParamsInspection */
+        /** @noinspection PhpVoidFunctionResultUsedInspection */
+        if(extension_loaded("xdebug") and (!function_exists('xdebug_info') || count(xdebug_info('mode')) !== 0)){
+            $this->getLogger()->warning("xdebug is enabled, this will cause major performance issues with the discord thread.");
         }
 
         $this->api = new Api($this);
