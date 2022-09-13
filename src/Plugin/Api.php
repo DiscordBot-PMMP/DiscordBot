@@ -294,10 +294,16 @@ class Api{
      *
      * @param string $member_id
      * @param string $role_id
+     * @param null|string $server_id
      * @return PromiseInterface Resolves with no data.
      */
-    public function removeRole(string $member_id, string $role_id): PromiseInterface{
-        [$sid, $uid] = explode(".", $member_id);
+    public function removeRole(string $member_id, string $role_id, ?string $server_id = null): PromiseInterface{
+        if (!str_contains($member_id, ".") && $server_id != null) {
+            $sid = $server_id;
+            $uid = $member_id;
+        } else {
+            [$sid, $uid] = explode(".", $member_id);
+        }
         if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
             return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
         }
@@ -314,10 +320,16 @@ class Api{
      *
      * @param string $member_id
      * @param string $role_id
+     * @param null|string $server_id
      * @return PromiseInterface Resolves with no data.
      */
-    public function addRole(string $member_id, string $role_id): PromiseInterface{
-        [$sid, $uid] = explode(".", $member_id);
+    public function addRole(string $member_id, string $role_id, ?string $server_id = null): PromiseInterface{
+        if (!str_contains($member_id, ".") && $server_id != null) {
+            $sid = $server_id;
+            $uid = $member_id;
+        } else {
+            [$sid, $uid] = explode(".", $member_id);
+        }
         if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
             return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
         }
@@ -466,10 +478,16 @@ class Api{
      * Attempt to kick a member.
      *
      * @param string $member_id
+     * @param null|string $server_id
      * @return PromiseInterface Resolves with no data.
      */
-    public function kickMember(string $member_id): PromiseInterface{
-        [$sid, $uid] = explode(".", $member_id);
+    public function kickMember(string $member_id, ?string $server_id = null): PromiseInterface{
+        if (!str_contains($member_id, ".") && $server_id != null) {
+            $sid = $server_id;
+            $uid = $member_id;
+        } else {
+            [$sid, $uid] = explode(".", $member_id);
+        }
         if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
             return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
         }
@@ -643,11 +661,17 @@ class Api{
      * Update a members nickname (set to null to remove)
      *
      * @param string $member_id
+     * @param null|string $server_id
      * @param null|string $nickname Null to remove nickname.
      * @return PromiseInterface Resolves with no data.
      */
-    public function updateNickname(string $member_id, ?string $nickname = null): PromiseInterface{
-        [$sid, $uid] = explode(".", $member_id);
+    public function updateNickname(string $member_id, ?string $server_id = null, ?string $nickname = null): PromiseInterface{
+        if (!str_contains($member_id, ".") && $server_id != null) {
+            $sid = $server_id;
+            $uid = $member_id;
+        } else {
+            [$sid, $uid] = explode(".", $member_id);
+        }
         if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
             return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
         }
