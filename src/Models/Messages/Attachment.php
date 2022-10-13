@@ -80,7 +80,7 @@ class Attachment implements \Serializable{
     }
 
     public function setSize(int $size): void{
-        if($size <= 0){
+        if($size < 0){
             throw new \AssertionError("Size '$size bytes' is invalid.");
         }
         $this->size = $size;
@@ -92,6 +92,7 @@ class Attachment implements \Serializable{
 
     public function setUrl(string $url): void{
         if(!str_starts_with($url, "https://")){
+            //TODO Check again, can't see in docs now.
             throw new \AssertionError("URL '$url' is invalid, must be prefixed 'https://'.");
         }
         $this->url = $url;
@@ -102,7 +103,7 @@ class Attachment implements \Serializable{
     }
 
     public function setWidth(?int $width): void{
-        if($width !== null and $width <= 0){
+        if($width !== null and $width < 0){
             throw new \AssertionError("Width '$width' is invalid.");
         }
         $this->width = $width;
@@ -113,7 +114,7 @@ class Attachment implements \Serializable{
     }
 
     public function setHeight(?int $height): void{
-        if($height !== null and $height <= 0){
+        if($height !== null and $height < 0){
             throw new \AssertionError("Height '$height' is invalid.");
         }
         $this->height = $height;
