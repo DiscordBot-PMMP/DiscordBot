@@ -225,7 +225,7 @@ abstract class ModelConverter{
             $attachments[] = self::genModelAttachment($attachment);
         }
         $guild_id = $discordMessage->guild_id??($discordMessage->author instanceof DiscordMember ? $discordMessage->author->guild_id : null);
-        if($discordMessage->type === DiscordMessage::TYPE_NORMAL){
+        if($discordMessage->type === DiscordMessage::TYPE_NORMAL or $discordMessage->type === DiscordMessage::TYPE_APPLICATION_COMMAND){ #TODO Decide on application commands.
             if($discordMessage->webhook_id === null){
                 /** @var DiscordEmbed|null $e */
                 $e = $discordMessage->embeds->first();
@@ -260,7 +260,8 @@ abstract class ModelConverter{
                 $discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
                 array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));
         }
-        throw new AssertionError("Discord message type not supported.");
+        # TODO Better handling of other/future message types.
+        throw new AssertionError("Discord message type (" . $discordMessage->type . ") not supported.");
     }
 
     static public function genModelAttachment(\stdClass $attachment): Attachment{
