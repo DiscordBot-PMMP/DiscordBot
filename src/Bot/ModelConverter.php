@@ -317,7 +317,7 @@ abstract class ModelConverter{
         $inviter = null;
         if(in_array("inviter", array_keys($invite->getRawAttributes()), true)){
             //Workaround for #52, can be removed once using DiscordPHP >= 7.0.0
-            $inviter = $invite->inviter instanceof DiscordUser ? $invite->inviter->id : null; /** @phpstan-ignore-line */
+            $inviter = $invite->inviter instanceof DiscordUser ? $invite->inviter->id : null;
         }
         return new Invite($invite->guild_id, $invite->channel_id, $invite->max_age, $invite->max_uses, $invite->temporary,
         $invite->code, $invite->created_at->getTimestamp(), $inviter === null ? null : $invite->guild_id.".".$inviter, $invite->uses);

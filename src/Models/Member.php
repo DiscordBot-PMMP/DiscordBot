@@ -191,7 +191,6 @@ class Member implements \Serializable{
     /** @param null|Activity[] $activities */
     public function setActivities(?array $activities): void{
         foreach($activities??[] as $activity){
-            /** @phpstan-ignore-next-line phpstan-strict-rules treatPhpDocTypesAsCertain doesn't work with this :( */
             if(!$activity instanceof Activity){
                 throw new \AssertionError("Activity not valid.");
             }

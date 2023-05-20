@@ -263,7 +263,6 @@ class Client{
                 $this->logger->critical($line);
             }
         }
-        /** @phpstan-ignore-next-line phpstan-strict-rules, client could be undefined */
         if($this->client instanceof Discord){
             try{
                 $this->client->close(true);

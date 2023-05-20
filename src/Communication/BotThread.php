@@ -47,7 +47,6 @@ class BotThread extends Thread{
         //Ignores everything outside our own files.
         require_once(\JaxkDev\DiscordBot\COMPOSER);
 
-        /* @phpstan-ignore-next-line phpstan-strict-rules initialConfig is volatile not array */
         new Client($this, (array)$this->initialConfig);
     }
 
