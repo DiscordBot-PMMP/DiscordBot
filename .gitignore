@@ -1,5 +1,10 @@
-/vendor/
 /dist/
+/vendor/bin/*
+/vendor/team-reflex/discord-php/bin/*
+/vendor/**/.git
+/vendor/**/.github
+/vendor/**/*.md
+.ds_store
 /.cache/
 /code-coverage/
 
@@ -7,8 +12,11 @@
 *.txt
 *.DS_STORE
 
-TEST.php
-PHPSTAN.php
 phpstan.neon
+/vendor/nesbot/carbon/src/Carbon/Lang/
+/vendor/guzzlehttp/psr7/vendor-bin/
+/vendor/team-reflex/discord-php/.github/
+/vendor/team-reflex/discord-php/.vscode/
+
 phpunit.xml
 .phpunit.result.cache
