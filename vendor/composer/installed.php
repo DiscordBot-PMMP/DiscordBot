@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '7f2492c963675ddbd1258e6f09bf38a7ad5128cd',
+        'reference' => 'd9bc8c30f2f3fc68572ce9e16649354353b85842',
         'name' => 'jaxkdev/discordbot',
         'dev' => false,
     ),
@@ -52,7 +52,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '7f2492c963675ddbd1258e6f09bf38a7ad5128cd',
+            'reference' => 'd9bc8c30f2f3fc68572ce9e16649354353b85842',
             'dev_requirement' => false,
         ),
         'mollie/polyfill-libsodium' => array(
