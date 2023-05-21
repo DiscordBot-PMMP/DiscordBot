@@ -43,7 +43,7 @@ class Activity implements \Serializable{
     /** @var null|string stream url, only when type is streaming. */
     private $url;
 
-    /** @var null|int https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-timestamps */
+    /** @var null|int https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps */
     private $start_timestamp;
     /** @var null|int */
     private $end_timestamp;
@@ -60,14 +60,14 @@ class Activity implements \Serializable{
     /** @var null|string */
     private $emoji;
 
-    /** @var null|string https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-party */
+    /** @var null|string https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party */
     private $party_id;
     /** @var null|int */
     private $party_size;
     /** @var null|int */
     private $party_max_size;
 
-    /** @var null|string https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-assets */
+    /** @var null|string https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets */
     private $large_image;
     /** @var null|string */
     private $large_text;
@@ -76,7 +76,7 @@ class Activity implements \Serializable{
     /** @var null|string */
     private $small_text;
 
-    ///** @var null|string https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-secrets */
+    ///** @var null|string https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-secrets */
     //private $join_secret;
     ///** @var null|string */
     //private $spectate_secret;
@@ -86,7 +86,7 @@ class Activity implements \Serializable{
     /** @var null|bool Whether or not the activity is an instanced game session */
     private $instance;
 
-    /** @var null|int https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-flags */
+    /** @var null|int https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags */
     private $flags;
 
     //Buttons (max 2) https://github.com/discord-php/DiscordPHP/issues/561
@@ -165,7 +165,7 @@ class Activity implements \Serializable{
             }
         }
         */
-        if($url !== null and !str_starts_with($url, "https://")){
+        if($url !== null and !str_starts_with($url, "https://") and !str_starts_with($url, "http://")){
             throw new \AssertionError("Invalid url '$url'.");
         }
         $this->url = $url;
