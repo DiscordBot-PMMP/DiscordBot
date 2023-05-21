@@ -1,0 +1,25 @@
+{
+    "name": "mollie/polyfill-libsodium",
+    "description": "A polyfill package to transition from the libsodium php extension to the sodium extension. Which is included in PHP 7.2",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Martijn Smit",
+            "email": "smit@mollie.com"
+        },
+        {
+            "name": "Willem Stuursma-Ruwen",
+            "email": "willem@mollie.com"
+        }
+    ],
+    "autoload": {
+        "files": ["./bootstrap.php"]
+    },
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "suggest": {
+        "ext-sodium": "The new sodium php extension"
+    }
+}

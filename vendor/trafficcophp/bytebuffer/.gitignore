@@ -1,0 +1,4 @@
+/vendor/.composer/
+vendor/
+/phpunit.xml
+.idea/

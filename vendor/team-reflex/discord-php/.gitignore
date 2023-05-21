@@ -1,0 +1,29 @@
+# general
+.env
+.DS_Store
+test*.php
+.idea
+.phplint-cache
+
+# phive
+/tools
+.phive
+
+# composer
+/vendor
+composer.lock
+
+# docs
+/build
+.phpdoc
+
+# php-cs-fixer
+.php_cs.cache
+.php_cs
+.php-cs-fixer.php
+.php-cs-fixer.cache
+
+# phpunit
+phpunit.log
+/.phpunit*
+/coverage

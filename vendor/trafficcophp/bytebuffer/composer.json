@@ -1,0 +1,20 @@
+{
+	"name": "TrafficCophp/ByteBuffer",
+	"type": "library",
+	"description": "Node.js inspired byte stream buffer for PHP.",
+	"keywords": ["Buffer", "Stream", "Socket", "Library", "Bytehandling", "pack", "wrapper", "binary data"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Ole 'nesQuick' Michaelis",
+			"email": "ole.michaelis@googlemail.com",
+			"homepage": "http://www.codestars.eu"
+		}
+	],
+	"autoload": {
+		"psr-0": {
+			"TrafficCophp": "src/"
+		}
+	},
+	"require": {}
+}
