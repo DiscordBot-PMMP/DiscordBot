@@ -343,7 +343,16 @@ array(5) {
 
     public function onMessageDelete(DiscordMessage|\stdClass $data, Discord $discord): void{
         if($data instanceof DiscordMessage){
-            $message = ModelConverter::genModelMessage($data);
+            if(!$this->checkMessage($data)){
+                //Unknown message type deleted (send basic details TODO decide for future).
+                $message = [
+                    "message_id" => $data->id,
+                    "channel_id" => $data->channel_id,
+                    "server_id" => $data->guild_id
+                ];
+            }else{
+                $message = ModelConverter::genModelMessage($data);
+            }
         }else{
             $message = [
                 "message_id" => $data->id,
