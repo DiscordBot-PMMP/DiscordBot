@@ -20,9 +20,9 @@
         ]
     },
     "require": {
-        "php": "~8.0.3",
-        "team-reflex/discord-php": "v6.0.3",
-        "react/promise": "v2.9.0"
+        "php": "^8.0.3",
+        "team-reflex/discord-php": "v7.3.4",
+        "react/promise": "v2.10.0"
     },
     "require-dev": {
         "phpstan/phpstan": "1.10.15",
