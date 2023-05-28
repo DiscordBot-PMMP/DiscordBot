@@ -14,8 +14,8 @@ namespace JaxkDev\DiscordBot\Communication;
 
 use JaxkDev\DiscordBot\Bot\Client;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use Thread;
-use Volatile;
+use pmmp\thread\Thread;
+use pmmp\thread\ThreadSafeArray;
 
 class BotThread extends Thread{
 
@@ -29,15 +29,15 @@ class BotThread extends Thread{
     /**  @var array */
     private $initialConfig;
 
-    /** @var Volatile */
+    /** @var ThreadSafeArray */
     private $inboundData;
-    /** @var Volatile */
+    /** @var ThreadSafeArray */
     private $outboundData; //@phpstan-ignore-line Write only.
 
     /** @var int */
     private $status = self::STATUS_STARTING;
 
-    public function __construct(array $initialConfig, Volatile $inboundData, Volatile $outboundData){
+    public function __construct(array $initialConfig, ThreadSafeArray $inboundData, ThreadSafeArray $outboundData){
         $this->initialConfig = $initialConfig;
         $this->inboundData = $inboundData;
         $this->outboundData = $outboundData;
@@ -57,7 +57,7 @@ class BotThread extends Thread{
                 throw new \AssertionError("Data did not unserialize to a Packet.");
             }
             return $packet;
-        }, $this->inboundData->chunk($count, false));
+        }, $this->inboundData->chunk($count));
     }
 
     public function writeOutboundData(Packet $packet): void{

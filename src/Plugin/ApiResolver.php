@@ -55,7 +55,7 @@ abstract class ApiResolver{
                 $pl = null;
                 try{
                     $pl = Server::getInstance()->getPluginManager()->getPlugin("DiscordBot");
-                }catch(\RuntimeException $e){}
+                }catch(\RuntimeException){}
                 if($pl instanceof Main){
                     self::$logger = $pl->getLogger();
                 }else{

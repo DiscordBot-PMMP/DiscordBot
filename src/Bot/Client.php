@@ -265,7 +265,7 @@ class Client{
         }
         if($this->client instanceof Discord){
             try{
-                $this->client->close(true);
+                $this->client->close();
             }catch (Error $e){
                 $this->logger->debug("Failed to close client, probably not started. ({$e->getMessage()})");
             }

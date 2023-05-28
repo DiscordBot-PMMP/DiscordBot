@@ -8,7 +8,7 @@ website: https://github.com/DiscordBot-PMMP/DiscordBot
 
 api: 5.0.0
 extensions:
-  core: ">=8.0.3" #aka PHP Version.
+  core: ">=8.1" #aka PHP Version.
 
 commands:
   debugdiscord:

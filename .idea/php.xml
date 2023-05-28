@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="MessDetectorOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
+  <component name="PHPCSFixerOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
+  <component name="PHPCodeSnifferOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
   <component name="PhpIncludePathManager">
     <include_path>
       <path value="$PROJECT_DIR$/../../PocketMine/PMMP4-PHP8/PocketMine-MP.phar" />
@@ -16,7 +25,6 @@
       <path value="$PROJECT_DIR$/vendor/react/datagram" />
       <path value="$PROJECT_DIR$/vendor/ringcentral/psr7" />
       <path value="$PROJECT_DIR$/vendor/react/promise-timer" />
-      <path value="$PROJECT_DIR$/vendor/react/promise-stream" />
       <path value="$PROJECT_DIR$/vendor/react/stream" />
       <path value="$PROJECT_DIR$/vendor/react/cache" />
       <path value="$PROJECT_DIR$/vendor/react/partial" />
@@ -72,17 +80,122 @@
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
       <path value="$PROJECT_DIR$/vendor/symfony/filesystem" />
       <path value="$PROJECT_DIR$/vendor/pocketmine/bedrock-item-upgrade-schema" />
+      <path value="$PROJECT_DIR$/../../PocketMine/PMMP5/PocketMine-MP.phar" />
     </include_path>
   </component>
-  <component name="PhpProjectSharedConfiguration" php_language_level="8.0" />
+  <component name="PhpProjectSharedConfiguration" php_language_level="8.1" />
+  <component name="PhpRuntimeConfiguration" default_stubs_path="$PROJECT_DIR$/../phpstorm-stubs">
+    <extensions>
+      <extension name="Ev" enabled="false" />
+      <extension name="SQLite" enabled="false" />
+      <extension name="SplType" enabled="false" />
+      <extension name="ZendDebugger" enabled="false" />
+      <extension name="ZendUtils" enabled="false" />
+      <extension name="amqp" enabled="false" />
+      <extension name="apache" enabled="false" />
+      <extension name="apcu" enabled="false" />
+      <extension name="bz2" enabled="false" />
+      <extension name="cassandra" enabled="false" />
+      <extension name="couchbase" enabled="false" />
+      <extension name="crypto" enabled="true" />
+      <extension name="cubrid" enabled="false" />
+      <extension name="dba" enabled="false" />
+      <extension name="decimal" enabled="false" />
+      <extension name="dio" enabled="false" />
+      <extension name="elastic_apm" enabled="false" />
+      <extension name="enchant" enabled="false" />
+      <extension name="exif" enabled="false" />
+      <extension name="fann" enabled="false" />
+      <extension name="ffmpeg" enabled="false" />
+      <extension name="gearman" enabled="false" />
+      <extension name="geoip" enabled="false" />
+      <extension name="geos" enabled="false" />
+      <extension name="gettext" enabled="false" />
+      <extension name="gmagick" enabled="false" />
+      <extension name="gnupg" enabled="false" />
+      <extension name="grpc" enabled="false" />
+      <extension name="http" enabled="false" />
+      <extension name="ibm_db2" enabled="false" />
+      <extension name="iconv" enabled="false" />
+      <extension name="imagick" enabled="false" />
+      <extension name="imap" enabled="false" />
+      <extension name="inotify" enabled="false" />
+      <extension name="interbase" enabled="false" />
+      <extension name="intl" enabled="false" />
+      <extension name="judy" enabled="false" />
+      <extension name="ldap" enabled="false" />
+      <extension name="leveldb" enabled="true" />
+      <extension name="libevent" enabled="false" />
+      <extension name="libsodium" enabled="false" />
+      <extension name="mailparse" enabled="false" />
+      <extension name="mcrypt" enabled="false" />
+      <extension name="memcache" enabled="false" />
+      <extension name="memcached" enabled="false" />
+      <extension name="ming" enabled="false" />
+      <extension name="mongo" enabled="false" />
+      <extension name="mongodb" enabled="false" />
+      <extension name="mosquitto-php" enabled="false" />
+      <extension name="mqseries" enabled="false" />
+      <extension name="mssql" enabled="false" />
+      <extension name="mysql" enabled="false" />
+      <extension name="mysql_xdevapi" enabled="false" />
+      <extension name="ncurses" enabled="false" />
+      <extension name="newrelic" enabled="false" />
+      <extension name="oauth" enabled="false" />
+      <extension name="oci8" enabled="false" />
+      <extension name="odbc" enabled="false" />
+      <extension name="pdflib" enabled="false" />
+      <extension name="pdo_ibm" enabled="false" />
+      <extension name="pdo_pgsql" enabled="false" />
+      <extension name="pgsql" enabled="false" />
+      <extension name="pspell" enabled="false" />
+      <extension name="rar" enabled="false" />
+      <extension name="readline" enabled="false" />
+      <extension name="recode" enabled="false" />
+      <extension name="redis" enabled="false" />
+      <extension name="rrd" enabled="false" />
+      <extension name="snappy" enabled="false" />
+      <extension name="snmp" enabled="false" />
+      <extension name="soap" enabled="false" />
+      <extension name="sodium" enabled="false" />
+      <extension name="sqlsrv" enabled="false" />
+      <extension name="ssh2" enabled="false" />
+      <extension name="suhosin" enabled="false" />
+      <extension name="svn" enabled="false" />
+      <extension name="sybase" enabled="false" />
+      <extension name="sysvmsg" enabled="false" />
+      <extension name="sysvsem" enabled="false" />
+      <extension name="sysvshm" enabled="false" />
+      <extension name="tidy" enabled="false" />
+      <extension name="v8js" enabled="false" />
+      <extension name="wddx" enabled="false" />
+      <extension name="win32service" enabled="false" />
+      <extension name="wincache" enabled="false" />
+      <extension name="xdebug" enabled="false" />
+      <extension name="xhprof" enabled="false" />
+      <extension name="xlswriter" enabled="false" />
+      <extension name="xmlrpc" enabled="false" />
+      <extension name="xsl" enabled="false" />
+      <extension name="zend" enabled="false" />
+      <extension name="zmq" enabled="false" />
+    </extensions>
+  </component>
   <component name="PhpStan">
     <PhpStan_settings>
       <PhpStanConfiguration tool_path="$PROJECT_DIR$/vendor/bin/phpstan.phar" />
     </PhpStan_settings>
   </component>
+  <component name="PhpStanOptionsConfiguration">
+    <option name="config" value="C:\Users\Jack\Documents\GitHub\DiscordBot\phpstan.neon" />
+    <option name="level" value="8" />
+    <option name="transferred" value="true" />
+  </component>
   <component name="PhpUnit">
     <phpunit_settings>
       <PhpUnitSettings custom_loader_path="$PROJECT_DIR$/vendor/autoload.php" />
     </phpunit_settings>
+  </component>
+  <component name="PsalmOptionsConfiguration">
+    <option name="transferred" value="true" />
   </component>
 </project>

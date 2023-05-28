@@ -85,6 +85,7 @@ class DebugData extends \pocketmine\scheduler\AsyncTask{
         $php = PHP_VERSION;
         $jit = "N/A";
         $jit_opt = "N/A";
+        //TODO Check 8.1+
         if(function_exists('opcache_get_status') and (($opcacheStatus = opcache_get_status(false)) !== false)){
             $jit = ((($opcacheStatus["jit"]??[])["on"]??false) ? "Enabled" : "Disabled");
             $opcacheConfig = opcache_get_configuration();

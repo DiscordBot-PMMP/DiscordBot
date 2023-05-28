@@ -17,6 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
 use JaxkDev\DiscordBot\Plugin\Tasks\DebugData;
 use Phar;
+use pmmp\thread\ThreadSafeArray;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\plugin\PluginBase;
@@ -25,16 +26,15 @@ use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
-use Volatile;
 
 class Main extends PluginBase{
 
     /** @var BotThread */
     private $discordBot;
 
-    /** @var Volatile */
+    /** @var ThreadSafeArray */
     private $inboundData;
-    /** @var Volatile */
+    /** @var ThreadSafeArray */
     private $outboundData;
 
     /** @var TaskHandler */
@@ -71,8 +71,8 @@ class Main extends PluginBase{
         $this->saveResource("HELP_ENG.txt", true); //Always keep these up-to-date.
         $this->saveResource("cacert.pem", true);
 
-        $this->inboundData = new Volatile();
-        $this->outboundData = new Volatile();
+        $this->inboundData = new ThreadSafeArray();
+        $this->outboundData = new ThreadSafeArray();
     }
 
     protected function onEnable(): void{
@@ -83,8 +83,7 @@ class Main extends PluginBase{
                 "the DiscordBot core, see https://github.com/DiscordBot-PMMP/DiscordChat for similar features.");
         }
 
-        /** @noinspection PhpParamsInspection */
-        /** @noinspection PhpVoidFunctionResultUsedInspection */
+        /** @noinspection PhpUndefinedFunctionInspection */
         if(extension_loaded("xdebug") and (!function_exists('xdebug_info') || count(xdebug_info('mode')) !== 0)){
             $this->getLogger()->warning("xdebug is enabled, this will cause major performance issues with the discord thread.");
         }
@@ -209,7 +208,7 @@ class Main extends PluginBase{
                 throw new \AssertionError("Data did not unserialize to a Packet.");
             }
             return $packet;
-        }, $this->inboundData->chunk($count, false));
+        }, $this->inboundData->chunk($count));
     }
 
     /**
