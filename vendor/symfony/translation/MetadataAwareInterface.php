@@ -12,7 +12,7 @@
 namespace Symfony\Component\Translation;
 
 /**
- * This interface is used to get, set, and delete metadata about the translation messages.
+ * MetadataAwareInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

@@ -42,6 +42,9 @@ abstract class FileDumper implements DumperInterface
         $this->relativePathTemplate = $relativePathTemplate;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function dump(MessageCatalogue $messages, array $options = [])
     {
         if (!\array_key_exists('path', $options)) {

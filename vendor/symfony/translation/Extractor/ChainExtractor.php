@@ -35,6 +35,9 @@ class ChainExtractor implements ExtractorInterface
         $this->extractors[$format] = $extractor;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setPrefix(string $prefix)
     {
         foreach ($this->extractors as $extractor) {
@@ -42,6 +45,9 @@ class ChainExtractor implements ExtractorInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function extract(string|iterable $directory, MessageCatalogue $catalogue)
     {
         foreach ($this->extractors as $extractor) {

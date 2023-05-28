@@ -45,11 +45,14 @@ class XliffLintCommand extends Command
     {
         parent::__construct($name);
 
-        $this->directoryIteratorProvider = null === $directoryIteratorProvider ? null : $directoryIteratorProvider(...);
-        $this->isReadableProvider = null === $isReadableProvider ? null : $isReadableProvider(...);
+        $this->directoryIteratorProvider = null === $directoryIteratorProvider || $directoryIteratorProvider instanceof \Closure ? $directoryIteratorProvider : \Closure::fromCallable($directoryIteratorProvider);
+        $this->isReadableProvider = null === $isReadableProvider || $isReadableProvider instanceof \Closure ? $isReadableProvider : \Closure::fromCallable($isReadableProvider);
         $this->requireStrictFileNames = $requireStrictFileNames;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -153,12 +156,16 @@ EOF
 
     private function display(SymfonyStyle $io, array $files)
     {
-        return match ($this->format) {
-            'txt' => $this->displayTxt($io, $files),
-            'json' => $this->displayJson($io, $files),
-            'github' => $this->displayTxt($io, $files, true),
-            default => throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $this->format)),
-        };
+        switch ($this->format) {
+            case 'txt':
+                return $this->displayTxt($io, $files);
+            case 'json':
+                return $this->displayJson($io, $files);
+            case 'github':
+                return $this->displayTxt($io, $files, true);
+            default:
+                throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $this->format));
+        }
     }
 
     private function displayTxt(SymfonyStyle $io, array $filesInfo, bool $errorAsGithubAnnotations = false)
@@ -177,7 +184,9 @@ EOF
                     // general document errors have a '-1' line number
                     $line = -1 === $error['line'] ? null : $error['line'];
 
-                    $githubReporter?->error($error['message'], $info['file'], $line, null !== $line ? $error['column'] : null);
+                    if ($githubReporter) {
+                        $githubReporter->error($error['message'], $info['file'], $line, null !== $line ? $error['column'] : null);
+                    }
 
                     return null === $line ? $error['message'] : sprintf('Line %d, Column %d: %s', $line, $error['column'], $error['message']);
                 }, $info['messages']));

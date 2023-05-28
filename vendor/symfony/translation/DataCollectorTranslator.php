@@ -25,7 +25,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     public const MESSAGE_MISSING = 1;
     public const MESSAGE_EQUALS_FALLBACK = 2;
 
-    private TranslatorInterface $translator;
+    private $translator;
     private array $messages = [];
 
     /**
@@ -40,6 +40,9 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         $this->translator = $translator;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
     {
         $trans = $this->translator->trans($id = (string) $id, $parameters, $domain, $locale);
@@ -48,27 +51,41 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         return $trans;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setLocale(string $locale)
     {
         $this->translator->setLocale($locale);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getLocale(): string
     {
         return $this->translator->getLocale();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCatalogue(string $locale = null): MessageCatalogueInterface
     {
         return $this->translator->getCatalogue($locale);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCatalogues(): array
     {
         return $this->translator->getCatalogues();
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @return string[]
      */
     public function warmUp(string $cacheDir): array
@@ -107,7 +124,9 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
 
     private function collectMessage(?string $locale, ?string $domain, string $id, string $translation, ?array $parameters = [])
     {
-        $domain ??= 'messages';
+        if (null === $domain) {
+            $domain = 'messages';
+        }
 
         $catalogue = $this->translator->getCatalogue($locale);
         $locale = $catalogue->getLocale();
