@@ -20,13 +20,13 @@
         ]
     },
     "require": {
-        "php": "^8.0.3",
-        "team-reflex/discord-php": "v7.3.4",
-        "react/promise": "v2.10.0"
+        "php": "~8.0.3",
+        "team-reflex/discord-php": "v6.0.3",
+        "react/promise": "v2.9.0"
     },
     "require-dev": {
         "phpstan/phpstan": "1.10.15",
         "phpstan/phpstan-strict-rules": "1.5.1",
-        "pocketmine/pocketmine-mp": "^5.0.0-BETA3"
+        "pocketmine/pocketmine-mp": "^4"
     }
 }
