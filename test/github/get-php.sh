@@ -1,4 +1,4 @@
-PHP=$"8.1"
+PHP=$"8.1" #Change this to void cache, 001
 GIT_TAG=$"php-$PHP-latest"
 
 wget -q -O - "https://github.com/pmmp/PHP-Binaries/releases/download/$GIT_TAG/PHP-Linux-x86_64-PM4.tar.gz" | tar -zx > /dev/null 2>&1
