@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class Member implements \Serializable{
+class Member{
 
     const STATUS_ONLINE = "online",
         STATUS_IDLE = "idle",
@@ -207,8 +207,8 @@ class Member implements \Serializable{
     }
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->user_id,
             $this->nickname,
             $this->join_timestamp,
@@ -220,26 +220,26 @@ class Member implements \Serializable{
             $this->client_status,
             $this->activities,
             $this->voice_state
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->user_id,
+                $this->nickname,
+                $this->join_timestamp,
+                $this->boost_timestamp,
+                $this->permissions,
+                $this->roles,
+                $this->server_id,
+                $this->status,
+                $this->client_status,
+                $this->activities,
+                $this->voice_state
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->user_id,
-            $this->nickname,
-            $this->join_timestamp,
-            $this->boost_timestamp,
-            $this->permissions,
-            $this->roles,
-            $this->server_id,
-            $this->status,
-            $this->client_status,
-            $this->activities,
-            $this->voice_state
-        ] = $data;
     }
 }

@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models\Messages;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class Message implements \Serializable{
+class Message{
 
     /** @var ?string Null when sending message. */
     protected $id;
@@ -251,8 +251,8 @@ class Message implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->id,
             $this->content,
             $this->embed,
@@ -265,27 +265,27 @@ class Message implements \Serializable{
             $this->users_mentioned,
             $this->roles_mentioned,
             $this->channels_mentioned
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->id,
+                $this->content,
+                $this->embed,
+                $this->author_id,
+                $this->channel_id,
+                $this->server_id,
+                $this->timestamp,
+                $this->attachments,
+                $this->everyone_mentioned,
+                $this->users_mentioned,
+                $this->roles_mentioned,
+                $this->channels_mentioned
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->id,
-            $this->content,
-            $this->embed,
-            $this->author_id,
-            $this->channel_id,
-            $this->server_id,
-            $this->timestamp,
-            $this->attachments,
-            $this->everyone_mentioned,
-            $this->users_mentioned,
-            $this->roles_mentioned,
-            $this->channels_mentioned
-        ] = $data;
     }
 }

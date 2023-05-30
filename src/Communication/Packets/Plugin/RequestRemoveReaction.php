@@ -52,27 +52,27 @@ class RequestRemoveReaction extends Packet{
         return $this->emoji;
     }
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->UID,
             $this->channel_id,
             $this->message_id,
             $this->user_id,
             $this->emoji
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->UID,
+                $this->channel_id,
+                $this->message_id,
+                $this->user_id,
+                $this->emoji
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->UID,
-            $this->channel_id,
-            $this->message_id,
-            $this->user_id,
-            $this->emoji
-        ] = $data;
     }
 }

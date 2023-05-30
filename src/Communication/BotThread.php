@@ -26,7 +26,7 @@ class BotThread extends Thread{
         STATUS_CLOSING  = 8,
         STATUS_CLOSED   = 9;
 
-    /**  @var array */
+    /**  @var ThreadSafeArray */
     private $initialConfig;
 
     /** @var ThreadSafeArray */
@@ -37,7 +37,7 @@ class BotThread extends Thread{
     /** @var int */
     private $status = self::STATUS_STARTING;
 
-    public function __construct(array $initialConfig, ThreadSafeArray $inboundData, ThreadSafeArray $outboundData){
+    public function __construct(ThreadSafeArray $initialConfig, ThreadSafeArray $inboundData, ThreadSafeArray $outboundData){
         $this->initialConfig = $initialConfig;
         $this->inboundData = $inboundData;
         $this->outboundData = $outboundData;

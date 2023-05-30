@@ -37,23 +37,23 @@ class RequestUpdatePresence extends Packet{
         return $this->status;
     }
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->UID,
             $this->activity,
             $this->status
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->UID,
+                $this->activity,
+                $this->status
+            ] = $data;
+        }catch (\Throwable $e){
+            throw new \InvalidArgumentException("Failed to unserialize packet: " . $e->getMessage());
         }
-        [
-            $this->UID,
-            $this->activity,
-            $this->status
-        ] = $data;
     }
 }

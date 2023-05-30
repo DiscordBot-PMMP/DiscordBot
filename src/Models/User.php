@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class User implements \Serializable{
+class User{
 
     //https://github.com/Delitefully/DiscordLists/blob/master/flags.md
     const FLAGS = [
@@ -169,29 +169,29 @@ class User implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->id,
             $this->username,
             $this->discriminator,
             $this->avatar_url,
             $this->bot,
             $this->flags_bitwise
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->id,
+                $this->username,
+                $this->discriminator,
+                $this->avatar_url,
+                $this->bot,
+                $this->flags_bitwise
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->id,
-            $this->username,
-            $this->discriminator,
-            $this->avatar_url,
-            $this->bot,
-            $this->flags_bitwise
-        ] = $data;
     }
 }

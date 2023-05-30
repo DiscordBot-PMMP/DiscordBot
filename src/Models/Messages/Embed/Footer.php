@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
-class Footer implements \Serializable{
+class Footer{
 
     /** @var null|string 2048 characters */
     private $text;
@@ -49,21 +49,21 @@ class Footer implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->text,
             $this->icon_url
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->text,
+                $this->icon_url
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->text,
-            $this->icon_url
-        ] = $data;
     }
 }

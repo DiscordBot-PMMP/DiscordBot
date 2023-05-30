@@ -25,7 +25,7 @@ class MessageDelete extends Packet{
     /**
      * @param Message|array{"message_id": string, "channel_id": string, "server_id": string} $message
      */
-    public function __construct($message){
+    public function __construct(Message|array $message){
         parent::__construct();
         $this->message = $message;
     }
@@ -33,25 +33,25 @@ class MessageDelete extends Packet{
     /**
      * @return Message|array{"message_id": string, "channel_id": string, "server_id": string}
      */
-    public function getMessage(){
+    public function getMessage(): Message|array{
         return $this->message;
     }
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->UID,
             $this->message
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->UID,
+                $this->message
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->UID,
-            $this->message
-        ] = $data;
     }
 }

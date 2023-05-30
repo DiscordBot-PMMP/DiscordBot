@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class Server implements \Serializable{
+class Server{
 
     /** @var string */
     private $id;
@@ -116,8 +116,8 @@ class Server implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->id,
             $this->name,
             $this->icon_url,
@@ -125,22 +125,22 @@ class Server implements \Serializable{
             $this->owner_id,
             $this->large,
             $this->member_count
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->id,
+                $this->name,
+                $this->icon_url,
+                $this->region,
+                $this->owner_id,
+                $this->large,
+                $this->member_count
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->id,
-            $this->name,
-            $this->icon_url,
-            $this->region,
-            $this->owner_id,
-            $this->large,
-            $this->member_count
-        ] = $data;
     }
 }

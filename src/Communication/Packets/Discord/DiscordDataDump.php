@@ -148,8 +148,8 @@ class DiscordDataDump extends Packet{
             +sizeof($this->users)+sizeof($this->bans)+sizeof($this->invites);
     }
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->UID,
             $this->servers,
             $this->channels,
@@ -160,25 +160,25 @@ class DiscordDataDump extends Packet{
             $this->users,
             $this->bot_user,
             $this->timestamp
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->UID,
+                $this->servers,
+                $this->channels,
+                $this->roles,
+                $this->invites,
+                $this->bans,
+                $this->members,
+                $this->users,
+                $this->bot_user,
+                $this->timestamp
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->UID,
-            $this->servers,
-            $this->channels,
-            $this->roles,
-            $this->invites,
-            $this->bans,
-            $this->members,
-            $this->users,
-            $this->bot_user,
-            $this->timestamp
-        ] = $data;
     }
 }

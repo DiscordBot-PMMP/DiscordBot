@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class Webhook implements \Serializable{
+class Webhook{
 
     const TYPE_NORMAL = 1, //Standard webhook
         TYPE_FOLLOWER = 2; //Receiving 'news' from another channel.
@@ -125,8 +125,8 @@ class Webhook implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->id,
             $this->type,
             $this->user_id,
@@ -134,22 +134,22 @@ class Webhook implements \Serializable{
             $this->name,
             $this->avatar,
             $this->token
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->id,
+                $this->type,
+                $this->user_id,
+                $this->channel_id,
+                $this->name,
+                $this->avatar,
+                $this->token
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->id,
-            $this->type,
-            $this->user_id,
-            $this->channel_id,
-            $this->name,
-            $this->avatar,
-            $this->token
-        ] = $data;
     }
 }

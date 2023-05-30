@@ -17,6 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
 use JaxkDev\DiscordBot\Plugin\Tasks\DebugData;
 use Phar;
+use pmmp\thread\Thread;
 use pmmp\thread\ThreadSafeArray;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -92,8 +93,8 @@ class Main extends PluginBase{
         $this->communicationHandler = new BotCommunicationHandler($this);
 
         $this->getLogger()->debug("Starting DiscordBot Thread...");
-        $this->discordBot = new BotThread($this->config, $this->outboundData, $this->inboundData);
-        $this->discordBot->start(PTHREADS_INHERIT_CONSTANTS);
+        $this->discordBot = new BotThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
+        $this->discordBot->start(Thread::INHERIT_CONSTANTS);
 
         //Redact token.
         $this->config["discord"]["token"] = preg_replace('([a-zA-Z0-9])','*', $this->config["discord"]["token"]);

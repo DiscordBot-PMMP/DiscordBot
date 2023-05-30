@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models;
 
 //https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-object
-class Activity implements \Serializable{
+class Activity{
 
     const
         TYPE_PLAYING = 0,
@@ -329,8 +329,8 @@ class Activity implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->name,
             $this->type,
             $this->created_at,
@@ -353,37 +353,37 @@ class Activity implements \Serializable{
             $this->match_secret,*/
             $this->instance,
             $this->flags
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->name,
+                $this->type,
+                $this->created_at,
+                $this->url,
+                $this->start_timestamp,
+                $this->end_timestamp,
+                $this->application_id,
+                $this->details,
+                $this->state,
+                $this->emoji,
+                $this->party_id,
+                $this->party_size,
+                $this->party_max_size,
+                $this->large_image,
+                $this->large_text,
+                $this->small_image,
+                $this->small_text,
+                /*$this->join_secret,
+                $this->spectate_secret,
+                $this->match_secret,*/
+                $this->instance,
+                $this->flags
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->name,
-            $this->type,
-            $this->created_at,
-            $this->url,
-            $this->start_timestamp,
-            $this->end_timestamp,
-            $this->application_id,
-            $this->details,
-            $this->state,
-            $this->emoji,
-            $this->party_id,
-            $this->party_size,
-            $this->party_max_size,
-            $this->large_image,
-            $this->large_text,
-            $this->small_image,
-            $this->small_text,
-            /*$this->join_secret,
-            $this->spectate_secret,
-            $this->match_secret,*/
-            $this->instance,
-            $this->flags
-        ] = $data;
     }
 }

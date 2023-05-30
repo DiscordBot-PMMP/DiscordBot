@@ -52,27 +52,27 @@ class RequestSendFile extends Packet{
         return $this->message;
     }
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->UID,
             $this->channel_id,
             $this->file_name,
             $this->file_path,
             $this->message
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->UID,
+                $this->channel_id,
+                $this->file_name,
+                $this->file_path,
+                $this->message
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->UID,
-            $this->channel_id,
-            $this->file_name,
-            $this->file_path,
-            $this->message
-        ] = $data;
     }
 }

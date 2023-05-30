@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Models\Channels;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-abstract class Channel implements \Serializable{
+abstract class Channel{
 
     /** @var string|null */
     protected $id;

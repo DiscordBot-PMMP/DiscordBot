@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models\Permissions;
 
-abstract class Permissions implements \Serializable{
+abstract class Permissions{
 
     const VOICE_PERMISSIONS = [
         "priority_speaker" => 256,
@@ -130,15 +130,17 @@ abstract class Permissions implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize($this->bitwise);
+    public function __serialize(): array{
+        return [
+            $this->bitwise
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_int($data)){
-            throw new \AssertionError("Failed to unserialize permission bitwise to int, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            $this->bitwise = $data[0];
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        $this->bitwise = $data;
     }
 }

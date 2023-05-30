@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
 // https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
-class Author implements \Serializable{
+class Author{
 
     /** @var null|string 2048 characters */
     private $name;
@@ -62,23 +62,23 @@ class Author implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->name,
             $this->url,
             $this->icon_url
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->name,
+                $this->url,
+                $this->icon_url
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->name,
-            $this->url,
-            $this->icon_url
-        ] = $data;
     }
 }

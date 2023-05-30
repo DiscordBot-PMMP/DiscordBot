@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
 //Yes quite a lot of nullables... (https://discord.com/developers/docs/resources/channel#embed-object)
-class Embed implements \Serializable{
+class Embed{
 
     // https://discord.com/developers/docs/resources/channel#embed-object-embed-types
     const
@@ -207,8 +207,8 @@ class Embed implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->title,
             $this->type,
             $this->description,
@@ -221,27 +221,27 @@ class Embed implements \Serializable{
             $this->video,
             $this->author,
             $this->fields
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->title,
+                $this->type,
+                $this->description,
+                $this->url,
+                $this->timestamp,
+                $this->colour,
+                $this->footer,
+                $this->image,
+                $this->thumbnail,
+                $this->video,
+                $this->author,
+                $this->fields
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->title,
-            $this->type,
-            $this->description,
-            $this->url,
-            $this->timestamp,
-            $this->colour,
-            $this->footer,
-            $this->image,
-            $this->thumbnail,
-            $this->video,
-            $this->author,
-            $this->fields
-        ] = $data;
     }
 }

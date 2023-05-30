@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class Ban implements \Serializable{
+class Ban{
 
     /** @var string */
     private $server_id;
@@ -82,25 +82,25 @@ class Ban implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->server_id,
             $this->user_id,
             $this->reason,
             $this->days_to_delete
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->server_id,
+                $this->user_id,
+                $this->reason,
+                $this->days_to_delete
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->server_id,
-            $this->user_id,
-            $this->reason,
-            $this->days_to_delete
-        ] = $data;
     }
 }

@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
 // https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
-class Field implements \Serializable{
+class Field{
 
     /** @var string 256 characters */
     private $name;
@@ -62,23 +62,23 @@ class Field implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->name,
             $this->value,
             $this->inline
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->name,
+                $this->value,
+                $this->inline
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->name,
-            $this->value,
-            $this->inline
-        ] = $data;
     }
 }

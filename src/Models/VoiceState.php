@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class VoiceState implements \Serializable{
+class VoiceState{
 
     /** @var string */
     private $session_id;
@@ -129,8 +129,8 @@ class VoiceState implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->session_id,
             $this->channel_id,
             $this->deaf,
@@ -140,24 +140,24 @@ class VoiceState implements \Serializable{
             $this->self_stream,
             $this->self_video,
             $this->suppress
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->session_id,
+                $this->channel_id,
+                $this->deaf,
+                $this->mute,
+                $this->self_deaf,
+                $this->self_mute,
+                $this->self_stream,
+                $this->self_video,
+                $this->suppress
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->session_id,
-            $this->channel_id,
-            $this->deaf,
-            $this->mute,
-            $this->self_deaf,
-            $this->self_mute,
-            $this->self_stream,
-            $this->self_video,
-            $this->suppress
-        ] = $data;
     }
 }

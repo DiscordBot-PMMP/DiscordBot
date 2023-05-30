@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-abstract class Packet implements \Serializable{
+abstract class Packet{
 
     // Used for responses.
     /** @var int */
@@ -30,7 +30,9 @@ abstract class Packet implements \Serializable{
         return $this->UID;
     }
 
-    public abstract function serialize(): ?string;
+    // Explicit serialization to significantly reduce serialized size.
 
-    public abstract function unserialize($data): void;
+    public abstract function __serialize(): array;
+
+    public abstract function __unserialize($data): void;
 }

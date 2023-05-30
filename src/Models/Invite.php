@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class Invite implements \Serializable{
+class Invite{
 
     /** @var string|null Also used as ID internally, null when creating model. */
     private $code;
@@ -149,8 +149,8 @@ class Invite implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->code,
             $this->server_id,
             $this->channel_id,
@@ -160,24 +160,24 @@ class Invite implements \Serializable{
             $this->uses,
             $this->max_uses,
             $this->creator
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->code,
+                $this->server_id,
+                $this->channel_id,
+                $this->max_age,
+                $this->created_at,
+                $this->temporary,
+                $this->uses,
+                $this->max_uses,
+                $this->creator
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->code,
-            $this->server_id,
-            $this->channel_id,
-            $this->max_age,
-            $this->created_at,
-            $this->temporary,
-            $this->uses,
-            $this->max_uses,
-            $this->creator
-        ] = $data;
     }
 }

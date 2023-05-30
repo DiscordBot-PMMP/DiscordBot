@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class Role implements \Serializable{
+class Role{
 
     /** @var null|string */
     private $id;
@@ -131,8 +131,8 @@ class Role implements \Serializable{
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
+    public function __serialize(): array{
+        return [
             $this->id,
             $this->name,
             $this->colour,
@@ -141,23 +141,23 @@ class Role implements \Serializable{
             $this->hoisted,
             $this->hoisted_position,
             $this->server_id
-        ]);
+        ];
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
+    public function __unserialize($data): void{
+        try{
+            [
+                $this->id,
+                $this->name,
+                $this->colour,
+                $this->permissions,
+                $this->mentionable,
+                $this->hoisted,
+                $this->hoisted_position,
+                $this->server_id
+            ] = $data;
+        }catch(\Throwable $e){
+            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
         }
-        [
-            $this->id,
-            $this->name,
-            $this->colour,
-            $this->permissions,
-            $this->mentionable,
-            $this->hoisted,
-            $this->hoisted_position,
-            $this->server_id
-        ] = $data;
     }
 }
