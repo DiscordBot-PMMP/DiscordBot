@@ -216,11 +216,15 @@ class Client{
 
     public function websocketHandler(int $op, string $reason): void{
         switch($op){
-            case 4014:
+            case Op::CLOSE_DISALLOWED_INTENTS:
                 $this->logger->emergency("Disallowed intents detected, Please follow the wiki provided ".
                     "(https://github.com/DiscordBot-PMMP/DiscordBot/wiki/Creating-your-discord-bot) and ensure both privileged intents are enabled.");
                 break;
-            case 4013:
+            case Op::CLOSE_INVALID_TOKEN:
+                $this->logger->emergency("Invalid token, rejected by discord , Please follow the wiki provided ".
+                    "(https://github.com/DiscordBot-PMMP/DiscordBot/wiki/Creating-your-discord-bot).");
+                break;
+            case Op::CLOSE_INVALID_INTENTS:
                 //Should never happen considering were set to a specific version of the gateway
                 $this->logger->emergency("Invalid intents specified, Please create a new issue on github ".
                     "(https://github.com/DiscordBot-PMMP/DiscordBot/issues/new) quoting the text `op:4013 - {$reason}`.");
