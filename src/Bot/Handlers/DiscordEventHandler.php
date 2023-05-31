@@ -428,7 +428,7 @@ array(5) {
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onGuildLeave(DiscordGuild $guild, Discord $discord): void{
+    public function onGuildLeave(DiscordGuild|\stdClass $guild, Discord $discord, bool $unavailable): void{
         $packet = new ServerLeavePacket($guild->id);
         $this->client->getThread()->writeOutboundData($packet);
     }
