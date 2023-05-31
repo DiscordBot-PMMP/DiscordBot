@@ -111,6 +111,13 @@ class Main extends PluginBase{
             $this->tickTask->cancel();
         }
 
+        //TODO Check if thread closed before we disabled (indicating an error/crash occurred in thread TBD on this method)
+        //If so, we need to generate a crash dump (debug data but in a separate folder for 'crashes'/'errors')
+        //TODO Also generate dump if PLUGIN crashes or similar.
+        if($this->discordBot !== null and $this->discordBot->isTerminated()){
+            $this->getLogger()->error("Discord thread terminated, check logs for more information.");
+        }
+
         if($this->discordBot !== null and $this->discordBot->isRunning()){
             $this->discordBot->setStatus(BotThread::STATUS_CLOSING);
             $this->getLogger()->info("Stopping discord thread gracefully, waiting for discord thread to stop...");
@@ -118,10 +125,6 @@ class Main extends PluginBase{
             $this->discordBot->join();
             $this->getLogger()->info("Thread stopped.");
         }
-
-        //TODO Check if thread closed before we disabled (indicating an error/crash occurred in thread TBD on this method)
-        //If so, we need to generate a crash dump (debug data but in a separate folder for 'crashes'/'errors')
-        //TODO Also generate dump if PLUGIN crashes or similar.
     }
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool{
