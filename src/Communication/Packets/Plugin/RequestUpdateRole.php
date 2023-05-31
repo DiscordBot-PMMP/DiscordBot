@@ -36,14 +36,10 @@ class RequestUpdateRole extends Packet{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->UID,
-                $this->role
-            ] = $data;
-        }catch (\Throwable $e){
-            throw new \InvalidArgumentException("Failed to unserialize packet: " . $e->getMessage());
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->UID,
+            $this->role
+        ] = $data;
     }
 }

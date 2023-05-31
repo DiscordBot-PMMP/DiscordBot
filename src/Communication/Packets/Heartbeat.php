@@ -33,14 +33,10 @@ class Heartbeat extends Packet{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->UID,
-                $this->heartbeat
-            ] = $data;
-        }catch (\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->UID,
+            $this->heartbeat
+        ] = $data;
     }
 }

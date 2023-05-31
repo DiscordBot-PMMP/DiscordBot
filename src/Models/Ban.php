@@ -91,16 +91,12 @@ class Ban{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->server_id,
-                $this->user_id,
-                $this->reason,
-                $this->days_to_delete
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->server_id,
+            $this->user_id,
+            $this->reason,
+            $this->days_to_delete
+        ] = $data;
     }
 }

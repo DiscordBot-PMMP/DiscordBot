@@ -34,5 +34,5 @@ abstract class Packet{
 
     public abstract function __serialize(): array;
 
-    public abstract function __unserialize($data): void;
+    public abstract function __unserialize(array $data): void;
 }

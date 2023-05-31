@@ -56,14 +56,10 @@ class Footer{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->text,
-                $this->icon_url
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->text,
+            $this->icon_url
+        ] = $data;
     }
 }

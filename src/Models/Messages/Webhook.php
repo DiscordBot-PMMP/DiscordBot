@@ -99,25 +99,21 @@ class Webhook extends Message{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->id,
-                $this->content,
-                $this->embeds,
-                $this->author_id,
-                $this->channel_id,
-                $this->server_id,
-                $this->timestamp,
-                $this->attachments,
-                $this->everyone_mentioned,
-                $this->users_mentioned,
-                $this->roles_mentioned,
-                $this->channels_mentioned,
-                $this->webhook_id
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->id,
+            $this->content,
+            $this->embeds,
+            $this->author_id,
+            $this->channel_id,
+            $this->server_id,
+            $this->timestamp,
+            $this->attachments,
+            $this->everyone_mentioned,
+            $this->users_mentioned,
+            $this->roles_mentioned,
+            $this->channels_mentioned,
+            $this->webhook_id
+        ] = $data;
     }
 }

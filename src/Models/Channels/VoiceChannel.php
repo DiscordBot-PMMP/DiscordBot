@@ -94,22 +94,18 @@ class VoiceChannel extends ServerChannel{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->id,
-                $this->name,
-                $this->position,
-                $this->member_permissions,
-                $this->role_permissions,
-                $this->server_id,
-                $this->bitrate,
-                $this->member_limit,
-                $this->members,
-                $this->category_id
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->id,
+            $this->name,
+            $this->position,
+            $this->member_permissions,
+            $this->role_permissions,
+            $this->server_id,
+            $this->bitrate,
+            $this->member_limit,
+            $this->members,
+            $this->category_id
+        ] = $data;
     }
 }

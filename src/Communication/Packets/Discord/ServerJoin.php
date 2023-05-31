@@ -77,17 +77,13 @@ class ServerJoin extends Packet{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->UID,
-                $this->server,
-                $this->roles,
-                $this->channels,
-                $this->members
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->UID,
+            $this->server,
+            $this->roles,
+            $this->channels,
+            $this->members
+        ] = $data;
     }
 }

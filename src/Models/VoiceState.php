@@ -143,21 +143,17 @@ class VoiceState{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->session_id,
-                $this->channel_id,
-                $this->deaf,
-                $this->mute,
-                $this->self_deaf,
-                $this->self_mute,
-                $this->self_stream,
-                $this->self_video,
-                $this->suppress
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->session_id,
+            $this->channel_id,
+            $this->deaf,
+            $this->mute,
+            $this->self_deaf,
+            $this->self_mute,
+            $this->self_stream,
+            $this->self_video,
+            $this->suppress
+        ] = $data;
     }
 }

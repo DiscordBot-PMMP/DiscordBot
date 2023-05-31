@@ -138,19 +138,15 @@ class Attachment{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->id,
-                $this->file_name,
-                $this->content_type,
-                $this->size,
-                $this->url,
-                $this->width,
-                $this->height
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->id,
+            $this->file_name,
+            $this->content_type,
+            $this->size,
+            $this->url,
+            $this->width,
+            $this->height
+        ] = $data;
     }
 }

@@ -166,7 +166,7 @@ class CommunicationHandler{
         $this->getChannel($pk, $pk->getWebhook()->getChannelId(), function(DiscordChannel $channel) use($pk){
             $channel->webhooks->fetch($pk->getWebhook()->getId())->then(function(DiscordWebhook $webhook) use($channel, $pk){
                 $webhook->name = $pk->getWebhook()->getName();
-                $webhook->avatar = $pk->getWebhook()->getAvatar(); /** @phpstan-ignore-line avatar can be null. */
+                $webhook->avatar = $pk->getWebhook()->getAvatar();
                 $channel->webhooks->save($webhook)->then(function(DiscordWebhook $webhook) use($pk){
                     $this->resolveRequest($pk->getUID(), true, "Successfully updated webhook.", [ModelConverter::genModelWebhook($webhook)]);
                 }, function(\Throwable $e) use($pk){

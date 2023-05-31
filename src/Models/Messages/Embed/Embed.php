@@ -224,24 +224,20 @@ class Embed{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->title,
-                $this->type,
-                $this->description,
-                $this->url,
-                $this->timestamp,
-                $this->colour,
-                $this->footer,
-                $this->image,
-                $this->thumbnail,
-                $this->video,
-                $this->author,
-                $this->fields
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->title,
+            $this->type,
+            $this->description,
+            $this->url,
+            $this->timestamp,
+            $this->colour,
+            $this->footer,
+            $this->image,
+            $this->thumbnail,
+            $this->video,
+            $this->author,
+            $this->fields
+        ] = $data;
     }
 }

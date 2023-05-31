@@ -70,15 +70,11 @@ class Field{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->name,
-                $this->value,
-                $this->inline
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->name,
+            $this->value,
+            $this->inline
+        ] = $data;
     }
 }

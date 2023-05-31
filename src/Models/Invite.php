@@ -163,21 +163,17 @@ class Invite{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->code,
-                $this->server_id,
-                $this->channel_id,
-                $this->max_age,
-                $this->created_at,
-                $this->temporary,
-                $this->uses,
-                $this->max_uses,
-                $this->creator
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->code,
+            $this->server_id,
+            $this->channel_id,
+            $this->max_age,
+            $this->created_at,
+            $this->temporary,
+            $this->uses,
+            $this->max_uses,
+            $this->creator
+        ] = $data;
     }
 }

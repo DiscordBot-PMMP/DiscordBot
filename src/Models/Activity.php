@@ -356,34 +356,30 @@ class Activity{
         ];
     }
 
-    public function __unserialize($data): void{
-        try{
-            [
-                $this->name,
-                $this->type,
-                $this->created_at,
-                $this->url,
-                $this->start_timestamp,
-                $this->end_timestamp,
-                $this->application_id,
-                $this->details,
-                $this->state,
-                $this->emoji,
-                $this->party_id,
-                $this->party_size,
-                $this->party_max_size,
-                $this->large_image,
-                $this->large_text,
-                $this->small_image,
-                $this->small_text,
-                /*$this->join_secret,
-                $this->spectate_secret,
-                $this->match_secret,*/
-                $this->instance,
-                $this->flags
-            ] = $data;
-        }catch(\Throwable $e){
-            throw new \AssertionError("Failed to unserialize '".get_parent_class($this)."'", 0, $e);
-        }
+    public function __unserialize(array $data): void{
+        [
+            $this->name,
+            $this->type,
+            $this->created_at,
+            $this->url,
+            $this->start_timestamp,
+            $this->end_timestamp,
+            $this->application_id,
+            $this->details,
+            $this->state,
+            $this->emoji,
+            $this->party_id,
+            $this->party_size,
+            $this->party_max_size,
+            $this->large_image,
+            $this->large_text,
+            $this->small_image,
+            $this->small_text,
+            /*$this->join_secret,
+            $this->spectate_secret,
+            $this->match_secret,*/
+            $this->instance,
+            $this->flags
+        ] = $data;
     }
 }
