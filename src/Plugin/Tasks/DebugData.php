@@ -83,16 +83,6 @@ class DebugData extends \pocketmine\scheduler\AsyncTask{
         $pmmp = $this->pocketmineVersion." | ".$this->serverVersion;
         $os = php_uname();
         $php = PHP_VERSION;
-        $jit = "N/A";
-        $jit_opt = "N/A";
-        //TODO Check 8.1+
-        if(function_exists('opcache_get_status') and (($opcacheStatus = opcache_get_status(false)) !== false)){
-            $jit = ((($opcacheStatus["jit"]??[])["on"]??false) ? "Enabled" : "Disabled");
-            $opcacheConfig = opcache_get_configuration();
-            if($opcacheConfig !== false){
-                $jit_opt = (($jit === "Enabled") ? (($opcacheConfig["directives"]??[])["opcache.jit"]??"N/A") : "N/A");
-            }
-        }
         $z->addFromString("metadata.txt", <<<META
 /*
  * DiscordBot, PocketMine-MP Plugin.
@@ -110,7 +100,6 @@ Timestamp  | {$time}
 
 PocketMine | {$pmmp}
 PHP        | {$php}
-JIT        | {$jit} [$jit_opt]
 OS         | {$os}
 META);
         $z->close();
