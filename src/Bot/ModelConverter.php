@@ -31,12 +31,12 @@ use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
-use Discord\Parts\Guild\Guild as DiscordServer;
+use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
-use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
+use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Invite;
@@ -54,7 +54,7 @@ use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
 use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Role;
-use JaxkDev\DiscordBot\Models\Server;
+use JaxkDev\DiscordBot\Models\Guild;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\VoiceState;
 use JaxkDev\DiscordBot\Models\Webhook;
@@ -100,7 +100,7 @@ abstract class ModelConverter{
         /** @var DiscordRole|null $r */
         $r = $discordMember->guild->roles->offsetGet($discordMember->guild_id);
         if($r === null){
-            throw new AssertionError("Everyone role not found for server '".$discordMember->guild_id."'.");
+            throw new AssertionError("Everyone role not found for guild '".$discordMember->guild_id."'.");
         }
         $bitwise = $r->permissions->bitwise; //Everyone perms.
         $roles = [];
@@ -129,13 +129,13 @@ abstract class ModelConverter{
             $user->public_flags??0);
     }
 
-    static public function genModelServer(DiscordServer $discordServer): Server{
-        return new Server($discordServer->id, $discordServer->name, $discordServer->region, $discordServer->owner_id,
-            $discordServer->large, $discordServer->member_count, $discordServer->icon);
+    static public function genModelGuild(DiscordGuild $discordGuild): Guild{
+        return new Guild($discordGuild->id, $discordGuild->name, $discordGuild->region, $discordGuild->owner_id,
+            $discordGuild->large, $discordGuild->member_count, $discordGuild->icon);
     }
 
     /**
-     * @template T of ServerChannel
+     * @template T of GuildChannel
      * @param DiscordChannel $dc
      * @param T $c
      * @return T
@@ -161,9 +161,9 @@ abstract class ModelConverter{
     /**
      * Generates a model based on whatever type $channel is. (Excludes game store/group type)
      * @param DiscordChannel $channel
-     * @return ?ServerChannel Null if type is invalid/unused.
+     * @return ?GuildChannel Null if type is invalid/unused.
      */
-    static public function genModelChannel(DiscordChannel $channel): ?ServerChannel{
+    static public function genModelChannel(DiscordChannel $channel): ?GuildChannel{
         switch($channel->type){
             case DiscordChannel::TYPE_TEXT:
             case DiscordChannel::TYPE_NEWS:

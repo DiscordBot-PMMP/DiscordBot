@@ -17,19 +17,19 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 class RequestDeleteChannel extends Packet{
 
     /** @var string */
-    private $server_id;
+    private $guild_id;
 
     /** @var string */
     private $channel_id;
 
-    public function __construct(string $server_id, string $channel_id){
+    public function __construct(string $guild_id, string $channel_id){
         parent::__construct();
-        $this->server_id = $server_id;
+        $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
     }
 
-    public function getServerId(): string{
-        return $this->server_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
     public function getChannelId(): string{
@@ -39,7 +39,7 @@ class RequestDeleteChannel extends Packet{
     public function __serialize(): array{
         return [
             $this->UID,
-            $this->server_id,
+            $this->guild_id,
             $this->channel_id
         ];
     }
@@ -47,7 +47,7 @@ class RequestDeleteChannel extends Packet{
     public function __unserialize(array $data): void{
         [
             $this->UID,
-            $this->server_id,
+            $this->guild_id,
             $this->channel_id
         ] = $data;
     }

@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models\Channels;
 use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-abstract class ServerChannel extends Channel{
+abstract class GuildChannel extends Channel{
 
     /** @var string */
     protected $name;
@@ -30,23 +30,23 @@ abstract class ServerChannel extends Channel{
     protected $member_permissions = [];
 
     /**
-     * This includes the @everyone role, use the server ID as role ID to set the @everyone permissions.
+     * This includes the @everyone role, use the guild ID as role ID to set the @everyone permissions.
      * ['roleID' => [AllowedPermissions|null, DeniedPermissions|null]]
      * @var Array<string, Array<null|ChannelPermissions>>
      */
     protected $role_permissions = [];
 
     /** @var string */
-    protected $server_id;
+    protected $guild_id;
 
     /** @var ?string Category ID | null when not categorised. */
     protected $category_id;
 
-    public function __construct(string $name, int $position, string $server_id, ?string $category_id = null, ?string $id = null){
+    public function __construct(string $name, int $position, string $guild_id, ?string $category_id = null, ?string $id = null){
         parent::__construct($id);
         $this->setName($name);
         $this->setPosition($position);
-        $this->setServerId($server_id);
+        $this->setGuildId($guild_id);
         $this->setCategoryId($category_id);
         //Note permissions are not in constructor.
     }
@@ -129,15 +129,15 @@ abstract class ServerChannel extends Channel{
         }
     }
 
-    public function getServerId(): string{
-        return $this->server_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
-    public function setServerId(string $server_id): void{
-        if(!Utils::validDiscordSnowflake($server_id)){
-            throw new \AssertionError("Server ID '$server_id' is invalid.");
+    public function setGuildId(string $guild_id): void{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
-        $this->server_id = $server_id;
+        $this->guild_id = $guild_id;
     }
 
     public function getCategoryId(): ?string{

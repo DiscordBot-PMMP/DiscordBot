@@ -47,7 +47,7 @@ class Member{
     private $roles;
 
     /** @var string */
-    private $server_id;
+    private $guild_id;
 
     /** @var null|Activity[] */
     private $activities;
@@ -60,7 +60,7 @@ class Member{
      *
      * @param string               $user_id
      * @param int                  $join_timestamp
-     * @param string               $server_id
+     * @param string               $guild_id
      * @param string[]             $roles
      * @param string|null          $nickname
      * @param int|null             $boost_timestamp
@@ -68,12 +68,12 @@ class Member{
      * @param Activity[]|null      $activities
      * @param VoiceState|null      $voice_state
      */
-    public function __construct(string $user_id, int $join_timestamp, string $server_id, array $roles = [],
+    public function __construct(string $user_id, int $join_timestamp, string $guild_id, array $roles = [],
                                 ?string $nickname = null, ?int $boost_timestamp = null, RolePermissions $permissions = null,
                                 ?array $activities = null, ?VoiceState $voice_state = null){
         $this->setUserId($user_id);
         $this->setJoinTimestamp($join_timestamp);
-        $this->setServerId($server_id);
+        $this->setGuildId($guild_id);
         $this->setRoles($roles);
         $this->setNickname($nickname);
         $this->setBoostTimestamp($boost_timestamp);
@@ -84,11 +84,11 @@ class Member{
 
     /**
      * @description Composite key guild_id.user_id
-     * @see Member::getServerId()
+     * @see Member::getGuildId()
      * @see Member::getUserId()
      */
     public function getId(): string{
-        return $this->server_id.".".$this->user_id;
+        return $this->guild_id.".".$this->user_id;
     }
 
     public function getUserId(): string{
@@ -153,15 +153,15 @@ class Member{
         $this->roles = $roles;
     }
 
-    public function getServerId(): string{
-        return $this->server_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
-    public function setServerId(string $server_id): void{
-        if(!Utils::validDiscordSnowflake($server_id)){
-            throw new \AssertionError("Server ID '$server_id' is invalid.");
+    public function setGuildId(string $guild_id): void{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
-        $this->server_id = $server_id;
+        $this->guild_id = $guild_id;
     }
 
     public function getStatus(): ?string{
@@ -215,7 +215,7 @@ class Member{
             $this->boost_timestamp,
             $this->permissions,
             $this->roles,
-            $this->server_id,
+            $this->guild_id,
             $this->status,
             $this->client_status,
             $this->activities,
@@ -231,7 +231,7 @@ class Member{
             $this->boost_timestamp,
             $this->permissions,
             $this->roles,
-            $this->server_id,
+            $this->guild_id,
             $this->status,
             $this->client_status,
             $this->activities,

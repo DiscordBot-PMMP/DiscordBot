@@ -33,7 +33,7 @@ class Message{
     protected $channel_id;
 
     /** @var ?string Null if DM Channel. */
-    protected $server_id;
+    protected $guild_id;
 
     /** @var ?float Null when sending message. */
     protected $timestamp;
@@ -61,7 +61,7 @@ class Message{
      * @param string       $content
      * @param Embed|null   $embed
      * @param string|null  $author_id
-     * @param string|null  $server_id
+     * @param string|null  $guild_id
      * @param float|null   $timestamp
      * @param Attachment[] $attachments
      * @param bool         $everyone_mentioned
@@ -70,7 +70,7 @@ class Message{
      * @param string[]     $channels_mentioned
      */
     public function __construct(string $channel_id, ?string $id = null, string $content = "", ?Embed $embed = null,
-                                ?string $author_id = null, ?string $server_id = null, ?float $timestamp = null,
+                                ?string $author_id = null, ?string $guild_id = null, ?float $timestamp = null,
                                 array $attachments = [], bool $everyone_mentioned = false, array $users_mentioned = [],
                                 array $roles_mentioned = [], array $channels_mentioned = []){
         $this->setChannelId($channel_id);
@@ -78,7 +78,7 @@ class Message{
         $this->setContent($content);
         $this->setEmbed($embed);
         $this->setAuthorId($author_id);
-        $this->setServerId($server_id);
+        $this->setGuildId($guild_id);
         $this->setTimestamp($timestamp);
         $this->setAttachments($attachments);
         $this->setEveryoneMentioned($everyone_mentioned);
@@ -144,15 +144,15 @@ class Message{
         $this->channel_id = $channel_id;
     }
 
-    public function getServerId(): ?string{
-        return $this->server_id;
+    public function getGuildId(): ?string{
+        return $this->guild_id;
     }
 
-    public function setServerId(?string $server_id): void{
-        if($server_id !== null and !Utils::validDiscordSnowflake($server_id)){
-            throw new \AssertionError("Server ID '$server_id' is invalid.");
+    public function setGuildId(?string $guild_id): void{
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
-        $this->server_id = $server_id;
+        $this->guild_id = $guild_id;
     }
 
     public function getTimestamp(): ?float{
@@ -258,7 +258,7 @@ class Message{
             $this->embed,
             $this->author_id,
             $this->channel_id,
-            $this->server_id,
+            $this->guild_id,
             $this->timestamp,
             $this->attachments,
             $this->everyone_mentioned,
@@ -275,7 +275,7 @@ class Message{
             $this->embed,
             $this->author_id,
             $this->channel_id,
-            $this->server_id,
+            $this->guild_id,
             $this->timestamp,
             $this->attachments,
             $this->everyone_mentioned,

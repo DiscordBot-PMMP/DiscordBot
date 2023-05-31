@@ -50,9 +50,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate as PresenceU
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerJoin as ServerJoinPacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerLeave as ServerLeavePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerUpdate as ServerUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use Monolog\Logger;
@@ -111,7 +111,7 @@ class DiscordEventHandler{
     /*
 Some timing notes.
 array(5) {
-  ["server"]=>
+  ["guild"]=>
   array(2) {
     [0]=>
     float(0.00259)
@@ -149,7 +149,7 @@ array(5) {
 }
 
 array(5) {
-  ["server"]=>
+  ["guild"]=>
   array(2) {
     [0]=>
     float(0.012749999999999975)
@@ -213,7 +213,7 @@ array(5) {
         foreach($client->guilds as $guild){
             $statusCheck();
 
-            $pk->addServer(ModelConverter::genModelServer($guild));
+            $pk->addGuild(ModelConverter::genModelGuild($guild));
 
             /** @var DiscordMember|null $m */
             $m = $guild->members->offsetGet($client->id);
@@ -225,7 +225,7 @@ array(5) {
             if($permissions->ban_members){
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $guild->bans->freshen()->done(function() use ($guild){
-                    $this->logger->debug("Successfully fetched ".sizeof($guild->bans)." bans from server '".
+                    $this->logger->debug("Successfully fetched ".sizeof($guild->bans)." bans from guild '".
                         $guild->name."' (".$guild->id.")");
                     if(sizeof($guild->bans) === 0) return;
                     $pk = new DiscordDataDumpPacket();
@@ -236,10 +236,10 @@ array(5) {
                     }
                     $this->client->getThread()->writeOutboundData($pk);
                 }, function() use ($guild){
-                    $this->logger->warning("Failed to fetch bans from server '".$guild->name."' (".$guild->id.")");
+                    $this->logger->warning("Failed to fetch bans from guild '".$guild->name."' (".$guild->id.")");
                 });
             }else{
-                $this->logger->notice("Cannot fetch bans from server '".$guild->name."' (".$guild->id.
+                $this->logger->notice("Cannot fetch bans from guild '".$guild->name."' (".$guild->id.
                     "), Bot does not have 'ban_members' permission.");
             }
 
@@ -260,7 +260,7 @@ array(5) {
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $guild->invites->freshen()->done(function() use ($guild){
                     $this->logger->debug("Successfully fetched ".sizeof($guild->invites).
-                        " invites from server '".$guild->name."' (".$guild->id.")");
+                        " invites from guild '".$guild->name."' (".$guild->id.")");
                     if(sizeof($guild->invites) === 0) return;
                     $pk = new DiscordDataDumpPacket();
                     $pk->setTimestamp(time());
@@ -270,10 +270,10 @@ array(5) {
                     }
                     $this->client->getThread()->writeOutboundData($pk);
                 }, function() use ($guild){
-                    $this->logger->warning("Failed to fetch invites from server '".$guild->name."' (".$guild->id.")");
+                    $this->logger->warning("Failed to fetch invites from guild '".$guild->name."' (".$guild->id.")");
                 });
             }else{
-                $this->logger->notice("Cannot fetch invites from server '".$guild->name."' (".$guild->id.
+                $this->logger->notice("Cannot fetch invites from guild '".$guild->name."' (".$guild->id.
                     "), Bot does not have 'manage_guild' permission.");
             }
 
@@ -348,7 +348,7 @@ array(5) {
                 $message = [
                     "message_id" => $data->id,
                     "channel_id" => $data->channel_id,
-                    "server_id" => $data->guild_id
+                    "guild_id" => $data->guild_id
                 ];
             }else{
                 $message = ModelConverter::genModelMessage($data);
@@ -357,7 +357,7 @@ array(5) {
             $message = [
                 "message_id" => $data->id,
                 "channel_id" => $data->channel_id,
-                "server_id" => $data->guild_id
+                "guild_id" => $data->guild_id
             ];
         }
         $packet = new MessageDeletePacket($message);
@@ -419,17 +419,17 @@ array(5) {
             $members[] = ModelConverter::genModelMember($member);
         }
 
-        $packet = new ServerJoinPacket(ModelConverter::genModelServer($guild), $channels, $members, $roles);
+        $packet = new GuildJoinPacket(ModelConverter::genModelGuild($guild), $channels, $members, $roles);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onGuildUpdate(DiscordGuild $guild, Discord $discord): void{
-        $packet = new ServerUpdatePacket(ModelConverter::genModelServer($guild));
+        $packet = new GuildUpdatePacket(ModelConverter::genModelGuild($guild));
         $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onGuildLeave(DiscordGuild|\stdClass $guild, Discord $discord, bool $unavailable): void{
-        $packet = new ServerLeavePacket($guild->id);
+        $packet = new GuildLeavePacket($guild->id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 

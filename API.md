@@ -24,7 +24,7 @@ That is all located in the namespace `JaxkDev\DiscordBot\Models` all type info a
 in the relevant file.
 
 
-+ All the actual discord data such as servers, roles members can be found in plugin storage anywhere from 
++ All the actual discord data such as guilds, roles members can be found in plugin storage anywhere from 
 5seconds to 500seconds after the plugin enables.
 
     + Listen to `JaxkDev\DiscordBot\Plugin\Events\DiscordReady.php` this is emitted when bot is connected

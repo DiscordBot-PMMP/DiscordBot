@@ -15,19 +15,19 @@ namespace JaxkDev\DiscordBot\Plugin\Events;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
-use JaxkDev\DiscordBot\Models\Server;
+use JaxkDev\DiscordBot\Models\Guild;
 use pocketmine\plugin\Plugin;
 
 /**
- * Emitted when the bot joins a discord server.
+ * Emitted when the bot joins a discord guild.
  * 
- * @see ServerDeleted Emitted when the bot leaves a server
- * @see ServerUpdated Emitted when a server the bot is in has been updated.
+ * @see GuildDeleted Emitted when the bot leaves a guild
+ * @see GuildUpdated Emitted when a guild the bot is in has been updated.
  */
-class ServerJoined extends DiscordBotEvent{
+class GuildJoined extends DiscordBotEvent{
 
-    /** @var Server */
-    private $server;
+    /** @var Guild */
+    private $guild;
 
     /** @var Role[] */
     private $roles;
@@ -40,21 +40,21 @@ class ServerJoined extends DiscordBotEvent{
 
     /**
      * @param Plugin    $plugin
-     * @param Server    $server
+     * @param Guild     $guild
      * @param Role[]    $roles
      * @param Channel[] $channels
      * @param Member[]  $members
      */
-    public function __construct(Plugin $plugin, Server $server, array $roles, array $channels, array $members){
+    public function __construct(Plugin $plugin, Guild $guild, array $roles, array $channels, array $members){
         parent::__construct($plugin);
-        $this->server = $server;
+        $this->guild = $guild;
         $this->roles = $roles;
         $this->channels = $channels;
         $this->members = $members;
     }
 
-    public function getServer(): Server{
-        return $this->server;
+    public function getGuild(): Guild{
+        return $this->guild;
     }
 
     /**

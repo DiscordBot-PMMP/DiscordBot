@@ -18,7 +18,7 @@ use pocketmine\plugin\Plugin;
 /**
  * Emitted when a message has been deleted.
  *
- * If message was made/updated before bot started it will only have message id, channel id and server id.
+ * If message was made/updated before bot started it will only have message id, channel id and guild id.
  * If it was made/updated after bot started it will have the full message model.
  *
  * @see MessageUpdated
@@ -27,13 +27,13 @@ use pocketmine\plugin\Plugin;
 class MessageDeleted extends DiscordBotEvent{
 
     /**
-     * @var Message|array{"message_id": string, "channel_id": string, "server_id": string}
+     * @var Message|array{"message_id": string, "channel_id": string, "guild_id": string}
      */
     private $message;
 
     /**
      * @param Plugin                                                                            $plugin
-     * @param Message|array{"message_id": string, "channel_id": string, "server_id": string}    $message
+     * @param Message|array{"message_id": string, "channel_id": string, "guild_id": string}    $message
      */
     public function __construct(Plugin $plugin, $message){
         parent::__construct($plugin);
@@ -41,7 +41,7 @@ class MessageDeleted extends DiscordBotEvent{
     }
 
     /**
-     * @return Message|array{"message_id": string, "channel_id": string, "server_id": string}
+     * @return Message|array{"message_id": string, "channel_id": string, "guild_id": string}
      */
     public function getMessage(){
         return $this->message;

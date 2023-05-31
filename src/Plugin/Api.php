@@ -29,7 +29,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveServer;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
@@ -47,7 +47,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
-use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
+use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Message;
@@ -132,20 +132,20 @@ class Api{
         return ApiResolver::create($pk->getUID());
     }
 
-    //createServer will not be added due to security issues,
-    //If you find a genuine use for createServer please open an issue.
+    //createGuild will not be added due to security issues,
+    //If you find a genuine use for createGuild please open an issue.
 
     /**
-     * Leave a discord server.
+     * Leave a discord guild.
      *
-     * @param string $server_id
+     * @param string $guild_id
      * @return PromiseInterface Resolves with no data.
      */
-    public function leaveServer(string $server_id): PromiseInterface{
-        if(!Utils::validDiscordSnowflake($server_id)){
-            return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
+    public function leaveGuild(string $guild_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        $pk = new RequestLeaveServer($server_id);
+        $pk = new RequestLeaveGuild($guild_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -273,18 +273,18 @@ class Api{
     /**
      * Delete a role.
      *
-     * @param string $server_id
+     * @param string $guild_id
      * @param string $role_id
      * @return PromiseInterface Resolves with no data.
      */
-    public function deleteRole(string $server_id, string $role_id): PromiseInterface{
-        if(!Utils::validDiscordSnowflake($server_id)){
-            return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
+    public function deleteRole(string $guild_id, string $role_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($role_id)){
             return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
         }
-        $pk = new RequestDeleteRole($server_id, $role_id);
+        $pk = new RequestDeleteRole($guild_id, $role_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -446,18 +446,18 @@ class Api{
     /**
      * Attempt to revoke a ban.
      *
-     * @param string $server_id
+     * @param string $guild_id
      * @param string $user_id
      * @return PromiseInterface Resolves with no data.
      */
-    public function revokeBan(string $server_id, string $user_id): PromiseInterface{
-        if(!Utils::validDiscordSnowflake($server_id)){
-            return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
+    public function revokeBan(string $guild_id, string $user_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
-        $pk = new RequestRevokeBan($server_id, $user_id);
+        $pk = new RequestRevokeBan($guild_id, $user_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -564,49 +564,49 @@ class Api{
     }
 
     /**
-     * Create a server channel.
+     * Create a guild channel.
      *
-     * @param ServerChannel $channel CategoryChannel, TextChannel or VoiceChannel.
+     * @param GuildChannel $channel CategoryChannel, TextChannel or VoiceChannel.
      * @return PromiseInterface Resolves with a Channel model of same type provided.
      */
-    public function createChannel(ServerChannel $channel): PromiseInterface{
+    public function createChannel(GuildChannel $channel): PromiseInterface{
         $pk = new RequestCreateChannel($channel);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
 
     /**
-     * Update a server channel, ID Must be present.
+     * Update a guild channel, ID Must be present.
      *
      * Note, Pins can NOT be updated directly.
      *
      * @see Api::pinMessage()
      * @see Api::unpinMessage()
      *
-     * @param ServerChannel $channel
+     * @param GuildChannel $channel
      * @return PromiseInterface Resolves with a Channel model of same type provided.
      */
-    public function updateChannel(ServerChannel $channel): PromiseInterface{
+    public function updateChannel(GuildChannel $channel): PromiseInterface{
         $pk = new RequestUpdateChannel($channel);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
 
     /**
-     * Delete a channel in a server, you cannot delete private channels (DM's)
+     * Delete a channel in a guild, you cannot delete private channels (DM's)
      *
-     * @param string $server_id
+     * @param string $guild_id
      * @param string $channel_id
      * @return PromiseInterface Resolves with no data.
      */
-    public function deleteChannel(string $server_id, string $channel_id): PromiseInterface{
-        if(!Utils::validDiscordSnowflake($server_id)){
-            return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
+    public function deleteChannel(string $guild_id, string $channel_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        $pk = new RequestDeleteChannel($server_id, $channel_id);
+        $pk = new RequestDeleteChannel($guild_id, $channel_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -626,15 +626,15 @@ class Api{
     /**
      * Revoke an initialised invite.
      *
-     * @param string $server_id
+     * @param string $guild_id
      * @param string $invite_code
      * @return PromiseInterface Resolves with a Invite model.
      */
-    public function revokeInvite(string $server_id, string $invite_code): PromiseInterface{
-        if(!Utils::validDiscordSnowflake($server_id)){
-            return rejectPromise(new ApiRejection("Invalid server ID '$server_id'."));
+    public function revokeInvite(string $guild_id, string $invite_code): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        $pk = new RequestRevokeInvite($server_id, $invite_code);
+        $pk = new RequestRevokeInvite($guild_id, $invite_code);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

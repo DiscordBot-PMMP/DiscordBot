@@ -20,7 +20,7 @@ class Invite{
     private $code;
 
     /** @var string */
-    private $server_id;
+    private $guild_id;
 
     /** @var string */
     private $channel_id;
@@ -43,9 +43,9 @@ class Invite{
     /** @var string|null Member ID, null when creating model. */
     private $creator;
 
-    public function __construct(string $server_id, string $channel_id, int $max_age, int $max_uses, bool $temporary,
+    public function __construct(string $guild_id, string $channel_id, int $max_age, int $max_uses, bool $temporary,
                                 ?string $code = null, ?int $created_at = null, ?string $creator = null, int $uses = 0){
-        $this->setServerId($server_id);
+        $this->setGuildId($guild_id);
         $this->setChannelId($channel_id);
         $this->setMaxAge($max_age);
         $this->setMaxUses($max_uses);
@@ -64,15 +64,15 @@ class Invite{
         $this->code = $code;
     }
 
-    public function getServerId(): string{
-        return $this->server_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
-    public function setServerId(string $server_id): void{
-        if(!Utils::validDiscordSnowflake($server_id)){
-            throw new \AssertionError("Server ID '$server_id' is invalid.");
+    public function setGuildId(string $guild_id): void{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
-        $this->server_id = $server_id;
+        $this->guild_id = $guild_id;
     }
 
     public function getChannelId(): string{
@@ -152,7 +152,7 @@ class Invite{
     public function __serialize(): array{
         return [
             $this->code,
-            $this->server_id,
+            $this->guild_id,
             $this->channel_id,
             $this->max_age,
             $this->created_at,
@@ -166,7 +166,7 @@ class Invite{
     public function __unserialize(array $data): void{
         [
             $this->code,
-            $this->server_id,
+            $this->guild_id,
             $this->channel_id,
             $this->max_age,
             $this->created_at,

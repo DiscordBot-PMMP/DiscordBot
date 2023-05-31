@@ -36,9 +36,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate as PresenceU
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerJoin as ServerJoinPacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerLeave as ServerLeavePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ServerUpdate as ServerUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
@@ -69,9 +69,9 @@ use JaxkDev\DiscordBot\Plugin\Events\PresenceUpdated as PresenceUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\ServerDeleted as ServerDeletedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\ServerJoined as ServerJoinedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\ServerUpdated as ServerUpdatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\GuildDeleted as GuildDeletedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\GuildJoined as GuildJoinedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\GuildUpdated as GuildUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberJoined as VoiceChannelMemberJoinedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberLeft as VoiceChannelMemberLeftEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberMoved as VoiceChannelMemberMovedEvent;
@@ -124,9 +124,9 @@ class BotCommunicationHandler{
         elseif($packet instanceof InviteDeletePacket) $this->handleInviteDelete($packet);
         elseif($packet instanceof BanAddPacket) $this->handleBanAdd($packet);
         elseif($packet instanceof BanRemovePacket) $this->handleBanRemove($packet);
-        elseif($packet instanceof ServerJoinPacket) $this->handleServerJoin($packet);
-        elseif($packet instanceof ServerLeavePacket) $this->handleServerLeave($packet);
-        elseif($packet instanceof ServerUpdatePacket) $this->handleServerUpdate($packet);
+        elseif($packet instanceof GuildJoinPacket) $this->handleGuildJoin($packet);
+        elseif($packet instanceof GuildLeavePacket) $this->handleGuildLeave($packet);
+        elseif($packet instanceof GuildUpdatePacket) $this->handleGuildUpdate($packet);
         elseif($packet instanceof DiscordDataDumpPacket) $this->handleDataDump($packet);
         elseif($packet instanceof DiscordReadyPacket) $this->handleReady();
     }
@@ -277,7 +277,7 @@ class BotCommunicationHandler{
     private function handleChannelDelete(ChannelDeletePacket $packet): void{
         $c = Storage::getChannel($packet->getChannelId());
         if($c === null){
-            throw new \AssertionError("Server Channel '{$packet->getChannelId()}' not found in storage.");
+            throw new \AssertionError("Guild Channel '{$packet->getChannelId()}' not found in storage.");
         }
         (new ChannelDeletedEvent($this->plugin, $c))->call();
         Storage::removeChannel($packet->getChannelId());
@@ -339,9 +339,9 @@ class BotCommunicationHandler{
     }
 
     private function handleMemberJoin(MemberJoinPacket $packet): void{
-        $server = Storage::getServer($packet->getMember()->getServerId());
-        if($server === null){
-            throw new \AssertionError("Server '{$packet->getMember()->getServerId()}' not found for member '{$packet->getMember()->getId()}'");
+        $guild = Storage::getGuild($packet->getMember()->getGuildId());
+        if($guild === null){
+            throw new \AssertionError("Guild '{$packet->getMember()->getGuildId()}' not found for member '{$packet->getMember()->getId()}'");
         }
         (new MemberJoinedEvent($this->plugin, $packet->getMember()))->call();
         Storage::addMember($packet->getMember());
@@ -354,7 +354,7 @@ class BotCommunicationHandler{
     }
 
     private function handleMemberLeave(MemberLeavePacket $packet): void{
-        //When leaving server this is emitted.
+        //When leaving guild this is emitted.
         if(($u = Storage::getBotUser()) !== null and $u->getId() === explode(".", $packet->getMemberID())[1]) return;
 
         $member = Storage::getMember($packet->getMemberID());
@@ -362,9 +362,9 @@ class BotCommunicationHandler{
             throw new \AssertionError("Member '{$packet->getMemberID()}' not found in storage.");
         }
 
-        $server = Storage::getServer($member->getServerId());
-        if($server === null){
-            throw new \AssertionError("Server '{$member->getServerId()}' not found for member '{$member->getId()}'");
+        $guild = Storage::getGuild($member->getGuildId());
+        if($guild === null){
+            throw new \AssertionError("Guild '{$member->getGuildId()}' not found for member '{$member->getId()}'");
         }
 
         (new MemberLeftEvent($this->plugin, $member))->call();
@@ -372,11 +372,11 @@ class BotCommunicationHandler{
         Storage::removeMember($packet->getMemberID());
     }
 
-    private function handleServerJoin(ServerJoinPacket $packet): void{
-        (new ServerJoinedEvent($this->plugin, $packet->getServer(), $packet->getRoles(),
+    private function handleGuildJoin(GuildJoinPacket $packet): void{
+        (new GuildJoinedEvent($this->plugin, $packet->getGuild(), $packet->getRoles(),
             $packet->getChannels(), $packet->getMembers()))->call();
 
-        Storage::addServer($packet->getServer());
+        Storage::addGuild($packet->getGuild());
         foreach($packet->getMembers() as $member){
             Storage::addMember($member);
         }
@@ -388,23 +388,23 @@ class BotCommunicationHandler{
         }
     }
 
-    private function handleServerUpdate(ServerUpdatePacket $packet): void{
-        (new ServerUpdatedEvent($this->plugin, $packet->getServer()))->call();
-        Storage::updateServer($packet->getServer());
+    private function handleGuildUpdate(GuildUpdatePacket $packet): void{
+        (new GuildUpdatedEvent($this->plugin, $packet->getGuild()))->call();
+        Storage::updateGuild($packet->getGuild());
     }
 
-    private function handleServerLeave(ServerLeavePacket $packet): void{
-        $server = Storage::getServer($packet->getServerId());
-        if($server === null){
-            throw new \AssertionError("Server '{$packet->getServerId()}' not found in storage.");
+    private function handleGuildLeave(GuildLeavePacket $packet): void{
+        $guild = Storage::getGuild($packet->getGuildId());
+        if($guild === null){
+            throw new \AssertionError("Guild '{$packet->getGuildId()}' not found in storage.");
         }
-        (new ServerDeletedEvent($this->plugin, $server))->call();
-        Storage::removeServer($packet->getServerId());
+        (new GuildDeletedEvent($this->plugin, $guild))->call();
+        Storage::removeGuild($packet->getGuildId());
     }
 
     private function handleDataDump(DiscordDataDumpPacket $packet): void{
-        foreach($packet->getServers() as $server){
-            Storage::addServer($server);
+        foreach($packet->getGuilds() as $guild){
+            Storage::addGuild($guild);
         }
         foreach($packet->getChannels() as $channel){
             Storage::addChannel($channel);

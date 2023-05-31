@@ -47,7 +47,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveServer;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
@@ -140,7 +140,7 @@ class CommunicationHandler{
         elseif($pk instanceof RequestCreateWebhook) $this->handleCreateWebhook($pk);
         elseif($pk instanceof RequestUpdateWebhook) $this->handleUpdateWebhook($pk);
         elseif($pk instanceof RequestDeleteWebhook) $this->handleDeleteWebhook($pk);
-        elseif($pk instanceof RequestLeaveServer) $this->handleLeaveServer($pk);
+        elseif($pk instanceof RequestLeaveGuild) $this->handleLeaveGuild($pk);
     }
 
     private function handleDeleteWebhook(RequestDeleteWebhook $pk): void{
@@ -257,20 +257,20 @@ class CommunicationHandler{
         });
     }
 
-    private function handleLeaveServer(RequestLeaveServer $pk): void{
-        $this->getServer($pk, $pk->getServerId(), function(DiscordGuild $guild) use($pk){
+    private function handleLeaveGuild(RequestLeaveGuild $pk): void{
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
             $this->client->getDiscordClient()->guilds->leave($guild)->then(function() use($pk){
                 $this->resolveRequest($pk->getUID());
             }, function(\Throwable $e) use($pk){
-                //Shouldn't happen unless not in server/connection issues.
-                $this->resolveRequest($pk->getUID(), false, "Failed to leave server.", [$e->getMessage(), $e->getTraceAsString()]);
-                $this->logger->debug("Failed to leave server? ({$pk->getUID()}) - {$e->getMessage()}");
+                //Shouldn't happen unless not in guild/connection issues.
+                $this->resolveRequest($pk->getUID(), false, "Failed to leave guild.", [$e->getMessage(), $e->getTraceAsString()]);
+                $this->logger->debug("Failed to leave guild? ({$pk->getUID()}) - {$e->getMessage()}");
             });
         });
     }
 
     private function handleCreateRole(RequestCreateRole $pk): void{
-        $this->getServer($pk, $pk->getRole()->getServerId(), function(DiscordGuild $guild) use($pk){
+        $this->getGuild($pk, $pk->getRole()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $r = $pk->getRole();
             $guild->createRole([
                 'name' => $r->getName(),
@@ -296,12 +296,12 @@ class CommunicationHandler{
         if($role->getId() === null){
             return reject(new ApiRejection("Role does not have a ID."));
         }
-        if($role->getId() === $role->getServerId()){
+        if($role->getId() === $role->getGuildId()){
             return reject(new ApiRejection("Cannot move the default 'everyone' role."));
         }
         $promise = new Deferred();
 
-        $this->client->getDiscordClient()->guilds->fetch($role->getServerId())->done(function(DiscordGuild $guild) use($promise, $role){
+        $this->client->getDiscordClient()->guilds->fetch($role->getGuildId())->done(function(DiscordGuild $guild) use($promise, $role){
             //Sort
             $arr = $guild->roles->toArray();
             $keys = array_values(array_map(function(DiscordRole $role){
@@ -348,8 +348,8 @@ class CommunicationHandler{
                 $this->logger->debug("Failed to update role positions, error: {$e->getMessage()}");
             });
         }, function(\Throwable $e) use($promise){
-            $promise->reject(new ApiRejection("Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]));
-            $this->logger->debug("Failed to update role position - server error: {$e->getMessage()}");
+            $promise->reject(new ApiRejection("Failed to fetch guild.", [$e->getMessage(), $e->getTraceAsString()]));
+            $this->logger->debug("Failed to update role position - guild error: {$e->getMessage()}");
         });
 
         return $promise->promise();
@@ -360,7 +360,7 @@ class CommunicationHandler{
             $this->resolveRequest($pk->getUID(), false, "Failed to update role.", ["Role ID must be present."]);
             return;
         }
-        $this->getServer($pk, $pk->getRole()->getServerId(), function(DiscordGuild $guild) use($pk){
+        $this->getGuild($pk, $pk->getRole()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->roles->fetch($pk->getRole()->getId())->then(function(DiscordRole $role) use($guild, $pk){
                 $role->position = $pk->getRole()->getHoistedPosition();
                 $role->hoist = $pk->getRole()->isHoisted();
@@ -369,7 +369,7 @@ class CommunicationHandler{
                 $role->color = $pk->getRole()->getColour();
                 $role->permissions->bitwise = $pk->getRole()->getPermissions()->getBitwise();
                 $guild->roles->save($role)->then(function(DiscordRole $role) use($pk){
-                    if($pk->getRole()->getId() !== $pk->getRole()->getServerId()){
+                    if($pk->getRole()->getId() !== $pk->getRole()->getGuildId()){
                         $this->handleUpdateRolePosition($pk->getRole())->then(function() use ($role, $pk){
                             $this->resolveRequest($pk->getUID(), true, "Updated role & position.", [ModelConverter::genModelRole($role)]);
                         }, function(ApiRejection $rejection) use ($pk){
@@ -390,7 +390,7 @@ class CommunicationHandler{
     }
 
     private function handleDeleteRole(RequestDeleteRole $pk): void{
-        $this->getServer($pk, $pk->getServerId(), function(DiscordGuild $guild) use($pk){
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->roles->fetch($pk->getRoleId())->then(function(DiscordRole $role) use($pk, $guild){
                 $guild->roles->delete($role)->then(function() use($pk){
                     $this->resolveRequest($pk->getUID(), true, "Deleted role.");
@@ -406,7 +406,7 @@ class CommunicationHandler{
     }
 
     private function handleRemoveRole(RequestRemoveRole $pk): void{
-        $this->getMember($pk, $pk->getServerId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
+        $this->getMember($pk, $pk->getGuildId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
             $dMember->removeRole($pk->getRoleId())->done(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Removed role.");
             }, function(\Throwable $e) use($pk){
@@ -417,7 +417,7 @@ class CommunicationHandler{
     }
 
     private function handleAddRole(RequestAddRole $pk): void{
-        $this->getMember($pk, $pk->getServerId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
+        $this->getMember($pk, $pk->getGuildId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
             $dMember->addRole($pk->getRoleId())->done(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Added role.");
             }, function(\Throwable $e) use($pk){
@@ -461,7 +461,7 @@ class CommunicationHandler{
     }
 
     private function handleCreateChannel(RequestCreateChannel $pk): void{
-        $this->getServer($pk, $pk->getChannel()->getServerId(), function(DiscordGuild $guild) use($pk){
+        $this->getGuild($pk, $pk->getChannel()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $c = $pk->getChannel();
             /** @var DiscordChannel $dc */
             $dc = $guild->channels->create([
@@ -515,7 +515,7 @@ class CommunicationHandler{
             $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel ID must be present."]);
             return;
         }
-        $this->getServer($pk, $pk->getChannel()->getServerId(), function(DiscordGuild $guild) use($pk){
+        $this->getGuild($pk, $pk->getChannel()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->channels->fetch($pk->getChannel()->getId())->then(function(DiscordChannel $dc) use($guild, $pk){
                 $channel = $pk->getChannel();
                 $dc->name = $pk->getChannel()->getName();
@@ -578,7 +578,7 @@ class CommunicationHandler{
     }
 
     private function handleDeleteChannel(RequestDeleteChannel $pk): void{
-        $this->getServer($pk, $pk->getServerId(), function(DiscordGuild $guild) use($pk){
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
             $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($guild, $pk){
                 $guild->channels->delete($channel)->then(function() use($pk){
                     $this->resolveRequest($pk->getUID(), true, "Channel deleted.");
@@ -603,7 +603,7 @@ class CommunicationHandler{
     }
 
     private function handleUpdateNickname(RequestUpdateNickname $pk): void{
-        $this->getMember($pk, $pk->getServerId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
+        $this->getMember($pk, $pk->getGuildId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
             $dMember->setNickname($pk->getNickname())->done(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Updated nickname.");
             }, function(\Throwable $e) use($pk){
@@ -743,7 +743,7 @@ class CommunicationHandler{
     }
 
     private function handleKickMember(RequestKickMember $pk): void{
-        $this->getMember($pk, $pk->getServerId(), $pk->getUserId(), function(DiscordMember $member, DiscordGuild $guild) use($pk){
+        $this->getMember($pk, $pk->getGuildId(), $pk->getUserId(), function(DiscordMember $member, DiscordGuild $guild) use($pk){
             $guild->members->kick($member)->then(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Member kicked.");
             }, function(\Throwable $e) use($pk){
@@ -754,7 +754,7 @@ class CommunicationHandler{
     }
 
     private function handleInitialiseBan(RequestInitialiseBan $pk): void{
-        $this->getServer($pk, $pk->getBan()->getServerId(), function(DiscordGuild $guild) use($pk){
+        $this->getGuild($pk, $pk->getBan()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->bans->ban($pk->getBan()->getUserId(), $pk->getBan()->getDaysToDelete(), $pk->getBan()->getReason())->then(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Member banned.");
             }, function(\Throwable $e) use($pk){
@@ -765,7 +765,7 @@ class CommunicationHandler{
     }
 
     private function handleRevokeBan(RequestRevokeBan $pk): void{
-        $this->getServer($pk, $pk->getServerId(), function(DiscordGuild $guild) use($pk){
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->unban($pk->getUserId())->then(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Member unbanned.");
             }, function(\Throwable $e) use($pk){
@@ -792,7 +792,7 @@ class CommunicationHandler{
     }
 
     private function handleRevokeInvite(RequestRevokeInvite $pk): void{
-        $this->getServer($pk, $pk->getServerId(), function(DiscordGuild $guild) use($pk){
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->invites->freshen()->done(function(DiscordInviteRepository $invites) use($pk){
                 /** @var DiscordInvite $dInvite */
                 $dInvite = $invites->offsetGet($pk->getInviteCode());
@@ -812,12 +812,12 @@ class CommunicationHandler{
 
     //---------------------------------------------------
 
-    private function getServer(Packet $pk, string $server_id, callable $cb): void{
-        $this->client->getDiscordClient()->guilds->fetch($server_id)->done(function(DiscordGuild $guild) use($cb){
+    private function getGuild(Packet $pk, string $guild_id, callable $cb): void{
+        $this->client->getDiscordClient()->guilds->fetch($guild_id)->done(function(DiscordGuild $guild) use($cb){
             $cb($guild);
         }, function(\Throwable $e) use($pk){
-            $this->resolveRequest($pk->getUID(), false, "Failed to fetch server.", [$e->getMessage(), $e->getTraceAsString()]);
-            $this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - server error: {$e->getMessage()}");
+            $this->resolveRequest($pk->getUID(), false, "Failed to fetch guild.", [$e->getMessage(), $e->getTraceAsString()]);
+            $this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - guild error: {$e->getMessage()}");
         });
     }
 
@@ -854,8 +854,8 @@ class CommunicationHandler{
         });
     }
 
-    private function getMember(Packet $pk, string $server_id, string $user_id, callable $cb): void{
-        $this->getServer($pk, $server_id, function(DiscordGuild $guild) use($pk, $user_id, $cb){
+    private function getMember(Packet $pk, string $guild_id, string $user_id, callable $cb): void{
+        $this->getGuild($pk, $guild_id, function(DiscordGuild $guild) use($pk, $user_id, $cb){
             $guild->members->fetch($user_id)->then(function(DiscordMember $member) use($guild, $cb){
                 $cb($member, $guild);
             }, function(\Throwable $e) use($pk){

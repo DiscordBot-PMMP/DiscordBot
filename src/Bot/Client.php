@@ -127,7 +127,7 @@ class Client{
         // Handles any problems pre-ready.
         $this->readyTimer = $this->client->getLoop()->addTimer(30, function(){
             if($this->client->id !== null){
-                $this->logger->warning("Client has taken >30s to get ready, How large is your discord server !?  [Create an issue on github is this persists]");
+                $this->logger->warning("Client has taken >30s to get ready, How large is your discord guild !?  [Create an issue on github is this persists]");
                 $this->client->getLoop()->addTimer(30, function(){
                     if($this->thread->getStatus() !== BotThread::STATUS_READY){
                         $this->logger->critical("Client has taken too long to become ready, shutting down.");
@@ -149,7 +149,7 @@ class Client{
     /** @noinspection PhpUnusedParameterInspection */
     private function registerHandlers(): void{
         // https://github.com/teamreflex/DiscordPHP/issues/433
-        // Note ready is emitted after successful connection + all servers/users loaded, so only register events
+        // Note ready is emitted after successful connection + all guilds/users loaded, so only register events
         // After this event.
         $this->client->on('ready', function(Discord $discord){
             if($this->readyTimer !== null){

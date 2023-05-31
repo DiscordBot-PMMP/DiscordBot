@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Models\Channels;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class VoiceChannel extends ServerChannel{
+class VoiceChannel extends GuildChannel{
 
     /** @var int */
     private $bitrate;
@@ -32,14 +32,14 @@ class VoiceChannel extends ServerChannel{
      * @param int         $member_limit
      * @param string      $name
      * @param int         $position
-     * @param string      $server_id
+     * @param string      $guild_id
      * @param string[]    $members Array of Member ID's
      * @param string|null $category_id
      * @param string|null $id
      */
-    public function __construct(int $bitrate, int $member_limit, string $name, int $position, string $server_id,
+    public function __construct(int $bitrate, int $member_limit, string $name, int $position, string $guild_id,
                                    array $members, ?string $category_id = null, ?string $id = null){
-        parent::__construct($name, $position, $server_id, $category_id, $id);
+        parent::__construct($name, $position, $guild_id, $category_id, $id);
         $this->setBitrate($bitrate);
         $this->setMemberLimit($member_limit);
         $this->setMembers($members);
@@ -86,7 +86,7 @@ class VoiceChannel extends ServerChannel{
             $this->position,
             $this->member_permissions,
             $this->role_permissions,
-            $this->server_id,
+            $this->guild_id,
             $this->bitrate,
             $this->member_limit,
             $this->members,
@@ -101,7 +101,7 @@ class VoiceChannel extends ServerChannel{
             $this->position,
             $this->member_permissions,
             $this->role_permissions,
-            $this->server_id,
+            $this->guild_id,
             $this->bitrate,
             $this->member_limit,
             $this->members,

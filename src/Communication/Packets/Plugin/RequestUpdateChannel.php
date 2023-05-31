@@ -13,19 +13,19 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
+use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 
 class RequestUpdateChannel extends Packet{
 
-    /** @var ServerChannel */
+    /** @var GuildChannel */
     private $channel;
 
-    public function __construct(ServerChannel $channel){
+    public function __construct(GuildChannel $channel){
         parent::__construct();
         $this->channel = $channel;
     }
 
-    public function getChannel(): ServerChannel{
+    public function getChannel(): GuildChannel{
         return $this->channel;
     }
 

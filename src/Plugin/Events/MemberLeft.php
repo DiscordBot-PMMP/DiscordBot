@@ -16,7 +16,7 @@ use JaxkDev\DiscordBot\Models\Member;
 use pocketmine\plugin\Plugin;
 
 /**
- * Emitted when a member leaves a discord server.
+ * Emitted when a member leaves a discord guild.
  * 
  * @see MemberJoined
  * @see MemberUpdated

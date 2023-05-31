@@ -13,20 +13,20 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Models\Ban;
-use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
+use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
-use JaxkDev\DiscordBot\Models\Server;
+use JaxkDev\DiscordBot\Models\Guild;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordDataDump extends Packet{
 
-    /** @var Server[] */
-    private $servers = [];
+    /** @var Guild[] */
+    private $guilds = [];
 
-    /** @var ServerChannel[] */
+    /** @var GuildChannel[] */
     private $channels = [];
 
     /** @var Role[] */
@@ -51,24 +51,24 @@ class DiscordDataDump extends Packet{
     private $timestamp;
 
     /**
-     * @return Server[]
+     * @return Guild[]
      */
-    public function getServers(): array{
-        return $this->servers;
+    public function getGuilds(): array{
+        return $this->guilds;
     }
 
-    public function addServer(Server $server): void{
-        $this->servers[] = $server;
+    public function addGuild(Guild $guild): void{
+        $this->guilds[] = $guild;
     }
 
     /**
-     * @return ServerChannel[]
+     * @return GuildChannel[]
      */
     public function getChannels(): array{
         return $this->channels;
     }
 
-    public function addChannel(ServerChannel $channel): void{
+    public function addChannel(GuildChannel $channel): void{
         $this->channels[] = $channel;
     }
 
@@ -144,14 +144,14 @@ class DiscordDataDump extends Packet{
     }
 
     public function getSize(): int{
-        return sizeof($this->servers)+sizeof($this->channels)+sizeof($this->roles)+sizeof($this->members)
+        return sizeof($this->guilds)+sizeof($this->channels)+sizeof($this->roles)+sizeof($this->members)
             +sizeof($this->users)+sizeof($this->bans)+sizeof($this->invites);
     }
 
     public function __serialize(): array{
         return [
             $this->UID,
-            $this->servers,
+            $this->guilds,
             $this->channels,
             $this->roles,
             $this->invites,
@@ -166,7 +166,7 @@ class DiscordDataDump extends Packet{
     public function __unserialize(array $data): void{
         [
             $this->UID,
-            $this->servers,
+            $this->guilds,
             $this->channels,
             $this->roles,
             $this->invites,

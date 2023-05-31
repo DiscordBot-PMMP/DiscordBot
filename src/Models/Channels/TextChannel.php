@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models\Channels;
 
-class TextChannel extends ServerChannel{
+class TextChannel extends GuildChannel{
 
     /** @var string AKA Description. */
     private $topic;
@@ -33,15 +33,15 @@ class TextChannel extends ServerChannel{
      * @param string      $topic
      * @param string      $name
      * @param int         $position
-     * @param string      $server_id
+     * @param string      $guild_id
      * @param bool        $nsfw
      * @param int|null    $rate_limit
      * @param string|null $category_id
      * @param string|null $id
      */
-    public function __construct(string $topic, string $name, int $position, string $server_id, bool $nsfw = false,
+    public function __construct(string $topic, string $name, int $position, string $guild_id, bool $nsfw = false,
                                    ?int $rate_limit = null, ?string $category_id = null, ?string $id = null){
-        parent::__construct($name, $position, $server_id, $category_id, $id);
+        parent::__construct($name, $position, $guild_id, $category_id, $id);
         $this->setTopic($topic);
         $this->setNsfw($nsfw);
         $this->setRateLimit($rate_limit);
@@ -86,7 +86,7 @@ class TextChannel extends ServerChannel{
             $this->position,
             $this->member_permissions,
             $this->role_permissions,
-            $this->server_id,
+            $this->guild_id,
             $this->topic,
             $this->nsfw,
             $this->rate_limit,
@@ -101,7 +101,7 @@ class TextChannel extends ServerChannel{
             $this->position,
             $this->member_permissions,
             $this->role_permissions,
-            $this->server_id,
+            $this->guild_id,
             $this->topic,
             $this->nsfw,
             $this->rate_limit,

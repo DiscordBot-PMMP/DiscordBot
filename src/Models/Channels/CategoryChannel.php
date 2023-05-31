@@ -12,10 +12,10 @@
 
 namespace JaxkDev\DiscordBot\Models\Channels;
 
-class CategoryChannel extends ServerChannel{
+class CategoryChannel extends GuildChannel{
 
-    public function __construct(string $name, int $position, string $server_id, ?string $id = null){
-        parent::__construct($name, $position, $server_id, null, $id);
+    public function __construct(string $name, int $position, string $guild_id, ?string $id = null){
+        parent::__construct($name, $position, $guild_id, null, $id);
     }
 
     public function getCategoryId(): ?string{
@@ -35,7 +35,7 @@ class CategoryChannel extends ServerChannel{
             $this->position,
             $this->member_permissions,
             $this->role_permissions,
-            $this->server_id
+            $this->guild_id
         ];
     }
 
@@ -46,7 +46,7 @@ class CategoryChannel extends ServerChannel{
             $this->position,
             $this->member_permissions,
             $this->role_permissions,
-            $this->server_id
+            $this->guild_id
         ] = $data;
     }
 }

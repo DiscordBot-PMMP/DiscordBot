@@ -10,35 +10,36 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
+namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Models\Guild;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestLeaveServer extends Packet{
+class GuildUpdate extends Packet{
 
-    /** @var string */
-    private $server_id;
+    /** @var Guild */
+    private $guild;
 
-    public function __construct(string $server_id){
+    public function __construct(Guild $guild){
         parent::__construct();
-        $this->server_id = $server_id;
+        $this->guild = $guild;
     }
 
-    public function getServerId(): string{
-        return $this->server_id;
+    public function getGuild(): Guild{
+        return $this->guild;
     }
 
     public function __serialize(): array{
         return [
             $this->UID,
-            $this->server_id
+            $this->guild
         ];
     }
 
     public function __unserialize(array $data): void{
         [
             $this->UID,
-            $this->server_id
+            $this->guild
         ] = $data;
     }
 }

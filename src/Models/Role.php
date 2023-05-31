@@ -39,16 +39,16 @@ class Role{
     private $mentionable;
 
     /** @var string */
-    private $server_id;
+    private $guild_id;
 
     public function __construct(string $name, int $colour, bool $hoisted, int $hoisted_position, bool $mentionable,
-                                string $server_id, RolePermissions $permissions = null, ?string $id = null){
+                                string $guild_id, RolePermissions $permissions = null, ?string $id = null){
         $this->setName($name);
         $this->setColour($colour);
         $this->setHoisted($hoisted);
         $this->setHoistedPosition($hoisted_position);
         $this->setMentionable($mentionable);
-        $this->setServerId($server_id);
+        $this->setGuildId($guild_id);
         $this->setPermissions($permissions??new RolePermissions(0));
         $this->setId($id);
     }
@@ -118,15 +118,15 @@ class Role{
         $this->mentionable = $mentionable;
     }
 
-    public function getServerId(): string{
-        return $this->server_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
-    public function setServerId(string $server_id): void{
-        if(!Utils::validDiscordSnowflake($server_id)){
-            throw new \AssertionError("Server ID '$server_id' is invalid.");
+    public function setGuildId(string $guild_id): void{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
-        $this->server_id = $server_id;
+        $this->guild_id = $guild_id;
     }
 
     //----- Serialization -----//
@@ -140,7 +140,7 @@ class Role{
             $this->mentionable,
             $this->hoisted,
             $this->hoisted_position,
-            $this->server_id
+            $this->guild_id
         ];
     }
 
@@ -153,7 +153,7 @@ class Role{
             $this->mentionable,
             $this->hoisted,
             $this->hoisted_position,
-            $this->server_id
+            $this->guild_id
         ] = $data;
     }
 }

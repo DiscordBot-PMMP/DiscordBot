@@ -12,18 +12,18 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
+use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
-use JaxkDev\DiscordBot\Models\Server;
+use JaxkDev\DiscordBot\Models\Guild;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class ServerJoin extends Packet{
+class GuildJoin extends Packet{
 
-    /** @var Server */
-    private $server;
+    /** @var Guild */
+    private $guild;
 
-    /** @var ServerChannel[] */
+    /** @var GuildChannel[] */
     private $channels;
 
     /** @var Member[] */
@@ -33,26 +33,26 @@ class ServerJoin extends Packet{
     private $roles;
 
     /**
-     * ServerJoin constructor.
+     * GuildJoin constructor.
      *
-     * @param Server          $server
-     * @param ServerChannel[] $channels
+     * @param Guild           $guild
+     * @param GuildChannel[] $channels
      * @param Member[]        $members
      * @param Role[]          $roles
      */
-    public function __construct(Server $server, array $channels, array $members, array $roles){
+    public function __construct(Guild $guild, array $channels, array $members, array $roles){
         parent::__construct();
-        $this->server = $server;
+        $this->guild = $guild;
         $this->channels = $channels;
         $this->members = $members;
         $this->roles = $roles;
     }
 
-    public function getServer(): Server{
-        return $this->server;
+    public function getGuild(): Guild{
+        return $this->guild;
     }
 
-    /** @return ServerChannel[] */
+    /** @return GuildChannel[] */
     public function getChannels(): array{
         return $this->channels;
     }
@@ -70,7 +70,7 @@ class ServerJoin extends Packet{
     public function __serialize(): array{
         return [
             $this->UID,
-            $this->server,
+            $this->guild,
             $this->roles,
             $this->channels,
             $this->members
@@ -80,7 +80,7 @@ class ServerJoin extends Packet{
     public function __unserialize(array $data): void{
         [
             $this->UID,
-            $this->server,
+            $this->guild,
             $this->roles,
             $this->channels,
             $this->members

@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 class RequestAddRole extends Packet{
 
     /** @var string */
-    private $server_id;
+    private $guild_id;
 
     /** @var string */
     private $user_id;
@@ -25,15 +25,15 @@ class RequestAddRole extends Packet{
     /** @var string */
     private $role_id;
 
-    public function __construct(string $server_id, string $user_id, string $role_id){
+    public function __construct(string $guild_id, string $user_id, string $role_id){
         parent::__construct();
-        $this->server_id = $server_id;
+        $this->guild_id = $guild_id;
         $this->user_id = $user_id;
         $this->role_id = $role_id;
     }
 
-    public function getServerId(): string{
-        return $this->server_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
     public function getUserId(): string{
@@ -47,7 +47,7 @@ class RequestAddRole extends Packet{
     public function __serialize(): array{
         return [
             $this->UID,
-            $this->server_id,
+            $this->guild_id,
             $this->user_id,
             $this->role_id
         ];
@@ -56,7 +56,7 @@ class RequestAddRole extends Packet{
     public function __unserialize(array $data): void{
         [
             $this->UID,
-            $this->server_id,
+            $this->guild_id,
             $this->user_id,
             $this->role_id
         ] = $data;

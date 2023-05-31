@@ -16,7 +16,7 @@ use JaxkDev\DiscordBot\Models\Member;
 use pocketmine\plugin\Plugin;
 
 /**
- * Emitted when a member joins a discord server.
+ * Emitted when a member joins a discord guild.
  * 
  * @see MemberLeft
  * @see MemberUpdated

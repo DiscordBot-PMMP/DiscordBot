@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class Server{
+class Guild{
 
     /** @var string */
     private $id;
@@ -54,7 +54,7 @@ class Server{
 
     public function setId(string $id): void{
         if(!Utils::validDiscordSnowflake($id)){
-            throw new \AssertionError("Server ID '$id' is invalid.");
+            throw new \AssertionError("Guild ID '$id' is invalid.");
         }
         $this->id = $id;
     }

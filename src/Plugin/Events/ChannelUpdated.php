@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Channels\ServerChannel;
+use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -23,15 +23,15 @@ use pocketmine\plugin\Plugin;
  */
 class ChannelUpdated extends DiscordBotEvent{
 
-    /** @var ServerChannel */
+    /** @var GuildChannel */
     private $channel;
 
-    public function __construct(Plugin $plugin, ServerChannel $channel){
+    public function __construct(Plugin $plugin, GuildChannel $channel){
         parent::__construct($plugin);
         $this->channel = $channel;
     }
 
-    public function getChannel(): ServerChannel{
+    public function getChannel(): GuildChannel{
         return $this->channel;
     }
 }
