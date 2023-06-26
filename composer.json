@@ -25,8 +25,8 @@
         "react/promise": "v2.10.0"
     },
     "require-dev": {
-        "phpstan/phpstan": "1.10.15",
+        "phpstan/phpstan": "1.10.21",
         "phpstan/phpstan-strict-rules": "1.5.1",
-        "pocketmine/pocketmine-mp": "^5.0.0-BETA4"
+        "pocketmine/pocketmine-mp": "^5"
     }
 }
