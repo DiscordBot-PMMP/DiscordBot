@@ -397,14 +397,6 @@ class Storage{
     }
 
     /**
-     * @deprecated Will be removed in v3.0, use Storage::getBansByGuild() instead.
-     * @see Storage::getBansByGuild()
-     */
-    public static function getGuildBans(string $guild_id): array{
-        return self::getBansByGuild($guild_id);
-    }
-
-    /**
      * @param string $guild_id
      * @return Ban[]
      */
