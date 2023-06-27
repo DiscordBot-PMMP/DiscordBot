@@ -5,6 +5,6 @@
  * Copyright (C) 2020-present JaxkDev
  *
  * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
