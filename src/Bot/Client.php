@@ -219,7 +219,7 @@ class Client{
             case Op::CLOSE_INVALID_INTENTS:
                 //Should never happen considering were set to a specific version of the gateway
                 $this->logger->emergency("Invalid intents specified, Please create a new issue on github ".
-                    "(https://github.com/DiscordBot-PMMP/DiscordBot/issues/new) quoting the text `op:4013 - {$reason}`.");
+                    "(https://github.com/DiscordBot-PMMP/DiscordBot/issues/new) quoting the text `op:".Op::CLOSE_INVALID_INTENTS." - {$reason}`.");
                 break;
         }
         if(in_array($op, Op::getCriticalCloseCodes(), true)) {
