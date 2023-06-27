@@ -22,7 +22,7 @@ use pocketmine\Server;
  */
 abstract class ApiResolver{
 
-    static private \AttachableLogger $logger;
+    static private ?\AttachableLogger $logger;
 
     /** @var Array<int, Deferred> */
     static private array $map = [];
