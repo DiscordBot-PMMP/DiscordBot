@@ -12,38 +12,37 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
-//https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-object
-class Activity{
+/** @link https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-object */
+final class Activity{
 
-    //TODO Enums?
-    const
-        TYPE_PLAYING = 0,
-        TYPE_STREAMING = 1,
-        TYPE_LISTENING = 2,
-        TYPE_WATCHING = 3,
-        TYPE_CUSTOM = 4,
-        TYPE_COMPETING = 5,
+    /** @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags */
+    public const
+        FLAG_INSTANCE = (1 << 0),
+        FLAG_JOIN = (1 << 1),
+        FLAG_SPECTATE = (1 << 2),
+        FLAG_JOIN_REQUEST = (1 << 3),
+        FLAG_SYNC = (1 << 4),
+        FLAG_PLAY = (1 << 5),
+        FLAG_PARTY_PRIVACY_FRIENDS = (1 << 6),
+        FLAG_PARTY_PRIVACY_VOICE_CHANNEL = (1 << 7),
+        FLAG_EMBEDDED = (1 << 8);
 
-        FLAG_INSTANCE = 1,
-        FLAG_JOIN = 2,
-        FLAG_SPECTATE = 4,
-        FLAG_JOIN_REQUEST = 8,
-        FLAG_SYNC = 16,
-        FLAG_PLAY = 32;
-
-    /** Activity Name */
+    /** Activity's Name */
     private string $name;
 
     /** Activity Type */
-    private int $type;
+    private ActivityType $type;
 
-    /** Only null when sending new presence, Unix timestamp of when the activity was added to the user's session */
-    private int $created_at;
-
-    /** Stream url, only when type is streaming. */
+    /** Stream URL, is validated when type is STREAMING. */
     private ?string $url;
 
-    /** https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps */
+    /** Unix timestamp (in ms) of when the activity was added to the user's session */
+    private int $created_at;
+
+    /**
+     * Unix time (in milliseconds) of when the activity started/ends
+     * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
+     */
     private ?int $start_timestamp;
     private ?int $end_timestamp;
 
@@ -53,64 +52,85 @@ class Activity{
     /** What the player is currently doing */
     private ?string $details;
 
-    /** The user's current party status*/
+    /** User's current party status */
     private ?string $state;
 
-    private ?string $emoji;
+    /**
+     * Emoji used for a custom status
+     * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji
+     */
+    private ?string $emoji_name;
+    private ?string $emoji_id;
+    private ?bool   $emoji_animated;
 
-    /** https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party */
+    /**
+     * Information for the current party of the player
+     * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party
+     */
     private ?string $party_id;
     private ?int    $party_size;
     private ?int    $party_max_size;
 
-    /** https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets */
-    private ?string $large_image;
-    private ?string $large_text;
-    private ?string $small_image;
-    private ?string $small_text;
+    /**
+     * Images for the presence and their hover texts
+     * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets
+     */
+    private ?string $asset_large_image;
+    private ?string $asset_large_text;
+    private ?string $asset_small_image;
+    private ?string $asset_small_text;
 
-    ///** @var null|string https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-secrets */
-    //private $join_secret;
-    ///** @var null|string */
-    //private $spectate_secret;
-    ///** @var null|string */
-    //private $match_secret;
+    /**
+     * Secrets for Rich Presence joining and spectating
+     * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-secrets
+     */
+    private ?string $secret_join;
+    private ?string $secret_spectate;
+    private ?string $secret_match;
 
     /** Whether the activity is an instanced game session */
     private ?bool $instance;
 
-    /** https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags */
+    /**
+     * @see Activity::FLAG_* constants
+     * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags
+     */
     private ?int $flags;
 
-    //Buttons (max 2) https://github.com/discord-php/DiscordPHP/issues/561
+    //Buttons (max 2)
+    //TODO Buttons.
 
-    public function __construct(string $name, int $type, int $created_at = null, ?string $url = null, ?int $start_timestamp = null,
-                                ?int $end_timestamp = null, ?string $application_id = null, ?string $details = null,
-                                ?string $state = null, ?string $emoji = null, ?string $party_id = null, ?int $party_size = null,
-                                ?int $party_max_size = null, ?string $large_image = null, ?string $large_text = null,
-                                ?string $small_image = null, ?string $small_text = null, /*?string $join_secret = null,
-                                ?string $spectate_secret = null, ?string $match_secret = null,*/ ?bool $instance = null,
+    public function __construct(string $name, ActivityType $type, ?string $url = null, ?int $created_at = null,
+                                ?int $start_timestamp = null, ?int $end_timestamp = null, ?string $application_id = null,
+                                ?string $details = null, ?string $state = null, ?string $emoji_name = null,
+                                ?string $emoji_id = null, ?bool $emoji_animated = null, ?string $party_id = null,
+                                ?int $party_size = null, ?int $party_max_size = null, ?string $asset_large_image = null,
+                                ?string $asset_large_text = null, ?string $asset_small_image = null,
+                                ?string $asset_small_text = null, ?string $secret_join = null,
+                                ?string $secret_spectate = null, ?string $secret_match = null, ?bool $instance = null,
                                 ?int $flags = null){
         $this->setName($name);
         $this->setType($type);
-        $this->setCreatedAt($created_at??time());
         $this->setUrl($url);
+        $this->setCreatedAt($created_at??time());
         $this->setStartTimestamp($start_timestamp);
         $this->setEndTimestamp($end_timestamp);
         $this->setApplicationId($application_id);
         $this->setDetails($details);
         $this->setState($state);
-        $this->setEmoji($emoji);
+        $this->setEmojiName($emoji_name);
+        $this->setEmojiId($emoji_id);
+        $this->setEmojiAnimated($emoji_animated);
         $this->setPartyId($party_id);
         $this->setPartySize($party_size);
         $this->setPartyMaxSize($party_max_size);
-        $this->setLargeImage($large_image);
-        $this->setLargeText($large_text);
-        $this->setSmallImage($small_image);
-        $this->setSmallText($small_text);
-        /*$this->setJoinSecret($join_secret);
-        $this->setSpectateSecret($spectate_secret);
-        $this->setMatchSecret($match_secret);*/
+        $this->setAssetLargeImage($asset_large_image);
+        $this->setAssetLargeText($asset_large_text);
+        $this->setAssetSmallImage($asset_small_image);
+        $this->setAssetSmallText($asset_small_text);
+        $this->setSecretJoin($secret_join);
+        $this->setSecretSpectate($secret_spectate);
+        $this->setSecretMatch($secret_match);
         $this->setInstance($instance);
         $this->setFlags($flags);
     }
@@ -123,26 +143,12 @@ class Activity{
         $this->name = $name;
     }
 
-    public function getType(): int{
+    public function getType(): ActivityType{
         return $this->type;
     }
 
-    public function setType(int $type): void{
-        if($type < self::TYPE_PLAYING or $type > self::TYPE_COMPETING){
-            throw new \AssertionError("Invalid type '{$type}'");
-        }
+    public function setType(ActivityType $type): void{
         $this->type = $type;
-    }
-
-    public function getCreatedAt(): int{
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(int $timestamp): void{
-        if($timestamp < 0){
-            throw new \AssertionError("Invalid created_at timestamp '$timestamp'.");
-        }
-        $this->created_at = $timestamp;
     }
 
     public function getUrl(): ?string{
@@ -162,6 +168,17 @@ class Activity{
             throw new \AssertionError("Invalid url '$url'.");
         }
         $this->url = $url;
+    }
+
+    public function getCreatedAt(): int{
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(int $timestamp): void{
+        if($timestamp < 0){
+            throw new \AssertionError("Invalid created_at timestamp '$timestamp'.");
+        }
+        $this->created_at = $timestamp;
     }
 
     public function getStartTimestamp(): ?int{
@@ -210,12 +227,28 @@ class Activity{
         $this->state = $state;
     }
 
-    public function getEmoji(): ?string{
-        return $this->emoji;
+    public function getEmojiName(): ?string{
+        return $this->emoji_name;
     }
 
-    public function setEmoji(?string $emoji): void{
-        $this->emoji = $emoji;
+    public function setEmojiName(?string $emoji_name): void{
+        $this->emoji_name = $emoji_name;
+    }
+
+    public function getEmojiId(): ?string{
+        return $this->emoji_id;
+    }
+
+    public function setEmojiId(?string $emoji_id): void{
+        $this->emoji_id = $emoji_id;
+    }
+
+    public function getEmojiAnimated(): ?bool{
+        return $this->emoji_animated;
+    }
+
+    public function setEmojiAnimated(?bool $emoji_animated): void{
+        $this->emoji_animated = $emoji_animated;
     }
 
     public function getPartyId(): ?string{
@@ -248,61 +281,61 @@ class Activity{
         $this->party_max_size = $party_max_size;
     }
 
-    public function getLargeImage(): ?string{
-        return $this->large_image;
+    public function getAssetLargeImage(): ?string{
+        return $this->asset_large_image;
     }
 
-    public function setLargeImage(?string $large_image): void{
-        $this->large_image = $large_image;
+    public function setAssetLargeImage(?string $asset_large_image): void{
+        $this->asset_large_image = $asset_large_image;
     }
 
-    public function getLargeText(): ?string{
-        return $this->large_text;
+    public function getAssetLargeText(): ?string{
+        return $this->asset_large_text;
     }
 
-    public function setLargeText(?string $large_text): void{
-        $this->large_text = $large_text;
+    public function setAssetLargeText(?string $asset_large_text): void{
+        $this->asset_large_text = $asset_large_text;
     }
 
-    public function getSmallImage(): ?string{
-        return $this->small_image;
+    public function getAssetSmallImage(): ?string{
+        return $this->asset_small_image;
     }
 
-    public function setSmallImage(?string $small_image): void{
-        $this->small_image = $small_image;
+    public function setAssetSmallImage(?string $asset_small_image): void{
+        $this->asset_small_image = $asset_small_image;
     }
 
-    public function getSmallText(): ?string{
-        return $this->small_text;
+    public function getAssetSmallText(): ?string{
+        return $this->asset_small_text;
     }
 
-    public function setSmallText(?string $small_text): void{
-        $this->small_text = $small_text;
+    public function setAssetSmallText(?string $asset_small_text): void{
+        $this->asset_small_text = $asset_small_text;
     }
 
-    /*public function getJoinSecret(): ?string{
-        return $this->join_secret;
+    public function getSecretJoin(): ?string{
+        return $this->secret_join;
     }
 
-    public function setJoinSecret(?string $join_secret): void{
-        $this->join_secret = $join_secret;
+    public function setSecretJoin(?string $secret_join): void{
+        $this->secret_join = $secret_join;
     }
 
-    public function getSpectateSecret(): ?string{
-        return $this->spectate_secret;
+    public function getSecretSpectate(): ?string{
+        return $this->secret_spectate;
     }
 
-    public function setSpectateSecret(?string $spectate_secret): void{
-        $this->spectate_secret = $spectate_secret;
+    public function setSecretSpectate(?string $secret_spectate): void{
+        $this->secret_spectate = $secret_spectate;
     }
 
-    public function getMatchSecret(): ?string{
-        return $this->match_secret;
+    public function getSecretMatch(): ?string{
+        return $this->secret_match;
     }
 
-    public function setMatchSecret(?string $match_secret): void{
-        $this->match_secret = $match_secret;
-    }*/
+    public function setSecretMatch(?string $secret_match): void{
+        $this->secret_match = $secret_match;
+    }
 
     public function getInstance(): ?bool{
         return $this->instance;
@@ -326,24 +359,26 @@ class Activity{
         return [
             $this->name,
             $this->type,
-            $this->created_at,
             $this->url,
+            $this->created_at,
             $this->start_timestamp,
             $this->end_timestamp,
             $this->application_id,
             $this->details,
             $this->state,
-            $this->emoji,
+            $this->emoji_name,
+            $this->emoji_id,
+            $this->emoji_animated,
             $this->party_id,
             $this->party_size,
             $this->party_max_size,
-            $this->large_image,
-            $this->large_text,
-            $this->small_image,
-            $this->small_text,
-            /*$this->join_secret,
-            $this->spectate_secret,
-            $this->match_secret,*/
+            $this->asset_large_image,
+            $this->asset_large_text,
+            $this->asset_small_image,
+            $this->asset_small_text,
+            $this->secret_join,
+            $this->secret_spectate,
+            $this->secret_match,
             $this->instance,
             $this->flags
         ];
@@ -353,24 +388,26 @@ class Activity{
         [
             $this->name,
             $this->type,
-            $this->created_at,
             $this->url,
+            $this->created_at,
             $this->start_timestamp,
             $this->end_timestamp,
             $this->application_id,
             $this->details,
             $this->state,
-            $this->emoji,
+            $this->emoji_name,
+            $this->emoji_id,
+            $this->emoji_animated,
             $this->party_id,
             $this->party_size,
             $this->party_max_size,
-            $this->large_image,
-            $this->large_text,
-            $this->small_image,
-            $this->small_text,
-            /*$this->join_secret,
-            $this->spectate_secret,
-            $this->match_secret,*/
+            $this->asset_large_image,
+            $this->asset_large_text,
+            $this->asset_small_image,
+            $this->asset_small_text,
+            $this->secret_join,
+            $this->secret_spectate,
+            $this->secret_match,
             $this->instance,
             $this->flags
         ] = $data;
