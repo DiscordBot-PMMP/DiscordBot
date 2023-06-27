@@ -19,6 +19,7 @@ class ChannelPermissions extends Permissions{
      * @return Array<string, int>
      */
     static function getPossiblePermissions(): array{
-        return array_merge(Permissions::ALL_PERMISSIONS, Permissions::TEXT_PERMISSIONS, Permissions::VOICE_PERMISSIONS);
+        return array_merge(Permissions::ALL_PERMISSIONS, Permissions::TEXT_PERMISSIONS,
+            Permissions::VOICE_PERMISSIONS, Permissions::STAGE_PERMISSIONS);
     }
 }
