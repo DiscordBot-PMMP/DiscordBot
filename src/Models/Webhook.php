@@ -113,12 +113,12 @@ class Webhook{
         $this->guild_id = $guild_id;
     }
 
-    public function getChannelId(): string{
+    public function getChannelId(): ?string{
         return $this->channel_id;
     }
 
-    public function setChannelId(string $channel_id): void{
-        if(!Utils::validDiscordSnowflake($channel_id)){
+    public function setChannelId(?string $channel_id): void{
+        if($channel_id !== null and !Utils::validDiscordSnowflake($channel_id)){
             throw new \AssertionError("Channel ID '$channel_id' is invalid.");
         }
         $this->channel_id = $channel_id;
@@ -135,11 +135,15 @@ class Webhook{
         $this->user_id = $user_id;
     }
 
-    public function getName(): string{
+    public function getName(): ?string{
         return $this->name;
     }
 
-    public function setName(string $name): void{
+    public function setName(?string $name): void{
+        if($name === null){
+            $this->name = null;
+            return;
+        }
         if(strlen($name) > 80){
             throw new \AssertionError("Name '$name' is too long, max 80 characters.");
         }
