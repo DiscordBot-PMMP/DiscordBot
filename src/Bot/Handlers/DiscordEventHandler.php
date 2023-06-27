@@ -59,11 +59,9 @@ use Monolog\Logger;
 
 class DiscordEventHandler{
 
-    /** @var Client */
-    private $client;
+    private Client $client;
 
-    /** @var Logger */
-    private $logger;
+    private Logger $logger;
 
     public function __construct(Client $client){
         $this->client = $client;

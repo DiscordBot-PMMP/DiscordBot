@@ -16,14 +16,11 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestAddRole extends Packet{
 
-    /** @var string */
-    private $guild_id;
+    private string $guild_id;
 
-    /** @var string */
-    private $user_id;
+    private string $user_id;
 
-    /** @var string */
-    private $role_id;
+    private string $role_id;
 
     public function __construct(string $guild_id, string $user_id, string $role_id){
         parent::__construct();

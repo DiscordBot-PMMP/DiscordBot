@@ -16,22 +16,11 @@ use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 
 class Reply extends Message{
 
-    /** @var ?string ID of message replying to. */
-    private $referenced_message_id;
+    /** ID of message replying to. */
+    private ?string $referenced_message_id;
 
     /**
-     * Reply constructor.
-     *
-     * @param string       $channel_id
-     * @param string|null  $referenced_message_id
-     * @param string|null  $id
-     * @param string       $content
-     * @param Embed|null   $embed
-     * @param string|null  $author_id
-     * @param string|null  $guild_id
-     * @param float|null   $timestamp
      * @param Attachment[] $attachments
-     * @param bool         $everyone_mentioned
      * @param string[]     $users_mentioned
      * @param string[]     $roles_mentioned
      * @param string[]     $channels_mentioned

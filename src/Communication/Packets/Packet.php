@@ -15,11 +15,9 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 abstract class Packet{
 
     // Used for responses.
-    /** @var int */
-    public static $UID_COUNT = 0;
+    public static int $UID_COUNT = 0;
 
-    /** @var int */
-    protected $UID;
+    protected int $UID;
 
     public function __construct(){
         Packet::$UID_COUNT += 2;  //BotThread = Odd, PluginThread = Even. (Keeps them unique, *shrugs*)

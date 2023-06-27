@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Models\Invite;
 
 class RequestInitialiseInvite extends Packet{
 
-    /** @var Invite */
-    private $invite;
+    private Invite $invite;
 
     public function __construct(Invite $invite){
         parent::__construct();

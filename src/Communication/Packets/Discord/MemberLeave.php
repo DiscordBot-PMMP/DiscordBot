@@ -16,8 +16,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MemberLeave extends Packet{
 
-    /** @var string */
-    private $member_id;
+    private string $member_id;
 
     public function __construct(string $member_id){
         parent::__construct();

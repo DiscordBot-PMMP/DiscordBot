@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class BanAdd extends Packet{
 
-    /** @var Ban */
-    private $ban;
+    private Ban $ban;
 
     public function __construct(Ban $ban){
         parent::__construct();

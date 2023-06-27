@@ -16,11 +16,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestRevokeInvite extends Packet{
 
-    /** @var string */
-    private $guild_id;
+    private string $guild_id;
 
-    /** @var string */
-    private $invite_code;
+    private string $invite_code;
 
     public function __construct(string $guild_id, string $invite_code){
         parent::__construct();

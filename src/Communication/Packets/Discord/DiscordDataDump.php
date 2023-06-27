@@ -24,31 +24,29 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 class DiscordDataDump extends Packet{
 
     /** @var Guild[] */
-    private $guilds = [];
+    private array $guilds = [];
 
     /** @var GuildChannel[] */
-    private $channels = [];
+    private array $channels = [];
 
     /** @var Role[] */
-    private $roles = [];
+    private array $roles = [];
 
     /** @var Invite[] */
-    private $invites = [];
+    private array $invites = [];
 
     /** @var Ban[] */
-    private $bans = [];
+    private array $bans = [];
 
     /** @var Member[] */
-    private $members = [];
+    private array $members = [];
 
     /** @var User[] */
-    private $users = [];
+    private array $users = [];
 
-    /** @var null|User */
-    private $bot_user = null;
+    private ?User $bot_user = null;
 
-    /** @var int */
-    private $timestamp;
+    private int $timestamp;
 
     /**
      * @return Guild[]

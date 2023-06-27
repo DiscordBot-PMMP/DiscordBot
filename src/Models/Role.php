@@ -17,29 +17,23 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Role{
 
-    /** @var null|string */
-    private $id;
+    /** null when creating model */
+    private ?string $id;
 
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /** @var RolePermissions */
-    private $permissions;
+    private RolePermissions $permissions;
 
-    /** @var int */
-    private $colour;
+    private int $colour;
 
-    /** @var bool Is role hoisted on member list. */
-    private $hoisted;
+    /** Is role hoisted on member list. */
+    private bool $hoisted;
 
-    /** @var int */
-    private $hoisted_position;
+    private int $hoisted_position;
 
-    /** @var bool */
-    private $mentionable;
+    private bool $mentionable;
 
-    /** @var string */
-    private $guild_id;
+    private string $guild_id;
 
     public function __construct(string $name, int $colour, bool $hoisted, int $hoisted_position, bool $mentionable,
                                 string $guild_id, RolePermissions $permissions = null, ?string $id = null){

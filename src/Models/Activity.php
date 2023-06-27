@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 //https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-object
 class Activity{
 
+    //TODO Enums?
     const
         TYPE_PLAYING = 0,
         TYPE_STREAMING = 1,
@@ -30,51 +31,43 @@ class Activity{
         FLAG_SYNC = 16,
         FLAG_PLAY = 32;
 
-    /** @var string Activity Name */
-    private $name;
+    /** Activity Name */
+    private string $name;
 
-    /** @var int Activity Type */
-    private $type;
+    /** Activity Type */
+    private int $type;
 
-    /** @var int Only null when sending new presence, Unix timestamp of when the activity was added to the user's session */
-    private $created_at;
+    /** Only null when sending new presence, Unix timestamp of when the activity was added to the user's session */
+    private int $created_at;
 
-    //The streaming type currently only supports Twitch and YouTube. Only https://twitch.tv/ and https://youtube.com/ urls will work.
-    /** @var null|string stream url, only when type is streaming. */
-    private $url;
+    /** Stream url, only when type is streaming. */
+    private ?string $url;
 
-    /** @var null|int https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps */
-    private $start_timestamp;
-    /** @var null|int */
-    private $end_timestamp;
+    /** https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps */
+    private ?int $start_timestamp;
+    private ?int $end_timestamp;
 
-    /** @var null|string Application id for the game */
-    private $application_id;
+    /** Application id for the game */
+    private ?string $application_id;
 
-    /** @var null|string What the player is currently doing */
-    private $details;
+    /** What the player is currently doing */
+    private ?string $details;
 
-    /** @var null|string The user's current party status*/
-    private $state;
+    /** The user's current party status*/
+    private ?string $state;
 
-    /** @var null|string */
-    private $emoji;
+    private ?string $emoji;
 
-    /** @var null|string https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party */
-    private $party_id;
-    /** @var null|int */
-    private $party_size;
-    /** @var null|int */
-    private $party_max_size;
+    /** https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party */
+    private ?string $party_id;
+    private ?int    $party_size;
+    private ?int    $party_max_size;
 
-    /** @var null|string https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets */
-    private $large_image;
-    /** @var null|string */
-    private $large_text;
-    /** @var null|string */
-    private $small_image;
-    /** @var null|string */
-    private $small_text;
+    /** https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets */
+    private ?string $large_image;
+    private ?string $large_text;
+    private ?string $small_image;
+    private ?string $small_text;
 
     ///** @var null|string https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-secrets */
     //private $join_secret;
@@ -83,11 +76,11 @@ class Activity{
     ///** @var null|string */
     //private $match_secret;
 
-    /** @var null|bool Whether or not the activity is an instanced game session */
-    private $instance;
+    /** Whether the activity is an instanced game session */
+    private ?bool $instance;
 
-    /** @var null|int https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags */
-    private $flags;
+    /** https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags */
+    private ?int $flags;
 
     //Buttons (max 2) https://github.com/discord-php/DiscordPHP/issues/561
 

@@ -80,11 +80,9 @@ use pocketmine\VersionInfo;
 
 class BotCommunicationHandler{
 
-    /** @var Main */
-    private $plugin;
+    private Main $plugin;
 
-    /** @var float|null */
-    private $lastHeartbeat = null;
+    private ?float $lastHeartbeat = null;
 
     public function __construct(Main $plugin){
         $this->plugin = $plugin;
@@ -132,6 +130,7 @@ class BotCommunicationHandler{
     }
 
     private function handleReady(): void{
+        //TODO Move default activity text to event.
         //Default activity, Feel free to change activity after ReadyEvent.
         $ac = new Activity(VersionInfo::NAME." v".VersionInfo::BASE_VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION, Activity::TYPE_PLAYING);
         $this->plugin->getApi()->updateBotPresence($ac, Member::STATUS_IDLE)->otherwise(function(ApiRejection $a){

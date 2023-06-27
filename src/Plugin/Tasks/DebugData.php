@@ -15,23 +15,18 @@ namespace JaxkDev\DiscordBot\Plugin\Tasks;
 use JaxkDev\DiscordBot\Plugin\Main;
 use JaxkDev\DiscordBot\Plugin\Storage;
 use pocketmine\command\CommandSender;
+use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\TextFormat;
 use ZipArchive;
 
-class DebugData extends \pocketmine\scheduler\AsyncTask{
+class DebugData extends AsyncTask{
 
-    /** @var string */
-    private $serverFolder;
-    /** @var string */
-    private $pluginFolder;
-    /** @var string */
-    private $config;
-    /** @var string */
-    private $version;
-    /** @var string */
-    private $pocketmineVersion;
-    /** @var string */
-    private $serverVersion;
+    private string $serverFolder;
+    private string $pluginFolder;
+    private string $config;
+    private string $version;
+    private string $pocketmineVersion;
+    private string $serverVersion;
 
     public function __construct(Main $plugin, CommandSender $sender){
         $this->storeLocal("sender", $sender);

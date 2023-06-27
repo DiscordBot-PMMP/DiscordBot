@@ -14,8 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 
 class Heartbeat extends Packet{
 
-    /** @var float */
-    private $heartbeat;
+    private float $heartbeat;
 
     public function __construct(float $heartbeat){
         parent::__construct();

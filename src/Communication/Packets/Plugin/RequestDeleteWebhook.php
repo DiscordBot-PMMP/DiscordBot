@@ -16,11 +16,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestDeleteWebhook extends Packet{
 
-    /** @var string */
-    private $webhook_id;
+    private string $webhook_id;
 
-    /** @var string */
-    private $channel_id;
+    private string $channel_id;
 
     public function __construct(string $channel_id, string $webhook_id){
         parent::__construct();

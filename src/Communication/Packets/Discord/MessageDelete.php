@@ -20,7 +20,7 @@ class MessageDelete extends Packet{
     /**
      * @var Message|array{"message_id": string, "channel_id": string, "guild_id": string}
      */
-    private $message;
+    private Message|array $message;
 
     /**
      * @param Message|array{"message_id": string, "channel_id": string, "guild_id": string} $message

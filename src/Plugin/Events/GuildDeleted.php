@@ -23,8 +23,7 @@ use pocketmine\plugin\Plugin;
  */
 class GuildDeleted extends DiscordBotEvent{
 
-    /** @var Guild */
-    private $guild;
+    private Guild $guild;
 
     public function __construct(Plugin $plugin, Guild $guild){
         parent::__construct($plugin);

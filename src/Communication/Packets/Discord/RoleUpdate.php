@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RoleUpdate extends Packet{
 
-    /** @var Role */
-    private $role;
+    private Role $role;
 
     public function __construct(Role $role){
         parent::__construct();

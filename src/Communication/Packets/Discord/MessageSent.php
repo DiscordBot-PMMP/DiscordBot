@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MessageSent extends Packet{
 
-    /** @var Message */
-    private $message;
+    private Message $message;
 
     public function __construct(Message $message){
         parent::__construct();

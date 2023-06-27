@@ -17,11 +17,9 @@ use JaxkDev\DiscordBot\Models\VoiceState;
 
 class VoiceStateUpdate extends Packet{
 
-    /** @var string */
-    private $member_id;
+    private string $member_id;
 
-    /** @var VoiceState */
-    private $voice_state;
+    private VoiceState $voice_state;
 
     public function __construct(string $member_id, VoiceState $voice_state){
         parent::__construct();

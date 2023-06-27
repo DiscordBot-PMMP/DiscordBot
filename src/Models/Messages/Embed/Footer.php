@@ -14,11 +14,11 @@ namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
 class Footer{
 
-    /** @var null|string 2048 characters */
-    private $text;
+    /** 2048 characters */
+    private ?string $text;
 
-    /** @var null|string Must be prefixed with `https` */
-    private $icon_url;
+    /** Must be prefixed with `https` */
+    private ?string $icon_url;
 
     public function __construct(?string $text = null, ?string $icon_url = null){
         $this->setText($text);

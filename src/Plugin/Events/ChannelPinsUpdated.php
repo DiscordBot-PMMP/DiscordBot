@@ -20,8 +20,7 @@ use pocketmine\plugin\Plugin;
  */
 class ChannelPinsUpdated extends DiscordBotEvent{
 
-    /** @var TextChannel */
-    private $channel;
+    private TextChannel $channel;
 
     public function __construct(Plugin $plugin, TextChannel $channel){
         parent::__construct($plugin);

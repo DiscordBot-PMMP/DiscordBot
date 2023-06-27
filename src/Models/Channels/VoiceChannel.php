@@ -16,26 +16,16 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class VoiceChannel extends GuildChannel{
 
-    /** @var int */
-    private $bitrate;
+    private int $bitrate;
 
-    /** @var int The max amount of members that can join - NOTE Admins(TBC)/Owner can still join if full. */
-    private $member_limit;
+    /** The max amount of members that can join - NOTE Admins(TBC)/Owner can still join if full. */
+    private int $member_limit;
 
     /** @var string[] Members in the channel (ID's only). */
-    private $members = [];
+    private array $members = [];
 
     /**
-     * VoiceChannel constructor.
-     *
-     * @param int         $bitrate
-     * @param int         $member_limit
-     * @param string      $name
-     * @param int         $position
-     * @param string      $guild_id
      * @param string[]    $members Array of Member ID's
-     * @param string|null $category_id
-     * @param string|null $id
      */
     public function __construct(int $bitrate, int $member_limit, string $name, int $position, string $guild_id,
                                    array $members, ?string $category_id = null, ?string $id = null){

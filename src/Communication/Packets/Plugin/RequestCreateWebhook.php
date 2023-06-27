@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Models\Webhook;
 
 class RequestCreateWebhook extends Packet{
 
-    /** @var Webhook */
-    private $webhook;
+    private Webhook $webhook;
 
     public function __construct(Webhook $webhook){
         parent::__construct();

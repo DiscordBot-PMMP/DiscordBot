@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MemberUpdate extends Packet{
 
-    /** @var Member */
-    private $member;
+    private Member $member;
 
     public function __construct(Member $member){
         parent::__construct();

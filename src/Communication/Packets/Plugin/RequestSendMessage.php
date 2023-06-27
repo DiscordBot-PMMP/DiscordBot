@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestSendMessage extends Packet{
 
-    /** @var Message */
-    private $message;
+    private Message $message;
 
     public function __construct(Message $message){
         parent::__construct();

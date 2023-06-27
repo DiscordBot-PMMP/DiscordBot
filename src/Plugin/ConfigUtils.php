@@ -67,7 +67,6 @@ abstract class ConfigUtils{
 
     /**
      * Verifies the config's keys and values, returning any keys and a relevant message.
-     * @param array $config
      * @return string[]
      */
     static public function verify(array $config): array{

@@ -30,25 +30,18 @@ use pocketmine\utils\TextFormat;
 
 class Main extends PluginBase{
 
-    /** @var BotThread */
-    private $discordBot;
+    private BotThread $discordBot;
 
-    /** @var ThreadSafeArray */
-    private $inboundData;
-    /** @var ThreadSafeArray */
-    private $outboundData;
+    private ThreadSafeArray $inboundData;
+    private ThreadSafeArray $outboundData;
 
-    /** @var TaskHandler */
-    private $tickTask;
+    private TaskHandler $tickTask;
 
-    /** @var BotCommunicationHandler */
-    private $communicationHandler;
+    private BotCommunicationHandler $communicationHandler;
 
-    /** @var Api */
-    private $api;
+    private Api $api;
 
-    /** @var array */
-    private $config;
+    private array $config;
 
     protected function onLoad(): void{
         if(($phar = Phar::running()) === ""){
@@ -84,7 +77,7 @@ class Main extends PluginBase{
                 "the DiscordBot core, see https://github.com/DiscordBot-PMMP/DiscordChat for similar features.");
         }
 
-        /** @noinspection PhpUndefinedFunctionInspection */
+        /** @noinspection PhpUndefinedFunctionInspection xdebug_info */
         if(extension_loaded("xdebug") and (!function_exists('xdebug_info') || count(xdebug_info('mode')) !== 0)){
             $this->getLogger()->warning("xdebug is enabled, this will cause major performance issues with the discord thread.");
         }
@@ -104,21 +97,20 @@ class Main extends PluginBase{
         }), 1);
     }
 
+    /** @noinspection PhpConditionAlreadyCheckedInspection */
     protected function onDisable(): void{
         (new DiscordClosed($this))->call();
 
-        if($this->tickTask !== null and !$this->tickTask->isCancelled()){
-            $this->tickTask->cancel();
-        }
+        $this->tickTask?->cancel();
 
         //TODO Check if thread closed before we disabled (indicating an error/crash occurred in thread TBD on this method)
         //If so, we need to generate a crash dump (debug data but in a separate folder for 'crashes'/'errors')
         //TODO Also generate dump if PLUGIN crashes or similar.
-        if($this->discordBot !== null and $this->discordBot->isTerminated()){
+        if($this->discordBot?->isTerminated()){
             $this->getLogger()->error("Discord thread terminated, check logs for more information.");
         }
 
-        if($this->discordBot !== null and $this->discordBot->isRunning()){
+        if($this->discordBot?->isRunning()){
             $this->discordBot->setStatus(BotThread::STATUS_CLOSING);
             $this->getLogger()->info("Stopping discord thread gracefully, waiting for discord thread to stop...");
             //Never had a condition where it hangs more than 1s (only long period of wait should be during the data dump.)
@@ -205,6 +197,9 @@ class Main extends PluginBase{
         }
     }
 
+    /**
+     * @internal
+     */
     private function readInboundData(int $count = 1): array{
         return array_map(function($data){
             $packet = unserialize($data);
@@ -216,7 +211,7 @@ class Main extends PluginBase{
     }
 
     /**
-     * @internal INTERNAL USE ONLY.
+     * @internal
      */
     public function writeOutboundData(Packet $packet): void{
         $this->outboundData[] = serialize($packet);

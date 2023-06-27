@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 
 class ChannelUpdate extends Packet{
 
-    /** @var GuildChannel */
-    private $channel;
+    private GuildChannel $channel;
 
     public function __construct(GuildChannel $channel){
         parent::__construct();

@@ -22,8 +22,7 @@ use pocketmine\plugin\Plugin;
  */
 class InviteCreated extends DiscordBotEvent{
 
-    /** @var Invite */
-    private $invite;
+    private Invite $invite;
 
     public function __construct(Plugin $plugin, Invite $invite){
         parent::__construct($plugin);

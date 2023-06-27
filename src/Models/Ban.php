@@ -16,17 +16,14 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Ban{
 
-    /** @var string */
-    private $guild_id;
+    private string $guild_id;
 
-    /** @var string */
-    private $user_id;
+    private string $user_id;
 
-    /** @var string|null */
-    private $reason;
+    private ?string $reason;
 
-    /** @var int|null Only present on banRequest. */
-    private $days_to_delete;
+    /** Only present on banRequest. */
+    private ?int $days_to_delete;
 
     public function __construct(string $guild_id, string $user_id, ?string $reason = null, ?int $days_to_delete = null){
         $this->setGuildId($guild_id);

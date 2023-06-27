@@ -17,24 +17,12 @@ use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 class Webhook extends Message{
 
     /** @var Embed[] Max 10 in webhook message. */
-    private $embeds = [];
+    private array $embeds = [];
 
-    /** @var String */
-    private $webhook_id;
+    private string $webhook_id;
 
     /**
-     * Webhook constructor.
-     *
-     * @param string       $channel_id
-     * @param string       $webhook_id
-     * @param Embed[]      $embeds
-     * @param string|null  $id
-     * @param string       $content
-     * @param string|null  $author_id
-     * @param string|null  $guild_id
-     * @param float|null   $timestamp
      * @param Attachment[] $attachments
-     * @param bool         $everyone_mentioned
      * @param string[]     $users_mentioned
      * @param string[]     $roles_mentioned
      * @param string[]     $channels_mentioned

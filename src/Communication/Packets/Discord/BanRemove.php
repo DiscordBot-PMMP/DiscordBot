@@ -16,8 +16,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class BanRemove extends Packet{
 
-    /** @var string */
-    private $ban_id;
+    private string $ban_id;
 
     public function __construct(string $ban_id){
         parent::__construct();

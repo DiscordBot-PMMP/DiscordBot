@@ -16,14 +16,11 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestRemoveAllReactions extends Packet{
 
-    /** @var string */
-    private $channel_id;
+    private string $channel_id;
 
-    /** @var string */
-    private $message_id;
+    private string $message_id;
 
-    /** @var null|string */
-    private $emoji;
+    private ?string $emoji;
 
     public function __construct(string $channel_id, string $message_id, ?string $emoji = null){
         parent::__construct();

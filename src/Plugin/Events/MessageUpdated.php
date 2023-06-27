@@ -23,8 +23,7 @@ use pocketmine\plugin\Plugin;
  */
 class MessageUpdated extends DiscordBotEvent{
 
-    /** @var Message */
-    private $message;
+    private Message $message;
 
     public function __construct(Plugin $plugin, Message $message){
         parent::__construct($plugin);

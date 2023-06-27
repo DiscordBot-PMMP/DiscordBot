@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
 
 class RequestEditMessage extends Packet{
 
-    /** @var Message */
-    private $message;
+    private Message $message;
 
     public function __construct(Message $message){
         parent::__construct();

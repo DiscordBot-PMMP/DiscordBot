@@ -25,17 +25,12 @@ use pocketmine\plugin\Plugin;
  */
 class VoiceStateUpdated extends DiscordBotEvent{
 
-    /** @var Member Member, note it contains old voice state. */
-    private $member;
+    /** Note member contains old voice state. */
+    private Member $member;
 
-    /** @var VoiceState New voice state. */
-    private $voice_state;
+    /** New voice state. */
+    private VoiceState $voice_state;
 
-    /**
-     * @param Plugin     $plugin
-     * @param Member     $member
-     * @param VoiceState $voice_state
-     */
     public function __construct(Plugin $plugin, Member $member, VoiceState $voice_state){
         parent::__construct($plugin);
         $this->member = $member;

@@ -16,8 +16,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class InviteDelete extends Packet{
 
-    /** @var string */
-    private $invite_code;
+    private string $invite_code;
 
     public function __construct(string $invite_code){
         parent::__construct();

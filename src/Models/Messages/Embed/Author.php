@@ -15,14 +15,13 @@ namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 // https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
 class Author{
 
-    /** @var null|string 2048 characters */
-    private $name;
+    /** 2048 characters */
+    private ?string $name;
 
-    /** @var null|string */
-    private $url;
+    private ?string $url;
 
-    /** @var null|string Must be prefixed with `https` */
-    private $icon_url;
+    /** Must be prefixed with `https` */
+    private ?string $icon_url;
 
     public function __construct(?string $name = null, ?string $url = null, ?string $icon_url = null){
         $this->setName($name);

@@ -16,17 +16,13 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestSendFile extends Packet{
 
-    /** @var string */
-    private $channel_id;
+    private string $channel_id;
 
-    /** @var string */
-    private $file_name;
+    private string $file_name;
 
-    /** @var string */
-    private $file_path;
+    private string $file_path;
 
-    /** @var string */
-    private $message;
+    private string $message;
 
     public function __construct(string $channel_id, string $file_name, string $file_path, string $message){
         parent::__construct();

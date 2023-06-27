@@ -16,33 +16,30 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Webhook{
 
+    //TODO Enums
     const TYPE_NORMAL = 1, //Standard webhook
         TYPE_FOLLOWER = 2; //Receiving 'news' from another channel.
 
-    /** @var string|null Only present on created webhooks. */
-    private $id;
+    /** Only present on created webhooks. */
+    private ?string $id;
 
     /**
      * @see Webhook::TYPE_NORMAL
      * @see Webhook::TYPE_FOLLOWER
-     * @var int
      */
-    private $type;
+    private int $type;
 
-    /** @var string|null User that added/created this webhook, only present on created webhooks. */
-    private $user_id;
+    /** User that added/created this webhook, only present on created webhooks. */
+    private ?string $user_id;
 
-    /** @var string */
-    private $channel_id;
+    private string $channel_id;
 
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /** @var string|null */
-    private $avatar;
+    private ?string $avatar;
 
-    /** @var string|null Only present on TYPE_NORMAL. */
-    private $token;
+    /** Only present on TYPE_NORMAL. */
+    private ?string $token;
 
     public function __construct(int $type, string $channel_id, string $name, ?string $id = null, ?string $user_id = null,
                                 ?string $avatar = null, ?string $token = null){

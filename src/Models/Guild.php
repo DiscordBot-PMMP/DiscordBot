@@ -16,29 +16,41 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Guild{
 
-    /** @var string */
-    private $id;
+    //https://discord.com/developers/docs/resources/guild#guild-object-guild-structure
 
-    /** @var string */
-    private $name;
+    private string $id;
 
-    /** @var string|null */
-    private $icon_url;
+    private string $name;
 
-    /** @var string */
-    private $region;
+    private string $owner_id;
 
-    /** @var string */
-    private $owner_id;
+    private ?string $icon_url;
 
-    /** @var bool */
-    private $large;
+    private ?string $icon_hash;
 
-    /** @var int */
-    private $member_count;
+    private ?string $splash_url;
+
+    private ?string $splash_hash;
+
+    /** Only for discoverable guilds. */
+    private ?string $discovery_splash_hash;
+
+    private ?string $afk_channel_id;
+
+    private int $afk_timeout;
+
+    private ?bool $widget_enabled;
+
+    private ?string $widget_channel_id;
+
+    private ?int $verification_level;
+
+    private ?int $default_message_notifications;
+
+    private ?int $explicit_content_filter;
 
     public function __construct(string $id, string $name, string $region, string $owner_id,
-                                bool $large, int $member_count, ?string $icon_url = null){
+                                bool $large, int $member_count, string|null $icon_url = null){
         $this->setId($id);
         $this->setName($name);
         $this->setRegion($region);

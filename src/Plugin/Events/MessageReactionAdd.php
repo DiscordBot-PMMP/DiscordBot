@@ -26,17 +26,13 @@ use pocketmine\plugin\Plugin;
  */
 class MessageReactionAdd extends DiscordBotEvent{
 
-    /** @var string */
-    private $emoji;
+    private string $emoji;
 
-    /** @var string */
-    private $message_id;
+    private string $message_id;
 
-    /** @var Channel */
-    private $channel;
+    private Channel $channel;
 
-    /** @var Member */
-    private $member;
+    private Member $member;
 
     public function __construct(Plugin $plugin, string $emoji, string $message_id, Channel $channel, Member $member){
         parent::__construct($plugin);

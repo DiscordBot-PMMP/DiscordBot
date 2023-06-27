@@ -21,6 +21,7 @@ use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\Bot\Handlers\CommunicationHandler;
 use JaxkDev\DiscordBot\Communication\BotThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use Monolog\Level as LoggerLevel;
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
 use React\EventLoop\TimerInterface;
@@ -28,31 +29,23 @@ use Throwable;
 
 class Client{
 
-    /** @var BotThread */
-    private $thread;
+    private BotThread $thread;
 
-    /** @var Discord */
-    private $client;
+    private Discord $client;
 
-    /** @var Logger */
-    private $logger;
+    private Logger $logger;
 
-    /** @var CommunicationHandler */
-    private $communicationHandler;
+    private CommunicationHandler $communicationHandler;
 
-    /** @var DiscordEventHandler */
-    private $discordEventHandler;
+    private DiscordEventHandler $discordEventHandler;
 
-    /** @var TimerInterface|null */
-    private $readyTimer;
+    private ?TimerInterface $readyTimer;
 
-    /** @var int */
-    private $tickCount = 0;
-    /** @var int */
-    private $lastGCCollection = 0;
+    private int $tickCount = 0;
 
-    /** @var array */
-    private $config;
+    private int $lastGCCollection = 0;
+
+    private array $config;
 
     public function __construct(BotThread $thread, array $config){
         $this->thread = $thread;
@@ -73,7 +66,7 @@ class Client{
         Packet::$UID_COUNT = 1;
 
         $this->logger = new Logger('DiscordThread');
-        $handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['max_files'], Logger::DEBUG);
+        $handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['max_files'], LoggerLevel::Debug);
         $handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
         $this->logger->setHandlers(array($handler));
 
@@ -239,6 +232,7 @@ class Client{
         $this->close($data[0]??null);
     }
 
+    /** @noinspection PhpConditionAlreadyCheckedInspection */
     public function close($error = null): void{ /** @phpstan-ignore-line  */
         if($this->thread->getStatus() === BotThread::STATUS_CLOSED) return;
         $this->thread->setStatus(BotThread::STATUS_CLOSED);
@@ -267,12 +261,10 @@ class Client{
                 $this->logger->critical($line);
             }
         }
-        if($this->client instanceof Discord){
-            try{
-                $this->client->close();
-            }catch (Error $e){
-                $this->logger->debug("Failed to close client, probably not started. ({$e->getMessage()})");
-            }
+        try{
+            $this->client?->close();
+        }catch (Error $e){
+            $this->logger->debug("Failed to close client, probably not started. ({$e->getMessage()})");
         }
         $this->logger->notice("Discord thread closed.");
         $this->logger->close();

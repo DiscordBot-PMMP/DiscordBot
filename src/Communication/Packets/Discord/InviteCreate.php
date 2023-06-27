@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class InviteCreate extends Packet{
 
-    /** @var Invite */
-    private $invite;
+    private Invite $invite;
 
     public function __construct(Invite $invite){
         parent::__construct();

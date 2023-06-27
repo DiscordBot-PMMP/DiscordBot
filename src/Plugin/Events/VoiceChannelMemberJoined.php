@@ -26,14 +26,12 @@ use pocketmine\plugin\Plugin;
  */
 class VoiceChannelMemberJoined extends DiscordBotEvent{
 
-    /** @var Member */
-    private $member;
+    private Member $member;
 
-    /** @var VoiceChannel */
-    private $channel;
+    private VoiceChannel $channel;
 
-    /** @var VoiceState New voice state. */
-    private $voice_state;
+    /** New voice state. */
+    private VoiceState $voice_state;
 
     public function __construct(Plugin $plugin, Member $member, VoiceChannel $channel, VoiceState $voice_state){
         parent::__construct($plugin);

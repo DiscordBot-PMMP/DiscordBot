@@ -16,14 +16,11 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestUpdateNickname extends Packet{
 
-    /** @var string */
-    private $guild_id;
+    private string $guild_id;
 
-    /** @var string */
-    private $user_id;
+    private string $user_id;
 
-    /** @var string|null */
-    private $nickname;
+    private ?string $nickname;
 
     public function __construct(string $guild_id, string $user_id, ?string $nickname = null){
         parent::__construct();

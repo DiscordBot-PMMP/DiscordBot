@@ -64,8 +64,7 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  */
 class Api{
 
-    /** @var Main */
-    private $plugin;
+    private Main $plugin;
 
     public function __construct(Main $plugin){
         $this->plugin = $plugin;
@@ -74,7 +73,6 @@ class Api{
     /**
      * Creates a normal webhook inside a channel.
      *
-     * @param Webhook $webhook
      * @return PromiseInterface Resolves with a Webhook model.
      */
     public function createWebhook(Webhook $webhook): PromiseInterface{
@@ -95,7 +93,6 @@ class Api{
     /**
      * Update a webhooks name or avatar.
      *
-     * @param Webhook $webhook
      * @return PromiseInterface Resolves with a Webhook model.
      */
     public function updateWebhook(Webhook $webhook): PromiseInterface{
@@ -116,8 +113,6 @@ class Api{
     /**
      * Delete a webhook
      *
-     * @param string $channel_id
-     * @param string $webhook_id
      * @return PromiseInterface Resolves with no data.
      */
     public function deleteWebhook(string $channel_id, string $webhook_id): PromiseInterface{
@@ -138,7 +133,6 @@ class Api{
     /**
      * Leave a discord guild.
      *
-     * @param string $guild_id
      * @return PromiseInterface Resolves with no data.
      */
     public function leaveGuild(string $guild_id): PromiseInterface{
@@ -153,7 +147,6 @@ class Api{
     /**
      * Fetch all webhooks that are linked to a channel.
      *
-     * @param string $channel_id
      * @return PromiseInterface Resolves with an array of Webhook models.
      */
     public function fetchWebhooks(string $channel_id): PromiseInterface{
@@ -170,7 +163,6 @@ class Api{
      *
      * Note you could fetch individual messages by id using fetchMessage from channel::pins but this is easier.
      *
-     * @param string $channel_id
      * @return PromiseInterface Resolves with an array of Message models.
      */
     public function fetchPinnedMessages(string $channel_id): PromiseInterface{
@@ -185,8 +177,6 @@ class Api{
     /**
      * Fetch a message by ID.
      *
-     * @param string $channel_id
-     * @param string $message_id
      * @return PromiseInterface Resolves with a Message model.
      */
     public function fetchMessage(string $channel_id, string $message_id): PromiseInterface{
@@ -204,8 +194,6 @@ class Api{
     /**
      * Pin a message to the channel.
      *
-     * @param string $channel_id
-     * @param string $message_id
      * @return PromiseInterface Resolves with no data.
      */
     public function pinMessage(string $channel_id, string $message_id): PromiseInterface{
@@ -223,8 +211,6 @@ class Api{
     /**
      * Un-pin a message to the channel.
      *
-     * @param string $channel_id
-     * @param string $message_id
      * @return PromiseInterface Resolves with no data.
      */
     public function unpinMessage(string $channel_id, string $message_id): PromiseInterface{
@@ -242,7 +228,6 @@ class Api{
     /**
      * Create a role.
      *
-     * @param Role $role
      * @return PromiseInterface Resolves with Role model.
      */
     public function createRole(Role $role): PromiseInterface{
@@ -252,13 +237,12 @@ class Api{
     }
 
     /**
-     * Update a already created role, ID must be present.
+     * Update an already created role, ID must be present.
      *
      * Note you cannot change the hoisted position of the 'everyone' role, or move any role higher than the bots highest role.
      *
      * If hoisted position changed, all roles that move to account for the change will emit an updated event.
      *
-     * @param Role $role
      * @return PromiseInterface Resolves with a Role model.
      */
     public function updateRole(Role $role): PromiseInterface{
@@ -273,8 +257,6 @@ class Api{
     /**
      * Delete a role.
      *
-     * @param string $guild_id
-     * @param string $role_id
      * @return PromiseInterface Resolves with no data.
      */
     public function deleteRole(string $guild_id, string $role_id): PromiseInterface{
@@ -292,8 +274,6 @@ class Api{
     /**
      * Remove a role from a member.
      *
-     * @param string $member_id
-     * @param string $role_id
      * @return PromiseInterface Resolves with no data.
      */
     public function removeRole(string $member_id, string $role_id): PromiseInterface{
@@ -312,8 +292,6 @@ class Api{
     /**
      * Give the member a role.
      *
-     * @param string $member_id
-     * @param string $role_id
      * @return PromiseInterface Resolves with no data.
      */
     public function addRole(string $member_id, string $role_id): PromiseInterface{
@@ -332,9 +310,6 @@ class Api{
     /**
      * Remove a single reaction.
      *
-     * @param string $channel_id
-     * @param string $message_id
-     * @param string $user_id
      * @param string $emoji Raw emoji eg '👍'
      * @return PromiseInterface Resolves with no data.
      */
@@ -356,8 +331,6 @@ class Api{
     /**
      * Remove all reactions on a message.
      *
-     * @param string      $channel_id
-     * @param string      $message_id
      * @param string|null $emoji If no emoji specified ALL reactions by EVERYONE will be deleted,
      *                           if specified everyone's reaction with that emoji will be removed.
      * @return PromiseInterface Resolves with no data.
@@ -379,8 +352,6 @@ class Api{
      *
      * Note, If you have already reacted with the emoji provided it will still respond with a successful promise resolution.
      *
-     * @param string $channel_id
-     * @param string $message_id
      * @param string $emoji            MUST BE THE ACTUAL EMOJI CHARACTER, (Custom/Private emoji's not yet supported) eg '👍'
      * @return PromiseInterface Resolves with no data.
      */
@@ -403,7 +374,6 @@ class Api{
      *
      * DO NOT ABUSE THIS.
      *
-     * @param string $channel_id
      * @return PromiseInterface Resolves with no data.
      */
     public function broadcastTyping(string $channel_id): PromiseInterface{
@@ -418,7 +388,6 @@ class Api{
     /**
      * Sends a new presence to replace the current one the bot has.
      *
-     * @param Activity $activity
      * @param string $status See Member::STATUS_ constants.
      * @return PromiseInterface Resolves with no data.
      */
@@ -434,7 +403,6 @@ class Api{
     /**
      * Attempt to ban a member.
      *
-     * @param Ban $ban
      * @return PromiseInterface Resolves with no data.
      */
     public function initialiseBan(Ban $ban): PromiseInterface{
@@ -446,8 +414,6 @@ class Api{
     /**
      * Attempt to revoke a ban.
      *
-     * @param string $guild_id
-     * @param string $user_id
      * @return PromiseInterface Resolves with no data.
      */
     public function revokeBan(string $guild_id, string $user_id): PromiseInterface{
@@ -465,7 +431,6 @@ class Api{
     /**
      * Attempt to kick a member.
      *
-     * @param string $member_id
      * @return PromiseInterface Resolves with no data.
      */
     public function kickMember(string $member_id): PromiseInterface{
@@ -481,7 +446,6 @@ class Api{
     /**
      * Sends the Message to discord.
      *
-     * @param Message $message
      * @return PromiseInterface Resolves with a Message model.
      */
     public function sendMessage(Message $message): PromiseInterface{
@@ -500,7 +464,6 @@ class Api{
     /**
      * Send a local file to a text channel.
      *
-     * @param string      $channel_id
      * @param string      $file_path Full file path on disk.
      * @param string      $message   Optional text/message to send with the file
      * @param string|null $file_name Optional file_name to show in discord, Prefix with 'SPOILER_' to make as spoiler.
@@ -529,7 +492,6 @@ class Api{
      *
      * Note you can't convert a 'REPLY' message to a normal 'MESSAGE'.
      *
-     * @param Message $message
      * @return PromiseInterface Resolves with a Message model.
      */
     public function editMessage(Message $message): PromiseInterface{
@@ -547,8 +509,6 @@ class Api{
     /**
      * Delete a sent message.
      *
-     * @param string $message_id
-     * @param string $channel_id
      * @return PromiseInterface Resolves with no data.
      */
     public function deleteMessage(string $message_id, string $channel_id): PromiseInterface{
@@ -566,7 +526,6 @@ class Api{
     /**
      * Create a guild channel.
      *
-     * @param GuildChannel $channel CategoryChannel, TextChannel or VoiceChannel.
      * @return PromiseInterface Resolves with a Channel model of same type provided.
      */
     public function createChannel(GuildChannel $channel): PromiseInterface{
@@ -583,7 +542,6 @@ class Api{
      * @see Api::pinMessage()
      * @see Api::unpinMessage()
      *
-     * @param GuildChannel $channel
      * @return PromiseInterface Resolves with a Channel model of same type provided.
      */
     public function updateChannel(GuildChannel $channel): PromiseInterface{
@@ -595,8 +553,6 @@ class Api{
     /**
      * Delete a channel in a guild, you cannot delete private channels (DM's)
      *
-     * @param string $guild_id
-     * @param string $channel_id
      * @return PromiseInterface Resolves with no data.
      */
     public function deleteChannel(string $guild_id, string $channel_id): PromiseInterface{
@@ -614,7 +570,6 @@ class Api{
     /**
      * Initialise if possible the given invite.
      *
-     * @param Invite $invite
      * @return PromiseInterface Resolves with a Invite model.
      */
     public function initialiseInvite(Invite $invite): PromiseInterface{
@@ -626,8 +581,6 @@ class Api{
     /**
      * Revoke an initialised invite.
      *
-     * @param string $guild_id
-     * @param string $invite_code
      * @return PromiseInterface Resolves with a Invite model.
      */
     public function revokeInvite(string $guild_id, string $invite_code): PromiseInterface{
@@ -642,7 +595,6 @@ class Api{
     /**
      * Update a members nickname (set to null to remove)
      *
-     * @param string $member_id
      * @param null|string $nickname Null to remove nickname.
      * @return PromiseInterface Resolves with no data.
      */

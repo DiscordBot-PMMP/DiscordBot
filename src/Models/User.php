@@ -36,26 +36,21 @@ class User{
         "CERTIFIED_MODERATOR" => 262144
     ];
 
-    /** @var string */
-    private $id;
+    private string $id;
 
-    /** @var string */
-    private $username;
+    private string $username;
 
-    /** @var string 0000 when user is webhook/system etc. */
-    private $discriminator;
+    /** Soon to be removed, if user has chosen a unique username this will be 0000 */
+    private string $discriminator;
 
-    /** @var string */
-    private $avatar_url;
+    private string $avatar_url;
 
-    /** @var bool */
-    private $bot;
+    private bool $bot;
 
-    /** @var int */
-    private $flags_bitwise;
+    private int $flags_bitwise;
 
     /** @var Array<string, bool> */
-    private $flags = [];
+    private array $flags = [];
 
     public function __construct(string $id, string $username, string $discriminator, string $avatar_url,
                                 bool $bot = false, int $flags_bitwise = 0){

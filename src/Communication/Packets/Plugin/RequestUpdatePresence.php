@@ -17,11 +17,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestUpdatePresence extends Packet{
 
-    /** @var Activity */
-    private $activity;
+    private Activity $activity;
 
-    /** @var string */
-    private $status;
+    private string $status;
 
     public function __construct(Activity $activity, string $status){
         parent::__construct();

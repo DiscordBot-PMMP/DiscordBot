@@ -20,22 +20,18 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class GuildJoin extends Packet{
 
-    /** @var Guild */
-    private $guild;
+    private Guild $guild;
 
     /** @var GuildChannel[] */
-    private $channels;
+    private array $channels;
 
     /** @var Member[] */
-    private $members;
+    private array $members;
 
     /** @var Role[] */
-    private $roles;
+    private array $roles;
 
     /**
-     * GuildJoin constructor.
-     *
-     * @param Guild           $guild
      * @param GuildChannel[] $channels
      * @param Member[]        $members
      * @param Role[]          $roles

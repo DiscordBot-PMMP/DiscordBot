@@ -16,17 +16,13 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MessageReactionAdd extends Packet{
 
-    /** @var string */
-    private $message_id;
+    private string $message_id;
 
-    /** @var string */
-    private $emoji;
+    private string $emoji;
 
-    /** @var string */
-    private $member_id;
+    private string $member_id;
 
-    /** @var string */
-    private $channel_id;
+    private string $channel_id;
 
     public function __construct(string $message_id, string $emoji, string $member_id, string $channel_id){
         parent::__construct();

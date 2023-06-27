@@ -26,21 +26,18 @@ use pocketmine\plugin\Plugin;
  */
 class GuildJoined extends DiscordBotEvent{
 
-    /** @var Guild */
-    private $guild;
+    private Guild $guild;
 
     /** @var Role[] */
-    private $roles;
+    private array $roles;
 
     /** @var Channel[] */
-    private $channels;
+    private array $channels;
 
     /** @var Member[] */
-    private $members;
+    private array $members;
 
     /**
-     * @param Plugin    $plugin
-     * @param Guild     $guild
      * @param Role[]    $roles
      * @param Channel[] $channels
      * @param Member[]  $members

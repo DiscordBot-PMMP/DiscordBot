@@ -16,8 +16,7 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 abstract class Channel{
 
-    /** @var string|null */
-    protected $id;
+    protected ?string $id;
 
     public function __construct(?string $id = null){
         $this->setId($id);

@@ -17,54 +17,42 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Message{
 
-    /** @var ?string Null when sending message. */
-    protected $id;
+    /** Null when sending message. */
+    protected ?string $id;
 
-    /** @var string (<=2000 characters for bots/users. <=4000 for nitro users) Possibly empty with attachments/embeds. */
-    protected $content = "";
+    /** (<=2000 characters for bots/users. <=4000 for nitro users) Possibly empty with attachments/embeds. */
+    protected string $content = "";
 
-    /** @var ?Embed Note gateway v9 / dphp7 supports several embeds and attachments in normal messages. (merge with webhook handling) */
-    protected $embed;
+    /** Note gateway v9 / dphp7 supports several embeds and attachments in normal messages. (merge with webhook handling) */
+    protected ?Embed $embed;
 
-    /** @var ?string MemberID (guildID.userID), Null when sending or receiving webhook messages, just (UserID) if DM Channel. */
-    protected $author_id;
+    /**  MemberID (guildID.userID), Null when sending or receiving webhook messages, just (UserID) if DM Channel. */
+    protected ?string $author_id;
 
-    /** @var string */
-    protected $channel_id;
+    protected string $channel_id;
 
-    /** @var ?string Null if DM Channel. */
-    protected $guild_id;
+    /** Null if DM Channel. */
+    protected ?string $guild_id;
 
-    /** @var ?float Null when sending message. */
-    protected $timestamp;
+    /** Null when sending message. */
+    protected ?float $timestamp;
 
     /** @var Attachment[] Used for INBOUND messages only. */
-    protected $attachments = [];
+    protected array $attachments = [];
 
-    /** @var bool */
-    protected $everyone_mentioned = false;
-
-    /** @var string[] */
-    protected $users_mentioned = [];
+    protected bool $everyone_mentioned = false;
 
     /** @var string[] */
-    protected $roles_mentioned = [];
+    protected array $users_mentioned = [];
 
     /** @var string[] */
-    protected $channels_mentioned = [];
+    protected array $roles_mentioned = [];
+
+    /** @var string[] */
+    protected array $channels_mentioned = [];
 
     /**
-     * Message constructor.
-     *
-     * @param string       $channel_id
-     * @param string|null  $id
-     * @param string       $content
-     * @param Embed|null   $embed
-     * @param string|null  $author_id
-     * @param string|null  $guild_id
-     * @param float|null   $timestamp
      * @param Attachment[] $attachments
-     * @param bool         $everyone_mentioned
      * @param string[]     $users_mentioned
      * @param string[]     $roles_mentioned
      * @param string[]     $channels_mentioned

@@ -22,51 +22,37 @@ class Member{
         STATUS_DND = "dnd",
         STATUS_OFFLINE = "offline";
 
-    /** @var string */
-    private $user_id;
+    private string $user_id;
 
-    /** @var null|string */
-    private $nickname;
+    private ?string $nickname;
 
-    /** @var null|string null until a presence update is sent. */
-    private $status;
+    /** null until a presence update is sent. */
+    private ?string $status;
 
     /** @var null|array{"mobile": string|null, "desktop": string|null, "web": string|null} null until a present update is sent. */
-    private $client_status;
+    private ?array $client_status;
 
-    /** @var int */
-    private $join_timestamp;
+    private int $join_timestamp;
 
-    /** @var null|int */
-    private $boost_timestamp;
+    private ?int $boost_timestamp;
 
-    /** @var RolePermissions */
-    private $permissions;
+    private RolePermissions $permissions;
 
     /** @var string[] */
-    private $roles;
+    private array $roles;
 
-    /** @var string */
-    private $guild_id;
+    private string $guild_id;
 
     /** @var null|Activity[] */
-    private $activities;
+    private ?array $activities;
 
-    /** @var null|VoiceState */
-    private $voice_state;
+    private ?VoiceState $voice_state;
 
     /**
      * Member constructor.
      *
-     * @param string               $user_id
-     * @param int                  $join_timestamp
-     * @param string               $guild_id
      * @param string[]             $roles
-     * @param string|null          $nickname
-     * @param int|null             $boost_timestamp
-     * @param RolePermissions|null $permissions
      * @param Activity[]|null      $activities
-     * @param VoiceState|null      $voice_state
      */
     public function __construct(string $user_id, int $join_timestamp, string $guild_id, array $roles = [],
                                 ?string $nickname = null, ?int $boost_timestamp = null, RolePermissions $permissions = null,

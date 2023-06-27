@@ -24,14 +24,11 @@ use pocketmine\plugin\Plugin;
  */
 class MessageReactionRemoveEmoji extends DiscordBotEvent{
 
-    /** @var string */
-    private $emoji;
+    private string $emoji;
 
-    /** @var string */
-    private $message_id;
+    private string $message_id;
 
-    /** @var Channel */
-    private $channel;
+    private Channel $channel;
 
     public function __construct(Plugin $plugin, string $emoji, string $message_id, Channel $channel){
         parent::__construct($plugin);

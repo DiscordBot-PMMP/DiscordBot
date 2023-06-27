@@ -17,30 +17,27 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 abstract class GuildChannel extends Channel{
 
-    /** @var string */
-    protected $name;
+    protected string $name;
 
-    /** @var int */
-    protected $position;
+    protected int $position;
 
     /**
      * ['MemberID' => [AllowedPermissions|null, DeniedPermissions|null]]
      * @var Array<string, Array<null|ChannelPermissions>>
      */
-    protected $member_permissions = [];
+    protected array $member_permissions = [];
 
     /**
      * This includes the @everyone role, use the guild ID as role ID to set the @everyone permissions.
      * ['roleID' => [AllowedPermissions|null, DeniedPermissions|null]]
      * @var Array<string, Array<null|ChannelPermissions>>
      */
-    protected $role_permissions = [];
+    protected array $role_permissions = [];
 
-    /** @var string */
-    protected $guild_id;
+    protected string $guild_id;
 
-    /** @var ?string Category ID | null when not categorised. */
-    protected $category_id;
+    /** Category ID / null when not categorised. */
+    protected ?string $category_id;
 
     public function __construct(string $name, int $position, string $guild_id, ?string $category_id = null, ?string $id = null){
         parent::__construct($id);
@@ -75,7 +72,6 @@ abstract class GuildChannel extends Channel{
     }
 
     /**
-     * @param string $id
      * @return Array<null|ChannelPermissions>  [AllowedPerms|null, DeniedPerms|null]
      */
     public function getMemberPermissions(string $id): array{
@@ -106,7 +102,6 @@ abstract class GuildChannel extends Channel{
     }
 
     /**
-     * @param string $id
      * @return Array<null|ChannelPermissions>  [AllowedPerms|null, DeniedPerms|null]
      */
     public function getRolePermissions(string $id): array{

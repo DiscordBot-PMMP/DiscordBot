@@ -15,14 +15,13 @@ namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 // https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
 class Field{
 
-    /** @var string 256 characters */
-    private $name;
+    /** 256 characters */
+    private string $name;
 
-    /** @var string 2048 characters */
-    private $value;
+    /** 2048 characters */
+    private string $value;
 
-    /** @var bool */
-    private $inline = false;
+    private bool $inline = false;
 
     public function __construct(string $name, string $value, bool $inline = false){
         $this->setName($name);

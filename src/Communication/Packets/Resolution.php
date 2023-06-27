@@ -14,17 +14,13 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 
 class Resolution extends Packet{
 
-    /** @var int */
-    private $pid;
+    private int $pid;
 
-    /** @var bool */
-    private $successful;
+    private bool $successful;
 
-    /** @var string */
-    private $response;
+    private string $response;
 
-    /** @var array */
-    private $data;
+    private array $data;
 
     public function __construct(int $pid, bool $successful, string $response, array $data = []){
         parent::__construct();

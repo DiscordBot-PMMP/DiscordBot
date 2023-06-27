@@ -24,59 +24,37 @@ class Embed{
         TYPE_ARTICLE = 'article',
         TYPE_LINK = 'link';
 
-    /** @var null|string 2048 characters */
-    private $title;
+    /** 2048 characters */
+    private ?string $title;
 
-    /** @var null|string */
-    private $type;
+    private ?string $type;
 
-    /** @var null|string 4096 characters */
-    private $description;
+    /** 4096 characters */
+    private ?string $description;
 
-    /** @var null|string */
-    private $url;
+    private ?string $url;
 
-    /** @var null|int */
-    private $timestamp;
+    private ?int $timestamp;
 
-    /** @var null|int */
-    private $colour;
+    private ?int $colour;
 
     //Provider?? https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
 
-    /** @var Footer */
-    private $footer;
+    private Footer $footer;
 
-    /** @var Image */
-    private $image;
+    private Image $image;
 
-    /** @var Image */
-    private $thumbnail;
+    private Image $thumbnail;
 
-    /** @var Video */
-    private $video;
+    private Video $video;
 
-    /** @var Author */
-    private $author;
+    private Author $author;
 
     /** @var Field[] 25 max */
-    private $fields = [];
+    private array $fields = [];
 
     /**
-     * Embed constructor.
-     *
-     * @param string|null $title
-     * @param string|null $type
-     * @param string|null $description
-     * @param string|null $url
-     * @param int|null    $timestamp
-     * @param int|null    $colour
-     * @param Footer|null $footer
-     * @param Image|null  $image
-     * @param Image|null  $thumbnail
-     * @param Video|null  $video
-     * @param Author|null $author
-     * @param Field[]     $fields
+     * @param Field[] $fields
      */
     public function __construct(?string $title = null, ?string $type = null, ?string $description = null, ?string $url = null,
                                    ?int $timestamp = null, ?int $colour = null, Footer $footer = null, Image $image = null,

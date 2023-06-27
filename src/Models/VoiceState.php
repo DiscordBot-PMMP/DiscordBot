@@ -16,28 +16,19 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class VoiceState{
 
-    /** @var string */
-    private $session_id;
+    private string $session_id;
 
-    /** @var string|null */
-    private $channel_id;
+    private ?string $channel_id;
 
-    /** @var bool */
-    private $deaf;
-    /** @var bool */
-    private $mute;
+    private bool $deaf;
+    private bool $mute;
 
-    /** @var bool */
-    private $self_deaf;
-    /** @var bool */
-    private $self_mute;
-    /** @var bool */
-    private $self_stream;
-    /** @var bool */
-    private $self_video;
+    private bool $self_deaf;
+    private bool $self_mute;
+    private bool $self_stream;
+    private bool $self_video;
 
-    /** @var bool */
-    private $suppress;
+    private bool $suppress;
 
     public function __construct(string $session_id, ?string $channel_id, bool $deaf, bool $mute, bool $self_deaf,
                                 bool $self_mute, bool $self_stream, bool $self_video, bool $suppress){

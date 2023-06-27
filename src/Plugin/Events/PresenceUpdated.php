@@ -21,22 +21,17 @@ use pocketmine\plugin\Plugin;
  */
 class PresenceUpdated extends DiscordBotEvent{
 
-    /** @var Member */
-    private $member;
+    private Member $member;
 
-    /** @var string */
-    private $new_status;
+    private string $new_status;
 
     /** @var array{"mobile": string|null, "desktop": string|null, "web": string|null} */
-    private $new_client_status;
+    private array $new_client_status;
 
     /** @var Activity[] */
-    private $new_activities;
+    private array $new_activities;
 
     /**
-     * @param Plugin                                                                    $plugin
-     * @param Member                                                                    $member
-     * @param string                                                                    $new_status
      * @param array{"mobile": string|null, "desktop": string|null, "web": string|null}  $new_client_status
      * @param Activity[]                                                                $new_activities
      */

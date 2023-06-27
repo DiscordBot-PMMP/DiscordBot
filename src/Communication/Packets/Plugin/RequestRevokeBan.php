@@ -16,11 +16,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestRevokeBan extends Packet{
 
-    /** @var string */
-    private $guild_id;
+    private string $guild_id;
 
-    /** @var string */
-    private $user_id;
+    private string $user_id;
 
     public function __construct(string $guild_id, string $user_id){
         parent::__construct();

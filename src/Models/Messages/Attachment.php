@@ -16,26 +16,24 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Attachment{
 
-    /** @var string */
-    private $id;
+    private string $id;
 
-    /** @var string */
-    private $file_name;
+    private string $file_name;
 
-    /** @var string|null https://en.wikipedia.org/wiki/Media_type */
-    private $content_type;
+    /** https://en.wikipedia.org/wiki/Media_type */
+    private ?string $content_type;
 
-    /** @var int Size of the resource in bytes */
-    private $size;
+    /** Size of the resource in bytes */
+    private int $size;
 
-    /** @var string Is this always a discord cdn url? */
-    private $url;
+    /** TODO Is this always a discord cdn url? */
+    private string $url;
 
-    /** @var int|null Image width, null if not an image. */
-    private $width;
+    /** Image width, null if not an image. */
+    private ?int $width;
 
-    /** @var int|null Image height, null if not an image. */
-    private $height;
+    /** Image height, null if not an image. */
+    private ?int $height;
 
     public function __construct(string $id, string $file_name, ?string $content_type, int $size, string $url,
                                 ?int $width = null, ?int $height = null){
@@ -67,8 +65,8 @@ class Attachment{
         $this->file_name = $file_name;
     }
 
-    public function getContentType(): string{
-        return $this->content_type??"Unknown"; //Maintain BC, TODO change to null in v3.0
+    public function getContentType(): ?string{
+        return $this->content_type;
     }
 
     public function setContentType(?string $content_type): void{

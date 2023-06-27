@@ -16,32 +16,29 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 
 class Invite{
 
-    /** @var string|null Also used as ID internally, null when creating model. */
-    private $code;
+    /** Also used as ID internally, null when creating model. */
+    private ?string $code;
 
-    /** @var string */
-    private $guild_id;
+    private string $guild_id;
 
-    /** @var string */
-    private $channel_id;
+    private string $channel_id;
 
-    /** @var int How long in seconds from creation time to expire, 0 for never. */
-    private $max_age;
+    /** How long in seconds from creation time to expire, 0 for never. */
+    private int $max_age;
 
-    /** @var int|null Timestamp null when creating model. */
-    private $created_at;
+    /** null when creating model. */
+    private ?int $created_at;
 
-    /** @var bool */
-    private $temporary;
+    private bool $temporary;
 
-    /** @var int How many times has this invite been used | NOTICE: This does not get updated when used */
-    private $uses;
+    /** NOTE, This does not get updated when used */
+    private int $uses;
 
-    /** @var int 0 for unlimited uses */
-    private $max_uses;
+    /** 0 for unlimited uses */
+    private int $max_uses;
 
-    /** @var string|null Member ID, null when creating model. */
-    private $creator;
+    /** Member ID, null when creating model. */
+    private ?string $creator;
 
     public function __construct(string $guild_id, string $channel_id, int $max_age, int $max_uses, bool $temporary,
                                 ?string $code = null, ?int $created_at = null, ?string $creator = null, int $uses = 0){

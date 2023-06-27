@@ -14,8 +14,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 
 class ApiResolution{
 
-    /** @var string[] */
-    private $data;
+    private array $data;
 
     public function __construct(array $data = []){
         if(sizeof($data) === 0 or !is_string($data[0])){

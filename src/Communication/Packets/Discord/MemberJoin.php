@@ -18,11 +18,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MemberJoin extends Packet{
 
-    /** @var Member */
-    private $member;
+    private Member $member;
 
-    /** @var User */
-    private $user;
+    private User $user;
 
     public function __construct(Member $member, User $user){
         parent::__construct();

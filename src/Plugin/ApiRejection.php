@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 class ApiRejection extends \Exception{
 
     /** @var string[] */
-    private $data;
+    private array $data;
 
     public function __construct(string $message, array $data = []){
         parent::__construct($message);

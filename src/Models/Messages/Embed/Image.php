@@ -15,14 +15,12 @@ namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 // https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
 class Image{
 
-    /** @var null|string Must be prefixed with `https` */
-    private $url;
+    /** Must be prefixed with `https` */
+    private ?string $url;
 
-    /** @var null|int */
-    private $width;
+    private ?int $width;
 
-    /** @var null|int */
-    private $height;
+    private ?int $height;
 
     public function __construct(?string $url = null, ?int $width = null, ?int $height = null){
         $this->setUrl($url);

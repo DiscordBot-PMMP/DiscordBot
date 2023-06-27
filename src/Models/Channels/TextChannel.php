@@ -14,31 +14,18 @@ namespace JaxkDev\DiscordBot\Models\Channels;
 
 class TextChannel extends GuildChannel{
 
-    /** @var string AKA Description. */
-    private $topic;
+    /** AKA Description. */
+    private string $topic;
 
-    /** @var bool */
-    private $nsfw = false;
+    private bool $nsfw = false;
 
-    /** @var ?int In seconds | null when disabled. */
-    private $rate_limit = null;
+    /** In seconds / null when disabled. */
+    private ?int $rate_limit = null;
 
     //Pins can be found via API::fetchPinnedMessages();
 
     //Webhooks can be found via API::fetchWebhooks();
 
-    /**
-     * TextChannel constructor.
-     *
-     * @param string      $topic
-     * @param string      $name
-     * @param int         $position
-     * @param string      $guild_id
-     * @param bool        $nsfw
-     * @param int|null    $rate_limit
-     * @param string|null $category_id
-     * @param string|null $id
-     */
     public function __construct(string $topic, string $name, int $position, string $guild_id, bool $nsfw = false,
                                    ?int $rate_limit = null, ?string $category_id = null, ?string $id = null){
         parent::__construct($name, $position, $guild_id, $category_id, $id);

@@ -16,8 +16,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RoleDelete extends Packet{
 
-    /** @var string */
-    private $role_id;
+    private string $role_id;
 
     public function __construct(string $role_id){
         parent::__construct();

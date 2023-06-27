@@ -16,8 +16,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestLeaveGuild extends Packet{
 
-    /** @var string */
-    private $guild_id;
+    private string $guild_id;
 
     public function __construct(string $guild_id){
         parent::__construct();

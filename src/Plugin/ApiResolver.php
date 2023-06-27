@@ -22,11 +22,10 @@ use pocketmine\Server;
  */
 abstract class ApiResolver{
 
-    /** @var \AttachableLogger */
-    static private $logger;
+    static private \AttachableLogger $logger;
 
     /** @var Array<int, Deferred> */
-    static private $map = [];
+    static private array $map = [];
 
     static public function create(int $uid): PromiseInterface{
         if(isset(self::$map[$uid])){

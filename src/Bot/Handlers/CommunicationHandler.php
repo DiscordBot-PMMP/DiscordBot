@@ -79,14 +79,11 @@ use function React\Promise\reject;
 
 class CommunicationHandler{
 
-    /** @var Client */
-    private $client;
+    private Client $client;
 
-    /** @var float|null */
-    private $lastHeartbeat = null;
+    private ?float $lastHeartbeat = null;
 
-    /** @var Logger */
-    private $logger;
+    private Logger $logger;
 
     public function __construct(Client $client){
         $this->client = $client;

@@ -30,55 +30,53 @@ use JaxkDev\DiscordBot\Models\User;
 class Storage{
 
     /** @var Array<string, Guild> */
-    private static $guild_map = [];
+    private static array $guild_map = [];
 
     /** @var Array<string, GuildChannel> */
-    private static $channel_map = [];
+    private static array $channel_map = [];
 
     /** @var Array<string, string[]> */
-    private static $channel_guild_map = [];
+    private static array $channel_guild_map = [];
 
     /** @var Array<string, string[]> */
-    private static $channel_category_map = [];
+    private static array $channel_category_map = [];
 
     /** @var Array<string, string[]> */
-    private static $category_guild_map = [];
+    private static array $category_guild_map = [];
 
     /** @var Array<string, string> Link member to voice channel they're currently in. */
-    private static $voiceChannel_member_map = [];
+    private static array $voiceChannel_member_map = [];
 
     /** @var Array<string, Member> */
-    private static $member_map = [];
+    private static array $member_map = [];
 
     /** @var Array<string, string[]> */
-    private static $member_guild_map = [];
+    private static array $member_guild_map = [];
 
     /** @var Array<string, User> */
-    private static $user_map = [];
+    private static array $user_map = [];
 
     /** @var Array<string, Role> */
-    private static $role_map = [];
+    private static array $role_map = [];
 
     /** @var Array<string, string[]> */
-    private static $role_guild_map = [];
+    private static array $role_guild_map = [];
 
     /** @var Array<string, Ban> */
-    private static $ban_map = [];
+    private static array $ban_map = [];
 
     /** @var Array<string, string[]> */
-    private static $ban_guild_map = [];
+    private static array $ban_guild_map = [];
 
     /** @var Array<string, Invite> */
-    private static $invite_map = [];
+    private static array $invite_map = [];
 
     /** @var Array<string, string[]> */
-    private static $invite_guild_map = [];
+    private static array $invite_guild_map = [];
 
-    /** @var null|User */
-    private static $bot_user = null;
+    private static ?User $bot_user = null;
 
-    /** @var int */
-    private static $timestamp = 0;
+    private static int $timestamp = 0;
 
     /**
      * @return Guild[]
@@ -112,7 +110,6 @@ class Storage{
 
     /**
      * NOTICE, Removes all linked members,channels and roles.
-     * @param string $guild_id
      */
     public static function removeGuild(string $guild_id): void{
         if(!isset(self::$guild_map[$guild_id])) return; //Was never added or already deleted.
@@ -154,7 +151,6 @@ class Storage{
     }
 
     /**
-     * @param string $guild_id
      * @return GuildChannel[]
      */
     public static function getChannelsByGuild(string $guild_id): array{
@@ -167,7 +163,6 @@ class Storage{
     }
 
     /**
-     * @param string $category_id
      * @return GuildChannel[]
      */
     public static function getChannelsByCategory(string $category_id): array{
@@ -186,7 +181,6 @@ class Storage{
     }
 
     /**
-     * @param string $guild_id
      * @return CategoryChannel[]
      */
     public static function getCategoriesByGuild(string $guild_id): array{
@@ -251,7 +245,6 @@ class Storage{
     }
 
     /**
-     * @param string $guild_id
      * @return Member[]
      */
     public static function getMembersByGuild(string $guild_id): array{
@@ -304,7 +297,6 @@ class Storage{
 
     /**
      * Same function as addUser because no links are kept for users.
-     * @param User $user
      */
     public static function updateUser(User $user): void{
         self::addUser($user);
@@ -326,9 +318,6 @@ class Storage{
 
     /**
      * Returns the voice channel the specified member is currently in.
-     *
-     * @param string $member_id
-     * @return VoiceChannel|null
      */
     public static function getMembersVoiceChannel(string $member_id): ?VoiceChannel{
         if(($id = self::$voiceChannel_member_map[$member_id]??null) === null) return null;
@@ -348,7 +337,6 @@ class Storage{
     }
 
     /**
-     * @param string $guild_id
      * @return Role[]
      */
     public static function getRolesByGuild(string $guild_id): array{
@@ -430,7 +418,6 @@ class Storage{
     }
 
     /**
-     * @param string $guild_id
      * @return Invite[]
      */
     public static function getInvitesByGuild(string $guild_id): array{
@@ -490,6 +477,9 @@ class Storage{
         return self::$timestamp;
     }
 
+    /**
+     * @internal DO NOT CHANGE.
+     */
     public static function setTimestamp(int $timestamp): void{
         if($timestamp < 0){
             throw new \InvalidArgumentException("Timestamp must be greater than or equal to 0.");
@@ -499,6 +489,7 @@ class Storage{
 
     /**
      * Serializes entire storage, ONLY USE FOR DEBUGGING PURPOSES.
+     * @internal
      */
     public static function serializeStorage(): string{
         return serialize([1, (new \ReflectionClass("\JaxkDev\DiscordBot\Plugin\Storage"))->getStaticProperties()]);

@@ -57,11 +57,10 @@ abstract class Permissions{
         "manage_webhooks" => 536870912,
     ];
 
-    /** @var int */
-    private $bitwise = 0;
+    private int $bitwise = 0;
 
     /** @var Array<string, bool> */
-    private $permissions = [];
+    private array $permissions = [];
 
     public function __construct(int $bitwise = 0){
         $this->setBitwise($bitwise);

@@ -17,8 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class GuildUpdate extends Packet{
 
-    /** @var Guild */
-    private $guild;
+    private Guild $guild;
 
     public function __construct(Guild $guild){
         parent::__construct();

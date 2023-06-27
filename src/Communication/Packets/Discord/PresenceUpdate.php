@@ -17,23 +17,17 @@ use JaxkDev\DiscordBot\Models\Activity;
 
 class PresenceUpdate extends Packet{
 
-    /** @var string */
-    private $member_id;
+    private string $member_id;
 
-    /** @var string */
-    private $status;
+    private string $status;
 
     /** @var array{"mobile": string|null, "desktop": string|null, "web": string|null} */
-    private $client_status;
+    private array $client_status;
 
     /** @var Activity[] */
-    private $activities;
+    private array $activities;
 
     /**
-     * PresenceUpdate constructor.
-     *
-     * @param string                                                                   $member_id
-     * @param string                                                                   $status
      * @param array{"mobile": string|null, "desktop": string|null, "web": string|null} $client_status
      * @param Activity[]                                                               $activities
      */

@@ -26,16 +26,12 @@ class BotThread extends Thread{
         STATUS_CLOSING  = 8,
         STATUS_CLOSED   = 9;
 
-    /**  @var ThreadSafeArray */
-    private $initialConfig;
+    private ThreadSafeArray $initialConfig;
 
-    /** @var ThreadSafeArray */
-    private $inboundData;
-    /** @var ThreadSafeArray */
-    private $outboundData; //@phpstan-ignore-line Write only.
+    private ThreadSafeArray $inboundData;
+    private ThreadSafeArray $outboundData; //@phpstan-ignore-line Write only.
 
-    /** @var int */
-    private $status = self::STATUS_STARTING;
+    private int $status = self::STATUS_STARTING;
 
     public function __construct(ThreadSafeArray $initialConfig, ThreadSafeArray $inboundData, ThreadSafeArray $outboundData){
         $this->initialConfig = $initialConfig;

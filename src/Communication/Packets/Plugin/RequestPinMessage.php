@@ -16,11 +16,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestPinMessage extends Packet{
 
-    /** @var string */
-    private $channel_id;
+    private string $channel_id;
 
-    /** @var string */
-    private $message_id;
+    private string $message_id;
 
     public function __construct(string $channel_id, string $message_id){
         parent::__construct();

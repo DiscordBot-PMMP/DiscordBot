@@ -26,11 +26,11 @@ use pocketmine\plugin\Plugin;
  */
 class VoiceChannelMemberMoved extends DiscordBotEvent{
 
-    /** @var Member Member, note it contains old voice state. */
-    private $member;
+    /** Note member contains old voice state. */
+    private Member $member;
 
     /** @var VoiceChannel */
-    private $previous_channel;
+    private VoiceChannel $previous_channel;
 
     /** @var VoiceChannel */
     private $new_channel;

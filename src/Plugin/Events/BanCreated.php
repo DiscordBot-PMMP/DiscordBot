@@ -22,8 +22,7 @@ use pocketmine\plugin\Plugin;
  */
 class BanCreated extends DiscordBotEvent{
 
-    /** @var Ban */
-    private $ban;
+    private Ban $ban;
 
     public function __construct(Plugin $plugin, Ban $ban){
         parent::__construct($plugin);

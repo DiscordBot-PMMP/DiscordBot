@@ -23,8 +23,7 @@ use pocketmine\plugin\Plugin;
  */
 class GuildUpdated extends DiscordBotEvent{
 
-    /** @var Guild */
-    private $guild;
+    private Guild $guild;
 
     public function __construct(Plugin $plugin, Guild $guild){
         parent::__construct($plugin);
