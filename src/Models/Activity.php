@@ -12,6 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Plugin\Api;
+
 /** @link https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-object */
 final class Activity{
 
@@ -99,6 +101,19 @@ final class Activity{
 
     //Buttons (max 2)
     //TODO Buttons.
+
+    /**
+     * The only parameters required (and allowed) to be set on creation for bot activity.
+     *
+     * @see Api::updateBotPresence()
+     * @param string       $name
+     * @param ActivityType $type
+     * @param string|null  $url
+     * @return self
+     */
+    public static function create(string $name, ActivityType $type, ?string $url = null): self{
+        return new self($name, $type, $url);
+    }
 
     public function __construct(string $name, ActivityType $type, ?string $url = null, ?int $created_at = null,
                                 ?int $start_timestamp = null, ?int $end_timestamp = null, ?string $application_id = null,
