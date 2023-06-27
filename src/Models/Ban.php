@@ -14,22 +14,22 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
+/** @link https://discord.com/developers/docs/resources/guild#ban-object */
 class Ban{
 
+    /** Guild the user is banned from */
     private string $guild_id;
 
+    /** The banned user */
     private string $user_id;
 
+    /** The reason for the ban */
     private ?string $reason;
 
-    /** Only present on banRequest. */
-    private ?int $days_to_delete;
-
-    public function __construct(string $guild_id, string $user_id, ?string $reason = null, ?int $days_to_delete = null){
+    public function __construct(string $guild_id, string $user_id, ?string $reason = null){
         $this->setGuildId($guild_id);
         $this->setUserId($user_id);
         $this->setReason($reason);
-        $this->setDaysToDelete($days_to_delete);
     }
 
     public function getId(): string{
@@ -66,25 +66,13 @@ class Ban{
         $this->reason = $reason;
     }
 
-    public function getDaysToDelete(): ?int{
-        return $this->days_to_delete;
-    }
-
-    public function setDaysToDelete(?int $days_to_delete): void{
-        if($days_to_delete !== null and ($days_to_delete < 0 or $days_to_delete > 7)){
-            throw new \AssertionError("Days to delete '$days_to_delete' is invalid, 0-7 allowed.");
-        }
-        $this->days_to_delete = $days_to_delete;
-    }
-
     //----- Serialization -----//
 
     public function __serialize(): array{
         return [
             $this->guild_id,
             $this->user_id,
-            $this->reason,
-            $this->days_to_delete
+            $this->reason
         ];
     }
 
@@ -92,8 +80,7 @@ class Ban{
         [
             $this->guild_id,
             $this->user_id,
-            $this->reason,
-            $this->days_to_delete
+            $this->reason
         ] = $data;
     }
 }
