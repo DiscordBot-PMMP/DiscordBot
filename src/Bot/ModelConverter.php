@@ -48,6 +48,7 @@ use JaxkDev\DiscordBot\Models\Guild\NsfwLevel;
 use JaxkDev\DiscordBot\Models\Guild\PremiumTier;
 use JaxkDev\DiscordBot\Models\Guild\VerificationLevel;
 use JaxkDev\DiscordBot\Models\Invite;
+use JaxkDev\DiscordBot\Models\InviteTargetType;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Attachment;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Author;
@@ -65,6 +66,7 @@ use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityButton;
 use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityType;
 use JaxkDev\DiscordBot\Models\Role;
+use JaxkDev\DiscordBot\Models\RoleTags;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\UserPremiumType;
 use JaxkDev\DiscordBot\Models\VoiceState;
@@ -347,22 +349,42 @@ abstract class ModelConverter{
         return new RolePermissions((int)$rolePermission->bitwise);
     }
 
+    /**
+     * Remember null = true, not present = false.
+     * @link https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
+     * @param object{bot_id?: int, integration_id?: int, premium_subscriber?: null, subscription_listing_id?: int,
+     *              available_for_purchase?: null, guild_connections?: null} $roleTags
+     */
+    static public function genModelRoleTags(object $roleTags): RoleTags{
+        return new RoleTags($roleTags->bot_id ?? null, $roleTags->integration_id ?? null,
+            ($roleTags->premium_subscriber ?? false) === null, $roleTags->subscription_listing_id ?? null,
+            ($roleTags->available_for_purchase ?? false) === null, ($roleTags->guild_connections ?? false) === null);
+    }
+
     static public function genModelRole(DiscordRole $discordRole): Role{
-        return new Role($discordRole->name, $discordRole->color, $discordRole->hoist, $discordRole->position, $discordRole->mentionable,
-            $discordRole->guild_id, self::genModelRolePermission($discordRole->permissions), $discordRole->id);
+        if($discordRole->guild_id === null){
+            throw new AssertionError("Guild ID is null, should never happen please report this issue. (".$discordRole->serialize().")");
+        }
+        $tags = ($discordRole->tags === null) ? null : self::genModelRoleTags($discordRole->tags);
+        return new Role($discordRole->id, $discordRole->guild_id, $discordRole->name, $discordRole->color,
+            $discordRole->hoist, $discordRole->getIconAttribute(), $discordRole->unicode_emoji ?? null,
+            $discordRole->position, self::genModelRolePermission($discordRole->permissions), $discordRole->managed,
+            $discordRole->mentionable, $tags);
     }
 
     static public function genModelInvite(DiscordInvite $invite): Invite{
-        $inviter = null;
-        if(in_array("inviter", array_keys($invite->getRawAttributes()), true)){
-            //Workaround for #52, can be removed once using DiscordPHP >= 7.0.0
-            $inviter = $invite->inviter instanceof DiscordUser ? $invite->inviter->id : null;
+        if($invite->channel_id === null){
+            throw new AssertionError("Channel ID is null, should never happen please report this issue. (".$invite->serialize().")");
         }
-        return new Invite($invite->guild_id, $invite->channel_id, $invite->max_age, $invite->max_uses, $invite->temporary,
-        $invite->code, $invite->created_at->getTimestamp(), $inviter === null ? null : $invite->guild_id.".".$inviter, $invite->uses);
+        return new Invite($invite->code, $invite->guild_id, $invite->channel_id, $invite->inviter?->id,
+            $invite->target_type === null ? null : InviteTargetType::from($invite->target_type), $invite->target_user?->id,
+            $invite->expires_at?->getTimestamp());
     }
 
     static public function genModelBan(DiscordBan $ban): Ban{
+        if($ban->guild_id === null){
+            throw new AssertionError("Guild ID is null, should never happen please report this issue. (".$ban->serialize().")");
+        }
         return new Ban($ban->guild_id, $ban->user_id, $ban->reason);
     }
 
