@@ -112,7 +112,7 @@ META);
         /** @var CommandSender $sender */
         $sender = $this->fetchLocal("sender");
         /** @var string $res */
-        $res = $this->getResult()??(TextFormat::RED."Internal error occurred");
+        $res = $this->getResult() ?? (TextFormat::RED."Internal error occurred");
         $sender->sendMessage($res);
     }
 }

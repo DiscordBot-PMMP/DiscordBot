@@ -101,15 +101,18 @@ class Main extends PluginBase{
     protected function onDisable(): void{
         (new DiscordClosed($this))->call();
 
+        /** @phpstan-ignore-next-line May disable before enable. */
         $this->tickTask?->cancel();
 
         //TODO Check if thread closed before we disabled (indicating an error/crash occurred in thread TBD on this method)
         //If so, we need to generate a crash dump (debug data but in a separate folder for 'crashes'/'errors')
         //TODO Also generate dump if PLUGIN crashes or similar.
+        /** @phpstan-ignore-next-line May disable before enable. */
         if($this->discordBot?->isTerminated()){
             $this->getLogger()->error("Discord thread terminated, check logs for more information.");
         }
 
+        /** @phpstan-ignore-next-line May disable before enable. */
         if($this->discordBot?->isRunning()){
             $this->discordBot->setStatus(BotThread::STATUS_CLOSING);
             $this->getLogger()->info("Stopping discord thread gracefully, waiting for discord thread to stop...");
@@ -136,7 +139,7 @@ class Main extends PluginBase{
 
         /** @var array<string, mixed>|false $config */
         $config = yaml_parse_file($this->getDataFolder()."config.yml");
-        if($config === false or !is_int($config["version"]??"")){
+        if($config === false or !is_int($config["version"] ?? "")){
             $this->getLogger()->critical("Failed to parse config.yml");
             $this->getServer()->getPluginManager()->disablePlugin($this);
             return false;

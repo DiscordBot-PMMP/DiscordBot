@@ -313,9 +313,9 @@ array(5) {
 
     public function onPresenceUpdate(DiscordPresenceUpdate $presenceUpdate): void{
         $clientStatus = [
-            "desktop" => $presenceUpdate->client_status->desktop??null,
-            "mobile" => $presenceUpdate->client_status->mobile??null,
-            "web" => $presenceUpdate->client_status->web??null
+            "desktop" => $presenceUpdate->client_status->desktop ?? null,
+            "mobile" => $presenceUpdate->client_status->mobile ?? null,
+            "web" => $presenceUpdate->client_status->web ?? null
         ];
         $activities = [];
         foreach($presenceUpdate->activities as $activity){
@@ -502,7 +502,7 @@ array(5) {
                     $packet = new BanAddPacket(ModelConverter::genModelBan($b));
                     $this->client->getThread()->writeOutboundData($packet);
                 }else{
-                    $this->logger->debug("No ban after freshen ??? (IMPORTANT LOGIC ERROR)");
+                    $this->logger->debug("No ban after freshen  ?? ? (IMPORTANT LOGIC ERROR)");
                     $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
                     $this->client->getThread()->writeOutboundData($packet);
                 }
@@ -536,7 +536,7 @@ array(5) {
 
         // Other types of messages not used right now.
         if($message->type !== DiscordMessage::TYPE_NORMAL and $message->type !== DiscordMessage::TYPE_REPLY) return false;
-        if(($message->content??"") === "" and $message->embeds->count() === 0 and sizeof($message->attachments) === 0) return false;
+        if(($message->content ?? "") === "" and $message->embeds->count() === 0 and sizeof($message->attachments) === 0) return false;
         // ^ Spotify/Games etc
 
         return true;

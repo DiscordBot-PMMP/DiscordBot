@@ -126,7 +126,7 @@ final class Activity{
         $this->setName($name);
         $this->setType($type);
         $this->setUrl($url);
-        $this->setCreatedAt($created_at??time());
+        $this->setCreatedAt($created_at ?? time());
         $this->setStartTimestamp($start_timestamp);
         $this->setEndTimestamp($end_timestamp);
         $this->setApplicationId($application_id);

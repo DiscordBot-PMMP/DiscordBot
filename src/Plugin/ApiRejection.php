@@ -23,10 +23,10 @@ class ApiRejection extends \Exception{
     }
 
     public function getOriginalMessage(): ?string{
-        return $this->data[0]??null;
+        return $this->data[0] ?? null;
     }
 
     public function getOriginalTrace(): ?string{
-        return $this->data[1]??null;
+        return $this->data[1] ?? null;
     }
 }

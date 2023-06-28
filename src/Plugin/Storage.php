@@ -310,7 +310,7 @@ class Storage{
      * @internal
      */
     public static function setMembersVoiceChannel(string $member_id, string $voice_channel_id): void{
-        if(!((self::$channel_map[$voice_channel_id]??null) instanceof VoiceChannel)){
+        if(!((self::$channel_map[$voice_channel_id] ?? null) instanceof VoiceChannel)){
             throw new \AssertionError("Voice channel '$voice_channel_id' does not exist in storage.");
         }
         self::$voiceChannel_member_map[$member_id] = $voice_channel_id;
@@ -320,7 +320,7 @@ class Storage{
      * Returns the voice channel the specified member is currently in.
      */
     public static function getMembersVoiceChannel(string $member_id): ?VoiceChannel{
-        if(($id = self::$voiceChannel_member_map[$member_id]??null) === null) return null;
+        if(($id = self::$voiceChannel_member_map[$member_id] ?? null) === null) return null;
         $c = self::$channel_map[$id];
         return ($c instanceof VoiceChannel) ? $c : null;
     }
@@ -390,7 +390,7 @@ class Storage{
      */
     public static function getBansByGuild(string $guild_id): array{
         $bans = [];
-        foreach((self::$ban_guild_map[$guild_id]??[]) as $member){
+        foreach((self::$ban_guild_map[$guild_id] ?? []) as $member){
             $b = self::getBan($member);
             if($b !== null) $bans[] = $b;
         }

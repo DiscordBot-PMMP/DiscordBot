@@ -494,7 +494,7 @@ class CommunicationHandler{
             }elseif($c instanceof TextChannel){
                 $dc->topic = $c->getTopic();
                 $dc->nsfw = $c->isNsfw();
-                $dc->rate_limit_per_user = $c->getRateLimit()??0;
+                $dc->rate_limit_per_user = $c->getRateLimit() ?? 0;
             }else{
                 throw new \AssertionError("What channel type is this ?? '".get_class($c)."'");
             }
@@ -556,7 +556,7 @@ class CommunicationHandler{
                     }
                     $dc->topic = $channel->getTopic();
                     $dc->nsfw = $channel->isNsfw();
-                    $dc->rate_limit_per_user = $channel->getRateLimit()??0;
+                    $dc->rate_limit_per_user = $channel->getRateLimit() ?? 0;
                 }else{
                     $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type is unknown."]);
                     throw new \AssertionError("What channel type is this ?? '".get_class($channel)."'");
@@ -652,11 +652,11 @@ class CommunicationHandler{
                 if($e->getTitle() !== null) $de->setTitle($e->getTitle());
                 if($e->getUrl() !== null) $de->setURL($e->getUrl());
                 if($e->getColour() !== null) $de->setColor($e->getColour());
-                if($e->getAuthor()->getName() !== null) $de->setAuthor($e->getAuthor()->getName(), $e->getAuthor()->getIconUrl()??"", $e->getAuthor()->getUrl()??"");
+                if($e->getAuthor()->getName() !== null) $de->setAuthor($e->getAuthor()->getName(), $e->getAuthor()->getIconUrl() ?? "", $e->getAuthor()->getUrl() ?? "");
                 if($e->getThumbnail()->getUrl() !== null) $de->setThumbnail($e->getThumbnail()->getUrl());
                 if($e->getImage()->getUrl() !== null) $de->setImage($e->getImage()->getUrl());
                 if($e->getDescription() !== null) $de->setDescription($e->getDescription());
-                if($e->getFooter()->getText() !== null) $de->setFooter($e->getFooter()->getText(), $e->getFooter()->getIconUrl()??"");
+                if($e->getFooter()->getText() !== null) $de->setFooter($e->getFooter()->getText(), $e->getFooter()->getIconUrl() ?? "");
                 if($e->getTimestamp() !== null) $de->setTimestamp($e->getTimestamp());
                 foreach($e->getFields() as $f){
                     $de->addFieldValues($f->getName(), $f->getValue(), $f->isInline());
@@ -704,11 +704,11 @@ class CommunicationHandler{
                 if($e->getTitle() !== null) $de->setTitle($e->getTitle());
                 if($e->getUrl() !== null) $de->setURL($e->getUrl());
                 if($e->getColour() !== null) $de->setColor($e->getColour());
-                if($e->getAuthor()->getName() !== null) $de->setAuthor($e->getAuthor()->getName(), $e->getAuthor()->getIconUrl()??"", $e->getAuthor()->getUrl()??"");
+                if($e->getAuthor()->getName() !== null) $de->setAuthor($e->getAuthor()->getName(), $e->getAuthor()->getIconUrl() ?? "", $e->getAuthor()->getUrl() ?? "");
                 if($e->getThumbnail()->getUrl() !== null) $de->setThumbnail($e->getThumbnail()->getUrl());
                 if($e->getImage()->getUrl() !== null) $de->setImage($e->getImage()->getUrl());
                 if($e->getDescription() !== null) $de->setDescription($e->getDescription());
-                if($e->getFooter()->getText() !== null) $de->setFooter($e->getFooter()->getText(), $e->getFooter()->getIconUrl()??"");
+                if($e->getFooter()->getText() !== null) $de->setFooter($e->getFooter()->getText(), $e->getFooter()->getIconUrl() ?? "");
                 if($e->getTimestamp() !== null) $de->setTimestamp($e->getTimestamp());
                 foreach($e->getFields() as $f){
                     $de->addFieldValues($f->getName(), $f->getValue(), $f->isInline());

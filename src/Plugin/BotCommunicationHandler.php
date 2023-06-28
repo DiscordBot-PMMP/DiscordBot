@@ -12,46 +12,50 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-use JaxkDev\DiscordBot\Communication\Packets\Resolution as ResolutionPacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump as DiscordDataDumpPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd as BanAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanRemove as BanRemovePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate as ChannelCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelDelete as ChannelDeletePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelUpdate as ChannelUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate as ChannelPinsUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelUpdate as ChannelUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump as DiscordDataDumpPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteCreate as InviteCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteDelete as InviteDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberJoin as MemberJoinPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberLeave as MemberLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberUpdate as MemberUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageDelete as MessageDeletePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageSent as MessageSentPacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageUpdate as MessageUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionAdd as MessageReactionAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemove as MessageReactionRemovePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveAll as MessageReactionRemoveAllPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveEmoji as MessageReactionRemoveEmojiPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageSent as MessageSentPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageUpdate as MessageUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate as PresenceUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Models\Activity;
+use JaxkDev\DiscordBot\Communication\Packets\Resolution as ResolutionPacket;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Plugin\Events\BanCreated as BanCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\BanDeleted as BanDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelDeleted as ChannelDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelPinsUpdated as ChannelPinsUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelUpdated as ChannelUpdatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\DiscordReady as DiscordReadyEvent;
+use JaxkDev\DiscordBot\Plugin\Events\GuildDeleted as GuildDeletedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\GuildJoined as GuildJoinedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\GuildUpdated as GuildUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteCreated as InviteCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteDeleted as InviteDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MemberJoined as MemberJoinedEvent;
@@ -64,14 +68,10 @@ use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveAll as MessageReaction
 use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveEmoji as MessageReactionRemoveEmojiEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\DiscordReady as DiscordReadyEvent;
 use JaxkDev\DiscordBot\Plugin\Events\PresenceUpdated as PresenceUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\GuildDeleted as GuildDeletedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\GuildJoined as GuildJoinedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\GuildUpdated as GuildUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberJoined as VoiceChannelMemberJoinedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberLeft as VoiceChannelMemberLeftEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberMoved as VoiceChannelMemberMovedEvent;
@@ -409,7 +409,7 @@ class BotCommunicationHandler{
             Storage::addChannel($channel);
             if($channel instanceof VoiceChannel){
                 foreach($channel->getMembers() as $member){
-                    Storage::setMembersVoiceChannel($member, $channel->getId()??"Never null here");
+                    Storage::setMembersVoiceChannel($member, $channel->getId() ?? "Never null here");
                 }
             }
         }

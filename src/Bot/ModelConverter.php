@@ -25,20 +25,20 @@ use Discord\Parts\Embed\Footer as DiscordFooter;
 use Discord\Parts\Embed\Image as DiscordImage;
 use Discord\Parts\Embed\Video as DiscordVideo;
 use Discord\Parts\Guild\Ban as DiscordBan;
+use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
-use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
-use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
+use JaxkDev\DiscordBot\Models\Guild\Guild;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Attachment;
@@ -53,8 +53,8 @@ use JaxkDev\DiscordBot\Models\Messages\Reply as ReplyMessage;
 use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
 use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
+use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Role;
-use JaxkDev\DiscordBot\Models\Guild;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\VoiceState;
 use JaxkDev\DiscordBot\Models\Webhook;
@@ -66,7 +66,7 @@ abstract class ModelConverter{
             throw new AssertionError("Not handling DM Voice states.");
         }
         return new VoiceState($stateUpdate->session_id, $stateUpdate->channel_id, $stateUpdate->deaf, $stateUpdate->mute,
-            $stateUpdate->self_deaf, $stateUpdate->self_mute, $stateUpdate->self_stream??false, $stateUpdate->self_video,
+            $stateUpdate->self_deaf, $stateUpdate->self_mute, $stateUpdate->self_stream ?? false, $stateUpdate->self_video,
             $stateUpdate->suppress);
     }
 
@@ -85,12 +85,12 @@ abstract class ModelConverter{
         //** @var \stdClass{"join" => string|null, "spectate" => string|null, "match" => string|null} $secrets  TODO, Still cant confirm this. no one has any secrets so I cant see any valid data. */
         //$secrets = $discordActivity->secrets;
         return new Activity($discordActivity->name, $discordActivity->type, $discordActivity->created_at->getTimestamp(),
-            $discordActivity->url, $timestamps->start??null, $timestamps->end??null,
+            $discordActivity->url, $timestamps->start ?? null, $timestamps->end ?? null,
             $discordActivity->application_id, $discordActivity->details, $discordActivity->state, $discordActivity->emoji,
-            $party->id??null, ($party->size??[])[0]??null,($party->size??[])[1]??null,
-            $assets->large_image??null, $assets->large_text??null, $assets->small_image??null,
-            $assets->small_text??null, /*$secrets->join??null, $secrets->spectate??null,
-            $secrets->match??null,*/ $discordActivity->instance, $discordActivity->flags);
+            $party->id ?? null, ($party->size ?? [])[0] ?? null,($party->size ?? [])[1] ?? null,
+            $assets->large_image ?? null, $assets->large_text ?? null, $assets->small_image ?? null,
+            $assets->small_text ?? null, /*$secrets->join ?? null, $secrets->spectate ?? null,
+            $secrets->match ?? null,*/ $discordActivity->instance, $discordActivity->flags);
     }
 
     static public function genModelMember(DiscordMember $discordMember): Member{
@@ -125,8 +125,8 @@ abstract class ModelConverter{
     }
 
     static public function genModelUser(DiscordUser $user): User{
-        return new User($user->id, $user->username, $user->discriminator, $user->avatar, $user->bot??false,
-            $user->public_flags??0);
+        return new User($user->id, $user->username, $user->discriminator, $user->avatar, $user->bot ?? false,
+            $user->public_flags ?? 0);
     }
 
     static public function genModelGuild(DiscordGuild $discordGuild): Guild{
@@ -210,8 +210,8 @@ abstract class ModelConverter{
         if($discordChannel->guild_id === null){
             throw new AssertionError("Guild ID must be present.");
         }
-        return self::applyPermissionOverwrites($discordChannel, new TextChannel($discordChannel->topic??"", $discordChannel->name,
-            $discordChannel->position, $discordChannel->guild_id, $discordChannel->nsfw??false, $discordChannel->rate_limit_per_user,
+        return self::applyPermissionOverwrites($discordChannel, new TextChannel($discordChannel->topic ?? "", $discordChannel->name,
+            $discordChannel->position, $discordChannel->guild_id, $discordChannel->nsfw ?? false, $discordChannel->rate_limit_per_user,
             $discordChannel->parent_id, $discordChannel->id));
     }
 
@@ -224,7 +224,7 @@ abstract class ModelConverter{
         foreach($discordMessage->attachments as $attachment){
             $attachments[] = self::genModelAttachment($attachment);
         }
-        $guild_id = $discordMessage->guild_id??($discordMessage->author instanceof DiscordMember ? $discordMessage->author->guild_id : null);
+        $guild_id = $discordMessage->guild_id ?? ($discordMessage->author instanceof DiscordMember ? $discordMessage->author->guild_id : null);
         if($discordMessage->type === DiscordMessage::TYPE_NORMAL or $discordMessage->type === DiscordMessage::TYPE_APPLICATION_COMMAND){ #TODO Decide on application commands.
             if($discordMessage->webhook_id === null){
                 /** @var DiscordEmbed|null $e */
@@ -265,8 +265,8 @@ abstract class ModelConverter{
     }
 
     static public function genModelAttachment(\stdClass $attachment): Attachment{
-        return new Attachment($attachment->id, $attachment->filename, $attachment->content_type??null,
-            $attachment->size, $attachment->url, $attachment->width??null, $attachment->height??null);
+        return new Attachment($attachment->id, $attachment->filename, $attachment->content_type ?? null,
+            $attachment->size, $attachment->url, $attachment->width ?? null, $attachment->height ?? null);
     }
 
     static public function genModelEmbed(DiscordEmbed $discordEmbed): Embed{

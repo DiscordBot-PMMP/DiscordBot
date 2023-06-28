@@ -75,7 +75,7 @@ abstract class GuildChannel extends Channel{
      * @return Array<null|ChannelPermissions>  [AllowedPerms|null, DeniedPerms|null]
      */
     public function getMemberPermissions(string $id): array{
-        return $this->member_permissions[$id]??[null,null];
+        return $this->member_permissions[$id] ?? [null,null];
     }
 
     public function setAllowedMemberPermissions(string $id, ChannelPermissions $allowedPermissions): void{
@@ -105,7 +105,7 @@ abstract class GuildChannel extends Channel{
      * @return Array<null|ChannelPermissions>  [AllowedPerms|null, DeniedPerms|null]
      */
     public function getRolePermissions(string $id): array{
-        return $this->role_permissions[$id]??[null,null];
+        return $this->role_permissions[$id] ?? [null,null];
     }
 
     public function setAllowedRolePermissions(string $id, ChannelPermissions $allowedPermissions): void{

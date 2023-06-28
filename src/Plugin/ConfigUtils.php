@@ -47,7 +47,7 @@ abstract class ConfigUtils{
                 "directory" => "logs"
             ];
         }else{
-            $config["logging"]["max_files"] = $config["logging"]["max_files"]??28;
+            $config["logging"]["max_files"] = $config["logging"]["max_files"] ?? 28;
             unset($config["logging"]["maxFiles"]);
         }
         if(!isset($config["protocol"])){

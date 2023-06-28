@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
@@ -22,7 +23,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
@@ -34,26 +34,26 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdatePresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdatePresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
-use JaxkDev\DiscordBot\Models\Activity;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
-use JaxkDev\DiscordBot\Models\Webhook;
+use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Role;
+use JaxkDev\DiscordBot\Models\Webhook;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /**

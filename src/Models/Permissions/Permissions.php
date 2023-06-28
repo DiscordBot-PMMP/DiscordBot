@@ -146,7 +146,8 @@ abstract class Permissions{
     }
 
     /**
-     * @internal Using current bitwise recalculate permissions.
+     * Using current bitwise recalculate permissions.
+     * @internal
      */
     private function recalculatePermissions(): void{
         $this->permissions = [];

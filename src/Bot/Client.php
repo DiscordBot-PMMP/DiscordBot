@@ -228,7 +228,7 @@ class Client{
     }
 
     public function discordErrorHandler(array $data): void{
-        $this->close($data[0]??null);
+        $this->close($data[0] ?? null);
     }
 
     /** @noinspection PhpConditionAlreadyCheckedInspection */
@@ -254,7 +254,7 @@ class Client{
                 E_DEPRECATED => "E_DEPRECATED",
                 E_USER_DEPRECATED => "E_USER_DEPRECATED"
             ];
-            $errno = $errorConversion[$error->getCode()]??$error->getCode();
+            $errno = $errorConversion[$error->getCode()] ?? $error->getCode();
             $this->logger->critical(get_class($error) . ": \"{$error->getMessage()}\" (".strval($errno).") in \"{$error->getFile()}\" at line {$error->getLine()}");
             foreach(self::printableTrace($error->getTrace()) as $line){
                 $this->logger->critical($line);
@@ -319,15 +319,15 @@ class Client{
                         return "array[" . count($value) . "]";
                     }
                     if(is_string($value)){
-                        return "string[" . strlen($value) . "] " . substr((preg_replace('#([^\x20-\x7E])#', '.', $value)??""), 0, $maxStringLength);
+                        return "string[" . strlen($value) . "] " . substr((preg_replace('#([^\x20-\x7E])#', '.', $value) ?? ""), 0, $maxStringLength);
                     }
                     if(is_bool($value)){
                         return $value ? "true" : "false";
                     }
-                    return gettype($value) . " " . (preg_replace('#([^\x20-\x7E])#', '.', strval($value))??"");
+                    return gettype($value) . " " . (preg_replace('#([^\x20-\x7E])#', '.', strval($value)) ?? "");
                 }, $args));
             }
-            $messages[] = "#$i " . ((isset($trace[$i]["file"]) && is_string($trace[$i]["file"])) ? self::cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . (preg_replace('#([^\x20-\x7E])#', '.', $params)??"") . ")";
+            $messages[] = "#$i " . ((isset($trace[$i]["file"]) && is_string($trace[$i]["file"])) ? self::cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . (preg_replace('#([^\x20-\x7E])#', '.', $params) ?? "") . ")";
         }
         return $messages;
     }
