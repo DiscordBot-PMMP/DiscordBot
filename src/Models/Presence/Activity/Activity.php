@@ -108,21 +108,20 @@ final class Activity{
      * The only parameters required (and allowed) to be set on creation for bot activity.
      *
      * @see Api::updateBotPresence()
-     * @param ActivityButton[] $buttons Max 2 buttons.
      */
-    public static function create(string $name, ActivityType $type, ?string $url = null, array $buttons = []): self{
-        return new self($name, $type, $url, buttons: $buttons);
+    public static function create(string $name, ActivityType $type, ?string $url = null): self{
+        return new self($name, $type, $url);
     }
 
     /** @param ActivityButton[] $buttons Max 2 buttons. */
     public function __construct(string  $name, ActivityType $type, ?string $url = null, ?int $created_at = null,
-                                ?int    $start_timestamp = null, ?int $end_timestamp = null, ?string $application_id = null,
+                                ?int $start_timestamp = null, ?int $end_timestamp = null, ?string $application_id = null,
                                 ?string $details = null, ?string $state = null, ?Emoji $emoji = null, ?string $party_id = null,
-                                ?int    $party_size = null, ?int $party_max_size = null, ?string $asset_large_image = null,
+                                ?int $party_size = null, ?int $party_max_size = null, ?string $asset_large_image = null,
                                 ?string $asset_large_text = null, ?string $asset_small_image = null,
                                 ?string $asset_small_text = null, ?string $secret_join = null,
                                 ?string $secret_spectate = null, ?string $secret_match = null, ?bool $instance = null,
-                                ?int    $flags = null, array $buttons = []){
+                                ?int $flags = null, array $buttons = []){
         $this->setName($name);
         $this->setType($type);
         $this->setUrl($url);
