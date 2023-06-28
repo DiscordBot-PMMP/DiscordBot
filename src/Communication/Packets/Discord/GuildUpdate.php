@@ -12,8 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Guild;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\Guild\Guild;
 
 class GuildUpdate extends Packet{
 

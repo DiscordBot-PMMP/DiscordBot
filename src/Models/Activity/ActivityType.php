@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Models;
+namespace JaxkDev\DiscordBot\Models\Activity;
 
 /**
  * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types

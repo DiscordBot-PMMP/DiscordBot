@@ -13,9 +13,9 @@
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
 use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Guild\Guild;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
-use JaxkDev\DiscordBot\Models\Guild;
 use pocketmine\plugin\Plugin;
 
 /**

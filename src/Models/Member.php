@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Models\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Plugin\Utils;
 

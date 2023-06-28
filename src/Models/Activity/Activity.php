@@ -10,8 +10,9 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Models;
+namespace JaxkDev\DiscordBot\Models\Activity;
 
+use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Plugin\Api;
 
 /** @link https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-object */
@@ -58,12 +59,10 @@ final class Activity{
     private ?string $state;
 
     /**
-     * Emoji used for a custom status
+     * Emoji used for custom status (only name, id and animated fields are used)
      * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji
      */
-    private ?string $emoji_name;
-    private ?string $emoji_id;
-    private ?bool   $emoji_animated;
+    private ?Emoji $emoji;
 
     /**
      * Information for the current party of the player
@@ -99,31 +98,31 @@ final class Activity{
      */
     private ?int $flags;
 
-    //Buttons (max 2)
-    //TODO Buttons.
+    /**
+     * Max 2 buttons.
+     * @var ActivityButton[]
+     */
+    private array $buttons;
 
     /**
      * The only parameters required (and allowed) to be set on creation for bot activity.
      *
      * @see Api::updateBotPresence()
-     * @param string       $name
-     * @param ActivityType $type
-     * @param string|null  $url
-     * @return self
+     * @param ActivityButton[] $buttons Max 2 buttons.
      */
-    public static function create(string $name, ActivityType $type, ?string $url = null): self{
-        return new self($name, $type, $url);
+    public static function create(string $name, ActivityType $type, ?string $url = null, array $buttons = []): self{
+        return new self($name, $type, $url, buttons: $buttons);
     }
 
-    public function __construct(string $name, ActivityType $type, ?string $url = null, ?int $created_at = null,
-                                ?int $start_timestamp = null, ?int $end_timestamp = null, ?string $application_id = null,
-                                ?string $details = null, ?string $state = null, ?string $emoji_name = null,
-                                ?string $emoji_id = null, ?bool $emoji_animated = null, ?string $party_id = null,
-                                ?int $party_size = null, ?int $party_max_size = null, ?string $asset_large_image = null,
+    /** @param ActivityButton[] $buttons Max 2 buttons. */
+    public function __construct(string  $name, ActivityType $type, ?string $url = null, ?int $created_at = null,
+                                ?int    $start_timestamp = null, ?int $end_timestamp = null, ?string $application_id = null,
+                                ?string $details = null, ?string $state = null, ?Emoji $emoji = null, ?string $party_id = null,
+                                ?int    $party_size = null, ?int $party_max_size = null, ?string $asset_large_image = null,
                                 ?string $asset_large_text = null, ?string $asset_small_image = null,
                                 ?string $asset_small_text = null, ?string $secret_join = null,
                                 ?string $secret_spectate = null, ?string $secret_match = null, ?bool $instance = null,
-                                ?int $flags = null){
+                                ?int    $flags = null, array $buttons = []){
         $this->setName($name);
         $this->setType($type);
         $this->setUrl($url);
@@ -133,9 +132,7 @@ final class Activity{
         $this->setApplicationId($application_id);
         $this->setDetails($details);
         $this->setState($state);
-        $this->setEmojiName($emoji_name);
-        $this->setEmojiId($emoji_id);
-        $this->setEmojiAnimated($emoji_animated);
+        $this->setEmoji($emoji);
         $this->setPartyId($party_id);
         $this->setPartySize($party_size);
         $this->setPartyMaxSize($party_max_size);
@@ -148,6 +145,7 @@ final class Activity{
         $this->setSecretMatch($secret_match);
         $this->setInstance($instance);
         $this->setFlags($flags);
+        $this->setButtons($buttons);
     }
 
     public function getName(): string{
@@ -242,28 +240,12 @@ final class Activity{
         $this->state = $state;
     }
 
-    public function getEmojiName(): ?string{
-        return $this->emoji_name;
+    public function getEmoji(): ?Emoji{
+        return $this->emoji;
     }
 
-    public function setEmojiName(?string $emoji_name): void{
-        $this->emoji_name = $emoji_name;
-    }
-
-    public function getEmojiId(): ?string{
-        return $this->emoji_id;
-    }
-
-    public function setEmojiId(?string $emoji_id): void{
-        $this->emoji_id = $emoji_id;
-    }
-
-    public function getEmojiAnimated(): ?bool{
-        return $this->emoji_animated;
-    }
-
-    public function setEmojiAnimated(?bool $emoji_animated): void{
-        $this->emoji_animated = $emoji_animated;
+    public function setEmoji(?Emoji $emoji): void{
+        $this->emoji = $emoji;
     }
 
     public function getPartyId(): ?string{
@@ -368,6 +350,24 @@ final class Activity{
         $this->flags = $flags;
     }
 
+    /** @return ActivityButton[] */
+    public function getButtons(): array{
+        return $this->buttons;
+    }
+
+    /** @param ActivityButton[] $buttons */
+    public function setButtons(array $buttons): void{
+        if(sizeof($buttons) > 2){
+            throw new \AssertionError("Too many buttons (max 2).");
+        }
+        foreach($buttons as $button){
+            if(!($button instanceof ActivityButton)){
+                throw new \AssertionError("Invalid button provided, must be of type ".ActivityButton::class);
+            }
+        }
+        $this->buttons = $buttons;
+    }
+
     //----- Serialization -----//
 
     public function __serialize(): array{
@@ -381,9 +381,7 @@ final class Activity{
             $this->application_id,
             $this->details,
             $this->state,
-            $this->emoji_name,
-            $this->emoji_id,
-            $this->emoji_animated,
+            $this->emoji,
             $this->party_id,
             $this->party_size,
             $this->party_max_size,
@@ -395,7 +393,8 @@ final class Activity{
             $this->secret_spectate,
             $this->secret_match,
             $this->instance,
-            $this->flags
+            $this->flags,
+            $this->buttons
         ];
     }
 
@@ -410,9 +409,7 @@ final class Activity{
             $this->application_id,
             $this->details,
             $this->state,
-            $this->emoji_name,
-            $this->emoji_id,
-            $this->emoji_animated,
+            $this->emoji,
             $this->party_id,
             $this->party_size,
             $this->party_max_size,
@@ -424,7 +421,8 @@ final class Activity{
             $this->secret_spectate,
             $this->secret_match,
             $this->instance,
-            $this->flags
+            $this->flags,
+            $this->buttons
         ] = $data;
     }
 }
