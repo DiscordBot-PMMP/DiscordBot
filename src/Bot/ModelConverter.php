@@ -40,7 +40,13 @@ use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Emoji;
+use JaxkDev\DiscordBot\Models\Guild\DefaultMessageNotificationLevel;
+use JaxkDev\DiscordBot\Models\Guild\ExplicitContentFilterLevel;
 use JaxkDev\DiscordBot\Models\Guild\Guild;
+use JaxkDev\DiscordBot\Models\Guild\MfaLevel;
+use JaxkDev\DiscordBot\Models\Guild\NsfwLevel;
+use JaxkDev\DiscordBot\Models\Guild\PremiumTier;
+use JaxkDev\DiscordBot\Models\Guild\VerificationLevel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Attachment;
@@ -60,6 +66,7 @@ use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityButton;
 use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityType;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\User;
+use JaxkDev\DiscordBot\Models\UserPremiumType;
 use JaxkDev\DiscordBot\Models\VoiceState;
 use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\WebhookType;
@@ -134,14 +141,36 @@ abstract class ModelConverter{
         return $m;
     }
 
+    //TODO, DiscordUser->global_name is only available in v10-RC6+
     static public function genModelUser(DiscordUser $user): User{
-        return new User($user->id, $user->username, $user->discriminator, $user->avatar, $user->bot ?? false,
+        return new User($user->id, $user->username, $user->discriminator, null, $user->getAvatarAttribute(), $user->bot, $user->system,
+            $user->mfa_enabled, $user->banner ?? null, $user->accent_color ?? null, $user->locale, $user->flags ?? 0, UserPremiumType::from($user->premium_type ?? 0),
             $user->public_flags ?? 0);
     }
 
     static public function genModelGuild(DiscordGuild $discordGuild): Guild{
-        return new Guild($discordGuild->id, $discordGuild->name, $discordGuild->region, $discordGuild->owner_id,
-            $discordGuild->large, $discordGuild->member_count, $discordGuild->icon);
+        /** @var Emoji[] $emojis */
+        $emojis = [];
+        foreach($discordGuild->emojis as $emoji){
+            $emojis[] = self::genModelEmoji($emoji);
+        }
+        //TODO Pending features
+        $features = [];
+
+        return new Guild($discordGuild->id, $discordGuild->name, $discordGuild->getIconAttribute(),
+            $discordGuild->getSplashAttribute(), $discordGuild->discovery_splash, $discordGuild->owner_id,
+            $discordGuild->afk_channel_id, $discordGuild->afk_timeout, $discordGuild->widget_enabled,
+            $discordGuild->widget_channel_id ?? null, VerificationLevel::from($discordGuild->verification_level),
+            DefaultMessageNotificationLevel::from($discordGuild->default_message_notifications),
+            ExplicitContentFilterLevel::from($discordGuild->explicit_content_filter),
+            $emojis, $features, MfaLevel::from($discordGuild->mfa_level), $discordGuild->application_id,
+            $discordGuild->system_channel_id, $discordGuild->system_channel_flags, $discordGuild->rules_channel_id,
+            $discordGuild->max_presences, $discordGuild->max_members, $discordGuild->vanity_url_code,
+            $discordGuild->description, $discordGuild->banner, PremiumTier::from($discordGuild->premium_tier),
+            $discordGuild->premium_subscription_count, $discordGuild->preferred_locale,
+            $discordGuild->public_updates_channel_id, $discordGuild->max_video_channel_users,
+            $discordGuild->max_stage_video_channel_users, NsfwLevel::from($discordGuild->nsfw_level),
+            $discordGuild->premium_progress_bar_enabled, $discordGuild->safety_alerts_channel_id);
     }
 
     /**
@@ -153,8 +182,8 @@ abstract class ModelConverter{
     static private function applyPermissionOverwrites(DiscordChannel $dc, $c){
         /** @var DiscordOverwrite $overwrite */
         foreach($dc->overwrites as $overwrite){
-            $allowed = new ChannelPermissions($overwrite->allow->bitwise);
-            $denied = new ChannelPermissions($overwrite->deny->bitwise);
+            $allowed = new ChannelPermissions((int)$overwrite->allow->bitwise);
+            $denied = new ChannelPermissions((int)$overwrite->deny->bitwise);
             if($overwrite->type === DiscordOverwrite::TYPE_MEMBER){
                 $c->setAllowedMemberPermissions($overwrite->id, $allowed);
                 $c->setDeniedMemberPermissions($overwrite->id, $denied);
@@ -315,7 +344,7 @@ abstract class ModelConverter{
     }
 
     static public function genModelRolePermission(DiscordRolePermission $rolePermission): RolePermissions{
-        return new RolePermissions($rolePermission->bitwise);
+        return new RolePermissions((int)$rolePermission->bitwise);
     }
 
     static public function genModelRole(DiscordRole $discordRole): Role{
