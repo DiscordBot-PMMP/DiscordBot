@@ -92,11 +92,11 @@ abstract class ModelConverter{
         /** @var ?object{"join": string|null, "spectate": string|null, "match": string|null} $secrets */
         $secrets = $discordActivity->secrets;
         /** @var ActivityButton[] $buttons */
-        $buttons = ($discordActivity->buttons === null ? [] : array_map(fn($button) => new ActivityButton($button->label, $button->url ?? null), $discordActivity->buttons));
+        $buttons = ($discordActivity->buttons === null ? [] : array_map(fn($button) => new ActivityButton($button->label ?? "", $button->url ?? null), $discordActivity->buttons));
 
-        return new Activity($discordActivity->name, ActivityType::from($discordActivity->type), $discordActivity->url,
+        return new Activity($discordActivity->name, ActivityType::from($discordActivity->type), $discordActivity->url ?? null,
             $discordActivity->created_at?->getTimestamp(), $timestamps?->start ?? null, $timestamps?->end ?? null,
-            $discordActivity->application_id, $discordActivity->details, $discordActivity->state, $emoji,
+            $discordActivity->application_id, $discordActivity->details ?? null, $discordActivity->state ?? null, $emoji,
             $party?->id ?? null, ($party?->size ?? [])[0] ?? null, ($party?->size ?? [])[1] ?? null,
             $assets?->large_image ?? null, $assets?->large_text ?? null, $assets?->small_image ?? null,
             $assets?->small_text ?? null, $secrets?->join ?? null, $secrets?->spectate ?? null,
