@@ -53,9 +53,8 @@ class Emoji{
     //No support for create/update emoji.
 
     /** @param ?string[] $role_ids Role IDs */
-    public function __construct(?string $id = null, ?string $name = null, ?array $role_ids = null, ?string $user_id = null,
-                                ?bool $require_colons = null, ?bool $managed = null, ?bool $animated = null,
-                                ?bool $available = null){
+    public function __construct(?string $id, ?string $name, ?array $role_ids, ?string $user_id, ?bool $require_colons,
+                                ?bool $managed, ?bool $animated, ?bool $available){
         $this->setId($id);
         $this->setName($name);
         $this->setRoleIds($role_ids);
