@@ -10,12 +10,12 @@ Here are a list of plugins that provide user functionality:
 # Requirements
 
 ---
-| Name                 | Version |  Included in releases  |
-|----------------------|---------|:----------------------:|
-| PHP                  | ^ 8.0.3 |          [ ]           |
-| PocketMine-MP        | ^ 4.0   |          [ ]           |
-| DiscordPHP           | 6.0.3   |          [X]           |
-| Promise              | 2.x-dev |          [X]           |
+| Name          | Version | Included in releases |
+|---------------|---------|:--------------------:|
+| PHP           | ^ 8.1   |          ❌           |
+| PocketMine-MP | ^ 5.0   |          ❌           |
+| DiscordPHP    | 10.0.0  |          ✅           |
+| Promise       | 2.x     |          ✅           |
 # Installation
 
 ---
@@ -39,7 +39,7 @@ To see more information about the project via composer/packagist please see [her
 No support is given for users or developers running from source,
 I myself build the plugin into a phar before testing.
 
-If you do become an active contributor to the plugin I will help you setup efficient workflows to ease testing.
+If you do become an active contributor to the plugin I will help you set up efficient workflows to ease testing.
 
 # Credits
 
@@ -51,6 +51,5 @@ If you do become an active contributor to the plugin I will help you setup effic
 - [Discord-PHP/DiscordPHP](https://github.com/DiscordPHP/DiscordPHP) - Used internally to communicate with discord.
 - [ReactPHP/Promise](https://github.com/reactphp/promise) - Used to provide a promise API Library to developers.
 - [[Dev] PHPStan/PHPStan](https://github.com/phpstan/phpstan) - Used to analyse the plugins code for any potential problems.
-- [[Dev] PHPUnit/PHPUnit](https://github.com/sebastianbergmann/phpunit/) - Used to run tests to ensure everything is working as it should be.
 
 And many more sub-dependencies that allow the above to function.
