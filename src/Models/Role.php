@@ -51,10 +51,7 @@ class Role{
     /** Whether this role is mentionable */
     private bool $mentionable;
 
-    /**
-     * The tags this role has
-     * TODO Remember magic null behaviour.
-     */
+    /** The tags this role has */
     private ?RoleTags $tags;
 
     /**
@@ -120,9 +117,7 @@ class Role{
         return $this->colour;
     }
 
-    /**
-     * @param int $colour Hex [0x000000 - 0xFFFFFF]
-     */
+    /** @param int $colour Hex [0x000000 - 0xFFFFFF] */
     public function setColour(int $colour): void{
         if($colour < 0 or $colour > 0xFFFFFF){
             throw new \AssertionError("Colour '$colour' is outside the bounds 0x000000-0xFFFFFF.");
