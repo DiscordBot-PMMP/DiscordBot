@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Bot;
 use AssertionError;
 use Carbon\Carbon;
 use Discord\Parts\Channel\Channel as DiscordChannel;
+use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Channel\Overwrite as DiscordOverwrite;
 use Discord\Parts\Channel\Webhook as DiscordWebhook;
@@ -25,8 +26,8 @@ use Discord\Parts\Embed\Footer as DiscordFooter;
 use Discord\Parts\Embed\Image as DiscordImage;
 use Discord\Parts\Embed\Video as DiscordVideo;
 use Discord\Parts\Guild\Ban as DiscordBan;
+use Discord\Parts\Guild\Emoji as DiscordEmoji;
 use Discord\Parts\Guild\Guild as DiscordGuild;
-use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
 use Discord\Parts\User\Activity as DiscordActivity;
@@ -38,6 +39,7 @@ use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
+use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Guild\Guild;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
@@ -54,43 +56,51 @@ use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
 use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
+use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityButton;
+use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityType;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\VoiceState;
 use JaxkDev\DiscordBot\Models\Webhook;
+use JaxkDev\DiscordBot\Models\WebhookType;
 
 abstract class ModelConverter{
 
     static public function genModelVoiceState(DiscordVoiceStateUpdate $stateUpdate): VoiceState{
-        if($stateUpdate->guild_id === null){
-            throw new AssertionError("Not handling DM Voice states.");
-        }
-        return new VoiceState($stateUpdate->session_id, $stateUpdate->channel_id, $stateUpdate->deaf, $stateUpdate->mute,
-            $stateUpdate->self_deaf, $stateUpdate->self_mute, $stateUpdate->self_stream ?? false, $stateUpdate->self_video,
-            $stateUpdate->suppress);
+        return new VoiceState($stateUpdate->guild_id, $stateUpdate->channel_id ?? null, $stateUpdate->user_id,
+            $stateUpdate->session_id, $stateUpdate->deaf, $stateUpdate->mute, $stateUpdate->self_deaf,
+            $stateUpdate->self_mute, $stateUpdate->self_stream, $stateUpdate->self_video, $stateUpdate->suppress,
+            $stateUpdate->request_to_speak_timestamp?->getTimestamp());
     }
 
     static public function genModelWebhook(DiscordWebhook $webhook): Webhook{
-        return new Webhook($webhook->type, $webhook->channel_id, $webhook->name, $webhook->id, $webhook->user->id,
-            $webhook->avatar, $webhook->token);
+        return new Webhook(WebhookType::from($webhook->type), $webhook->id, $webhook->guild_id ?? null,
+            $webhook->channel_id ?? null, $webhook->user?->id, $webhook->name, $webhook->avatar, $webhook->token,
+            $webhook->application_id, $webhook->source_guild?->id ?? null,
+            $webhook->source_channel?->id ?? null);
     }
 
     static public function genModelActivity(DiscordActivity $discordActivity): Activity{
-        /** @var \stdClass{"end" => int|null, "start" => int|null} $timestamps */
+        /** @var ?object{end: int|null, start: int|null} $timestamps */
         $timestamps = $discordActivity->timestamps;
-        /** @var \stdClass{"id" => string|null, "size" => int[]|null} $party */
+        /** @var ?object{id: string|null, size: int[]|null} $party */
         $party = $discordActivity->party;
-        /** @var \stdClass{"large_image" => string|null, "large_text" => string|null, "small_image" => string|null, "small_text" => string|null} $assets */
+        /** @var ?object{"large_image": string|null, "large_text": string|null, "small_image": string|null, "small_text": string|null} $assets */
         $assets = $discordActivity->assets;
-        //** @var \stdClass{"join" => string|null, "spectate" => string|null, "match" => string|null} $secrets  TODO, Still cant confirm this. no one has any secrets so I cant see any valid data. */
-        //$secrets = $discordActivity->secrets;
-        return new Activity($discordActivity->name, $discordActivity->type, $discordActivity->created_at->getTimestamp(),
-            $discordActivity->url, $timestamps->start ?? null, $timestamps->end ?? null,
-            $discordActivity->application_id, $discordActivity->details, $discordActivity->state, $discordActivity->emoji,
-            $party->id ?? null, ($party->size ?? [])[0] ?? null,($party->size ?? [])[1] ?? null,
-            $assets->large_image ?? null, $assets->large_text ?? null, $assets->small_image ?? null,
-            $assets->small_text ?? null, /*$secrets->join ?? null, $secrets->spectate ?? null,
-            $secrets->match ?? null,*/ $discordActivity->instance, $discordActivity->flags);
+        /** @var ?Emoji $emoji */
+        $emoji = ($discordActivity->emoji === null ? null : self::genModelEmoji($discordActivity->emoji));
+        /** @var ?object{"join": string|null, "spectate": string|null, "match": string|null} $secrets */
+        $secrets = $discordActivity->secrets;
+        /** @var ActivityButton[] $buttons */
+        $buttons = ($discordActivity->buttons === null ? [] : array_map(fn($button) => new ActivityButton($button->label, $button->url ?? null), $discordActivity->buttons));
+
+        return new Activity($discordActivity->name, ActivityType::from($discordActivity->type), $discordActivity->url,
+            $discordActivity->created_at?->getTimestamp(), $timestamps?->start ?? null, $timestamps?->end ?? null,
+            $discordActivity->application_id, $discordActivity->details, $discordActivity->state, $emoji,
+            $party?->id ?? null, ($party?->size ?? [])[0] ?? null, ($party?->size ?? [])[1] ?? null,
+            $assets?->large_image ?? null, $assets?->large_text ?? null, $assets?->small_image ?? null,
+            $assets?->small_text ?? null, $secrets?->join ?? null, $secrets?->spectate ?? null,
+            $secrets?->match ?? null, $discordActivity->instance, $discordActivity->flags, $buttons);
     }
 
     static public function genModelMember(DiscordMember $discordMember): Member{
@@ -325,5 +335,14 @@ abstract class ModelConverter{
 
     static public function genModelBan(DiscordBan $ban): Ban{
         return new Ban($ban->guild_id, $ban->user_id, $ban->reason);
+    }
+
+    static public function genModelEmoji(DiscordEmoji $emoji): Emoji{
+        $roles = [];
+        foreach($emoji->roles as $role){
+            $roles[] = $role->id;
+        }
+        return new Emoji($emoji->id, $emoji->name, $roles, $emoji->user?->id, $emoji->require_colons, $emoji->managed,
+            $emoji->animated, $emoji->available);
     }
 }
