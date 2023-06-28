@@ -194,6 +194,7 @@ class Role{
     public function __serialize(): array{
         return [
             $this->id,
+            $this->guild_id,
             $this->name,
             $this->colour,
             $this->hoist,
@@ -210,6 +211,7 @@ class Role{
     public function __unserialize(array $data): void{
         [
             $this->id,
+            $this->guild_id,
             $this->name,
             $this->colour,
             $this->hoist,
