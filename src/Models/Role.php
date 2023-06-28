@@ -15,36 +15,71 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
+/** @link https://discord.com/developers/docs/topics/permissions#role-object */
 class Role{
 
-    /** null when creating model */
+    /** Role ID, never null unless you are sending a new createRole via API. */
     private ?string $id;
 
+    /** Role name */
     private string $name;
 
-    private RolePermissions $permissions;
-
+    /** Integer representation of hexadecimal color code  */
     private int $colour;
 
-    /** Is role hoisted on member list. */
-    private bool $hoisted;
+    /** If this role is pinned in the user listing */
+    private bool $hoist;
 
-    private int $hoisted_position;
+    /** Role icon  */
+    private ?string $icon;
 
+    /** Role unicode emoji */
+    private ?string $unicode_emoji;
+
+    /** Position of this role */
+    private int $position;
+
+    /** Permissions */
+    private RolePermissions $permissions;
+
+    /** Whether this role is managed by an integration */
+    private bool $managed;
+
+    /** Whether this role is mentionable */
     private bool $mentionable;
 
-    private string $guild_id;
+    /**
+     * The tags this role has
+     * TODO Remember magic null behaviour.
+     *
+     */
+    private ?RoleTags $tags;
 
-    public function __construct(string $name, int $colour, bool $hoisted, int $hoisted_position, bool $mentionable,
-                                string $guild_id, RolePermissions $permissions = null, ?string $id = null){
+    /**
+     * Required/possible parameters that can be specified when creating a new Role.
+     *
+     * @see Api::createRole()
+     */
+    public static function create(string $name, RolePermissions $permissions = new RolePermissions(0),
+                                  int $colour = 0, bool $hoist = false, ?string $icon = null,
+                                  ?string $unicode_emoji = null, bool $mentionable = false): self{
+        return new self(null, $name, $colour, $hoist, $icon, $unicode_emoji,
+            0, $permissions, false, $mentionable, null);
+    }
+
+    public function __construct(?string $id, string $name, int $colour, bool $hoist, ?string $icon, ?string $unicode_emoji,
+                                int $position, RolePermissions $permissions, bool $managed, bool $mentionable, ?RoleTags $tags){
+        $this->setId($id);
         $this->setName($name);
         $this->setColour($colour);
-        $this->setHoisted($hoisted);
-        $this->setHoistedPosition($hoisted_position);
+        $this->setHoist($hoist);
+        $this->setIcon($icon);
+        $this->setUnicodeEmoji($unicode_emoji);
+        $this->setPosition($position);
+        $this->setPermissions($permissions);
+        $this->setManaged($managed);
         $this->setMentionable($mentionable);
-        $this->setGuildId($guild_id);
-        $this->setPermissions($permissions??new RolePermissions(0));
-        $this->setId($id);
+        $this->setTags($tags);
     }
 
     public function getId(): ?string{
@@ -66,14 +101,6 @@ class Role{
         $this->name = $name;
     }
 
-    public function getPermissions(): RolePermissions{
-        return $this->permissions;
-    }
-
-    public function setPermissions(RolePermissions $permissions): void{
-        $this->permissions = $permissions;
-    }
-
     public function getColour(): int{
         return $this->colour;
     }
@@ -88,23 +115,55 @@ class Role{
         $this->colour = $colour;
     }
 
-    public function isHoisted(): bool{
-        return $this->hoisted;
+    public function getHoist(): bool{
+        return $this->hoist;
     }
 
-    public function setHoisted(bool $hoisted): void{
-        $this->hoisted = $hoisted;
+    public function setHoist(bool $hoist): void{
+        $this->hoist = $hoist;
     }
 
-    public function getHoistedPosition(): int{
-        return $this->hoisted_position;
+    public function getIcon(): ?string{
+        return $this->icon;
     }
 
-    public function setHoistedPosition(int $hoisted_position): void{
-        $this->hoisted_position = $hoisted_position;
+    public function setIcon(?string $icon): void{
+        $this->icon = $icon;
     }
 
-    public function isMentionable(): bool{
+    public function getUnicodeEmoji(): ?string{
+        return $this->unicode_emoji;
+    }
+
+    public function setUnicodeEmoji(?string $unicode_emoji): void{
+        $this->unicode_emoji = $unicode_emoji;
+    }
+
+    public function getPosition(): int{
+        return $this->position;
+    }
+
+    public function setPosition(int $position): void{
+        $this->position = $position;
+    }
+
+    public function getPermissions(): RolePermissions{
+        return $this->permissions;
+    }
+
+    public function setPermissions(RolePermissions $permissions): void{
+        $this->permissions = $permissions;
+    }
+
+    public function getManaged(): bool{
+        return $this->managed;
+    }
+
+    public function setManaged(bool $managed): void{
+        $this->managed = $managed;
+    }
+
+    public function getMentionable(): bool{
         return $this->mentionable;
     }
 
@@ -112,15 +171,12 @@ class Role{
         $this->mentionable = $mentionable;
     }
 
-    public function getGuildId(): string{
-        return $this->guild_id;
+    public function getTags(): ?RoleTags{
+        return $this->tags;
     }
 
-    public function setGuildId(string $guild_id): void{
-        if(!Utils::validDiscordSnowflake($guild_id)){
-            throw new \AssertionError("Guild ID '$guild_id' is invalid.");
-        }
-        $this->guild_id = $guild_id;
+    public function setTags(?RoleTags $tags): void{
+        $this->tags = $tags;
     }
 
     //----- Serialization -----//
@@ -130,11 +186,14 @@ class Role{
             $this->id,
             $this->name,
             $this->colour,
+            $this->hoist,
+            $this->icon,
+            $this->unicode_emoji,
+            $this->position,
             $this->permissions,
+            $this->managed,
             $this->mentionable,
-            $this->hoisted,
-            $this->hoisted_position,
-            $this->guild_id
+            $this->tags
         ];
     }
 
@@ -143,11 +202,14 @@ class Role{
             $this->id,
             $this->name,
             $this->colour,
+            $this->hoist,
+            $this->icon,
+            $this->unicode_emoji,
+            $this->position,
             $this->permissions,
+            $this->managed,
             $this->mentionable,
-            $this->hoisted,
-            $this->hoisted_position,
-            $this->guild_id
+            $this->tags
         ] = $data;
     }
 }
