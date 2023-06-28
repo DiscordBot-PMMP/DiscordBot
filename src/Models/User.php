@@ -92,7 +92,7 @@ class User{
      * The public flags on a user's account
      * @see User::FLAGS
      */
-    private ?int $public_flags_bitwise;
+    private int $public_flags_bitwise;
 
     /** @var Array<string, bool> */
     private array $public_flags = [];
@@ -115,7 +115,7 @@ class User{
         $this->setLocale($locale);
         $this->setFlagsBitwise($flags_bitwise, false);
         $this->setPremiumType($premium_type);
-        $this->setPublicFlagsBitwise($public_flags);
+        $this->setPublicFlagsBitwise($public_flags ?? 0, false);
     }
 
     public function getId(): string{
@@ -177,27 +177,27 @@ class User{
         $this->avatar = $avatar;
     }
 
-    public function getBot(): bool{
+    public function getBot(): ?bool{
         return $this->bot;
     }
 
-    public function setBot(bool $bot): void{
+    public function setBot(?bool $bot): void{
         $this->bot = $bot;
     }
 
-    public function getSystem(): bool{
+    public function getSystem(): ?bool{
         return $this->system;
     }
 
-    public function setSystem(bool $system): void{
+    public function setSystem(?bool $system): void{
         $this->system = $system;
     }
 
-    public function getMfaEnabled(): bool{
+    public function getMfaEnabled(): ?bool{
         return $this->mfa_enabled;
     }
 
-    public function setMfaEnabled(bool $mfa_enabled): void{
+    public function setMfaEnabled(?bool $mfa_enabled): void{
         $this->mfa_enabled = $mfa_enabled;
     }
 
@@ -326,7 +326,8 @@ class User{
     }
 
     /**
-     * @internal Using current flags_bitwise recalculate flags.
+     * Using current flags_bitwise recalculate flags.
+     * @internal
      */
     private function recalculateFlags(): void{
         $this->flags = [];
@@ -336,7 +337,8 @@ class User{
     }
 
     /**
-     * @internal Using current public_flags_bitwise recalculate flags.
+     * Using current public_flags_bitwise recalculate flags.
+     * @internal
      */
     private function recalculatePublicFlags(): void{
         $this->public_flags = [];
