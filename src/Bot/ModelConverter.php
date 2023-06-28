@@ -65,6 +65,9 @@ use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityButton;
 use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityType;
+use JaxkDev\DiscordBot\Models\Presence\ClientStatus;
+use JaxkDev\DiscordBot\Models\Presence\Presence;
+use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\RoleTags;
 use JaxkDev\DiscordBot\Models\User;
@@ -112,20 +115,32 @@ abstract class ModelConverter{
             $secrets?->match ?? null, $discordActivity->instance, $discordActivity->flags, $buttons);
     }
 
+    /**
+     * @link https://discord.com/developers/docs/topics/gateway-events#client-status-object
+     * @param object{desktop?: string, mobile?: string, web?: string} $clientStatus
+     * @return ClientStatus
+     */
+    static public function genModelClientStatus(object $clientStatus): ClientStatus{
+        return new ClientStatus(($clientStatus->desktop ?? null) === null ? Status::OFFLINE : Status::from($clientStatus->desktop),
+            ($clientStatus->mobile ?? null) === null ? Status::OFFLINE : Status::from($clientStatus->mobile),
+            ($clientStatus->web ?? null) === null ? Status::OFFLINE : Status::from($clientStatus->web));
+    }
+
     static public function genModelMember(DiscordMember $discordMember): Member{
-        $m = new Member($discordMember->id, $discordMember->joined_at === null ? 0 : $discordMember->joined_at->getTimestamp(),
-            $discordMember->guild_id, [], $discordMember->nick, $discordMember->premium_since === null ? null : $discordMember->premium_since->getTimestamp());
+        if($discordMember->guild_id === null){
+            throw new AssertionError("Guild id is null for member. (".$discordMember->serialize().")");
+        }
 
         /** @var DiscordRole|null $r */
-        $r = $discordMember->guild->roles->offsetGet($discordMember->guild_id);
+        $r = $discordMember->guild?->roles?->get("id", $discordMember->guild_id);
         if($r === null){
             throw new AssertionError("Everyone role not found for guild '".$discordMember->guild_id."'.");
         }
-        $bitwise = $r->permissions->bitwise; //Everyone perms.
+        $bitwise = (int)$r->permissions->bitwise; //Everyone perms.
         $roles = [];
 
         //O(2n) -> O(n) by using same loop for permissions to add roles.
-        if($discordMember->guild->owner_id === $discordMember->id){
+        if($discordMember->guild?->owner_id === $discordMember->id){
             $bitwise |= 0x8; // Add administrator permission
             foreach($discordMember->roles ?? [] as $role){
                 $roles[] = $role->id;
@@ -134,18 +149,34 @@ abstract class ModelConverter{
             /* @var DiscordRole */
             foreach($discordMember->roles ?? [] as $role){
                 $roles[] = $role->id;
-                $bitwise |= $role->permissions->bitwise;
+                $bitwise |= (int)$role->permissions->bitwise;
             }
         }
 
-        $m->setPermissions(new RolePermissions((($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0) ? 2147483647 : $bitwise));
-        $m->setRoles($roles);
-        return $m;
+        $presence = null;
+        if($discordMember->status !== null){
+            /** @var Activity[] $activities */
+            $activities = [];
+            foreach($discordMember->activities as $activity){
+                $activities[] = self::genModelActivity($activity);
+            }
+            $presence = new Presence(Status::from($discordMember->status), $activities,
+                $discordMember->client_status === null ? null : self::genModelClientStatus($discordMember->client_status));
+        }
+
+        $perms = new RolePermissions((($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0) ? 2147483647 : $bitwise);
+
+        //TODO, DiscordMember->flags is only available in v10-RC6+
+        return new Member($discordMember->guild_id, $discordMember->id, $discordMember->nick ?? null,
+            $discordMember->getAvatarAttribute(), $roles, $discordMember->joined_at?->getTimestamp(),
+            $discordMember->premium_since?->getTimestamp(), $discordMember->deaf, $discordMember->mute, 0/*$discordMember->flags*/,
+            $discordMember->pending ?? null, $perms, $discordMember->communication_disabled_until?->getTimestamp(), $presence);
     }
 
     //TODO, DiscordUser->global_name is only available in v10-RC6+
     static public function genModelUser(DiscordUser $user): User{
-        return new User($user->id, $user->username, $user->discriminator, null, $user->getAvatarAttribute(), $user->bot, $user->system,
+        $discriminator = ($user->discriminator === "0" ? "0000" : $user->discriminator); //Assume it got cast to int somewhere in lib.
+        return new User($user->id, $user->username, $discriminator, null, $user->getAvatarAttribute(), $user->bot, $user->system,
             $user->mfa_enabled, $user->banner ?? null, $user->accent_color ?? null, $user->locale, $user->flags ?? 0, UserPremiumType::from($user->premium_type ?? 0),
             $user->public_flags ?? 0);
     }
