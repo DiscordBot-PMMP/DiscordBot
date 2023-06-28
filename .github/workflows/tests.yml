@@ -61,5 +61,16 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: php composer.phar install --no-interaction
 
+      - name: Save Composer package cache
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        id: composer-cache-save
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            ~/.cache/composer/files
+            ~/.cache/composer/vcs
+            ./vendor
+          key: ${{ steps.composer-cache.outputs.cache-primary-key }}
+
       - name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-progress --memory-limit=2G --error-format=github
