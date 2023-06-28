@@ -19,16 +19,17 @@ use JaxkDev\DiscordBot\Plugin\Api;
 final class Activity{
 
     /** @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags */
-    public const
-        FLAG_INSTANCE = (1 << 0),
-        FLAG_JOIN = (1 << 1),
-        FLAG_SPECTATE = (1 << 2),
-        FLAG_JOIN_REQUEST = (1 << 3),
-        FLAG_SYNC = (1 << 4),
-        FLAG_PLAY = (1 << 5),
-        FLAG_PARTY_PRIVACY_FRIENDS = (1 << 6),
-        FLAG_PARTY_PRIVACY_VOICE_CHANNEL = (1 << 7),
-        FLAG_EMBEDDED = (1 << 8);
+    public const FLAGS = [
+        "INSTANCE" => (1 << 0),
+        "JOIN" => (1 << 1),
+        "SPECTATE" => (1 << 2),
+        "JOIN_REQUEST" => (1 << 3),
+        "SYNC" => (1 << 4),
+        "PLAY" => (1 << 5),
+        "PARTY_PRIVACY_FRIENDS" => (1 << 6),
+        "PARTY_PRIVACY_VOICE_CHANNEL" => (1 << 7),
+        "EMBEDDED" => (1 << 8)
+    ];
 
     /** Activity's Name */
     private string $name;
@@ -96,7 +97,13 @@ final class Activity{
      * @see Activity::FLAG_* constants
      * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags
      */
-    private ?int $flags;
+    private ?int $flags_bitwise;
+
+    /**
+     * All the flags possible and their current state, or null if no bitwise present.
+     * @var ?array<string, bool>
+     */
+    private ?array $flags;
 
     /**
      * Max 2 buttons.
@@ -143,7 +150,7 @@ final class Activity{
         $this->setSecretSpectate($secret_spectate);
         $this->setSecretMatch($secret_match);
         $this->setInstance($instance);
-        $this->setFlags($flags);
+        $this->setFlagsBitwise($flags);
         $this->setButtons($buttons);
     }
 
@@ -341,12 +348,60 @@ final class Activity{
         $this->instance = $instance;
     }
 
-    public function getFlags(): ?int{
+    public function getFlagsBitwise(): ?int{
+        return $this->flags_bitwise;
+    }
+
+    public function setFlagsBitwise(?int $flags_bitwise): void{
+        $this->flags_bitwise = $flags_bitwise;
+        if($flags_bitwise !== null){
+            $this->recalculateFlags();
+        }else{
+            $this->flags = null;
+        }
+    }
+
+    /**
+     * Array of flags and their state, or null if flags_bitwise is null.
+     * @return ?array<string, bool>
+     */
+    public function getFlags(): ?array{
+        if($this->flags === null and $this->flags_bitwise !== null){
+            $this->recalculateFlags();
+        }
         return $this->flags;
     }
 
-    public function setFlags(?int $flags): void{
-        $this->flags = $flags;
+    public function getFlag(string $flag): ?bool{
+        if($this->flags_bitwise !== null){
+            if($this->flags === null){
+                $this->recalculateFlags();
+            }
+            return $this->flags[$flag] ?? null;
+        }
+        return null;
+    }
+
+    public function setFlag(string $flag, bool $value): void{
+        if(!in_array($flag, array_keys(self::FLAGS), true)){
+            throw new \AssertionError("Invalid flag '{$flag}'.");
+        }
+
+        if($this->flags_bitwise === null){
+            $this->flags_bitwise = self::FLAGS[$flag] ?? 0;
+            $this->recalculateFlags();
+            return;
+        }
+
+        if($this->flags[$flag] !== $value){
+            $this->flags_bitwise ^= self::FLAGS[$flag];
+        }
+
+        if($this->flags !== null){
+            $this->flags[$flag] = $value;
+        }else{
+            $this->recalculateFlags();
+        }
     }
 
     /** @return ActivityButton[] */
@@ -365,6 +420,17 @@ final class Activity{
             }
         }
         $this->buttons = $buttons;
+    }
+
+    /**
+     * Recalculate the flags from the bitwise value.
+     * @internal
+     */
+    private function recalculateFlags(): void{
+        $this->flags = [];
+        foreach(self::FLAGS as $flag => $bitwise){
+            $this->flags[$flag] = ($this->flags_bitwise & $bitwise) !== 0;
+        }
     }
 
     //----- Serialization -----//
@@ -392,7 +458,7 @@ final class Activity{
             $this->secret_spectate,
             $this->secret_match,
             $this->instance,
-            $this->flags,
+            $this->flags_bitwise,
             $this->buttons
         ];
     }
@@ -420,7 +486,7 @@ final class Activity{
             $this->secret_spectate,
             $this->secret_match,
             $this->instance,
-            $this->flags,
+            $this->flags_bitwise,
             $this->buttons
         ] = $data;
     }
