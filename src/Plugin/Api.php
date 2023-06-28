@@ -55,6 +55,7 @@ use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Webhook;
+use JaxkDev\DiscordBot\Models\WebhookType;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /**
@@ -77,10 +78,10 @@ class Api{
      * @return PromiseInterface Resolves with a Webhook model.
      */
     public function createWebhook(Webhook $webhook): PromiseInterface{
-        if($webhook->getType() !== Webhook::TYPE_NORMAL){
-            return rejectPromise(new ApiRejection("Only normal webhooks can be created right now."));
+        if($webhook->getType() !== WebhookType::INCOMING){
+            return rejectPromise(new ApiRejection("Only Incoming Webhooks can be created."));
         }
-        if(!Utils::validDiscordSnowflake($webhook->getChannelId())){
+        if(!Utils::validDiscordSnowflake($webhook->getChannelId()??"")){
             return rejectPromise(new ApiRejection("Webhook channel ID is invalid."));
         }
         if($webhook->getId() !== null or $webhook->getToken() !== null){
@@ -97,8 +98,8 @@ class Api{
      * @return PromiseInterface Resolves with a Webhook model.
      */
     public function updateWebhook(Webhook $webhook): PromiseInterface{
-        if($webhook->getType() !== Webhook::TYPE_NORMAL){
-            return rejectPromise(new ApiRejection("Only normal webhooks can be edited right now."));
+        if($webhook->getType() !== WebhookType::INCOMING){
+            return rejectPromise(new ApiRejection("Only Incoming webhooks can be edited."));
         }
         if($webhook->getId() === null or $webhook->getToken() === null){
             return rejectPromise(new ApiRejection("Webhook does not have an ID/token, it cannot be edited before being created."));
