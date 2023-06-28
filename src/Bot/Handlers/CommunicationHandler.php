@@ -15,12 +15,12 @@ namespace JaxkDev\DiscordBot\Bot\Handlers;
 
 use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
+use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Channel\Overwrite as DiscordOverwrite;
 use Discord\Parts\Channel\Webhook as DiscordWebhook;
 use Discord\Parts\Embed\Embed as DiscordEmbed;
 use Discord\Parts\Guild\Guild as DiscordGuild;
-use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;

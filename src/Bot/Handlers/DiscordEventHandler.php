@@ -14,10 +14,10 @@ namespace JaxkDev\DiscordBot\Bot\Handlers;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Channel as DiscordChannel;
+use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Guild\Ban as DiscordBan;
 use Discord\Parts\Guild\Guild as DiscordGuild;
-use Discord\Parts\Guild\Invite as DiscordInvite;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
@@ -214,7 +214,7 @@ array(5) {
             $pk->addGuild(ModelConverter::genModelGuild($guild));
 
             /** @var DiscordMember|null $m */
-            $m = $guild->members->offsetGet($client->id);
+            $m = $guild->members->get("id", $client->id);
             if($m === null){
                 throw new \AssertionError("Client member not found in guild '$guild->id'.");
             }
@@ -489,14 +489,14 @@ array(5) {
         //No reason unless you freshen bans which is only possible with ban_members permission.
         $g = $ban->guild;
         /** @var DiscordMember|null $m */
-        $m = $g->members->offsetGet($discord->user->id);
+        $m = $g->members->get("id", $discord->user->id);
         if($m !== null and $m->getPermissions()->ban_members){
             //Get ban reason.
             /** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
             $g->bans->freshen()->done(function() use ($ban, $g){
                 //Got latest bans so we can fetch reason unless it was unbanned in like 0.01s
                 /** @var DiscordBan|null $b */
-                $b = $g->bans->offsetGet($ban->user_id);
+                $b = $g->bans->get("user_id", $ban->user_id);
                 if($b !== null){
                     $this->logger->debug("Successfully fetched bans, attached reason to new ban event.");
                     $packet = new BanAddPacket(ModelConverter::genModelBan($b));
@@ -535,7 +535,7 @@ array(5) {
         if($message->author->id === $this->client->getDiscordClient()->id) return false;
 
         // Other types of messages not used right now.
-        if($message->type !== DiscordMessage::TYPE_NORMAL and $message->type !== DiscordMessage::TYPE_REPLY) return false;
+        if($message->type !== DiscordMessage::TYPE_DEFAULT and $message->type !== DiscordMessage::TYPE_REPLY) return false;
         if(($message->content ?? "") === "" and $message->embeds->count() === 0 and sizeof($message->attachments) === 0) return false;
         // ^ Spotify/Games etc
 
