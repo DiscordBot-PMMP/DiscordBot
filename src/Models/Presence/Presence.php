@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Models\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Plugin\Api;
 
+/** A simple class to hold all presence data for members. */
 class Presence{
 
     /** Current status */
