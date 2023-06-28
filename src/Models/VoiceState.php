@@ -105,11 +105,11 @@ class VoiceState{
         $this->user_id = $user_id;
     }
 
-    public function getSessionId(): string{
+    public function getSessionId(): ?string{
         return $this->session_id;
     }
 
-    public function setSessionId(string $session_id): void{
+    public function setSessionId(?string $session_id): void{
         $this->session_id = $session_id;
     }
 
@@ -145,11 +145,11 @@ class VoiceState{
         $this->self_mute = $self_mute;
     }
 
-    public function getSelfStream(): bool{
+    public function getSelfStream(): ?bool{
         return $this->self_stream;
     }
 
-    public function setSelfStream(bool $self_stream): void{
+    public function setSelfStream(?bool $self_stream): void{
         $this->self_stream = $self_stream;
     }
 
@@ -169,13 +169,13 @@ class VoiceState{
         $this->suppress = $suppress;
     }
 
-    /** @return int UNIX Timestamp */
-    public function getRequestToSpeakTimestamp(): int{
+    /** @return ?int UNIX Timestamp */
+    public function getRequestToSpeakTimestamp(): ?int{
         return $this->request_to_speak_timestamp;
     }
 
-    /** @param int $request_to_speak_timestamp UNIX Timestamp */
-    public function setRequestToSpeakTimestamp(int $request_to_speak_timestamp): void{
+    /** @param ?int $request_to_speak_timestamp UNIX Timestamp */
+    public function setRequestToSpeakTimestamp(?int $request_to_speak_timestamp): void{
         $this->request_to_speak_timestamp = $request_to_speak_timestamp;
     }
 
