@@ -47,8 +47,6 @@ class Member{
     /** @var null|Activity[] */
     private ?array $activities;
 
-    private ?VoiceState $voice_state;
-
     /**
      * Member constructor.
      *
@@ -57,7 +55,7 @@ class Member{
      */
     public function __construct(string $user_id, int $join_timestamp, string $guild_id, array $roles = [],
                                 ?string $nickname = null, ?int $boost_timestamp = null, RolePermissions $permissions = null,
-                                ?array $activities = null, ?VoiceState $voice_state = null){
+                                ?array $activities = null){
         $this->setUserId($user_id);
         $this->setJoinTimestamp($join_timestamp);
         $this->setGuildId($guild_id);
@@ -66,7 +64,6 @@ class Member{
         $this->setBoostTimestamp($boost_timestamp);
         $this->setPermissions($permissions ?? new RolePermissions());
         $this->setActivities($activities);
-        $this->setVoiceState($voice_state);
     }
 
     /**
@@ -185,13 +182,6 @@ class Member{
         $this->activities = $activities;
     }
 
-    public function getVoiceState(): ?VoiceState{
-        return $this->voice_state;
-    }
-
-    public function setVoiceState(?VoiceState $voice_state): void{
-        $this->voice_state = $voice_state;
-    }
     //----- Serialization -----//
 
     public function __serialize(): array{
@@ -205,8 +195,7 @@ class Member{
             $this->guild_id,
             $this->status,
             $this->client_status,
-            $this->activities,
-            $this->voice_state
+            $this->activities
         ];
     }
 
@@ -221,8 +210,7 @@ class Member{
             $this->guild_id,
             $this->status,
             $this->client_status,
-            $this->activities,
-            $this->voice_state
+            $this->activities
         ] = $data;
     }
 }
