@@ -61,8 +61,9 @@ class ClientStatus{
 
     public function __unserialize(array $data): void{
         [
-            $this->label,
-            $this->url
+            $this->desktop,
+            $this->mobile,
+            $this->web
         ] = $data;
     }
 }
