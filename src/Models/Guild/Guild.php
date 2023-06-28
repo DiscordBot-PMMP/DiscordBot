@@ -184,6 +184,8 @@ class Guild{
     /** The id of the channel where admins and moderators of Community guilds receive safety alerts from Discord */
     private ?string $safety_alerts_channel_id;
 
+    //No create method. This is a read-update-only object, guilds cannot be created by my API.
+
     //Only ModelConverter should create this object, so we don't need to pad it out with defaults and make it look nice.
     public function __construct(string $id, string $name, ?string $icon, ?string $splash, ?string $discovery_splash,
         ?string $owner_id, ?string $afk_channel_id, int $afk_timeout, ?bool $widget_enabled, ?string $widget_channel_id,

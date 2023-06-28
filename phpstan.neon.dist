@@ -9,6 +9,7 @@ parameters:
         analyse:
             - vendor
             - src/Libs
+            - src/Bot
     bootstrapFiles:
         - test/phpstan/bootstrap.php
     checkMissingIterableValueType: false
