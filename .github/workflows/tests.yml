@@ -70,7 +70,7 @@ jobs:
             ~/.cache/composer/files
             ~/.cache/composer/vcs
             ./vendor
-          key: ${{ steps.composer-cache.outputs.cache-primary-key }}
+          key: "composer-v3-cache-${{ hashFiles('./composer.lock') }}"
 
       - name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-progress --memory-limit=2G --error-format=github
