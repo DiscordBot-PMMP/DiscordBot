@@ -35,6 +35,14 @@ class PresenceUpdated extends DiscordBotEvent{
         return $this->member;
     }
 
+    /**
+     * Alias, Member still has old presence at time of event.
+     * @see Member::getPresence()
+     */
+    public function getOldPresence(): ?Presence{
+        return $this->member->getPresence();
+    }
+
     public function getNewPresence(): Presence{
         return $this->new_presence;
     }
