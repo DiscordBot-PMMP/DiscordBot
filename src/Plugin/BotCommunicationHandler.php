@@ -45,9 +45,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution as ResolutionPacket;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
-use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
-use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityButton;
 use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityType;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
@@ -210,10 +208,9 @@ class BotCommunicationHandler{
         if($member === null){
             throw new \AssertionError("Member '{$packet->getMemberId()}' not found in storage.");
         }
-        (new PresenceUpdatedEvent($this->plugin, $member, $packet->getStatus(), $packet->getClientStatus(), $packet->getActivities()))->call();
-        $member->setStatus($packet->getStatus());
-        $member->setClientStatus($packet->getClientStatus());
-        $member->setActivities($packet->getActivities());
+        $presence = $packet->getPresence();
+        (new PresenceUpdatedEvent($this->plugin, $member, $presence))->call();
+        $member->setPresence($presence);
         Storage::updateMember($member);
     }
 

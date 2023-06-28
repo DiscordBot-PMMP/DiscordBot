@@ -55,6 +55,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
+use JaxkDev\DiscordBot\Models\Presence\ClientStatus;
+use JaxkDev\DiscordBot\Models\Presence\Presence;
+use JaxkDev\DiscordBot\Models\Presence\Status;
 use Monolog\Logger;
 
 class DiscordEventHandler{
@@ -312,17 +315,24 @@ array(5) {
     }
 
     public function onPresenceUpdate(DiscordPresenceUpdate $presenceUpdate): void{
-        $clientStatus = [
-            "desktop" => $presenceUpdate->client_status->desktop ?? null,
-            "mobile" => $presenceUpdate->client_status->mobile ?? null,
-            "web" => $presenceUpdate->client_status->web ?? null
-        ];
+        $clientStatus = null;
+        if($presenceUpdate->client_status !== null){
+            $clientStatus = new ClientStatus(
+                ($presenceUpdate->client_status->desktop ?? null) === null ? Status::OFFLINE : Status::from($presenceUpdate->client_status->desktop),
+                ($presenceUpdate->client_status->mobile ?? null) === null ? Status::OFFLINE : Status::from($presenceUpdate->client_status->mobile),
+                ($presenceUpdate->client_status->web ?? null) === null ? Status::OFFLINE : Status::from($presenceUpdate->client_status->web)
+            );
+        }
+
         $activities = [];
         foreach($presenceUpdate->activities as $activity){
             $activities[] = ModelConverter::genModelActivity($activity);
         }
-        $this->client->getThread()->writeOutboundData(new PresenceUpdatePacket($presenceUpdate->guild_id.".".$presenceUpdate->user->id,
-            $presenceUpdate->status, $clientStatus, $activities));
+
+        $presence = new Presence(Status::from($presenceUpdate->status), $activities, $clientStatus);
+        $this->client->getThread()->writeOutboundData(
+            new PresenceUpdatePacket($presenceUpdate->guild_id.".".$presenceUpdate->user->id, $presence)
+        );
     }
 
     public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
