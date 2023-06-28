@@ -90,7 +90,7 @@ abstract class Permissions{
         "send_voice_messages" => (1 << 46)
     ];
 
-    private int $bitwise = 0;
+    private int $bitwise;
 
     /** @var Array<string, bool> */
     private array $permissions = [];
@@ -103,8 +103,11 @@ abstract class Permissions{
         return $this->bitwise;
     }
 
-    public function setBitwise(int $bitwise): void{
+    public function setBitwise(int $bitwise, bool $recalculate = true): void{
         $this->bitwise = $bitwise;
+        if($recalculate){
+            $this->recalculatePermissions();
+        }
     }
 
     /**
@@ -112,21 +115,21 @@ abstract class Permissions{
      * @return Array<string, bool>
      */
     public function getPermissions(): array{
-        if(sizeof($this->permissions) === 0 and $this->bitwise > 0){
+        if(sizeof($this->permissions) === 0){
             $this->recalculatePermissions();
         }
         return $this->permissions;
     }
 
     public function getPermission(string $permission): ?bool{
-        if(sizeof($this->permissions) === 0 and $this->bitwise > 0){
+        if(sizeof($this->permissions) === 0){
             $this->recalculatePermissions();
         }
         return $this->permissions[$permission] ?? null;
     }
 
     public function setPermission(string $permission, bool $state = true): Permissions{
-        if(sizeof($this->permissions) === 0 and $this->bitwise > 0){
+        if(sizeof($this->permissions) === 0){
             $this->recalculatePermissions();
         }
         $permission = strtolower($permission);
