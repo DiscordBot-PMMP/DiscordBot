@@ -14,43 +14,41 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
+/** @link https://discord.com/developers/docs/resources/invite#invite-object */
 class Invite{
 
-    /** Also used as ID internally, null when creating model. */
+    /** Also used as ID internally, ONLY null when creating model. */
     private ?string $code;
 
-    private string $guild_id;
+    /** The guild this invite is for (if any) */
+    private ?string $guild_id;
 
+    /** The channel this invite is for */
     private string $channel_id;
 
-    /** How long in seconds from creation time to expire, 0 for never. */
-    private int $max_age;
+    /** The user (ID) who created the invite */
+    private ?string $inviter;
 
-    /** null when creating model. */
-    private ?int $created_at;
+    /** The type of target for this voice channel invite */
+    private ?InviteTargetType $target_type;
 
-    private bool $temporary;
+    /** The user (ID) whose stream to display for this voice channel stream invite */
+    private ?string $target_user;
 
-    /** NOTE, This does not get updated when used */
-    private int $uses;
+    /** The expiration date of this invite. (UNIX Timestamp) */
+    private ?int $expires_at;
 
-    /** 0 for unlimited uses */
-    private int $max_uses;
+    //TODO decide on objects: target_application, stage_instance, guild_scheduled_event
 
-    /** Member ID, null when creating model. */
-    private ?string $creator;
-
-    public function __construct(string $guild_id, string $channel_id, int $max_age, int $max_uses, bool $temporary,
-                                ?string $code = null, ?int $created_at = null, ?string $creator = null, int $uses = 0){
+    public function __construct(?string $code, ?string $guild_id, string $channel_id, ?string $inviter,
+                                ?InviteTargetType $target_type, ?string $target_user, ?int $expires_at){
+        $this->setCode($code);
         $this->setGuildId($guild_id);
         $this->setChannelId($channel_id);
-        $this->setMaxAge($max_age);
-        $this->setMaxUses($max_uses);
-        $this->setTemporary($temporary);
-        $this->setCode($code);
-        $this->setCreatedAt($created_at);
-        $this->setCreator($creator);
-        $this->setUses($uses);
+        $this->setInviter($inviter);
+        $this->setTargetType($target_type);
+        $this->setTargetUser($target_user);
+        $this->setExpiresAt($expires_at);
     }
 
     public function getCode(): ?string{
@@ -61,12 +59,12 @@ class Invite{
         $this->code = $code;
     }
 
-    public function getGuildId(): string{
+    public function getGuildId(): ?string{
         return $this->guild_id;
     }
 
-    public function setGuildId(string $guild_id): void{
-        if(!Utils::validDiscordSnowflake($guild_id)){
+    public function setGuildId(?string $guild_id): void{
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -83,65 +81,42 @@ class Invite{
         $this->channel_id = $channel_id;
     }
 
-    public function getMaxAge(): int{
-        return $this->max_age;
+    public function getInviter(): ?string{
+        return $this->inviter;
     }
 
-    /**  @param int $max_age 0 for eternity. */
-    public function setMaxAge(int $max_age): void{
-        if($max_age > 604800 or $max_age < 0){
-            throw new \AssertionError("Max age '$max_age' is outside bounds 0-604800.");
+    public function setInviter(?string $inviter): void{
+        if($inviter !== null && !Utils::validDiscordSnowflake($inviter)){
+            throw new \AssertionError("Inviter ID '$inviter' is invalid.");
         }
-        $this->max_age = $max_age;
+        $this->inviter = $inviter;
     }
 
-    public function getCreatedAt(): ?int{
-        return $this->created_at;
+    public function getTargetType(): ?InviteTargetType{
+        return $this->target_type;
     }
 
-    public function setCreatedAt(?int $created_at): void{
-        if($created_at !== null and $created_at > time()){
-            throw new \AssertionError("Time travel has been attempted, '$created_at' is in the future !");
+    public function setTargetType(?InviteTargetType $target_type): void{
+        $this->target_type = $target_type;
+    }
+
+    public function getTargetUser(): ?string{
+        return $this->target_user;
+    }
+
+    public function setTargetUser(?string $target_user): void{
+        if($target_user !== null && !Utils::validDiscordSnowflake($target_user)){
+            throw new \AssertionError("Target user ID '$target_user' is invalid.");
         }
-        $this->created_at = $created_at;
+        $this->target_user = $target_user;
     }
 
-    public function isTemporary(): bool{
-        return $this->temporary;
+    public function getExpiresAt(): ?int{
+        return $this->expires_at;
     }
 
-    public function setTemporary(bool $temporary): void{
-        $this->temporary = $temporary;
-    }
-
-    public function getUses(): int{
-        return $this->uses;
-    }
-
-    public function setUses(int $uses): void{
-        if($this->max_uses !== 0 and $uses > $this->max_uses){
-            throw new \AssertionError("Uses '$uses' is bigger than max uses '$this->max_uses'.");
-        }
-        $this->uses = $uses;
-    }
-
-    public function getMaxUses(): int{
-        return $this->max_uses;
-    }
-
-    public function setMaxUses(int $max_uses): void{
-        if($max_uses < 0 or $max_uses > 100){
-            throw new \AssertionError("Max uses '$max_uses' is outside the bounds 0-100.");
-        }
-        $this->max_uses = $max_uses;
-    }
-
-    public function getCreator(): ?string{
-        return $this->creator;
-    }
-
-    public function setCreator(?string $creator): void{
-        $this->creator = $creator;
+    public function setExpiresAt(?int $expires_at): void{
+        $this->expires_at = $expires_at;
     }
 
     //----- Serialization -----//
@@ -151,12 +126,10 @@ class Invite{
             $this->code,
             $this->guild_id,
             $this->channel_id,
-            $this->max_age,
-            $this->created_at,
-            $this->temporary,
-            $this->uses,
-            $this->max_uses,
-            $this->creator
+            $this->inviter,
+            $this->target_type,
+            $this->target_user,
+            $this->expires_at
         ];
     }
 
@@ -165,12 +138,10 @@ class Invite{
             $this->code,
             $this->guild_id,
             $this->channel_id,
-            $this->max_age,
-            $this->created_at,
-            $this->temporary,
-            $this->uses,
-            $this->max_uses,
-            $this->creator
+            $this->inviter,
+            $this->target_type,
+            $this->target_user,
+            $this->expires_at
         ] = $data;
     }
 }
