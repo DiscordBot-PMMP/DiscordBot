@@ -21,6 +21,9 @@ class Role{
     /** Role ID, never null unless you are sending a new createRole via API. */
     private ?string $id;
 
+    /** The guild this role is part of, used for internal mapping. */
+    private string $guild_id;
+
     /** Role name */
     private string $name;
 
@@ -51,7 +54,6 @@ class Role{
     /**
      * The tags this role has
      * TODO Remember magic null behaviour.
-     *
      */
     private ?RoleTags $tags;
 
@@ -60,16 +62,18 @@ class Role{
      *
      * @see Api::createRole()
      */
-    public static function create(string $name, RolePermissions $permissions = new RolePermissions(0),
+    public static function create(string $guild_id, string $name, RolePermissions $permissions = null,
                                   int $colour = 0, bool $hoist = false, ?string $icon = null,
                                   ?string $unicode_emoji = null, bool $mentionable = false): self{
-        return new self(null, $name, $colour, $hoist, $icon, $unicode_emoji,
-            0, $permissions, false, $mentionable, null);
+        return new self(null, $guild_id, $name, $colour, $hoist, $icon, $unicode_emoji,
+            0, $permissions ?? new RolePermissions(0), false, $mentionable, null);
     }
 
-    public function __construct(?string $id, string $name, int $colour, bool $hoist, ?string $icon, ?string $unicode_emoji,
-                                int $position, RolePermissions $permissions, bool $managed, bool $mentionable, ?RoleTags $tags){
+    public function __construct(?string $id, string $guild_id, string $name, int $colour, bool $hoist, ?string $icon,
+                                ?string $unicode_emoji, int $position, RolePermissions $permissions, bool $managed,
+                                bool $mentionable, ?RoleTags $tags){
         $this->setId($id);
+        $this->setGuildId($guild_id);
         $this->setName($name);
         $this->setColour($colour);
         $this->setHoist($hoist);
@@ -91,6 +95,17 @@ class Role{
             throw new \AssertionError("Role ID '$id' is invalid.");
         }
         $this->id = $id;
+    }
+
+    public function getGuildId(): string{
+        return $this->guild_id;
+    }
+
+    public function setGuildId(string $guild_id): void{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Guild ID '$guild_id' is invalid.");
+        }
+        $this->guild_id = $guild_id;
     }
 
     public function getName(): string{
