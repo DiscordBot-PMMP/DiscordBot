@@ -113,7 +113,7 @@ class User{
         $this->setBanner($banner);
         $this->setAccentColour($accent_colour);
         $this->setLocale($locale);
-        $this->setFlagsBitwise($flags_bitwise);
+        $this->setFlagsBitwise($flags_bitwise, false);
         $this->setPremiumType($premium_type);
         $this->setPublicFlagsBitwise($public_flags);
     }

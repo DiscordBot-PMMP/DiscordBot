@@ -96,7 +96,7 @@ abstract class Permissions{
     private array $permissions = [];
 
     public function __construct(int $bitwise = 0){
-        $this->setBitwise($bitwise);
+        $this->setBitwise($bitwise, false);
     }
 
     public function getBitwise(): int{
