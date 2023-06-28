@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Models\Activity;
+namespace JaxkDev\DiscordBot\Models\Presence\Activity;
 
 /** @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons */
 class ActivityButton{
