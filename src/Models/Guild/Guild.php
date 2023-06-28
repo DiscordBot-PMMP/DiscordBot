@@ -17,7 +17,10 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 /** @link https://discord.com/developers/docs/resources/guild#guild-resource */
 class Guild{
 
-    /** @link https://discord.com/developers/docs/resources/guild#guild-object-system-channel-flags */
+    /**
+     * @link https://discord.com/developers/docs/resources/guild#guild-object-system-channel-flags
+     * @var array<string, int>
+     */
     public const SYSTEM_FLAGS = [
         "SUPPRESS_JOIN_NOTIFICATIONS" => (1 << 0),
         "SUPPRESS_PREMIUM_SUBSCRIPTIONS" => (1 << 1),
