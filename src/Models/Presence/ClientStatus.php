@@ -18,8 +18,8 @@ class ClientStatus{
     private Status $mobile;
     private Status $web;
 
-    public function __construct(Status $desktop = Status::STATUS_OFFLINE, Status $mobile = Status::STATUS_OFFLINE,
-                                Status $web = Status::STATUS_OFFLINE){
+    public function __construct(Status $desktop = Status::OFFLINE, Status $mobile = Status::OFFLINE,
+                                Status $web = Status::OFFLINE){
         $this->setDesktop($desktop);
         $this->setMobile($mobile);
         $this->setWeb($web);

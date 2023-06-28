@@ -14,8 +14,8 @@ namespace JaxkDev\DiscordBot\Models\Presence;
 
 enum Status: string{
 
-    case STATUS_ONLINE = "online";
-    case STATUS_IDLE = "idle";
-    case STATUS_DND = "dnd";
-    case STATUS_OFFLINE = "offline";
+    case ONLINE = "online";
+    case IDLE = "idle";
+    case DND = "dnd";
+    case OFFLINE = "offline";
 }

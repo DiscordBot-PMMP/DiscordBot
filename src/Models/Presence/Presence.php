@@ -35,7 +35,7 @@ class Presence{
      *
      * @see Api::updateBotPresence() To update bots presence.
      */
-    public static function create(Status $status = Status::STATUS_ONLINE, Activity $activity = null): self{
+    public static function create(Status $status = Status::ONLINE, Activity $activity = null): self{
         return new self($status, $activity === null ? [] : [$activity], null);
     }
 

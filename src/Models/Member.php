@@ -49,7 +49,7 @@ class Member{
     private array $roles;
 
     /** When the user joined the guild (UNIX Timestamp) */
-    private int $join_timestamp;
+    private ?int $join_timestamp;
 
     /** When the user started boosting the guild (UNIX Timestamp) */
     private ?int $premium_since;
@@ -91,7 +91,7 @@ class Member{
 
     /** @param string[] $roles */
     public function __construct(string $guild_id, string $user_id, ?string $nickname, ?string $avatar, array $roles,
-                                int $join_timestamp, ?int $premium_since, bool $deaf, bool $mute, int $flags,
+                                ?int $join_timestamp, ?int $premium_since, bool $deaf, bool $mute, int $flags,
                                 ?bool $pending, RolePermissions $permissions, ?int $communications_disabled_until,
                                 ?Presence $presence){
         $this->setGuildId($guild_id);
@@ -172,11 +172,11 @@ class Member{
         $this->roles = $roles;
     }
 
-    public function getJoinTimestamp(): int{
+    public function getJoinTimestamp(): ?int{
         return $this->join_timestamp;
     }
 
-    public function setJoinTimestamp(int $join_timestamp): void{
+    public function setJoinTimestamp(?int $join_timestamp): void{
         $this->join_timestamp = $join_timestamp;
     }
 
