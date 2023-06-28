@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models\Guild;
 
+use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/resources/guild#guild-resource */
@@ -107,7 +108,7 @@ class Guild{
      * Custom guild emojis
      * @var Emoji[]
      */
-    //private array $emojis; TODO Emoji class
+    private array $emojis;
 
     /**
      * @link https://discord.com/developers/docs/resources/guild#guild-object-guild-features
@@ -116,7 +117,7 @@ class Guild{
     private array $features;
 
     /** Required MFA level for the guild */
-    private MFALevel $mfa_level;
+    private MfaLevel $mfa_level;
 
     /** Application id of the guild creator if it is bot-created */
     private ?string $application_id;
@@ -173,9 +174,9 @@ class Guild{
     //private $welcome_screen;
 
     /** The NSFW level of the guild */
-    private NSFWLevel $nsfw_level;
+    private NsfwLevel $nsfw_level;
 
-    /**
+    /*
      * Custom guild stickers
      * @var Sticker[]
      */
@@ -190,15 +191,15 @@ class Guild{
     //No create method. This is a read-update-only object, guilds cannot be created by my API.
 
     //Only ModelConverter should create this object, so we don't need to pad it out with defaults and make it look nice.
-    public function __construct(string $id, string $name, ?string $icon, ?string $splash, ?string $discovery_splash,
-        ?string $owner_id, ?string $afk_channel_id, int $afk_timeout, ?bool $widget_enabled, ?string $widget_channel_id,
-        VerificationLevel $verification_level, DefaultMessageNotificationLevel $default_message_notifications,
-        ExplicitContentFilterLevel $explicit_content_filter, array $emojis, array $features, MFALevel $mfa_level,
-        ?string $application_id, ?string $system_channel_id, int $system_channel_flags, ?string $rules_channel_id,
-        ?int $max_presences, ?int $max_members, ?string $vanity_url_code, ?string $description, ?string $banner,
-        PremiumTier $premium_tier, ?int $premium_subscription_count, string $preferred_locale,
-        ?string $public_updates_channel_id, ?int $max_video_channel_users, ?int $max_stage_video_channel_users,
-        NSFWLevel $nsfw_level, array $stickers, bool $premium_progress_bar_enabled, ?string $safety_alerts_channel_id
+    public function __construct(string                     $id, string $name, ?string $icon, ?string $splash, ?string $discovery_splash,
+                                ?string                    $owner_id, ?string $afk_channel_id, int $afk_timeout, ?bool $widget_enabled, ?string $widget_channel_id,
+                                VerificationLevel          $verification_level, DefaultMessageNotificationLevel $default_message_notifications,
+                                ExplicitContentFilterLevel $explicit_content_filter, array $emojis, array $features, MfaLevel $mfa_level,
+                                ?string                    $application_id, ?string $system_channel_id, int $system_channel_flags, ?string $rules_channel_id,
+                                ?int                       $max_presences, ?int $max_members, ?string $vanity_url_code, ?string $description, ?string $banner,
+                                PremiumTier                $premium_tier, ?int $premium_subscription_count, string $preferred_locale,
+                                ?string                    $public_updates_channel_id, ?int $max_video_channel_users, ?int $max_stage_video_channel_users,
+                                NsfwLevel                  $nsfw_level, /*array $stickers,*/ bool $premium_progress_bar_enabled, ?string $safety_alerts_channel_id
     ){
         $this->setId($id);
         $this->setName($name);
@@ -213,9 +214,9 @@ class Guild{
         $this->setVerificationLevel($verification_level);
         $this->setDefaultMessageNotifications($default_message_notifications);
         $this->setExplicitContentFilter($explicit_content_filter);
-        //$this->setEmojis($emojis);
+        $this->setEmojis($emojis);
         $this->setFeatures($features);
-        $this->setMFALevel($mfa_level);
+        $this->setMfaLevel($mfa_level);
         $this->setApplicationId($application_id);
         $this->setSystemChannelId($system_channel_id);
         $this->setSystemChannelFlags($system_channel_flags);
@@ -231,7 +232,7 @@ class Guild{
         $this->setPublicUpdatesChannelId($public_updates_channel_id);
         $this->setMaxVideoChannelUsers($max_video_channel_users);
         $this->setMaxStageVideoChannelUsers($max_stage_video_channel_users);
-        $this->setNSFWLevel($nsfw_level);
+        $this->setNsfwLevel($nsfw_level);
         //$this->setStickers($stickers);
         $this->setPremiumProgressBarEnabled($premium_progress_bar_enabled);
         $this->setSafetyAlertsChannelId($safety_alerts_channel_id);
@@ -332,6 +333,21 @@ class Guild{
         $this->widget_channel_id = $widget_channel_id;
     }
 
+    /** @return Emoji[] */
+    public function getEmojis(): array{
+        return $this->emojis;
+    }
+
+    /** @param Emoji[] $emojis */
+    public function setEmojis(array $emojis): void{
+        foreach($emojis as $emoji){
+            if(!($emoji instanceof Emoji)){
+                throw new \TypeError("All emojis must be instances of Emoji.");
+            }
+        }
+        $this->emojis = $emojis;
+    }
+
     public function getVerificationLevel(): VerificationLevel{
         return $this->verification_level;
     }
@@ -385,11 +401,11 @@ class Guild{
         $this->features = $features;
     }
 
-    public function getMFALevel(): MFALevel{
+    public function getMfaLevel(): MfaLevel{
         return $this->mfa_level;
     }
 
-    public function setMFALevel(MFALevel $mfa_level): void{
+    public function setMfaLevel(MfaLevel $mfa_level): void{
         $this->mfa_level = $mfa_level;
     }
 
@@ -542,11 +558,11 @@ class Guild{
         $this->max_stage_video_channel_users = $max_stage_video_channel_users;
     }
 
-    public function getNSFWLevel(): NSFWLevel{
+    public function getNsfwLevel(): NsfwLevel{
         return $this->nsfw_level;
     }
 
-    public function setNSFWLevel(NSFWLevel $nsfw_level): void{
+    public function setNsfwLevel(NsfwLevel $nsfw_level): void{
         $this->nsfw_level = $nsfw_level;
     }
 
@@ -586,7 +602,7 @@ class Guild{
             $this->verification_level,
             $this->default_message_notifications,
             $this->explicit_content_filter,
-            //$this->emojis,
+            $this->emojis,
             $this->features,
             $this->mfa_level,
             $this->application_id,
@@ -626,7 +642,7 @@ class Guild{
             $this->verification_level,
             $this->default_message_notifications,
             $this->explicit_content_filter,
-            //$this->emojis,
+            $this->emojis,
             $this->features,
             $this->mfa_level,
             $this->application_id,

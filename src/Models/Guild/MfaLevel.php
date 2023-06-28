@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Guild;
 
 /** @link https://discord.com/developers/docs/resources/guild#guild-object-mfa-level */
-enum MFALevel: int{
+enum MfaLevel: int{
 
     /** Guild has no MFA/2FA requirement for moderation actions */
     case NONE = 0;

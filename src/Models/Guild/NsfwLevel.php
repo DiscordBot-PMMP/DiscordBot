@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Guild;
 
 /** @link https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level */
-enum NSFWLevel: int{
+enum NsfwLevel: int{
 
     case DEFAULT = 0;
     case EXPLICIT = 1;
