@@ -111,8 +111,8 @@ abstract class Permissions{
     }
 
     /**
-     * Returns all the permissions possible and the current state, or an empty array if not initialised.
-     * @return Array<string, bool>
+     * Returns all the permissions possible and their current state.
+     * @return array<string, bool>
      */
     public function getPermissions(): array{
         if(sizeof($this->permissions) === 0){
@@ -128,7 +128,7 @@ abstract class Permissions{
         return $this->permissions[$permission] ?? null;
     }
 
-    public function setPermission(string $permission, bool $state = true): Permissions{
+    public function setPermission(string $permission, bool $state = true): void{
         if(sizeof($this->permissions) === 0){
             $this->recalculatePermissions();
         }
@@ -139,10 +139,10 @@ abstract class Permissions{
             throw new \AssertionError("Invalid permission '{$permission}' for a '".get_parent_class($this)."'");
         }
 
-        if($this->permissions[$permission] === $state) return $this;
+        if($this->permissions[$permission] === $state) return;
         $this->permissions[$permission] = $state;
         $this->bitwise ^= $posPermissions[$permission];
-        return $this;
+        return;
     }
 
     /**
@@ -157,7 +157,7 @@ abstract class Permissions{
     }
 
     /**
-     * @return Array<string, int>
+     * @return array<string, int>
      */
     abstract static function getPossiblePermissions(): array;
 
