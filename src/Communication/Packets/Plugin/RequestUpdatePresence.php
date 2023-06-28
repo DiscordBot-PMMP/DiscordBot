@@ -13,41 +13,32 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
+use JaxkDev\DiscordBot\Models\Presence\Presence;
 
 class RequestUpdatePresence extends Packet{
 
-    private Activity $activity;
+    private Presence $presence;
 
-    private string $status;
-
-    public function __construct(Activity $activity, string $status){
+    public function __construct(Presence $presence){
         parent::__construct();
-        $this->activity = $activity;
-        $this->status = $status;
+        $this->presence = $presence;
     }
 
-    public function getActivity(): Activity{
-        return $this->activity;
-    }
-
-    public function getStatus(): string{
-        return $this->status;
+    public function getPresence(): Presence{
+        return $this->presence;
     }
 
     public function __serialize(): array{
         return [
             $this->UID,
-            $this->activity,
-            $this->status
+            $this->presence
         ];
     }
 
     public function __unserialize(array $data): void{
         [
             $this->UID,
-            $this->activity,
-            $this->status
+            $this->presence
         ] = $data;
     }
 }

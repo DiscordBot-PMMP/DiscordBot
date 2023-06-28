@@ -52,6 +52,7 @@ use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
+use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Webhook;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
@@ -388,14 +389,12 @@ class Api{
     /**
      * Sends a new presence to replace the current one the bot has.
      *
-     * @param string $status See Member::STATUS_ constants.
+     * @see Presence::create()
+     * @param Presence $presence
      * @return PromiseInterface Resolves with no data.
      */
-    public function updateBotPresence(Activity $activity, string $status = Member::STATUS_ONLINE): PromiseInterface{
-        if(!in_array($status, [Member::STATUS_ONLINE, Member::STATUS_IDLE, Member::STATUS_OFFLINE, Member::STATUS_DND], true)){
-            return rejectPromise(new ApiRejection("Invalid status '$status'."));
-        }
-        $pk = new RequestUpdatePresence($activity, $status);
+    public function updateBotPresence(Presence $presence): PromiseInterface{
+        $pk = new RequestUpdatePresence($presence);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

@@ -70,6 +70,7 @@ use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Reply;
+use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Plugin\ApiRejection;
 use Monolog\Logger;
@@ -611,14 +612,19 @@ class CommunicationHandler{
     }
 
     private function handleUpdatePresence(RequestUpdatePresence $pk): void{
-        $activity = $pk->getActivity();
-        $presence = new DiscordActivity($this->client->getDiscordClient(), [
-            'name' => $activity->getName(),
-            'type' => $activity->getType()
-        ]);
+        $presence = $pk->getPresence();
+        $activity = $presence->getActivities()[0] ?? null;
+        $dactivity = null;
+        if($activity !== null){
+            $dactivity = new DiscordActivity($this->client->getDiscordClient(), [
+                'name' => $activity->getName(),
+                'type' => $activity->getType()->value,
+                'url' => $activity->getUrl()
+            ]);
+        }
 
         try{
-            $this->client->getDiscordClient()->updatePresence($presence, $pk->getStatus() === Member::STATUS_IDLE, $pk->getStatus());
+            $this->client->getDiscordClient()->updatePresence($dactivity, $presence->getStatus() === Status::IDLE, $presence->getStatus()->value);
             $this->resolveRequest($pk->getUID());
         }catch (\Throwable $e){
             $this->resolveRequest($pk->getUID(), false, $e->getMessage());

@@ -47,6 +47,10 @@ use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
+use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityButton;
+use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityType;
+use JaxkDev\DiscordBot\Models\Presence\Presence;
+use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Plugin\Events\BanCreated as BanCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\BanDeleted as BanDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelDeleted as ChannelDeletedEvent;
@@ -132,8 +136,10 @@ class BotCommunicationHandler{
     private function handleReady(): void{
         //TODO Move default activity text to event.
         //Default activity, Feel free to change activity after ReadyEvent.
-        $ac = new Activity(VersionInfo::NAME." v".VersionInfo::BASE_VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION, Activity::TYPE_PLAYING);
-        $this->plugin->getApi()->updateBotPresence($ac, Member::STATUS_IDLE)->otherwise(function(ApiRejection $a){
+        $ac = Activity::create(VersionInfo::NAME." v".VersionInfo::BASE_VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION, ActivityType::GAME, "https://github/com");
+        $pc = Presence::create(Status::ONLINE, $ac);
+
+        $this->plugin->getApi()->updateBotPresence($pc)->otherwise(function(ApiRejection $a){
             $this->plugin->getLogger()->logException($a);
         });
 
