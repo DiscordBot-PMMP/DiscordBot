@@ -18,6 +18,7 @@ use JaxkDev\DiscordBot\Models\VoiceState;
 class VoiceStateUpdate extends Packet{
 
     public const ID = 62;
+
     private string $member_id;
 
     private VoiceState $voice_state;

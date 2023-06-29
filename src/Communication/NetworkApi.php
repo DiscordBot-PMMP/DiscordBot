@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication;
 
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordClose;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanRemove;
@@ -73,15 +74,19 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdatePresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
+use JaxkDev\DiscordBot\Communication\Packets\Verify;
 
 class NetworkApi{
 
+    //Version will change for any breaking changes to:
+    //Models, Packets, Magic.
     public const VERSION = 1;
+    public const MAGIC = 0x4a61786b446576; //JaxkDev :)
 
     //Map all packets to their ID.
     /** @var array<int, class-string>  */
     public const PACKETS = [
-        //Starts at 1
+        Verify::ID => Verify::class,
         Heartbeat::ID => Heartbeat::class,
         Resolution::ID => Resolution::class,
         RequestAddReaction::ID => RequestAddReaction::class,
@@ -143,6 +148,8 @@ class NetworkApi{
         RoleDelete::ID => RoleDelete::class,
         RoleUpdate::ID => RoleUpdate::class,
         VoiceStateUpdate::ID => VoiceStateUpdate::class,
+        DiscordClose::ID => DiscordClose::class,
+        //64 Next ID
     ];
 
     /**

@@ -1,15 +1,22 @@
 ---
-version: 3
+version: 4
 
-discord:
-  token: "Long Token here."
-  use_plugin_cacert: true
+token: "Long Discord Token here."
 
 logging:
   max_files: 28
   directory: "logs"
 
 protocol:
-  packets_per_tick: 50
-  heartbeat_allowance: 60
+  general:
+    packets_per_tick: 50
+    heartbeat_allowance: 60
+
+  internal:
+    use_plugin_cacert: true
+
+  external:
+    host: "0.0.0.0"
+    port: 22222
+
 ...

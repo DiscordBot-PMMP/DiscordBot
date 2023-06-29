@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
+use JaxkDev\DiscordBot\Communication\ExternalThread;
 use JaxkDev\DiscordBot\Communication\InternalThread;
 use JaxkDev\DiscordBot\Communication\NetworkApi;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
@@ -73,11 +74,6 @@ class Main extends PluginBase{
 
     protected function onEnable(): void{
         if(!$this->loadConfig()) return;
-        if(is_file($this->getDataFolder()."events.yml")){
-            // Don't delete file, DiscordChat will transfer it then delete it.
-            $this->getLogger()->alert("DiscordBot v1 events.yml file found, please note this has been stripped out of ".
-                "the DiscordBot core, see https://github.com/DiscordBot-PMMP/DiscordChat for similar features.");
-        }
 
         /** @noinspection PhpUndefinedFunctionInspection xdebug_info */
         if(extension_loaded("xdebug") and (!function_exists('xdebug_info') || count(xdebug_info('mode')) !== 0)){
@@ -88,6 +84,11 @@ class Main extends PluginBase{
         $this->communicationHandler = new BotCommunicationHandler($this);
 
         $this->getLogger()->debug("Starting DiscordBot Thread...");
+/*
+        $this->externalThread = new ExternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
+        $this->externalThread->start(Thread::INHERIT_CONSTANTS);
+        return;
+*/
         $this->discordBot = new InternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
         $this->discordBot->start(Thread::INHERIT_CONSTANTS);
 
@@ -148,11 +149,12 @@ class Main extends PluginBase{
         }
 
         if(intval($config["version"]) !== ConfigUtils::VERSION){
-            $this->getLogger()->info("Updating your config from v".intval($config["version"])." to v".ConfigUtils::VERSION);
+            $oldVersion = $config["version"];
+            $this->getLogger()->info("Updating your config from v".$oldVersion." to v".ConfigUtils::VERSION);
             ConfigUtils::update($config);
-            rename($this->getDataFolder()."config.yml", $this->getDataFolder()."config.yml.old");
+            rename($this->getDataFolder()."config.yml", $this->getDataFolder()."config-v".$oldVersion.".yml.old");
             yaml_emit_file($this->getDataFolder()."config.yml", $config);
-            $this->getLogger()->info("Config updated, old config was saved to '{$this->getDataFolder()}config.yml.old'");
+            $this->getLogger()->info("Config updated, old config was saved to '{$this->getDataFolder()}config-v{$oldVersion}.yml.old'");
         }
 
         $this->getLogger()->debug("Verifying config...");
