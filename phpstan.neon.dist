@@ -1,5 +1,6 @@
 includes:
     - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
 
 parameters:
     level: max
@@ -9,8 +10,6 @@ parameters:
         analyse:
             - vendor
             - src/Libs
-            - src/Bot
-            - src/Plugin
     bootstrapFiles:
         - test/phpstan/bootstrap.php
     checkMissingIterableValueType: false
