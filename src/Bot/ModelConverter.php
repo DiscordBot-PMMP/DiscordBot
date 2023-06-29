@@ -166,17 +166,15 @@ abstract class ModelConverter{
 
         $perms = new RolePermissions((($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0) ? 2147483647 : $bitwise);
 
-        //TODO, DiscordMember->flags is only available in v10-RC6+
         return new Member($discordMember->guild_id, $discordMember->id, $discordMember->nick ?? null,
             $discordMember->getAvatarAttribute(), $roles, $discordMember->joined_at?->getTimestamp(),
-            $discordMember->premium_since?->getTimestamp(), $discordMember->deaf, $discordMember->mute, 0/*$discordMember->flags*/,
+            $discordMember->premium_since?->getTimestamp(), $discordMember->deaf, $discordMember->mute, $discordMember->flags,
             $discordMember->pending ?? null, $perms, $discordMember->communication_disabled_until?->getTimestamp(), $presence);
     }
 
-    //TODO, DiscordUser->global_name is only available in v10-RC6+
     static public function genModelUser(DiscordUser $user): User{
         $discriminator = ($user->discriminator === "0" ? "0000" : $user->discriminator); //Assume it got cast to int somewhere in lib.
-        return new User($user->id, $user->username, $discriminator, null, $user->getAvatarAttribute(), $user->bot, $user->system,
+        return new User($user->id, $user->username, $discriminator, $user->global_name, $user->getAvatarAttribute(), $user->bot, $user->system,
             $user->mfa_enabled, $user->banner ?? null, $user->accent_color ?? null, $user->locale, $user->flags ?? 0, UserPremiumType::from($user->premium_type ?? 0),
             $user->public_flags ?? 0);
     }
