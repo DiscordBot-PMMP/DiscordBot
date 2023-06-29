@@ -16,14 +16,16 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestAddReaction extends Packet{
 
+    public const ID = 3;
+
     private string $channel_id;
 
     private string $message_id;
 
     private string $emoji;
 
-    public function __construct(string $channel_id, string $message_id, string $emoji){
-        parent::__construct();
+    public function __construct(string $channel_id, string $message_id, string $emoji, ?int $uid = null){
+        parent::__construct($uid);
         $this->channel_id = $channel_id;
         $this->message_id = $message_id;
         $this->emoji = $emoji;
@@ -41,21 +43,20 @@ class RequestAddReaction extends Packet{
         return $this->emoji;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->channel_id,
-            $this->message_id,
-            $this->emoji
+            "uid" => $this->UID,
+            "channel_id" => $this->channel_id,
+            "message_id" => $this->message_id,
+            "emoji" => $this->emoji
         ];
     }
-
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->channel_id,
-            $this->message_id,
-            $this->emoji
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["channel_id"],
+            $data["message_id"],
+            $data["emoji"],
+            $data["uid"]
+        );
     }
 }

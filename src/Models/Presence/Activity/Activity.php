@@ -16,7 +16,7 @@ use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Plugin\Api;
 
 /** @link https://github.com/discord/discord-api-docs/blob/master/docs/topics/Gateway.md#activity-object */
-final class Activity{
+final class Activity implements \JsonSerializable{
 
     /** @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags */
     public const FLAGS = [
@@ -393,7 +393,7 @@ final class Activity{
             return;
         }
 
-        if($this->flags[$flag] !== $value){
+        if(($this->flags[$flag] ?? null) !== $value){
             $this->flags_bitwise ^= self::FLAGS[$flag];
         }
 
@@ -435,59 +435,67 @@ final class Activity{
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->name,
-            $this->type,
-            $this->url,
-            $this->created_at,
-            $this->start_timestamp,
-            $this->end_timestamp,
-            $this->application_id,
-            $this->details,
-            $this->state,
-            $this->emoji,
-            $this->party_id,
-            $this->party_size,
-            $this->party_max_size,
-            $this->asset_large_image,
-            $this->asset_large_text,
-            $this->asset_small_image,
-            $this->asset_small_text,
-            $this->secret_join,
-            $this->secret_spectate,
-            $this->secret_match,
-            $this->instance,
-            $this->flags_bitwise,
-            $this->buttons
+            "name" => $this->name,
+            "type" => $this->type->jsonSerialize(),
+            "url" => $this->url,
+            "created_at" => $this->created_at,
+            "timestamps" => [
+                "start" => $this->start_timestamp,
+                "end" => $this->end_timestamp
+            ],
+            "application_id" => $this->application_id,
+            "details" => $this->details,
+            "state" => $this->state,
+            "emoji" => $this->emoji?->jsonSerialize(),
+            "party" => [
+                "id" => $this->party_id,
+                "size" => $this->party_size,
+                "max_size" => $this->party_max_size
+            ],
+            "assets" => [
+                "large_image" => $this->asset_large_image,
+                "large_text" => $this->asset_large_text,
+                "small_image" => $this->asset_small_image,
+                "small_text" => $this->asset_small_text
+            ],
+            "secrets" => [
+                "join" => $this->secret_join,
+                "spectate" => $this->secret_spectate,
+                "match" => $this->secret_match
+            ],
+            "instance" => $this->instance,
+            "flags" => $this->flags_bitwise,
+            "buttons" => array_map(fn(ActivityButton $button) => $button->jsonSerialize(), $this->buttons)
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->name,
-            $this->type,
-            $this->url,
-            $this->created_at,
-            $this->start_timestamp,
-            $this->end_timestamp,
-            $this->application_id,
-            $this->details,
-            $this->state,
-            $this->emoji,
-            $this->party_id,
-            $this->party_size,
-            $this->party_max_size,
-            $this->asset_large_image,
-            $this->asset_large_text,
-            $this->asset_small_image,
-            $this->asset_small_text,
-            $this->secret_join,
-            $this->secret_spectate,
-            $this->secret_match,
-            $this->instance,
-            $this->flags_bitwise,
-            $this->buttons
-        ] = $data;
+    public static function fromJson(array $json): self{
+        return new self(
+            $json["name"],
+            ActivityType::fromJson($json["type"]),
+            $json["url"] ?? null,
+            $json["created_at"],
+            $json["timestamps"]["start"] ?? null,
+            $json["timestamps"]["end"] ?? null,
+            $json["application_id"] ?? null,
+            $json["details"] ?? null,
+            $json["state"] ?? null,
+            ($json["emoji"] ?? null) !== null ? Emoji::fromJson($json["emoji"]) : null,
+            $json["party"]["id"] ?? null,
+            $json["party"]["size"] ?? null,
+            $json["party"]["max_size"] ?? null,
+            $json["assets"]["large_image"] ?? null,
+            $json["assets"]["large_text"] ?? null,
+            $json["assets"]["small_image"] ?? null,
+            $json["assets"]["small_text"] ?? null,
+            $json["secrets"]["join"] ?? null,
+            $json["secrets"]["spectate"] ?? null,
+            $json["secrets"]["match"] ?? null,
+            $json["instance"] ?? null,
+            $json["flags"] ?? null,
+            array_map(fn(array $button) => ActivityButton::fromJson($button), $json["buttons"] ?? [])
+        );
     }
 }

@@ -17,6 +17,8 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
 
 class MessageDelete extends Packet{
 
+    public const ID = 51;
+
     /**
      * @var Message|array{"message_id": string, "channel_id": string, "guild_id": string}
      */
@@ -25,8 +27,8 @@ class MessageDelete extends Packet{
     /**
      * @param Message|array{"message_id": string, "channel_id": string, "guild_id": string} $message
      */
-    public function __construct(Message|array $message){
-        parent::__construct();
+    public function __construct(Message|array $message, ?int $uid = null){
+        parent::__construct($uid);
         $this->message = $message;
     }
 
@@ -37,17 +39,17 @@ class MessageDelete extends Packet{
         return $this->message;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->message
+            "uid" => $this->UID,
+            "message" => [] //$this->message->jsonSerialize() TODO
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->message
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            [], //Message::fromJson($data["message"]), TODO
+            $data["uid"]
+        );
     }
 }

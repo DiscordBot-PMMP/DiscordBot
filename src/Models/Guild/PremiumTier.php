@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Guild;
 
 /** @link https://discord.com/developers/docs/resources/guild#guild-object-premium-tier */
-enum PremiumTier: int{
+enum PremiumTier: int implements \JsonSerializable{
 
     /** Guild has not unlocked any Server Boost perks */
     case NONE = 0;
@@ -26,4 +26,12 @@ enum PremiumTier: int{
 
     /** Guild has unlocked Server Boost level 3 perks */
     case TIER_3 = 3;
+
+    public function jsonSerialize(): int{
+        return $this->value;
+    }
+
+    public static function fromJson(int $value): self{
+        return self::from($value);
+    }
 }

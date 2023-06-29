@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Guild;
 
 /** @link https://discord.com/developers/docs/resources/guild#guild-object-verification-level */
-enum VerificationLevel: int{
+enum VerificationLevel: int implements \JsonSerializable{
 
     /** Unrestricted */
     case NONE = 0;
@@ -29,4 +29,12 @@ enum VerificationLevel: int{
 
     /** Must have a verified phone number */
     case VERY_HIGH = 4;
+
+    public function jsonSerialize(): int{
+        return $this->value;
+    }
+
+    public static function fromJson(int $value): self{
+        return self::from($value);
+    }
 }

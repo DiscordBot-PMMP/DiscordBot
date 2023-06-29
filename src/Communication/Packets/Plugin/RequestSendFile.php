@@ -16,6 +16,8 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestSendFile extends Packet{
 
+    public const ID = 27;
+
     private string $channel_id;
 
     private string $file_name;
@@ -24,8 +26,8 @@ class RequestSendFile extends Packet{
 
     private string $message;
 
-    public function __construct(string $channel_id, string $file_name, string $file_path, string $message){
-        parent::__construct();
+    public function __construct(string $channel_id, string $file_name, string $file_path, string $message, ?int $uid = null){
+        parent::__construct($uid);
         $this->channel_id = $channel_id;
         $this->file_name = $file_name;
         $this->file_path = $file_path;
@@ -48,23 +50,23 @@ class RequestSendFile extends Packet{
         return $this->message;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->channel_id,
-            $this->file_name,
-            $this->file_path,
-            $this->message
+            "uid" => $this->UID,
+            "channel_id" => $this->channel_id,
+            "file_name" => $this->file_name,
+            "file_path" => $this->file_path,
+            "message" => $this->message
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->channel_id,
-            $this->file_name,
-            $this->file_path,
-            $this->message
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["channel_id"],
+            $data["file_name"],
+            $data["file_path"],
+            $data["message"],
+            $data["uid"]
+        );
     }
 }

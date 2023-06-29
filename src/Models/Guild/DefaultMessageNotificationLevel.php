@@ -12,11 +12,19 @@
 
 namespace JaxkDev\DiscordBot\Models\Guild;
 
-enum DefaultMessageNotificationLevel: int{
+enum DefaultMessageNotificationLevel: int implements \JsonSerializable{
 
     /** Members will receive notifications for all messages by default */
     case ALL_MESSAGES = 0;
 
     /** Members will receive notifications only for messages that @ mention them by default */
     case ONLY_MENTIONS = 1;
+
+    public function jsonSerialize(): int{
+        return $this->value;
+    }
+
+    public static function fromJson(int $value): self{
+        return self::from($value);
+    }
 }

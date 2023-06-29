@@ -17,10 +17,12 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class BanAdd extends Packet{
 
+    public const ID = 35;
+
     private Ban $ban;
 
-    public function __construct(Ban $ban){
-        parent::__construct();
+    public function __construct(Ban $ban, ?int $uid = null){
+        parent::__construct($uid);
         $this->ban = $ban;
     }
 
@@ -28,19 +30,17 @@ class BanAdd extends Packet{
         return $this->ban;
     }
 
-    // Explicit serialization to significantly reduce serialized size.
-
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->ban
+            "uid" => $this->UID,
+            "ban" => $this->ban->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->ban
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            Ban::fromJson($data["ban"]),
+            $data["uid"]
+        );
     }
 }

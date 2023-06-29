@@ -13,8 +13,16 @@
 namespace JaxkDev\DiscordBot\Models;
 
 /** @link https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types */
-enum InviteTargetType: int{
+enum InviteTargetType: int implements \JsonSerializable{
 
     case STREAM = 1;
     case EMBEDDED_APPLICATION = 2;
+
+    public function jsonSerialize(): int{
+        return $this->value;
+    }
+
+    public static function fromJson(int $value): self{
+        return self::from($value);
+    }
 }

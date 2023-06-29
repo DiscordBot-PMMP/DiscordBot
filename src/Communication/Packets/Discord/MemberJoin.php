@@ -18,12 +18,14 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MemberJoin extends Packet{
 
+    public const ID = 48;
+
     private Member $member;
 
     private User $user;
 
-    public function __construct(Member $member, User $user){
-        parent::__construct();
+    public function __construct(Member $member, User $user, ?int $uid = null){
+        parent::__construct($uid);
         $this->member = $member;
         $this->user = $user;
     }
@@ -36,19 +38,19 @@ class MemberJoin extends Packet{
         return $this->user;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->member,
-            $this->user
+            "uid" => $this->UID,
+            "member" => $this->member->jsonSerialize(),
+            "user" => $this->user->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->member,
-            $this->user
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            Member::fromJson($data["member"]),
+            User::fromJson($data["user"]),
+            $data["uid"]
+        );
     }
 }

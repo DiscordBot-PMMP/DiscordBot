@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/resources/invite#invite-object */
-class Invite{
+class Invite implements \JsonSerializable{
 
     /** Also used as ID internally, ONLY null when creating model. */
     private ?string $code;
@@ -121,27 +121,27 @@ class Invite{
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->code,
-            $this->guild_id,
-            $this->channel_id,
-            $this->inviter,
-            $this->target_type,
-            $this->target_user,
-            $this->expires_at
+            "code" => $this->code,
+            "guild_id" => $this->guild_id,
+            "channel_id" => $this->channel_id,
+            "inviter" => $this->inviter,
+            "target_type" => $this->target_type,
+            "target_user" => $this->target_user,
+            "expires_at" => $this->expires_at,
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->code,
-            $this->guild_id,
-            $this->channel_id,
-            $this->inviter,
-            $this->target_type,
-            $this->target_user,
-            $this->expires_at
-        ] = $data;
+    public static function fromJson(array $json): self{
+        return new self(
+            $json["code"] ?? null,
+            $json["guild_id"] ?? null,
+            $json["channel_id"] ?? null,
+            $json["inviter"] ?? null,
+            $json["target_type"] ?? null,
+            $json["target_user"] ?? null,
+            $json["expires_at"] ?? null,
+        );
     }
 }

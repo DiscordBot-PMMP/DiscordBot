@@ -16,10 +16,12 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class InviteDelete extends Packet{
 
+    public const ID = 47;
+
     private string $invite_code;
 
-    public function __construct(string $invite_code){
-        parent::__construct();
+    public function __construct(string $invite_code, ?int $uid = null){
+        parent::__construct($uid);
         $this->invite_code = $invite_code;
     }
 
@@ -27,17 +29,17 @@ class InviteDelete extends Packet{
         return $this->invite_code;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->invite_code
+            "uid" => $this->UID,
+            "invite_code" => $this->invite_code
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->invite_code
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["invite_code"],
+            $data["uid"]
+        );
     }
 }

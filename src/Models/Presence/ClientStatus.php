@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models\Presence;
 
-class ClientStatus{
+class ClientStatus implements \JsonSerializable{
 
     private Status $desktop;
     private Status $mobile;
@@ -51,19 +51,19 @@ class ClientStatus{
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->desktop,
-            $this->mobile,
-            $this->web
+            'desktop' => $this->desktop->jsonSerialize(),
+            'mobile' => $this->mobile->jsonSerialize(),
+            'web' => $this->web->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->desktop,
-            $this->mobile,
-            $this->web
-        ] = $data;
+    public static function fromJson(array $json): self{
+        return new self(
+            Status::fromJson($json['desktop']),
+            Status::fromJson($json['mobile']),
+            Status::fromJson($json['web'])
+        );
     }
 }

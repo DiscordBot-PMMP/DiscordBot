@@ -12,25 +12,33 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-abstract class Packet{
+abstract class Packet implements \JsonSerializable{
+
+    // Each packet has a unique ID, this will not change.
+    public const ID = 0;
 
     // Used for responses.
     public static int $UID_COUNT = 0;
 
     protected int $UID;
 
-    public function __construct(){
-        Packet::$UID_COUNT += 2;  //BotThread = Odd, PluginThread = Even. (Keeps them unique, *shrugs*)
-        $this->UID = Packet::$UID_COUNT;
+    public function __construct(?int $uid = null){
+        if($uid === null){
+            //BotThread = Odd, PluginThread = Even. (Keeps them unique, *shrugs*)
+            Packet::$UID_COUNT += 2;
+            $this->UID = Packet::$UID_COUNT;
+        }else{
+            $this->UID = $uid;
+        }
     }
 
     public function getUID(): int{
         return $this->UID;
     }
 
-    // Explicit serialization to significantly reduce serialized size.
+    // Serialise to a specific network format.
+    // TODO Packet Type ID's
 
-    public abstract function __serialize(): array;
-
-    public abstract function __unserialize(array $data): void;
+    abstract public function jsonSerialize(): array;
+    abstract public static function fromJson(array $data): self;
 }

@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/resources/guild#ban-object */
-class Ban{
+class Ban implements \JsonSerializable{
 
     /** Guild the user is banned from */
     private string $guild_id;
@@ -77,19 +77,20 @@ class Ban{
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->guild_id,
-            $this->user_id,
-            $this->reason
+            "guild_id" => $this->guild_id,
+            "user_id" => $this->user_id,
+            "reason" => $this->reason,
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->guild_id,
-            $this->user_id,
-            $this->reason
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["guild_id"],
+            $data["user_id"],
+            $data["reason"] ?? null
+        );
     }
+
 }

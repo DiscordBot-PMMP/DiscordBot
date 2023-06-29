@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Guild;
 
 /** @link https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level */
-enum ExplicitContentFilterLevel: int{
+enum ExplicitContentFilterLevel: int implements \JsonSerializable{
 
     /** Media content will not be scanned */
     case DISABLED = 0;
@@ -23,4 +23,12 @@ enum ExplicitContentFilterLevel: int{
 
     /** Media content sent by all members will be scanned */
     case ALL_MEMBERS = 2;
+
+    public function jsonSerialize(): int{
+        return $this->value;
+    }
+
+    public static function fromJson(int $value): self{
+        return self::from($value);
+    }
 }

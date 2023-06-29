@@ -17,10 +17,12 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MemberUpdate extends Packet{
 
+    public const ID = 50;
+
     private Member $member;
 
-    public function __construct(Member $member){
-        parent::__construct();
+    public function __construct(Member $member, ?int $uid = null){
+        parent::__construct($uid);
         $this->member = $member;
     }
 
@@ -28,17 +30,17 @@ class MemberUpdate extends Packet{
         return $this->member;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->member
+            "uid" => $this->UID,
+            "member" => $this->member->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->member
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            Member::fromJson($data["member"]),
+            $data["uid"]
+        );
     }
 }

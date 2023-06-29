@@ -13,10 +13,18 @@
 namespace JaxkDev\DiscordBot\Models;
 
 /** @link https://discord.com/developers/docs/resources/user#user-object-premium-types */
-enum UserPremiumType: int{
+enum UserPremiumType: int implements \JsonSerializable{
 
     case NONE = 0;
     case NITRO_CLASSIC = 1;
     case NITRO = 2;
     case NITRO_BASIC = 3;
+
+    public function jsonSerialize(): int{
+        return $this->value;
+    }
+
+    public static function fromJson(int $value): self{
+        return self::from($value);
+    }
 }

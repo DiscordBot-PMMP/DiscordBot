@@ -14,10 +14,12 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 
 class Heartbeat extends Packet{
 
+    public const ID = 1;
+
     private float $heartbeat;
 
-    public function __construct(float $heartbeat){
-        parent::__construct();
+    public function __construct(float $heartbeat, ?int $uid = null){
+        parent::__construct($uid);
         $this->heartbeat = $heartbeat;
     }
 
@@ -25,17 +27,17 @@ class Heartbeat extends Packet{
         return $this->heartbeat;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->heartbeat
+            "uid" => $this->UID,
+            "heartbeat" => $this->heartbeat
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->heartbeat
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["heartbeat"],
+            $data["uid"]
+        );
     }
 }

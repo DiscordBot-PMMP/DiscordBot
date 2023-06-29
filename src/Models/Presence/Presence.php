@@ -16,7 +16,7 @@ use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Plugin\Api;
 
 /** A simple class to hold all presence data for members. */
-class Presence{
+class Presence implements \JsonSerializable{
 
     /** Current status */
     private Status $status;
@@ -74,19 +74,19 @@ class Presence{
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->status,
-            $this->activities,
-            $this->client_status
+            "status" => $this->status->jsonSerialize(),
+            "activities" => array_map(fn(Activity $activity) => $activity->jsonSerialize(), $this->activities),
+            "client_status" => $this->client_status?->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->status,
-            $this->activities,
-            $this->client_status
-        ] = $data;
+    public static function fromJson(array $json): self{
+        return new self(
+            Status::fromJson($json["status"]),
+            array_map(fn(array $activity) => Activity::fromJson($activity), $json["activities"]),
+            $json["client_status"] === null ? null : ClientStatus::fromJson($json["client_status"])
+        );
     }
 }

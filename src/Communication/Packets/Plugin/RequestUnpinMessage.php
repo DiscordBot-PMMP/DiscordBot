@@ -16,12 +16,14 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestUnpinMessage extends Packet{
 
+    public const ID = 29;
+
     private string $channel_id;
 
     private string $message_id;
 
-    public function __construct(string $channel_id, string $message_id){
-        parent::__construct();
+    public function __construct(string $channel_id, string $message_id, ?int $uid = null){
+        parent::__construct($uid);
         $this->message_id = $message_id;
         $this->channel_id = $channel_id;
     }
@@ -34,19 +36,19 @@ class RequestUnpinMessage extends Packet{
         return $this->channel_id;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->message_id,
-            $this->channel_id
+            "uid" => $this->UID,
+            "channel_id" => $this->channel_id,
+            "message_id" => $this->message_id
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->message_id,
-            $this->channel_id
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["channel_id"],
+            $data["message_id"],
+            $data["uid"]
+        );
     }
 }

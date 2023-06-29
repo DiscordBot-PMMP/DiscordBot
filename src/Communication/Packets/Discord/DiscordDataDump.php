@@ -23,6 +23,8 @@ use JaxkDev\DiscordBot\Models\User;
 
 class DiscordDataDump extends Packet{
 
+    public const ID = 41;
+
     /** @var Guild[] */
     private array $guilds = [];
 
@@ -146,33 +148,32 @@ class DiscordDataDump extends Packet{
             +sizeof($this->users)+sizeof($this->bans)+sizeof($this->invites);
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->guilds,
-            $this->channels,
-            $this->roles,
-            $this->invites,
-            $this->bans,
-            $this->members,
-            $this->users,
-            $this->bot_user,
-            $this->timestamp
+            "uid" => $this->UID,
+            "guilds" => array_map(fn(Guild $guild) => $guild->jsonSerialize(), $this->guilds),
+            "channels" => [],//array_map(fn(GuildChannel $channel) => $channel->jsonSerialize(), $this->channels), TODO
+            "roles" => array_map(fn(Role $role) => $role->jsonSerialize(), $this->roles),
+            "invites" => array_map(fn(Invite $invite) => $invite->jsonSerialize(), $this->invites),
+            "bans" => array_map(fn(Ban $ban) => $ban->jsonSerialize(), $this->bans),
+            "members" => array_map(fn(Member $member) => $member->jsonSerialize(), $this->members),
+            "users" => array_map(fn(User $user) => $user->jsonSerialize(), $this->users),
+            "bot_user" => ($this->bot_user ?? null) !== null ? $this->bot_user->jsonSerialize() : null,
+            "timestamp" => $this->timestamp
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->guilds,
-            $this->channels,
-            $this->roles,
-            $this->invites,
-            $this->bans,
-            $this->members,
-            $this->users,
-            $this->bot_user,
-            $this->timestamp
-        ] = $data;
+    public static function fromJson(array $data): self{
+        $packet = new self($data["uid"]);
+        $packet->guilds = array_map(fn(array $guild) => Guild::fromJson($guild), $data["guilds"]);
+        $packet->channels = [];//array_map(fn(array $channel) => GuildChannel::fromJson($channel), $data["channels"]); TODO
+        $packet->roles = array_map(fn(array $role) => Role::fromJson($role), $data["roles"]);
+        $packet->invites = array_map(fn(array $invite) => Invite::fromJson($invite), $data["invites"]);
+        $packet->bans = array_map(fn(array $ban) => Ban::fromJson($ban), $data["bans"]);
+        $packet->members = array_map(fn(array $member) => Member::fromJson($member), $data["members"]);
+        $packet->users = array_map(fn(array $user) => User::fromJson($user), $data["users"]);
+        $packet->bot_user = ($data["bot_user"] ?? null) !== null ? User::fromJson($data["bot_user"]) : null;
+        $packet->timestamp = $data["timestamp"];
+        return $packet;
     }
 }

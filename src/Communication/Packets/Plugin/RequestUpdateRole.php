@@ -17,10 +17,12 @@ use JaxkDev\DiscordBot\Models\Role;
 
 class RequestUpdateRole extends Packet{
 
+    public const ID = 33;
+
     private Role $role;
 
-    public function __construct(Role $role){
-        parent::__construct();
+    public function __construct(Role $role, ?int $uid = null){
+        parent::__construct($uid);
         $this->role = $role;
     }
 
@@ -28,17 +30,17 @@ class RequestUpdateRole extends Packet{
         return $this->role;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->role
+            "uid" => $this->UID,
+            "role" => $this->role->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->role
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            Role::fromJson($data["role"]),
+            $data["uid"]
+        );
     }
 }

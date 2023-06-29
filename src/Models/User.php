@@ -14,7 +14,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class User{
+class User implements \JsonSerializable{
 
     /**
      * @link https://discord.com/developers/docs/resources/user#user-object-user-flags
@@ -349,41 +349,41 @@ class User{
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->id,
-            $this->username,
-            $this->discriminator,
-            $this->global_name,
-            $this->avatar,
-            $this->bot,
-            $this->system,
-            $this->mfa_enabled,
-            $this->banner,
-            $this->accent_colour,
-            $this->locale,
-            $this->flags_bitwise,
-            $this->premium_type,
-            $this->public_flags_bitwise
+            "id" => $this->id,
+            "username" => $this->username,
+            "discriminator" => $this->discriminator,
+            "global_name" => $this->global_name,
+            "avatar" => $this->avatar,
+            "bot" => $this->bot,
+            "system" => $this->system,
+            "mfa_enabled" => $this->mfa_enabled,
+            "banner" => $this->banner,
+            "accent_colour" => $this->accent_colour,
+            "locale" => $this->locale,
+            "flags_bitwise" => $this->flags_bitwise,
+            "premium_type" => $this->premium_type,
+            "public_flags_bitwise" => $this->public_flags_bitwise
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->id,
-            $this->username,
-            $this->discriminator,
-            $this->global_name,
-            $this->avatar,
-            $this->bot,
-            $this->system,
-            $this->mfa_enabled,
-            $this->banner,
-            $this->accent_colour,
-            $this->locale,
-            $this->flags_bitwise,
-            $this->premium_type,
-            $this->public_flags_bitwise
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["id"],
+            $data["username"],
+            $data["discriminator"],
+            $data["global_name"] ?? null,
+            $data["avatar"],
+            $data["bot"] ?? null,
+            $data["system"] ?? null,
+            $data["mfa_enabled"] ?? null,
+            $data["banner"] ?? null,
+            $data["accent_colour"] ?? null,
+            $data["locale"] ?? null,
+            $data["flags_bitwise"],
+            ($data["premium_type"] ?? null) === null ? UserPremiumType::fromJson($data["premium_type"]) : null,
+            $data["public_flags_bitwise"]
+        );
     }
 }

@@ -16,10 +16,12 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestBroadcastTyping extends Packet{
 
+    public const ID = 5;
+
     private string $channel_id;
 
-    public function __construct(string $channel_id){
-        parent::__construct();
+    public function __construct(string $channel_id, ?int $uid = null){
+        parent::__construct($uid);
         $this->channel_id = $channel_id;
     }
 
@@ -27,17 +29,17 @@ class RequestBroadcastTyping extends Packet{
         return $this->channel_id;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->channel_id
+            "uid" => $this->UID,
+            "channel_id" => $this->channel_id
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->channel_id
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["channel_id"],
+            $data["uid"]
+        );
     }
 }

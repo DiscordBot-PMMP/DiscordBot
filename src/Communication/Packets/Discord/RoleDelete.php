@@ -16,10 +16,12 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RoleDelete extends Packet{
 
+    public const ID = 60;
+
     private string $role_id;
 
-    public function __construct(string $role_id){
-        parent::__construct();
+    public function __construct(string $role_id, ?int $uid = null){
+        parent::__construct($uid);
         $this->role_id = $role_id;
     }
 
@@ -27,17 +29,17 @@ class RoleDelete extends Packet{
         return $this->role_id;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->role_id
+            "uid" => $this->UID,
+            "role_id" => $this->role_id
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->role_id
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["role_id"],
+            $data["uid"]
+        );
     }
 }

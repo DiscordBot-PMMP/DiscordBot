@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Presence\Activity;
 
 /** @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons */
-class ActivityButton{
+class ActivityButton implements \JsonSerializable{
 
     /** Text shown on the button (1-32 characters) */
     private string $label;
@@ -58,17 +58,17 @@ class ActivityButton{
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->label,
-            $this->url
+            "label" => $this->label,
+            "url" => $this->url,
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->label,
-            $this->url
-        ] = $data;
+    public static function fromJson(array $json): self{
+        return new self(
+            $json["label"],
+            $json["url"] ?? null
+        );
     }
 }

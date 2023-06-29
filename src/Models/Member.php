@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/resources/guild#guild-member-object */
-class Member{
+class Member implements \JsonSerializable{
 
     /**
      * @link https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
@@ -64,7 +64,7 @@ class Member{
      * guild member flags represented as a bit set, defaults to 0
      * @see Member::FLAGS
      */
-    private int $flag_bitwise;
+    private int $flags_bitwise;
 
     /**
      * All the flags possible and their current state.
@@ -103,7 +103,7 @@ class Member{
         $this->setPremiumSince($premium_since);
         $this->setDeaf($deaf);
         $this->setMute($mute);
-        $this->setFlagBitwise($flags, false);
+        $this->setFlagsBitwise($flags, false);
         $this->setPending($pending);
         $this->setPermissions($permissions);
         $this->setCommunicationsDisabledUntil($communications_disabled_until);
@@ -204,12 +204,12 @@ class Member{
         $this->mute = $mute;
     }
 
-    public function getFlagBitwise(): int{
-        return $this->flag_bitwise;
+    public function getFlagsBitwise(): int{
+        return $this->flags_bitwise;
     }
 
-    public function setFlagBitwise(int $flag_bitwise, bool $recalculate = true): void{
-        $this->flag_bitwise = $flag_bitwise;
+    public function setFlagsBitwise(int $flags_bitwise, bool $recalculate = true): void{
+        $this->flags_bitwise = $flags_bitwise;
         if($recalculate){
             $this->recalculateFlags();
         }
@@ -244,7 +244,7 @@ class Member{
         }
         if($this->flags[$flag] === $state) return;
         $this->flags[$flag] = $state;
-        $this->flag_bitwise ^= self::FLAGS[$flag];
+        $this->flags_bitwise ^= self::FLAGS[$flag];
     }
 
     public function getPending(): ?bool{
@@ -286,47 +286,47 @@ class Member{
     private function recalculateFlags(): void{
         $this->flags = [];
         foreach(self::FLAGS as $flag => $bitwise){
-            $this->flags[$flag] = ($this->flag_bitwise & $bitwise) === $bitwise;
+            $this->flags[$flag] = ($this->flags_bitwise & $bitwise) === $bitwise;
         }
     }
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->guild_id,
-            $this->user_id,
-            $this->nickname,
-            $this->avatar,
-            $this->roles,
-            $this->join_timestamp,
-            $this->premium_since,
-            $this->deaf,
-            $this->mute,
-            $this->flag_bitwise,
-            $this->pending,
-            $this->permissions,
-            $this->communications_disabled_until,
-            $this->presence
+            "guild_id" => $this->guild_id,
+            "user_id" => $this->user_id,
+            "nickname" => $this->nickname,
+            "avatar" => $this->avatar,
+            "roles" => $this->roles,
+            "join_timestamp" => $this->join_timestamp,
+            "premium_since" => $this->premium_since,
+            "deaf" => $this->deaf,
+            "mute" => $this->mute,
+            "flags" => $this->flags_bitwise,
+            "pending" => $this->pending,
+            "permissions" => $this->permissions->jsonSerialize(),
+            "communications_disabled_until" => $this->communications_disabled_until,
+            "presence" => $this->presence?->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->guild_id,
-            $this->user_id,
-            $this->nickname,
-            $this->avatar,
-            $this->roles,
-            $this->join_timestamp,
-            $this->premium_since,
-            $this->deaf,
-            $this->mute,
-            $this->flag_bitwise,
-            $this->pending,
-            $this->permissions,
-            $this->communications_disabled_until,
-            $this->presence
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new Member(
+            $data["guild_id"],
+            $data["user_id"],
+            $data["nickname"] ?? null,
+            $data["avatar"] ?? null,
+            $data["roles"],
+            $data["join_timestamp"] ?? null,
+            $data["premium_since"] ?? null,
+            $data["deaf"],
+            $data["mute"],
+            $data["flags"],
+            $data["pending"] ?? null,
+            RolePermissions::fromJson($data["permissions"]),
+            $data["communications_disabled_until"] ?? null,
+            ($data["presence"] ?? null) !== null ? Presence::fromJson($data["presence"]) : null
+        );
     }
 }

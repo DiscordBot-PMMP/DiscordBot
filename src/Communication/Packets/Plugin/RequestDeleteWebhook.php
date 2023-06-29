@@ -16,37 +16,39 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestDeleteWebhook extends Packet{
 
+    public const ID = 12;
+
     private string $webhook_id;
 
     private string $channel_id;
 
-    public function __construct(string $channel_id, string $webhook_id){
-        parent::__construct();
+    public function __construct(string $channel_id, string $webhook_id, ?int $uid = null){
+        parent::__construct($uid);
         $this->webhook_id = $webhook_id;
         $this->channel_id = $channel_id;
-    }
-
-    public function getWebhookId(): string{
-        return $this->webhook_id;
     }
 
     public function getChannelId(): string{
         return $this->channel_id;
     }
 
-    public function __serialize(): array{
+    public function getWebhookId(): string{
+        return $this->webhook_id;
+    }
+
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->webhook_id,
-            $this->channel_id
+            "uid" => $this->UID,
+            "channel_id" => $this->channel_id,
+            "webhook_id" => $this->webhook_id,
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->webhook_id,
-            $this->channel_id
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["channel_id"],
+            $data["webhook_id"],
+            $data["uid"]
+        );
     }
 }

@@ -16,14 +16,16 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestRemoveRole extends Packet{
 
+    public const ID = 24;
+
     private string $guild_id;
 
     private string $user_id;
 
     private string $role_id;
 
-    public function __construct(string $guild_id, string $user_id, string $role_id){
-        parent::__construct();
+    public function __construct(string $guild_id, string $user_id, string $role_id, ?int $uid = null){
+        parent::__construct($uid);
         $this->guild_id = $guild_id;
         $this->user_id = $user_id;
         $this->role_id = $role_id;
@@ -41,21 +43,21 @@ class RequestRemoveRole extends Packet{
         return $this->role_id;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->guild_id,
-            $this->user_id,
-            $this->role_id
+            "uid" => $this->UID,
+            "guild_id" => $this->guild_id,
+            "user_id" => $this->user_id,
+            "role_id" => $this->role_id
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->guild_id,
-            $this->user_id,
-            $this->role_id
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["guild_id"],
+            $data["user_id"],
+            $data["role_id"],
+            $data["uid"]
+        );
     }
 }

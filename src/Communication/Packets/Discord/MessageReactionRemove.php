@@ -16,6 +16,8 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MessageReactionRemove extends Packet{
 
+    public const ID = 53;
+
     private string $message_id;
 
     private string $emoji;
@@ -24,8 +26,8 @@ class MessageReactionRemove extends Packet{
 
     private string $channel_id;
 
-    public function __construct(string $message_id, string $emoji, string $member_id, string $channel_id){
-        parent::__construct();
+    public function __construct(string $message_id, string $emoji, string $member_id, string $channel_id, ?int $uid = null){
+        parent::__construct($uid);
         $this->message_id = $message_id;
         $this->emoji = $emoji;
         $this->member_id = $member_id;
@@ -48,23 +50,23 @@ class MessageReactionRemove extends Packet{
         return $this->channel_id;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->message_id,
-            $this->emoji,
-            $this->member_id,
-            $this->channel_id
+            "uid" => $this->UID,
+            "message_id" => $this->message_id,
+            "emoji" => $this->emoji,
+            "member_id" => $this->member_id,
+            "channel_id" => $this->channel_id
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->message_id,
-            $this->emoji,
-            $this->member_id,
-            $this->channel_id
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["message_id"],
+            $data["emoji"],
+            $data["member_id"],
+            $data["channel_id"],
+            $data["uid"]
+        );
     }
 }

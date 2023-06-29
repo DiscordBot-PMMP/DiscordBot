@@ -15,11 +15,9 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /**
- * TODO Remember null behaviour for these.
- *
  * @link https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
  */
-class RoleTags{
+class RoleTags implements \JsonSerializable{
 
     /** The id of the bot this role belongs to */
     private ?string $bot_id;
@@ -107,5 +105,29 @@ class RoleTags{
 
     public function setGuildConnections(?bool $guild_connections): void{
         $this->guild_connections = $guild_connections;
+    }
+
+    //----- Serialization -----//
+
+    public function jsonSerialize(): array{
+        return [
+            'bot_id' => $this->bot_id,
+            'integration_id' => $this->integration_id,
+            'premium_subscriber' => $this->premium_subscriber,
+            'subscription_listing_id' => $this->subscription_listing_id,
+            'available_for_purchase' => $this->available_for_purchase,
+            'guild_connections' => $this->guild_connections,
+        ];
+    }
+
+    public static function fromJson(array $json): self{
+        return new self(
+            $json['bot_id'] ?? null,
+            $json['integration_id'] ?? null,
+            $json['premium_subscriber'] ?? null,
+            $json['subscription_listing_id'] ?? null,
+            $json['available_for_purchase'] ?? null,
+            $json['guild_connections'] ?? null
+        );
     }
 }

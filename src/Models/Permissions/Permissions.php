@@ -18,7 +18,7 @@ namespace JaxkDev\DiscordBot\Models\Permissions;
  *
  * @link https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
  */
-abstract class Permissions{
+abstract class Permissions implements \JsonSerializable{
 
     /** All Voice only permissions (v) */
     const VOICE_PERMISSIONS = [
@@ -164,15 +164,9 @@ abstract class Permissions{
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
-        return [
-            $this->bitwise
-        ];
+    public function jsonSerialize(): int{
+        return $this->bitwise;
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->bitwise
-        ] = $data;
-    }
+    abstract public static function fromJson(int $bitwise): self;
 }

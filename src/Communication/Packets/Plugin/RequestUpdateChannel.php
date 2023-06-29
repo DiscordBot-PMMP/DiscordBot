@@ -17,10 +17,12 @@ use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 
 class RequestUpdateChannel extends Packet{
 
+    public const ID = 30;
+
     private GuildChannel $channel;
 
-    public function __construct(GuildChannel $channel){
-        parent::__construct();
+    public function __construct(GuildChannel $channel, ?int $uid = null){
+        parent::__construct($uid);
         $this->channel = $channel;
     }
 
@@ -28,17 +30,17 @@ class RequestUpdateChannel extends Packet{
         return $this->channel;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->channel
+            "uid" => $this->UID,
+            "channel" => $this->channel->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->channel
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            GuildChannel::fromJson($data["channel"]),
+            $data["uid"]
+        );
     }
 }

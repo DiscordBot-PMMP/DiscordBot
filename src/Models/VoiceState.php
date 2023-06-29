@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/resources/voice#voice-state-object */
-class VoiceState{
+class VoiceState implements \JsonSerializable{
 
     /** The guild id this voice state is for, null for DMs. */
     private ?string $guild_id;
@@ -179,40 +179,39 @@ class VoiceState{
         $this->request_to_speak_timestamp = $request_to_speak_timestamp;
     }
 
-
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->guild_id,
-            $this->channel_id,
-            $this->user_id,
-            $this->session_id,
-            $this->deaf,
-            $this->mute,
-            $this->self_deaf,
-            $this->self_mute,
-            $this->self_stream,
-            $this->self_video,
-            $this->suppress,
-            $this->request_to_speak_timestamp
+            "guild_id" => $this->guild_id,
+            "channel_id" => $this->channel_id,
+            "user_id" => $this->user_id,
+            "session_id" => $this->session_id,
+            "deaf" => $this->deaf,
+            "mute" => $this->mute,
+            "self_deaf" => $this->self_deaf,
+            "self_mute" => $this->self_mute,
+            "self_stream" => $this->self_stream,
+            "self_video" => $this->self_video,
+            "suppress" => $this->suppress,
+            "request_to_speak_timestamp" => $this->request_to_speak_timestamp
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->guild_id,
-            $this->channel_id,
-            $this->user_id,
-            $this->session_id,
-            $this->deaf,
-            $this->mute,
-            $this->self_deaf,
-            $this->self_mute,
-            $this->self_stream,
-            $this->self_video,
-            $this->suppress,
-            $this->request_to_speak_timestamp
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["guild_id"] ?? null,
+            $data["channel_id"] ?? null,
+            $data["user_id"],
+            $data["session_id"] ?? null,
+            $data["deaf"],
+            $data["mute"],
+            $data["self_deaf"],
+            $data["self_mute"],
+            $data["self_stream"] ?? null,
+            $data["self_video"],
+            $data["suppress"],
+            $data["request_to_speak_timestamp"] ?? null
+        );
     }
 }

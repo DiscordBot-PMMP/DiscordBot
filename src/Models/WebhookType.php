@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 /**
  * @link https://discord.com/developers/docs/resources/webhook#webhook-object-webhook-types
  */
-enum WebhookType: int{
+enum WebhookType: int implements \JsonSerializable{
 
     /**
      * Standard webhook
@@ -33,4 +33,12 @@ enum WebhookType: int{
      * "Application webhooks are webhooks used with Interactions"
      */
     case APPLICATION = 3;
+
+    public function jsonSerialize(): int{
+        return $this->value;
+    }
+
+    public static function fromJson(int $value): self{
+        return self::from($value);
+    }
 }

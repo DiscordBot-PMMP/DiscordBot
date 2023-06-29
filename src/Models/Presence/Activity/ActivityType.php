@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models\Presence\Activity;
 /**
  * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
  */
-enum ActivityType: int{
+enum ActivityType: int implements \JsonSerializable{
 
     /** Playing {name} */
     case GAME = 0;
@@ -34,4 +34,12 @@ enum ActivityType: int{
 
     /** Competing in {name} */
     case COMPETING = 5;
+
+    public function jsonSerialize(): int{
+        return $this->value;
+    }
+
+    public static function fromJson(int $value): self{
+        return self::from($value);
+    }
 }

@@ -13,11 +13,19 @@
 namespace JaxkDev\DiscordBot\Models\Guild;
 
 /** @link https://discord.com/developers/docs/resources/guild#guild-object-mfa-level */
-enum MfaLevel: int{
+enum MfaLevel: int implements \JsonSerializable{
 
     /** Guild has no MFA/2FA requirement for moderation actions */
     case NONE = 0;
 
     /** Guild has a 2FA requirement for moderation actions */
     case ELEVATED = 1;
+
+    public function jsonSerialize(): int{
+        return $this->value;
+    }
+
+    public static function fromJson(int $value): self{
+        return self::from($value);
+    }
 }

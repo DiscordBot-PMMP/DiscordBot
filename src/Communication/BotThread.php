@@ -47,17 +47,29 @@ class BotThread extends Thread{
     }
 
     public function readInboundData(int $count = 1): array{
-        return array_map(function($data){
-            $packet = unserialize($data);
-            if(!$packet instanceof Packet){
-                throw new \AssertionError("Data did not unserialize to a Packet.");
+        return array_map(function($raw_data){
+            $data = (array)json_decode($raw_data, true);
+            if(sizeof($data) !== 2){
+                throw new \AssertionError("Invalid packet size - " . $raw_data);
             }
-            return $packet;
+            if(!is_int($data[0])){
+                throw new \AssertionError("Invalid packet ID - " . $raw_data);
+            }
+            if(!is_array($data[1])){
+                throw new \AssertionError("Invalid packet data - " . $raw_data);
+            }
+            /** @var Packet $packet */
+            $packet = NetworkApi::getPacketClass($data[0]);
+            return $packet::fromJson($data[1]);
         }, $this->inboundData->chunk($count));
     }
 
     public function writeOutboundData(Packet $packet): void{
-        $this->outboundData[] = serialize($packet);
+        try{
+            $this->outboundData[] = json_encode([$packet::ID, $packet], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }catch(\JsonException $e){
+            throw new \AssertionError("Failed to encode packet to JSON, " . $e->getMessage());
+        }
     }
 
     public function setStatus(int $status): void{

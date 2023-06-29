@@ -16,10 +16,12 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class BanRemove extends Packet{
 
+    public const ID = 36;
+
     private string $ban_id;
 
-    public function __construct(string $ban_id){
-        parent::__construct();
+    public function __construct(string $ban_id, ?int $uid = null){
+        parent::__construct($uid);
         $this->ban_id = $ban_id;
     }
 
@@ -27,17 +29,17 @@ class BanRemove extends Packet{
         return $this->ban_id;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->ban_id
+            "uid" => $this->UID,
+            "ban_id" => $this->ban_id
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->ban_id
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["ban_id"],
+            $data["uid"]
+        );
     }
 }

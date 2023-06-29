@@ -20,6 +20,8 @@ use JaxkDev\DiscordBot\Models\Role;
 
 class GuildJoin extends Packet{
 
+    public const ID = 43;
+
     private Guild $guild;
 
     /** @var GuildChannel[] */
@@ -36,8 +38,8 @@ class GuildJoin extends Packet{
      * @param Member[]        $members
      * @param Role[]          $roles
      */
-    public function __construct(Guild $guild, array $channels, array $members, array $roles){
-        parent::__construct();
+    public function __construct(Guild $guild, array $channels, array $members, array $roles, ?int $uid = null){
+        parent::__construct($uid);
         $this->guild = $guild;
         $this->channels = $channels;
         $this->members = $members;
@@ -63,23 +65,23 @@ class GuildJoin extends Packet{
         return $this->members;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->guild,
-            $this->roles,
-            $this->channels,
-            $this->members
+            "uid" => $this->UID,
+            "guild" => $this->guild->jsonSerialize(),
+            "channels" => array_map(fn(GuildChannel $channel) => $channel->jsonSerialize(), $this->channels),
+            "members" => array_map(fn(Member $member) => $member->jsonSerialize(), $this->members),
+            "roles" => array_map(fn(Role $role) => $role->jsonSerialize(), $this->roles)
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->guild,
-            $this->roles,
-            $this->channels,
-            $this->members
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            Guild::fromJson($data["guild"]),
+            array_map(fn(array $channel) => GuildChannel::fromJson($channel), $data["channels"]),
+            array_map(fn(array $member) => Member::fromJson($member), $data["members"]),
+            array_map(fn(array $role) => Role::fromJson($role), $data["roles"]),
+            $data["uid"]
+        );
     }
 }

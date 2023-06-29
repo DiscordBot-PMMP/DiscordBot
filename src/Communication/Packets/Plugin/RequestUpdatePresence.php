@@ -17,10 +17,12 @@ use JaxkDev\DiscordBot\Models\Presence\Presence;
 
 class RequestUpdatePresence extends Packet{
 
+    public const ID = 32;
+
     private Presence $presence;
 
-    public function __construct(Presence $presence){
-        parent::__construct();
+    public function __construct(Presence $presence, ?int $uid = null){
+        parent::__construct($uid);
         $this->presence = $presence;
     }
 
@@ -28,17 +30,17 @@ class RequestUpdatePresence extends Packet{
         return $this->presence;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->presence
+            "uid" => $this->UID,
+            "presence" => $this->presence->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->presence
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            Presence::fromJson($data["presence"]),
+            $data["uid"]
+        );
     }
 }

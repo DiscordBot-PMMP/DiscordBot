@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/resources/emoji#emoji-object */
-class Emoji{
+class Emoji implements \JsonSerializable{
 
     /** Emoji ID */
     private ?string $id;
@@ -146,29 +146,29 @@ class Emoji{
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->id,
-            $this->name,
-            $this->role_ids,
-            $this->user_id,
-            $this->require_colons,
-            $this->managed,
-            $this->animated,
-            $this->available
+            'id' => $this->id,
+            'name' => $this->name,
+            'roles' => $this->role_ids,
+            'user_id' => $this->user_id,
+            'require_colons' => $this->require_colons,
+            'managed' => $this->managed,
+            'animated' => $this->animated,
+            'available' => $this->available,
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->id,
-            $this->name,
-            $this->role_ids,
-            $this->user_id,
-            $this->require_colons,
-            $this->managed,
-            $this->animated,
-            $this->available
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data['id'] ?? null,
+            $data['name'] ?? null,
+            $data['roles'] ?? null,
+            $data['user_id'] ?? null,
+            $data['require_colons'] ?? null,
+            $data['managed'] ?? null,
+            $data['animated'] ?? null,
+            $data['available'] ?? null
+        );
     }
 }

@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 /**
  * @link https://discord.com/developers/docs/resources/webhook#webhook-object
  */
-class Webhook{
+class Webhook implements \JsonSerializable{
 
     /**
      * The type of the webhook
@@ -211,35 +211,35 @@ class Webhook{
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->type,
-            $this->id,
-            $this->guild_id,
-            $this->channel_id,
-            $this->user_id,
-            $this->name,
-            $this->avatar,
-            $this->token,
-            $this->application_id,
-            $this->source_guild_id,
-            $this->source_channel_id
+            "type" => $this->type->jsonSerialize(),
+            "id" => $this->id,
+            "guild_id" => $this->guild_id,
+            "channel_id" => $this->channel_id,
+            "user_id" => $this->user_id,
+            "name" => $this->name,
+            "avatar" => $this->avatar,
+            "token" => $this->token,
+            "application_id" => $this->application_id,
+            "source_guild_id" => $this->source_guild_id,
+            "source_channel_id" => $this->source_channel_id
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->type,
-            $this->id,
-            $this->guild_id,
-            $this->channel_id,
-            $this->user_id,
-            $this->name,
-            $this->avatar,
-            $this->token,
-            $this->application_id,
-            $this->source_guild_id,
-            $this->source_channel_id
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            WebhookType::fromJson($data["type"]),
+            $data["id"] ?? null,
+            $data["guild_id"] ?? null,
+            $data["channel_id"] ?? null,
+            $data["user_id"] ?? null,
+            $data["name"] ?? null,
+            $data["avatar"] ?? null,
+            $data["token"] ?? null,
+            $data["application_id"] ?? null,
+            $data["source_guild_id"] ?? null,
+            $data["source_channel_id"] ?? null
+        );
     }
 }

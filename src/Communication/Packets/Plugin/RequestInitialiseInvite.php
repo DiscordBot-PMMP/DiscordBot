@@ -17,10 +17,12 @@ use JaxkDev\DiscordBot\Models\Invite;
 
 class RequestInitialiseInvite extends Packet{
 
+    public const ID = 18;
+
     private Invite $invite;
 
-    public function __construct(Invite $invite){
-        parent::__construct();
+    public function __construct(Invite $invite, ?int $uid = null){
+        parent::__construct($uid);
         $this->invite = $invite;
     }
 
@@ -28,17 +30,17 @@ class RequestInitialiseInvite extends Packet{
         return $this->invite;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->invite
+            "uid" => $this->UID,
+            "invite" => $this->invite->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->invite
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            Invite::fromJson($data["invite"]),
+            $data["uid"]
+        );
     }
 }

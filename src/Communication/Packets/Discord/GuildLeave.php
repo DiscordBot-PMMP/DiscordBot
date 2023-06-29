@@ -16,10 +16,12 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class GuildLeave extends Packet{
 
+    public const ID = 44;
+
     private string $guild_id;
 
-    public function __construct(string $guild_id){
-        parent::__construct();
+    public function __construct(string $guild_id, ?int $uid = null){
+        parent::__construct($uid);
         $this->guild_id = $guild_id;
     }
 
@@ -27,17 +29,17 @@ class GuildLeave extends Packet{
         return $this->guild_id;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->guild_id
+            "uid" => $this->UID,
+            "guild_id" => $this->guild_id
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->guild_id
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["guild_id"],
+            $data["uid"]
+        );
     }
 }

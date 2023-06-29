@@ -17,10 +17,12 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
 
 class RequestEditMessage extends Packet{
 
+    public const ID = 13;
+
     private Message $message;
 
-    public function __construct(Message $message){
-        parent::__construct();
+    public function __construct(Message $message, ?int $uid = null){
+        parent::__construct($uid);
         $this->message = $message;
     }
 
@@ -28,17 +30,17 @@ class RequestEditMessage extends Packet{
         return $this->message;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->message
+            "uid" => $this->UID,
+            "message" => $this->message->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->message
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            Message::fromJson($data["message"]),
+            $data["uid"]
+        );
     }
 }

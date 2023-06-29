@@ -16,15 +16,17 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordReady extends Packet{
 
-    public function __serialize(): array{
+    public const ID = 42;
+
+    public function jsonSerialize(): array{
         return [
-            $this->UID
+            "uid" => $this->UID
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            $data["uid"]
+        );
     }
 }

@@ -22,4 +22,8 @@ class ChannelPermissions extends Permissions{
         return array_merge(Permissions::ALL_PERMISSIONS, Permissions::TEXT_PERMISSIONS,
             Permissions::VOICE_PERMISSIONS, Permissions::STAGE_PERMISSIONS);
     }
+
+    public static function fromJson(int $value): self{
+        return new self($value);
+    }
 }

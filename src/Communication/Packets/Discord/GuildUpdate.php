@@ -17,10 +17,12 @@ use JaxkDev\DiscordBot\Models\Guild\Guild;
 
 class GuildUpdate extends Packet{
 
+    public const ID = 45;
+
     private Guild $guild;
 
-    public function __construct(Guild $guild){
-        parent::__construct();
+    public function __construct(Guild $guild, ?int $uid = null){
+        parent::__construct($uid);
         $this->guild = $guild;
     }
 
@@ -28,17 +30,17 @@ class GuildUpdate extends Packet{
         return $this->guild;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->guild
+            "uid" => $this->UID,
+            "guild" => $this->guild->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->guild
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            Guild::fromJson($data["guild"]),
+            $data["uid"]
+        );
     }
 }

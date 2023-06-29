@@ -12,10 +12,18 @@
 
 namespace JaxkDev\DiscordBot\Models\Presence;
 
-enum Status: string{
+enum Status: string implements \JsonSerializable{
 
     case ONLINE = "online";
     case IDLE = "idle";
     case DND = "dnd";
     case OFFLINE = "offline";
+
+    public function jsonSerialize(): string{
+        return $this->value;
+    }
+
+    public static function fromJson(string $value): self{
+        return self::from($value);
+    }
 }

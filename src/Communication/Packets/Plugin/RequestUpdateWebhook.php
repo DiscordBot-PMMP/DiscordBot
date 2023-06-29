@@ -17,10 +17,12 @@ use JaxkDev\DiscordBot\Models\Webhook;
 
 class RequestUpdateWebhook extends Packet{
 
+    public const ID = 34;
+
     private Webhook $webhook;
 
-    public function __construct(Webhook $webhook){
-        parent::__construct();
+    public function __construct(Webhook $webhook, ?int $uid = null){
+        parent::__construct($uid);
         $this->webhook = $webhook;
     }
 
@@ -28,17 +30,17 @@ class RequestUpdateWebhook extends Packet{
         return $this->webhook;
     }
 
-    public function __serialize(): array{
+    public function jsonSerialize(): array{
         return [
-            $this->UID,
-            $this->webhook
+            "uid" => $this->UID,
+            "webhook" => $this->webhook->jsonSerialize()
         ];
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->UID,
-            $this->webhook
-        ] = $data;
+    public static function fromJson(array $data): self{
+        return new self(
+            Webhook::fromJson($data["webhook"]),
+            $data["uid"]
+        );
     }
 }
