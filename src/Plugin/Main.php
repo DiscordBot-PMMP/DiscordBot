@@ -12,9 +12,10 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\Communication\InternalThread;
 use JaxkDev\DiscordBot\Communication\NetworkApi;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
 use JaxkDev\DiscordBot\Plugin\Tasks\DebugData;
 use Phar;
@@ -31,7 +32,7 @@ use pocketmine\utils\TextFormat;
 
 class Main extends PluginBase{
 
-    private BotThread $discordBot;
+    private Thread $discordBot;
 
     private ThreadSafeArray $inboundData;
     private ThreadSafeArray $outboundData;
@@ -87,7 +88,7 @@ class Main extends PluginBase{
         $this->communicationHandler = new BotCommunicationHandler($this);
 
         $this->getLogger()->debug("Starting DiscordBot Thread...");
-        $this->discordBot = new BotThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
+        $this->discordBot = new InternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
         $this->discordBot->start(Thread::INHERIT_CONSTANTS);
 
         //Redact token.
@@ -115,7 +116,7 @@ class Main extends PluginBase{
 
         /** @phpstan-ignore-next-line May disable before enable. */
         if($this->discordBot?->isRunning()){
-            $this->discordBot->setStatus(BotThread::STATUS_CLOSING);
+            $this->discordBot->setStatus(ThreadStatus::STOPPING);
             $this->getLogger()->info("Stopping discord thread gracefully, waiting for discord thread to stop...");
             //Never had a condition where it hangs more than 1s (only long period of wait should be during the data dump.)
             $this->discordBot->join();
@@ -181,11 +182,13 @@ class Main extends PluginBase{
 
         if(($currentTick % 20) === 0){
             //Run every second. [Faster/More accurate over bots tick]
-            if($this->discordBot->getStatus() === BotThread::STATUS_READY){
+            if($this->discordBot->getStatus() === ThreadStatus::RUNNING){
                 $this->communicationHandler->checkHeartbeat();
                 $this->communicationHandler->sendHeartbeat();
             }
-            if($this->discordBot->getStatus() === BotThread::STATUS_CLOSED){
+            if($this->discordBot->getStatus() === ThreadStatus::STOPPED){
+                //Thread has crashed, we need to stop the plugin.
+                //If stopping gracefully, this will never be called (tick task gets cancelled).
                 $this->getServer()->getPluginManager()->disablePlugin($this);
             }
         }

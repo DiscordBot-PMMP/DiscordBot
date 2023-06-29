@@ -11,7 +11,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Bot\Handlers;
+namespace JaxkDev\DiscordBot\InternalBot\Handlers;
 
 use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
@@ -27,9 +27,8 @@ use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use Discord\Repository\Channel\WebhookRepository as DiscordWebhookRepository;
 use Discord\Repository\Guild\InviteRepository as DiscordInviteRepository;
-use JaxkDev\DiscordBot\Bot\Client;
-use JaxkDev\DiscordBot\Bot\ModelConverter;
-use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\InternalBot\Client;
+use JaxkDev\DiscordBot\InternalBot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
@@ -65,6 +64,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
@@ -101,7 +101,7 @@ class CommunicationHandler{
         }
 
         //API Check:
-        if($this->client->getThread()->getStatus() !== BotThread::STATUS_READY){
+        if($this->client->getThread()->getStatus() !== ThreadStatus::RUNNING){
             $this->resolveRequest($pk->getUID(), false, "Thread not ready for API Requests.");
             return;
         }

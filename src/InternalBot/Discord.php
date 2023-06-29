@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Bot;
+namespace JaxkDev\DiscordBot\InternalBot;
 
 class Discord extends \Discord\Discord{
     public function handleWsClose(int $op, string $reason): void{

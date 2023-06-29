@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Bot;
+namespace JaxkDev\DiscordBot\InternalBot;
 
 use AssertionError;
 use Carbon\Carbon;

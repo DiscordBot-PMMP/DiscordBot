@@ -10,7 +10,7 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Bot\Handlers;
+namespace JaxkDev\DiscordBot\InternalBot\Handlers;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Channel as DiscordChannel;
@@ -24,9 +24,8 @@ use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
 use Discord\Parts\WebSockets\PresenceUpdate as DiscordPresenceUpdate;
 use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
-use JaxkDev\DiscordBot\Bot\Client;
-use JaxkDev\DiscordBot\Bot\ModelConverter;
-use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\InternalBot\Client;
+use JaxkDev\DiscordBot\InternalBot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate as ChannelPinsUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump as DiscordDataDumpPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd as BanAddPacket;
@@ -55,6 +54,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
+use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\Models\Presence\ClientStatus;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
@@ -191,7 +191,7 @@ array(5) {
     public function onReady(): void{
         //Checked frequently during data dump as this is the only time when it can cause the thread to hang during disable.
         $statusCheck = function(){
-            if($this->client->getThread()->getStatus() !== BotThread::STATUS_STARTED){
+            if($this->client->getThread()->getStatus() !== ThreadStatus::STARTED){
                 $this->logger->warning("Closing thread, unexpected state change.");
                 $this->client->close();
             }
@@ -301,7 +301,7 @@ array(5) {
 
         $this->client->getThread()->writeOutboundData($pk);
 
-        $this->client->getThread()->setStatus(BotThread::STATUS_READY);
+        $this->client->getThread()->setStatus(ThreadStatus::RUNNING);
         $this->logger->info("Client '".$client->username."#".$client->discriminator."' ready.");
 
         $this->client->getThread()->writeOutboundData(new DiscordReadyPacket());

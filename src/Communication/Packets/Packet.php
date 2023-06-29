@@ -24,7 +24,7 @@ abstract class Packet implements \JsonSerializable{
 
     public function __construct(?int $uid = null){
         if($uid === null){
-            //BotThread = Odd, PluginThread = Even. (Keeps them unique, *shrugs*)
+            //Thread = Odd, Plugin = Even. (Keeps them unique, *shrugs*)
             Packet::$UID_COUNT += 2;
             $this->UID = Packet::$UID_COUNT;
         }else{

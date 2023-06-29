@@ -10,17 +10,18 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Bot;
+namespace JaxkDev\DiscordBot\InternalBot;
 
 use Discord\Exceptions\IntentException;
 use Discord\WebSockets\Intents;
 use Discord\WebSockets\Op;
 use Error;
 use ErrorException;
-use JaxkDev\DiscordBot\Bot\Handlers\DiscordEventHandler;
-use JaxkDev\DiscordBot\Bot\Handlers\CommunicationHandler;
-use JaxkDev\DiscordBot\Communication\BotThread;
+use JaxkDev\DiscordBot\InternalBot\Handlers\DiscordEventHandler;
+use JaxkDev\DiscordBot\InternalBot\Handlers\CommunicationHandler;
+use JaxkDev\DiscordBot\Communication\InternalThread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use Monolog\Level as LoggerLevel;
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
@@ -29,7 +30,7 @@ use Throwable;
 
 class Client{
 
-    private BotThread $thread;
+    private InternalThread $thread;
 
     private Discord $client;
 
@@ -45,11 +46,8 @@ class Client{
 
     private int $lastGCCollection = 0;
 
-    private array $config;
-
-    public function __construct(BotThread $thread, array $config){
+    public function __construct(InternalThread $thread){
         $this->thread = $thread;
-        $this->config = $config;
 
         gc_enable();
 
@@ -64,6 +62,8 @@ class Client{
         ini_set("date.timezone", "UTC");
 
         Packet::$UID_COUNT = 1;
+
+        $config = $this->getConfig();
 
         $this->logger = new Logger('DiscordThread');
         $handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['max_files'], LoggerLevel::Debug);
@@ -91,7 +91,8 @@ class Client{
             $this->close($e);
         }
 
-        $this->config['discord']['token'] = "REDACTED";
+        $this->thread->secureConfig();
+        unset($config);
 
         $this->communicationHandler = new CommunicationHandler($this);
         $this->discordEventHandler = new DiscordEventHandler($this);
@@ -99,8 +100,8 @@ class Client{
         $this->registerHandlers();
         $this->registerTimers();
 
-        if($this->thread->getStatus() === BotThread::STATUS_STARTING){
-            $this->thread->setStatus(BotThread::STATUS_STARTED);
+        if($this->thread->getStatus() === ThreadStatus::STARTING){
+            $this->thread->setStatus(ThreadStatus::STARTED);
             $this->client->run();
         }else{
             $this->logger->warning("Closing thread, unexpected state change.");
@@ -112,7 +113,7 @@ class Client{
         // Handles shutdown, rather than a SHUTDOWN const to send through internal communication, set flag to closed.
         // Saves time & will guarantee closure ASAP rather than waiting in line through ^
         $this->client->getLoop()->addPeriodicTimer(1, function(){
-            if($this->thread->getStatus() === BotThread::STATUS_CLOSING){
+            if($this->thread->getStatus() === ThreadStatus::STOPPING){
                 $this->close();
             }
         });
@@ -120,9 +121,8 @@ class Client{
         // Handles any problems pre-ready.
         $this->readyTimer = $this->client->getLoop()->addTimer(30, function(){
             if($this->client->id !== null){
-                $this->logger->warning("Client has taken >30s to get ready, How large is your discord guild !?  [Create an issue on github is this persists]");
                 $this->client->getLoop()->addTimer(30, function(){
-                    if($this->thread->getStatus() !== BotThread::STATUS_READY){
+                    if($this->thread->getStatus() !== ThreadStatus::RUNNING){
                         $this->logger->critical("Client has taken too long to become ready (>60s), shutting down.");
                         $this->close();
                     }
@@ -157,14 +157,14 @@ class Client{
     }
 
     public function tick(): void{
-        $data = $this->thread->readInboundData($this->config["protocol"]["packets_per_tick"]);
+        $data = $this->thread->readInboundData($this->getConfig()["protocol"]["packets_per_tick"]);
 
         foreach($data as $d){
             $this->communicationHandler->handle($d);
         }
 
         if(($this->tickCount % 20) === 0){
-            if($this->thread->getStatus() === BotThread::STATUS_READY){
+            if($this->thread->getStatus() === ThreadStatus::RUNNING){
                 $this->communicationHandler->checkHeartbeat();
                 $this->communicationHandler->sendHeartbeat();
             }
@@ -182,14 +182,14 @@ class Client{
     }
 
     public function getConfig(): array{
-        return $this->config;
+        return $this->thread->getConfig();
     }
 
     public function getLogger(): Logger{
         return $this->logger;
     }
 
-    public function getThread(): BotThread{
+    public function getThread(): InternalThread{
         return $this->thread;
     }
 
@@ -233,8 +233,8 @@ class Client{
 
     /** @noinspection PhpConditionAlreadyCheckedInspection */
     public function close($error = null): void{ /** @phpstan-ignore-line  */
-        if($this->thread->getStatus() === BotThread::STATUS_CLOSED) return;
-        $this->thread->setStatus(BotThread::STATUS_CLOSED);
+        if($this->thread->getStatus() === ThreadStatus::STOPPED) return;
+        $this->thread->setStatus(ThreadStatus::STOPPED);
         if($error instanceof Throwable){
             $errorConversion = [
                 0 => "EXCEPTION",
@@ -261,6 +261,7 @@ class Client{
             }
         }
         try{
+            /** @phpstan-ignore-next-line Client may not have open before closing. */
             $this->client?->close();
         }catch (Error $e){
             $this->logger->debug("Failed to close client, probably not started. ({$e->getMessage()})");
