@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dde5efc253860730a7e0d3f26fff889a",
+    "content-hash": "4eadc8258ef826b49b609ed82fb048dc",
     "packages": [
         {
             "name": "discord-php/http",
@@ -2208,16 +2208,16 @@
         },
         {
             "name": "team-reflex/discord-php",
-            "version": "v10.0.0-RC5",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/discord-php/DiscordPHP.git",
-                "reference": "edfa57db56e59ed51b0e2945408020f67431cede"
+                "reference": "c892cfb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/edfa57db56e59ed51b0e2945408020f67431cede",
-                "reference": "edfa57db56e59ed51b0e2945408020f67431cede",
+                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/c892cfb",
+                "reference": "c892cfb",
                 "shasum": ""
             },
             "require": {
@@ -2253,6 +2253,7 @@
                 "ext-mbstring": "For accurate calculations of string length when handling non-english characters.",
                 "ext-uv": "For a faster, and more performant loop. Preferred."
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -2277,10 +2278,10 @@
                 "chat": "https://discord.gg/dphp",
                 "docs": "https://discord-php.github.io/DiscordPHP/",
                 "issues": "https://github.com/discord-php/DiscordPHP/issues",
-                "source": "https://github.com/discord-php/DiscordPHP/tree/v10.0.0-RC5",
+                "source": "https://github.com/discord-php/DiscordPHP/tree/master",
                 "wiki": "https://github.com/discord-php/DiscordPHP/wiki"
             },
-            "time": "2023-02-11T16:40:37+00:00"
+            "time": "2023-06-25T06:57:38+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",
@@ -3681,7 +3682,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "team-reflex/discord-php": 5
+        "team-reflex/discord-php": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
