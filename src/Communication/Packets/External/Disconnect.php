@@ -10,11 +10,11 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
+namespace JaxkDev\DiscordBot\Communication\Packets\External;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordClose extends Packet{
+class Disconnect extends Packet{
 
     public const ID = 63;
 

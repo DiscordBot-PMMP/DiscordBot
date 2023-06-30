@@ -10,13 +10,16 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Packets;
+namespace JaxkDev\DiscordBot\Communication\Packets\External;
+
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 /**
  * Packet for external bot to verify its connection with the correct Version and MAGIC.
- * Only used on ExternalThread.
  */
-class Verify extends Packet{
+class Connect extends Packet{
+
+    public const ID = 0;
 
     private int $version;
     private int $magic;

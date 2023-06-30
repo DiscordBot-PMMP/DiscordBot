@@ -78,8 +78,11 @@ abstract class Thread extends PMMPThread{
                 if(!is_array($data[1])){
                     throw new \AssertionError("Invalid packet data - ".$raw_data);
                 }
-                /** @var Packet $packet */
+                /** @var ?Packet $packet */
                 $packet = NetworkApi::getPacketClass($data[0]);
+                if($packet === null){
+                    throw new \AssertionError("Invalid packet ID - ".$raw_data);
+                }
                 return $packet::fromJson($data[1]);
             }, $this->inboundData->chunk($count));
         }

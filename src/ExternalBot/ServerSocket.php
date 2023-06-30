@@ -163,8 +163,7 @@ class ServerSocket{
                     self::close($client, "Invalid packet type, Expecting Connect packet.");
                     break;
                 }
-                var_dump("Received Connect packet:");
-                var_dump($packet);
+                var_dump("Received Connect packet.");
                 if($packet->getMagic() !== NetworkApi::MAGIC){
                     self::close($client, "Invalid network magic.");
                     break;

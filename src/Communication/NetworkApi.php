@@ -12,8 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Communication;
 
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordClose;
-use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanRemove;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate;
@@ -42,6 +40,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\External\Connect;
+use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
+use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
@@ -74,7 +75,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdatePresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
-use JaxkDev\DiscordBot\Communication\Packets\Verify;
 
 class NetworkApi{
 
@@ -86,7 +86,7 @@ class NetworkApi{
     //Map all packets to their ID.
     /** @var array<int, class-string>  */
     public const PACKETS = [
-        Verify::ID => Verify::class,
+        Connect::ID => Connect::class,
         Heartbeat::ID => Heartbeat::class,
         Resolution::ID => Resolution::class,
         RequestAddReaction::ID => RequestAddReaction::class,
@@ -148,15 +148,15 @@ class NetworkApi{
         RoleDelete::ID => RoleDelete::class,
         RoleUpdate::ID => RoleUpdate::class,
         VoiceStateUpdate::ID => VoiceStateUpdate::class,
-        DiscordClose::ID => DiscordClose::class,
+        Disconnect::ID => Disconnect::class,
         //64 Next ID
     ];
 
     /**
      * @param int $id
-     * @return class-string
+     * @return ?class-string
      */
-    public static function getPacketClass(int $id): string{
-        return self::PACKETS[$id];
+    public static function getPacketClass(int $id): ?string{
+        return self::PACKETS[$id] ?? null;
     }
 }
