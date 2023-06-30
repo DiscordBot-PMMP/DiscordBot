@@ -27,9 +27,12 @@ class DebugData extends AsyncTask{
     private string $version;
     private string $pocketmineVersion;
     private string $serverVersion;
+    //Cannot fetch serialised storage from this task, so we pass it in.
+    private string $storage;
 
-    public function __construct(Main $plugin, CommandSender $sender){
+    public function __construct(Main $plugin, CommandSender $sender, string $storage){
         $this->storeLocal("sender", $sender);
+        $this->storage = $storage;
         $this->serverFolder = $plugin->getServer()->getDataPath();
         $this->pluginFolder = $plugin->getDataFolder();
         $this->config = yaml_emit($plugin->getPluginConfig());
@@ -68,9 +71,7 @@ class DebugData extends AsyncTask{
         }
 
         //Add Storage.
-        if(Storage::getTimestamp() !== 0){
-            $z->addFromString("storage.serialized", Storage::serializeStorage());
-        }
+        $z->addFromString("storage.serialized", $this->storage);
 
         //Some metadata, instead of users having no clue of anything I ask, therefore generate this information beforehand.
         $time = time();
