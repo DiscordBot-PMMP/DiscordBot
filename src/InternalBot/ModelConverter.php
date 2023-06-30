@@ -104,7 +104,7 @@ abstract class ModelConverter{
         /** @var ?object{"join": string|null, "spectate": string|null, "match": string|null} $secrets */
         $secrets = $discordActivity->secrets;
         /** @var ActivityButton[] $buttons */
-        $buttons = ($discordActivity->buttons === null ? [] : array_map(fn($button) => new ActivityButton($button->label ?? "", $button->url ?? null), $discordActivity->buttons));
+        $buttons = ($discordActivity->buttons === null ? [] : array_map(fn($button) => new ActivityButton(is_string($button) ? $button : $button->label, $button->url ?? null), $discordActivity->buttons));
 
         return new Activity($discordActivity->name, ActivityType::from($discordActivity->type), $discordActivity->url ?? null,
             $discordActivity->created_at?->getTimestamp(), $timestamps?->start ?? null, $timestamps?->end ?? null,
