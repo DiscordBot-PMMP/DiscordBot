@@ -12,8 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-use JaxkDev\DiscordBot\Communication\ExternalThread;
-use JaxkDev\DiscordBot\Communication\InternalThread;
 use JaxkDev\DiscordBot\Communication\NetworkApi;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Thread;
@@ -86,11 +84,7 @@ class Main extends PluginBase{
 
         $this->getLogger()->debug("Starting DiscordBot Thread...");
 
-        if($this->config["discord"]["type"] === "external"){
-            $this->discordBot = new ExternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
-        }else{
-            $this->discordBot = new InternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
-        }
+        $this->discordBot = new Thread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
 
         $this->discordBot->start(Thread::INHERIT_CONSTANTS);
 

@@ -18,13 +18,17 @@ use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Thread;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Level as LoggerLevel;
+use Monolog\Logger;
 use Socket;
 
 //Small testing socket.
-//TODO Logs.
 class ServerSocket{
 
     private Thread $thread;
+
+    private Logger $logger;
 
     private Socket $sock;
 
@@ -35,23 +39,39 @@ class ServerSocket{
 
     public function __construct(Thread $thread){
         $this->thread = $thread;
+
+        //Socket options.
         $this->host = (string)$this->thread->getConfig()["protocol"]["external"]["host"];
         $this->port = (int)$this->thread->getConfig()["protocol"]["external"]["port"];
+
+        //Setup logger.
+        $this->logger = new Logger('DiscordThread-External');
+        $handler = new RotatingFileHandler(
+            \JaxkDev\DiscordBot\DATA_PATH . $this->thread->getConfig()['logging']['directory'] . DIRECTORY_SEPARATOR . "DiscordBot.log",
+            $this->thread->getConfig()['logging']['max_files'],
+            LoggerLevel::Debug
+        );
+        $handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
+        $this->logger->setHandlers(array($handler));
+
+        $this->getLogger()->debug("Creating socket.");
         $sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if($sock === false){
             throw new \RuntimeException("Failed to create socket.");
         }
+        $this->getLogger()->debug("Setting socket to non-blocking.");
         $this->sock = $sock;
         if(socket_set_nonblock($this->sock) === false){
             socket_close($this->sock);
             throw new \RuntimeException("Failed to set socket to non-blocking.");
         }
-        if(socket_set_option($this->sock, SOL_SOCKET, SO_REUSEADDR, 1)){
-            //Warning.
-        }
+
+        $this->getLogger()->debug("Socket created.");
+        $this->start();
     }
 
-    public function start(): void{
+    private function start(): void{
+        $this->getLogger()->debug("Starting socket.");
         $this->thread->setStatus(ThreadStatus::STARTING);
 
         if(socket_bind($this->sock, $this->host, $this->port) === false){
@@ -240,5 +260,9 @@ class ServerSocket{
             }
             $this->lastTick = $time;
         }
+    }
+
+    public function getLogger(): Logger{
+        return $this->logger;
     }
 }

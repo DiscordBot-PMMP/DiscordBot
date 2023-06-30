@@ -13,14 +13,16 @@
 namespace JaxkDev\DiscordBot\Communication;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\ExternalBot\ServerSocket;
+use JaxkDev\DiscordBot\InternalBot\Client;
 use pmmp\thread\Thread as PMMPThread;
 use pmmp\thread\ThreadSafeArray;
 
 /**
  * This class is used to represent a thread that is used for network communication.
- * At the moment there are two options, InternalThread (hosting the bot) and ExternalThread (hosting the bot outside the server).
+ * There are two options, internal (hosting the bot) and external (hosting the bot outside the server).
  */
-abstract class Thread extends PMMPThread{
+ class Thread extends PMMPThread{
 
     private ThreadStatus $status = ThreadStatus::STARTING;
 
@@ -32,6 +34,22 @@ abstract class Thread extends PMMPThread{
         $this->config = $config;
         $this->inboundData = $inboundData;
         $this->outboundData = $outboundData;
+    }
+
+    public function run(): void{
+        //Ignores everything outside our own files.
+        require_once(\JaxkDev\DiscordBot\COMPOSER);
+
+        // Mono logger can have issues with other timezones, for now use UTC.
+        // Must be set globally due to internal methods in the rotating file handler.
+        // Note, this does not affect outside thread.
+        ini_set("date.timezone", "UTC");
+
+        if($this->config["discord"]["type"] === "internal"){
+            new Client($this);
+        }else{
+            new ServerSocket($this);
+        }
     }
 
     public function getStatus(): ThreadStatus{

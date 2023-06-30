@@ -17,20 +17,20 @@ use Discord\WebSockets\Intents;
 use Discord\WebSockets\Op;
 use Error;
 use ErrorException;
-use JaxkDev\DiscordBot\InternalBot\Handlers\DiscordEventHandler;
-use JaxkDev\DiscordBot\InternalBot\Handlers\CommunicationHandler;
-use JaxkDev\DiscordBot\Communication\InternalThread;
+use JaxkDev\DiscordBot\Communication\Thread;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
+use JaxkDev\DiscordBot\InternalBot\Handlers\DiscordEventHandler;
+use JaxkDev\DiscordBot\InternalBot\Handlers\CommunicationHandler;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level as LoggerLevel;
 use Monolog\Logger;
-use Monolog\Handler\RotatingFileHandler;
 use React\EventLoop\TimerInterface;
 use Throwable;
 
 class Client{
 
-    private InternalThread $thread;
+    private Thread $thread;
 
     private Discord $client;
 
@@ -46,7 +46,7 @@ class Client{
 
     private int $lastGCCollection = 0;
 
-    public function __construct(InternalThread $thread){
+    public function __construct(Thread $thread){
         $this->thread = $thread;
 
         gc_enable();
@@ -56,17 +56,16 @@ class Client{
         set_exception_handler([$this, 'close']);
         register_shutdown_function([$this, 'close']);
 
-        // Mono logger can have issues with other timezones, for now use UTC.
-        // Must be set globally due to internal methods in the rotating file handler.
-        // Note, this does not affect outside thread config.
-        ini_set("date.timezone", "UTC");
-
         Packet::$UID_COUNT = 1;
 
         $config = $this->getConfig();
 
-        $this->logger = new Logger('DiscordThread');
-        $handler = new RotatingFileHandler(\JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log", $config['logging']['max_files'], LoggerLevel::Debug);
+        $this->logger = new Logger('DiscordThread-Internal');
+        $handler = new RotatingFileHandler(
+            \JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log",
+            $config['logging']['max_files'],
+            LoggerLevel::Debug
+        );
         $handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
         $this->logger->setHandlers(array($handler));
 
@@ -190,7 +189,7 @@ class Client{
         return $this->logger;
     }
 
-    public function getThread(): InternalThread{
+    public function getThread(): Thread{
         return $this->thread;
     }
 
