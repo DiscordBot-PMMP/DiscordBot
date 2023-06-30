@@ -1,7 +1,9 @@
 ---
 version: 4
 
-token: "Long Discord Token here."
+discord:
+  token: "Long Discord Token here."
+  type: "internal"
 
 logging:
   max_files: 28

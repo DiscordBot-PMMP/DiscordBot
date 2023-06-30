@@ -55,7 +55,7 @@ abstract class Thread extends PMMPThread{
      * This is recommended once token has been loaded to avoid token leaks on crashes etc.
      */
     public function secureConfig(): void{
-        $this->config["token"] = "**** Redacted Token ****";
+        $this->config["discord"]["token"] = "**** Redacted Token ****";
     }
 
     /**

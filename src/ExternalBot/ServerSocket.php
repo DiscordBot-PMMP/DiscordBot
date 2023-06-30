@@ -13,9 +13,9 @@
 namespace JaxkDev\DiscordBot\ExternalBot;
 
 use JaxkDev\DiscordBot\Communication\NetworkApi;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordClose;
+use JaxkDev\DiscordBot\Communication\Packets\External\Connect;
+use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Communication\Packets\Verify;
 use JaxkDev\DiscordBot\Communication\Thread;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use Socket;
@@ -69,17 +69,35 @@ class ServerSocket{
     }
 
     private static function close(Socket $sock, ?string $message = null): void{
-        $close = json_encode(new DiscordClose($message), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        if($close === false){
-            throw new \RuntimeException("Failed to encode close packet.");
-        }
-        $buf = pack("N", strlen($close)) . $close;
-        @socket_write($sock, $buf);
+        var_dump("Closing socket: ".$message);
+        $close = new Disconnect($message);
+        try{
+            self::writeDataPacket($sock, $close);
+        }catch(\AssertionError){}
         @socket_close($sock);
     }
 
     /**
-     * @throws \Throwable
+     * @throws \AssertionError
+     */
+    private static function writeDataPacket(Socket $sock, Packet|string $packet): void{
+        if($packet instanceof Packet){
+            $data = json_encode($packet, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            if($data === false){
+                throw new \AssertionError("Failed to encode packet.");
+            }
+        }else{
+            $data = $packet;
+        }
+        // data length (Unsigned 32bit BE) + packet id (Unsigned 16bit BE) + data (string)
+        $buf = pack("Nn", strlen($data) + 2, $packet::ID) . $data;
+        if(socket_write($sock, $buf) === false){
+            throw new \AssertionError("Failed to write packet.");
+        }
+    }
+
+    /**
+     * @throws \AssertionError
      */
     private static function readDataPacket(Socket $sock, bool $block = false): ?Packet{
         do{
@@ -92,29 +110,30 @@ class ServerSocket{
         $len = unpack("N", $buf);
         if($len === false){
             self::close($sock, "Failed to read data length.");
-            throw new \RuntimeException("Failed to unpack data length.");
+            throw new \AssertionError("Failed to unpack data length.");
         }
         $buf = socket_read($sock, $len[1]);
         if($buf === false or $buf === "" or strlen($buf) !== $len[1]){
             self::close($sock, "Failed to read data.");
-            throw new \RuntimeException("Failed to read data.");
+            throw new \AssertionError("Failed to read data.");
         }
 
-        $data = (array)json_decode($buf, true);
-        if(sizeof($data) !== 2){
-            throw new \AssertionError("Invalid packet size.");
+        $id = unpack("n", substr($buf, 0, 2));
+        if($id === false){
+            self::close($sock, "Failed to read packet id.");
+            throw new \AssertionError("Failed to unpack packet id.");
         }
-        if(!is_int($data[0])){
-            throw new \AssertionError("Invalid packet type ID.");
-        }
-        if(!is_array($data[1])){
-            throw new \AssertionError("Invalid packet data.");
+        $data = (array)json_decode(substr($buf, 2));
+
+        /** @var ?Packet $packet */
+        $packet = NetworkApi::getPacketClass($id[1]);
+        if($packet === null){
+            self::close($sock, "Unknown packet id $id[1] received.");
+            throw new \AssertionError("Unknown packet id received.");
         }
 
         try{
-            /** @var Packet $packet */
-            $packet = NetworkApi::getPacketClass($data[0]);
-            $packet = $packet::fromJson($data[1]);
+            $packet = $packet::fromJson($data);
         }catch(\Throwable $e){
             self::close($sock, "Failed to parse packet - " . $e->getMessage());
             throw new \AssertionError("Failed to parse packet.", 0, $e);
@@ -132,19 +151,19 @@ class ServerSocket{
             $client = socket_accept($this->sock);
             if($client === false) continue;
             socket_getpeername($client, $ip, $port);
-            var_dump("New client from " . $ip . " on port " . $port . ", pending verification.");
+            var_dump("New client from " . $ip . " on port " . $port . ", pending Connect packet.");
             while(true){
                 //Wait for initial Packet.
                 try{
                     $packet = self::readDataPacket($client, true);
-                }catch(\Throwable){
+                }catch(\AssertionError){
                     break;
                 }
-                if(!$packet instanceof Verify){
-                    self::close($client, "Invalid packet type, Expecting verify packet.");
+                if(!$packet instanceof Connect){
+                    self::close($client, "Invalid packet type, Expecting Connect packet.");
                     break;
                 }
-                var_dump("Received verify packet:");
+                var_dump("Received Connect packet:");
                 var_dump($packet);
                 if($packet->getMagic() !== NetworkApi::MAGIC){
                     self::close($client, "Invalid network magic.");
@@ -154,14 +173,14 @@ class ServerSocket{
                     self::close($client, "Invalid network version, expecting " . NetworkApi::VERSION . " got " . $packet->getVersion() . ".");
                     break;
                 }
-                var_dump("Client verified.");
+                var_dump("Client connected successfully.");
 
-                $packet = json_encode(new Verify(NetworkApi::VERSION, NetworkApi::MAGIC), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-                if($packet === false){
-                    throw new \RuntimeException("Failed to encode outbound verify packet.");
+                $packet = new Connect(NetworkApi::VERSION, NetworkApi::MAGIC);
+                try{
+                    self::writeDataPacket($client, $packet);
+                }catch(\AssertionError $e){
+                    throw new \RuntimeException("Failed to send outbound Connect packet.", 0, $e);
                 }
-                socket_write($client, pack("N", strlen($packet)) . $packet);
-
                 $this->tickLoop($client);
                 break;
             }
@@ -173,7 +192,7 @@ class ServerSocket{
      * Loop the socket for packets.
      */
     private function tickLoop(Socket $client): void{
-        $this->thread->setStatus(ThreadStatus::STARTED);
+        $this->thread->setStatus(ThreadStatus::RUNNING);
         $this->lastTick = (int)(microtime(true)*1000000);
         while(true){
 
@@ -183,33 +202,37 @@ class ServerSocket{
             do{
                 try{
                     $packet = self::readDataPacket($client);
-                }catch(\Throwable){
+                }catch(\AssertionError){
                     return;
                 }
 
                 if($packet !== null){
                     $count += 1;
-                    var_dump("Received packet:");
-                    var_dump($packet);
-                    if($packet instanceof Verify){
-                        throw new \AssertionError("Invalid packet type, Not expecting verify packet.");
+                    if($packet instanceof Connect){
+                        self::close($client, "Invalid packet type, Not expecting connect packet.");
+                        return;
                     }
-                    if($packet instanceof DiscordClose){
-                        var_dump("Closing external bot connection, reason: ".$packet->getMessage());
+                    if($packet instanceof Disconnect){
+                        var_dump("External client disconnected, reason: ".$packet->getMessage());
                         socket_close($client);
                         return;
                     }
+                    var_dump("Received packet: " . $packet::ID . "(" . $packet->getUID() . ") from external client.");
                     $this->thread->writeOutboundData($packet);
                 }
             }while($packet !== null and $count < $this->thread->getConfig()["protocol"]["general"]["packets_per_tick"]);
 
             //Write packets:
-            /** @var string[] $packets */
-            $packets = $this->thread->readInboundData($this->thread->getConfig()["protocol"]["external"]["max-packets-per-tick"], true);
+            /** @var Packet[] $packets */
+            $packets = $this->thread->readInboundData($this->thread->getConfig()["protocol"]["general"]["packets_per_tick"]);
             foreach($packets as $data){
-                socket_write($client, pack("N", strlen($data)) . $data);
+                try{
+                    var_dump("Sending packet: " . $data::ID . "(" . $data->getUID() . ") to external client.");
+                    self::writeDataPacket($client, $data);
+                }catch(\AssertionError $e){
+                    var_dump("Failed to send outbound packet ". $data::ID . " " . $e->getMessage());
+                }
             }
-
 
             $time = (int)(microtime(true)*1000000);
             //sleep dynamically to keep up with the tick rate (1/20).

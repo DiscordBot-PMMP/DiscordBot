@@ -68,7 +68,7 @@ abstract class ConfigUtils{
 
     static private function patch_3(array $config): array{
         $config["version"] = 4;
-        $config["token"] = $config["discord"]["token"];
+        $config["discord"]["type"] = "internal";
         $old = $config["protocol"];
         $config["protocol"] = [
             "general" => [
@@ -83,7 +83,7 @@ abstract class ConfigUtils{
                 "port" => 22222
             ]
         ];
-        unset($config["discord"]);
+        unset($config["discord"]["use_plugin_cacert"]);
         return $config;
     }
 
@@ -102,11 +102,22 @@ abstract class ConfigUtils{
             }
         }
 
-        if(!array_key_exists("token", $config) or $config["token"] === null){
-            $result[] = "No 'token' field found.";
+        if(!array_key_exists("discord", $config) or $config["discord"] === null){
+            $result[] = "No 'discord' field found.";
         }else{
-            if(!is_string($config["token"]) or strlen($config["token"]) < 59){
-                $result[] = "Invalid 'token' ({$config["token"]}), did you follow the wiki ?";
+            if(!array_key_exists("token", $config["discord"]) or $config["discord"]["token"] === null){
+                $result[] = "No 'discord.token' field found.";
+            }else{
+                if(!is_string($config["discord"]["token"]) or strlen($config["discord"]["token"]) < 59){
+                    $result[] = "Invalid 'discord.token' ({$config["discord"]["token"]}), did you follow the wiki ?";
+                }
+            }
+            if(!array_key_exists("type", $config["discord"]) or $config["discord"]["type"] === null){
+                $result[] = "No 'discord.type' field found.";
+            }else{
+                if(!is_string($config["discord"]["type"]) or !in_array($config["discord"]["type"], ["internal", "external"])){
+                    $result[] = "Invalid 'discord.token' ({$config["discord"]["token"]}), must be 'internal' or 'external'.";
+                }
             }
         }
 

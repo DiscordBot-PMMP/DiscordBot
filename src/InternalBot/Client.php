@@ -80,7 +80,7 @@ class Client{
 
         try{
             $this->client = new Discord([
-                'token' => $config['token'],
+                'token' => $config['discord']['token'],
                 'logger' => $this->logger,
                 'socket_options' => $socket_opts,
                 'loadAllMembers' => true,

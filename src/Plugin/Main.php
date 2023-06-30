@@ -85,16 +85,17 @@ class Main extends PluginBase{
         $this->communicationHandler = new BotCommunicationHandler($this);
 
         $this->getLogger()->debug("Starting DiscordBot Thread...");
-//*
-        $this->externalThread = new ExternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
-        $this->externalThread->start(Thread::INHERIT_CONSTANTS);
-        return;
-//*
-        $this->discordBot = new InternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
+
+        if($this->config["discord"]["type"] === "external"){
+            $this->discordBot = new ExternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
+        }else{
+            $this->discordBot = new InternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
+        }
+
         $this->discordBot->start(Thread::INHERIT_CONSTANTS);
 
         //Redact token.
-        $this->config["token"] = "**** Redacted Token ****";
+        $this->config["discord"]["token"] = "**** Redacted Token ****";
 
         $this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void{
             $this->tick($this->getServer()->getTick());
@@ -187,7 +188,7 @@ class Main extends PluginBase{
         }
 
         if(($currentTick % 20) === 0){
-            //Run every second. [Faster/More accurate over bots tick]
+            //Run every second. [Faster/More accurate over internal bots tick]
             if($this->discordBot->getStatus() === ThreadStatus::RUNNING){
                 $this->communicationHandler->checkHeartbeat();
                 $this->communicationHandler->sendHeartbeat();
