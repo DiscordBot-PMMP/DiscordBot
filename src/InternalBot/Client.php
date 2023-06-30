@@ -71,7 +71,7 @@ class Client{
         $this->logger->setHandlers(array($handler));
 
         $socket_opts = [];
-        if($config["discord"]["use_plugin_cacert"]){
+        if($config["protocol"]["internal"]["use_plugin_cacert"]){
             $this->logger->debug("TLS cafile set to '".\JaxkDev\DiscordBot\DATA_PATH."cacert.pem"."'");
             $socket_opts["tls"] = [
                 "cafile" => \JaxkDev\DiscordBot\DATA_PATH."cacert.pem"
@@ -80,7 +80,7 @@ class Client{
 
         try{
             $this->client = new Discord([
-                'token' => $config['discord']['token'],
+                'token' => $config['token'],
                 'logger' => $this->logger,
                 'socket_options' => $socket_opts,
                 'loadAllMembers' => true,

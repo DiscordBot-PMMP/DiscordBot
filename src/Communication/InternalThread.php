@@ -20,6 +20,7 @@ use JaxkDev\DiscordBot\InternalBot\Client;
 class InternalThread extends Thread{
 
     public function run(): void{
+
         //Ignores everything outside our own files.
         require_once(\JaxkDev\DiscordBot\COMPOSER);
 

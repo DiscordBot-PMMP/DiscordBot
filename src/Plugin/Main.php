@@ -16,11 +16,11 @@ use JaxkDev\DiscordBot\Communication\ExternalThread;
 use JaxkDev\DiscordBot\Communication\InternalThread;
 use JaxkDev\DiscordBot\Communication\NetworkApi;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Communication\Thread;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
 use JaxkDev\DiscordBot\Plugin\Tasks\DebugData;
 use Phar;
-use pmmp\thread\Thread;
 use pmmp\thread\ThreadSafeArray;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -73,6 +73,7 @@ class Main extends PluginBase{
     }
 
     protected function onEnable(): void{
+        //return;
         if(!$this->loadConfig()) return;
 
         /** @noinspection PhpUndefinedFunctionInspection xdebug_info */
@@ -88,35 +89,38 @@ class Main extends PluginBase{
         $this->externalThread = new ExternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
         $this->externalThread->start(Thread::INHERIT_CONSTANTS);
         return;
-*/
+/*/
         $this->discordBot = new InternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
         $this->discordBot->start(Thread::INHERIT_CONSTANTS);
 
         //Redact token.
-        $this->config["discord"]["token"] = preg_replace('([a-zA-Z0-9])','*', $this->config["discord"]["token"]);
+        $this->config["token"] = preg_replace('([a-zA-Z0-9])','*', $this->config["token"]);
 
         $this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void{
             $this->tick($this->getServer()->getTick());
         }), 1);
     }
 
-    /** @noinspection PhpConditionAlreadyCheckedInspection */
     protected function onDisable(): void{
         (new DiscordClosed($this))->call();
 
-        /** @phpstan-ignore-next-line May disable before enable. */
-        $this->tickTask?->cancel();
+        try{
+            $this->tickTask->cancel();
+        }catch(\Error){} //Ignore if tickTask isn't set.
 
         //TODO Check if thread closed before we disabled (indicating an error/crash occurred in thread TBD on this method)
         //If so, we need to generate a crash dump (debug data but in a separate folder for 'crashes'/'errors')
         //TODO Also generate dump if PLUGIN crashes or similar.
-        /** @phpstan-ignore-next-line May disable before enable. */
-        if($this->discordBot?->isTerminated()){
-            $this->getLogger()->error("Discord thread terminated, check logs for more information.");
+        try{
+            if($this->discordBot->isTerminated()){
+                $this->getLogger()->error("Discord thread terminated, check logs for more information.");
+            }
+        }catch(\Error){
+            //Ignore not initialised.
+            return;
         }
 
-        /** @phpstan-ignore-next-line May disable before enable. */
-        if($this->discordBot?->isRunning()){
+        if($this->discordBot->isRunning()){
             $this->discordBot->setStatus(ThreadStatus::STOPPING);
             $this->getLogger()->info("Stopping discord thread gracefully, waiting for discord thread to stop...");
             //Never had a condition where it hangs more than 1s (only long period of wait should be during the data dump.)
@@ -175,7 +179,7 @@ class Main extends PluginBase{
     }
 
     private function tick(int $currentTick): void{
-        $data = $this->readInboundData($this->config["protocol"]["packets_per_tick"]);
+        $data = $this->readInboundData($this->config["protocol"]["general"]["packets_per_tick"]);
 
         /** @var Packet $d */
         foreach($data as $d){

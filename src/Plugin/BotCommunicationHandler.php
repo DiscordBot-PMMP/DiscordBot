@@ -443,7 +443,7 @@ class BotCommunicationHandler{
      */
     public function checkHeartbeat(): void{
         if($this->lastHeartbeat === null) return;
-        if(($diff = microtime(true) - $this->lastHeartbeat) > $this->plugin->getPluginConfig()["protocol"]["heartbeat_allowance"]){
+        if(($diff = microtime(true) - $this->lastHeartbeat) > $this->plugin->getPluginConfig()["protocol"]["general"]["heartbeat_allowance"]){
             $this->plugin->getLogger()->emergency("DiscordBot has not responded for {$diff} seconds, disabling plugin.");
             $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
         }

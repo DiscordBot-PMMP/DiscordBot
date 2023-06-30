@@ -25,6 +25,10 @@ class DiscordClose extends Packet{
         $this->message = $message ?? "Unknown";
     }
 
+    public function getMessage(): string{
+        return $this->message;
+    }
+
     public function jsonSerialize(): array{
         return [
             "message" => $this->message
