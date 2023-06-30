@@ -1,0 +1,222 @@
+<?php
+/*
+ * DiscordBot, PocketMine-MP Plugin.
+ *
+ * Licensed under the Open Software License version 3.0 (OSL-3.0)
+ * Copyright (C) 2020-present JaxkDev
+ *
+ * Twitter :: @JaxkDev
+ * Discord :: JaxkDev
+ * Email   :: JaxkDev@gmail.com
+ */
+
+namespace JaxkDev\DiscordBot\ExternalBot;
+
+use JaxkDev\DiscordBot\Communication\NetworkApi;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordClose;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Communication\Packets\Verify;
+use JaxkDev\DiscordBot\Communication\Thread;
+use JaxkDev\DiscordBot\Communication\ThreadStatus;
+use Socket;
+
+//Small testing socket.
+//TODO Logs.
+class ServerSocket{
+
+    private Thread $thread;
+
+    private Socket $sock;
+
+    private string $host;
+    private int $port;
+
+    private int $lastTick = 0;
+
+    public function __construct(Thread $thread){
+        $this->thread = $thread;
+        $this->host = (string)$this->thread->getConfig()["protocol"]["external"]["host"];
+        $this->port = (int)$this->thread->getConfig()["protocol"]["external"]["port"];
+        $sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        if($sock === false){
+            throw new \RuntimeException("Failed to create socket.");
+        }
+        $this->sock = $sock;
+        if(socket_set_nonblock($this->sock) === false){
+            socket_close($this->sock);
+            throw new \RuntimeException("Failed to set socket to non-blocking.");
+        }
+        if(socket_set_option($this->sock, SOL_SOCKET, SO_REUSEADDR, 1)){
+            //Warning.
+        }
+    }
+
+    public function start(): void{
+        $this->thread->setStatus(ThreadStatus::STARTING);
+
+        if(socket_bind($this->sock, $this->host, $this->port) === false){
+            socket_close($this->sock);
+            throw new \RuntimeException("Failed to bind on socket ({$this->host}:{$this->port})");
+        }
+        if(socket_listen($this->sock) === false){
+            socket_close($this->sock);
+            throw new \RuntimeException("Failed to listen on socket ({$this->host}:{$this->port})");
+        }
+
+        $this->thread->setStatus(ThreadStatus::STARTED);
+
+        $this->verifyLoop();
+    }
+
+    private static function close(Socket $sock, ?string $message = null): void{
+        $close = json_encode(new DiscordClose($message), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if($close === false){
+            throw new \RuntimeException("Failed to encode close packet.");
+        }
+        $buf = pack("N", strlen($close)) . $close;
+        @socket_write($sock, $buf);
+        @socket_close($sock);
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    private static function readDataPacket(Socket $sock, bool $block = false): ?Packet{
+        do{
+            $buf = socket_read($sock, 4);
+        }while(($buf === false or $buf === "") and $block === true);
+        if($buf === false or $buf === ""){
+            //Nothing to read.
+            return null;
+        }
+        $len = unpack("N", $buf);
+        if($len === false){
+            self::close($sock, "Failed to read data length.");
+            throw new \RuntimeException("Failed to unpack data length.");
+        }
+        $buf = socket_read($sock, $len[1]);
+        if($buf === false or $buf === "" or strlen($buf) !== $len[1]){
+            self::close($sock, "Failed to read data.");
+            throw new \RuntimeException("Failed to read data.");
+        }
+
+        $data = (array)json_decode($buf, true);
+        if(sizeof($data) !== 2){
+            throw new \AssertionError("Invalid packet size.");
+        }
+        if(!is_int($data[0])){
+            throw new \AssertionError("Invalid packet type ID.");
+        }
+        if(!is_array($data[1])){
+            throw new \AssertionError("Invalid packet data.");
+        }
+
+        try{
+            /** @var Packet $packet */
+            $packet = NetworkApi::getPacketClass($data[0]);
+            $packet = $packet::fromJson($data[1]);
+        }catch(\Throwable $e){
+            self::close($sock, "Failed to parse packet - " . $e->getMessage());
+            throw new \AssertionError("Failed to parse packet.", 0, $e);
+        }
+
+        return $packet;
+    }
+
+    /**
+     * Loop new connections until a valid verify packet is received.
+     */
+    private function verifyLoop(): void{
+        //Todo lower tick rate here, maybe 20 tps max.
+        while(true){
+            $client = socket_accept($this->sock);
+            if($client === false) continue;
+            socket_getpeername($client, $ip, $port);
+            var_dump("New client from " . $ip . " on port " . $port . ", pending verification.");
+            while(true){
+                //Wait for initial Packet.
+                try{
+                    $packet = self::readDataPacket($client, true);
+                }catch(\Throwable){
+                    break;
+                }
+                if(!$packet instanceof Verify){
+                    self::close($client, "Invalid packet type, Expecting verify packet.");
+                    break;
+                }
+                var_dump("Received verify packet:");
+                var_dump($packet);
+                if($packet->getMagic() !== NetworkApi::MAGIC){
+                    self::close($client, "Invalid network magic.");
+                    break;
+                }
+                if($packet->getVersion() !== NetworkApi::VERSION){
+                    self::close($client, "Invalid network version, expecting " . NetworkApi::VERSION . " got " . $packet->getVersion() . ".");
+                    break;
+                }
+                var_dump("Client verified.");
+
+                $packet = json_encode(new Verify(NetworkApi::VERSION, NetworkApi::MAGIC), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                if($packet === false){
+                    throw new \RuntimeException("Failed to encode outbound verify packet.");
+                }
+                socket_write($client, pack("N", strlen($packet)) . $packet);
+
+                $this->tickLoop($client);
+                break;
+            }
+            var_dump("Waiting for new client.");
+        }
+    }
+
+    /**
+     * Loop the socket for packets.
+     */
+    private function tickLoop(Socket $client): void{
+        $this->thread->setStatus(ThreadStatus::STARTED);
+        $this->lastTick = (int)(microtime(true)*1000000);
+        while(true){
+
+            //Read packets:
+
+            $count = 0;
+            do{
+                try{
+                    $packet = self::readDataPacket($client);
+                }catch(\Throwable){
+                    return;
+                }
+
+                if($packet !== null){
+                    $count += 1;
+                    var_dump("Received packet:");
+                    var_dump($packet);
+                    if($packet instanceof Verify){
+                        throw new \AssertionError("Invalid packet type, Not expecting verify packet.");
+                    }
+                    if($packet instanceof DiscordClose){
+                        var_dump("Closing external bot connection, reason: ".$packet->getMessage());
+                        socket_close($client);
+                        return;
+                    }
+                    $this->thread->writeOutboundData($packet);
+                }
+            }while($packet !== null and $count < $this->thread->getConfig()["protocol"]["general"]["packets_per_tick"]);
+
+            //Write packets:
+            /** @var string[] $packets */
+            $packets = $this->thread->readInboundData($this->thread->getConfig()["protocol"]["external"]["max-packets-per-tick"], true);
+            foreach($packets as $data){
+                socket_write($client, pack("N", strlen($data)) . $data);
+            }
+
+
+            $time = (int)(microtime(true)*1000000);
+            //sleep dynamically to keep up with the tick rate (1/20).
+            if($time - $this->lastTick < 49000){
+                usleep(50000 - ($time - $this->lastTick));
+            }
+            $this->lastTick = $time;
+        }
+    }
+}

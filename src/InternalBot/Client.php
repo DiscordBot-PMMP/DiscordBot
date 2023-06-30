@@ -157,6 +157,7 @@ class Client{
     }
 
     public function tick(): void{
+        /** @var Packet[] $data */
         $data = $this->thread->readInboundData($this->getConfig()["protocol"]["packets_per_tick"]);
 
         foreach($data as $d){

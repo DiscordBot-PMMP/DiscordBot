@@ -55,7 +55,7 @@ abstract class Thread extends PMMPThread{
      * This is recommended once token has been loaded to avoid token leaks on crashes etc.
      */
     public function secureConfig(): void{
-        $this->config["token"] = preg_replace('([a-zA-Z0-9])','*', $this->config["token"]);
+        $this->config["token"] = "**** Redacted Token ****";
     }
 
     /**

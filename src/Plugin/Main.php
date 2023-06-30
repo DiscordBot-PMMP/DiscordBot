@@ -85,16 +85,16 @@ class Main extends PluginBase{
         $this->communicationHandler = new BotCommunicationHandler($this);
 
         $this->getLogger()->debug("Starting DiscordBot Thread...");
-/*
+//*
         $this->externalThread = new ExternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
         $this->externalThread->start(Thread::INHERIT_CONSTANTS);
         return;
-/*/
+//*
         $this->discordBot = new InternalThread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
         $this->discordBot->start(Thread::INHERIT_CONSTANTS);
 
         //Redact token.
-        $this->config["token"] = preg_replace('([a-zA-Z0-9])','*', $this->config["token"]);
+        $this->config["token"] = "**** Redacted Token ****";
 
         $this->tickTask = $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void{
             $this->tick($this->getServer()->getTick());
