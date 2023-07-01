@@ -117,10 +117,8 @@ class ServerSocket{
     /**
      * @throws \AssertionError
      */
-    private static function readDataPacket(Socket $sock, bool $block = false): ?Packet{
-        do{
-            $buf = socket_read($sock, 4);
-        }while(($buf === false or $buf === "") and $block === true);
+    private static function readDataPacket(Socket $sock): ?Packet{
+        $buf = socket_read($sock, 4);
         if($buf === false or $buf === ""){
             //Nothing to read.
             return null;
@@ -167,6 +165,7 @@ class ServerSocket{
     private function verifyLoop(): void{
         //Todo lower tick rate here, maybe 20 tps max.
         while(true){
+            $this->checkStatus();
             $client = socket_accept($this->sock);
             if($client === false) continue;
             socket_getpeername($client, $ip, $port);
@@ -174,7 +173,10 @@ class ServerSocket{
             while(true){
                 //Wait for initial Packet.
                 try{
-                    $packet = self::readDataPacket($client, true);
+                    do{
+                        $this->checkStatus($client);
+                        $packet = self::readDataPacket($client);
+                    }while($packet === null);
                 }catch(\AssertionError){
                     break;
                 }
@@ -213,6 +215,7 @@ class ServerSocket{
         $this->thread->setStatus(ThreadStatus::RUNNING);
         $this->lastTick = (int)(microtime(true)*1000000);
         while(true){
+            $this->checkStatus($client);
 
             //Read packets:
 
@@ -258,6 +261,18 @@ class ServerSocket{
                 usleep(50000 - ($time - $this->lastTick));
             }
             $this->lastTick = $time;
+        }
+    }
+
+    private function checkStatus(?Socket $client = null): void{
+        if($this->thread->getStatus() === ThreadStatus::STOPPING){
+            $this->getLogger()->info("Stopping socket, Thread is stopping.");
+            if($client !== null){
+                self::close($client, "Emergency stop.");
+            }
+            socket_close($this->sock);
+            $this->thread->setStatus(ThreadStatus::STOPPED);
+            exit(0);
         }
     }
 
