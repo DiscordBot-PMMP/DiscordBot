@@ -2323,7 +2323,7 @@
                 "source": "https://github.com/discord-php/DiscordPHP/tree/master",
                 "wiki": "https://github.com/discord-php/DiscordPHP/wiki"
             },
-            "time": "2023-06-25T06:57:38+00:00"
+            "time": "2023-07-01T05:06:19+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",
@@ -3179,20 +3179,20 @@
         },
         {
             "name": "pocketmine/pocketmine-mp",
-            "version": "5.1.2",
+            "version": "5.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "7cd317bf398a017f7c690a475c5a67650c610323"
+                "reference": "2278275505a7f9d768027673e699e6199575c8bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/7cd317bf398a017f7c690a475c5a67650c610323",
-                "reference": "7cd317bf398a017f7c690a475c5a67650c610323",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/2278275505a7f9d768027673e699e6199575c8bc",
+                "reference": "2278275505a7f9d768027673e699e6199575c8bc",
                 "shasum": ""
             },
             "require": {
-                "adhocore/json-comment": "^1.1",
+                "adhocore/json-comment": "~1.2.0",
                 "composer-runtime-api": "^2.0",
                 "ext-chunkutils2": "^0.3.1",
                 "ext-crypto": "^0.3.1",
@@ -3217,7 +3217,7 @@
                 "ext-yaml": ">=2.0.0",
                 "ext-zip": "*",
                 "ext-zlib": ">=1.2.11",
-                "fgrosse/phpasn1": "^2.3",
+                "fgrosse/phpasn1": "~2.5.0",
                 "php": "^8.1",
                 "php-64bit": "*",
                 "pocketmine/bedrock-block-upgrade-schema": "~2.2.0+bedrock-1.20.0",
@@ -3236,8 +3236,8 @@
                 "pocketmine/raklib": "^0.15.0",
                 "pocketmine/raklib-ipc": "^0.2.0",
                 "pocketmine/snooze": "^0.5.0",
-                "ramsey/uuid": "^4.1",
-                "symfony/filesystem": "^6.2"
+                "ramsey/uuid": "~4.7.0",
+                "symfony/filesystem": "~6.2.0"
             },
             "require-dev": {
                 "phpstan/phpstan": "1.10.16",
@@ -3262,7 +3262,7 @@
             "homepage": "https://pmmp.io",
             "support": {
                 "issues": "https://github.com/pmmp/PocketMine-MP/issues",
-                "source": "https://github.com/pmmp/PocketMine-MP/tree/5.1.2"
+                "source": "https://github.com/pmmp/PocketMine-MP/tree/5.1.3"
             },
             "funding": [
                 {
@@ -3274,7 +3274,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2023-06-09T00:37:45+00:00"
+            "time": "2023-07-01T11:18:10+00:00"
         },
         {
             "name": "pocketmine/raklib",
@@ -3583,16 +3583,16 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v6.3.1",
+            "version": "v6.2.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "edd36776956f2a6fcf577edb5b05eb0e3bdc52ae"
+                "reference": "b0818e7203e53540f2a5c9a5017d97897df1e9bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/edd36776956f2a6fcf577edb5b05eb0e3bdc52ae",
-                "reference": "edd36776956f2a6fcf577edb5b05eb0e3bdc52ae",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/b0818e7203e53540f2a5c9a5017d97897df1e9bb",
+                "reference": "b0818e7203e53540f2a5c9a5017d97897df1e9bb",
                 "shasum": ""
             },
             "require": {
@@ -3626,7 +3626,7 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/filesystem/tree/v6.3.1"
+                "source": "https://github.com/symfony/filesystem/tree/v6.2.12"
             },
             "funding": [
                 {
@@ -3642,7 +3642,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-06-01T08:30:39+00:00"
+            "time": "2023-06-01T08:29:37+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
