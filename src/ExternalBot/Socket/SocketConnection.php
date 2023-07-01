@@ -14,7 +14,6 @@ namespace JaxkDev\DiscordBot\ExternalBot\Socket;
 
 use Monolog\Logger;
 use pocketmine\utils\BinaryStream;
-use raklib\server\ServerSocket;
 
 /**
  * Represents a connection to the socket server (a client).
