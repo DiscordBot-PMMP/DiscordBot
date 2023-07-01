@@ -58,7 +58,7 @@ class Client{
 
         $config = $this->getConfig();
 
-        $this->logger = new Logger('DiscordThread-Internal');
+        $this->logger = new Logger('InternalThread');
         $handler = new RotatingFileHandler(
             \JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log",
             $config['logging']['max_files'],

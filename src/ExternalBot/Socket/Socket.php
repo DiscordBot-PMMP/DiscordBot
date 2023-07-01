@@ -27,7 +27,7 @@ class Socket{
     private ?\Socket $socket;
 
     public function __construct(Logger $logger, string $address, int $port){
-        $this->logger = $logger;
+        $this->logger = $logger->withName("ExternalThread.Socket");
         $this->address = $address;
         $this->port = $port;
         $this->socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -46,7 +46,7 @@ class Socket{
         if(@socket_listen($this->socket, 1) === false){
             throw new SocketException("Failed to listen on socket: " . socket_strerror(socket_last_error()));
         }
-        var_dump("Socket listening on " . $this->address . ":" . $this->port . ".");
+        $this->logger->info("Socket listening on " . $this->address . ":" . $this->port . ".");
         $this->open = true;
     }
 
@@ -63,12 +63,15 @@ class Socket{
         if($client === false){
             return null;
         }
+
+        $id = SocketConnection::$idCounter++;
+
         if(@socket_getpeername($client, $ip, $port)){
-            var_dump("New client accepted from " . $ip . " on port " . $port . ".");
+            $this->logger->info("New client ID: $id, accepted from " . $ip . " on port " . $port . ".");
         }else{
-            var_dump("New client accepted.");
+            $this->logger->info("New client ID: $id, accepted.");
         }
-        return new SocketConnection($this->logger, $client);
+        return new SocketConnection($this->logger, $client, $id);
     }
 
     public function reject(): bool{
@@ -86,9 +89,9 @@ class Socket{
         }
 
         if(@socket_getpeername($client, $ip, $port)){
-            var_dump("Rejecting client from " . $ip . " on port " . $port . ".");
+            $this->logger->debug("Rejecting client from " . $ip . " on port " . $port . ".");
         }else{
-            var_dump("New client rejected.");
+            $this->logger->debug("New client rejected.");
         }
 
         $packet = (new Disconnect("Connection refused."))->binarySerialize()->getBuffer();
@@ -124,6 +127,7 @@ class Socket{
             $this->socket = null;
         }
         $this->open = false;
+        $this->logger->info("Socket closed.");
     }
 
     public function isOpen(): bool{

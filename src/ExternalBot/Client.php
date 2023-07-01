@@ -42,7 +42,7 @@ class Client{
         $this->thread = $thread;
 
         //Setup logger.
-        $this->logger = new Logger('DiscordThread-External');
+        $this->logger = new Logger('ExternalThread');
         $handler = new RotatingFileHandler(
             \JaxkDev\DiscordBot\DATA_PATH . $this->thread->getConfig()['logging']['directory'] . DIRECTORY_SEPARATOR . "DiscordBot.log",
             $this->thread->getConfig()['logging']['max_files'],
@@ -64,7 +64,6 @@ class Client{
             $this->thread->setStatus(ThreadStatus::STOPPED);
             exit(1);
         }
-        $this->getLogger()->debug("Socket created.");
 
         $this->start();
     }
@@ -86,8 +85,7 @@ class Client{
     }
 
     private function stop(): void{
-        var_dump("Stopping external client.");
-        $this->getLogger()->notice("Stopping External client.");
+        $this->getLogger()->notice("Stopping external client.");
         $this->thread->setStatus(ThreadStatus::STOPPING);
         try{
             if($this->connection !== null){
@@ -105,6 +103,7 @@ class Client{
             $this->getLogger()->error("Failed to close socket: ".$e->getMessage());
         }
         $this->thread->setStatus(ThreadStatus::STOPPED);
+        $this->logger->notice("External client stopped gracefully.");
         exit(0);
     }
 
@@ -112,7 +111,7 @@ class Client{
         if($this->connection === null){
             return;
         }
-        var_dump("Closing connection.");
+        $this->logger->debug("Closing main connection.");
         if($this->connection->isOpen()){
             $this->connection->close();
         }
@@ -205,7 +204,6 @@ class Client{
             try{
                 $this->connection = $this->socket->accept();
             }catch(\RuntimeException $e){
-                var_dump("Failed to accept connection: ".$e->getMessage());
                 $this->getLogger()->error("Failed to accept connection: ".$e->getMessage());
                 $this->stop();
             }
@@ -237,14 +235,16 @@ class Client{
                 continue;
             }
             if(!$packet instanceof Connect){
+                $this->logger->debug("Invalid packet type received, expecting Connect packet. Closing connection.");
                 try{
                     $this->writeDataPacket(new Disconnect("Invalid packet type, Expecting Connect packet."));
                     $this->closeConnection();
                 }catch(\AssertionError){}
                 continue;
             }
-            $this->getLogger()->debug("Received Connect packet.");
+            $this->getLogger()->debug("Received connect packet.");
             if($packet->getVersion() !== NetworkApi::VERSION){
+                $this->getLogger()->debug("Invalid version, expecting " . NetworkApi::VERSION . " got " . $packet->getVersion() . ". Closing connection.");
                 try{
                     $this->writeDataPacket(new Disconnect("Invalid version, Expecting " . NetworkApi::VERSION . " got " . $packet->getVersion()));
                     $this->closeConnection();
@@ -252,13 +252,14 @@ class Client{
                 continue;
             }
             if($packet->getMagic() !== NetworkApi::MAGIC){
+                $this->getLogger()->debug("Invalid magic, expecting " . NetworkApi::MAGIC . " got " . $packet->getMagic() . ". Closing connection.");
                 try{
                     $this->writeDataPacket(new Disconnect("Invalid magic."));
                     $this->closeConnection();
                 }catch(\AssertionError){}
                 continue;
             }
-            $this->getLogger()->debug("Connection verified, sending config packet.");
+            $this->getLogger()->debug("Connection checked, sending config packet.");
             //Yes I know this is plain text token, but unless you have a better way without setting up TLS/SSL, this is the best we can do.
             //External client should still be hosted locally, so it's not over the internet, hopefully.
             try{
@@ -287,7 +288,6 @@ class Client{
                 }
                 if($packet !== null){
                     $count += 1;
-                    var_dump("Received packet: ".get_class($packet));
                     $this->thread->writeOutboundData($packet);
                 }
             }while($packet !== null and $count < $this->thread->getConfig()["protocol"]["general"]["packets_per_tick"]);
@@ -296,7 +296,6 @@ class Client{
             foreach($packets as $packet){
                 try{
                     $this->writeDataPacket($packet);
-                    var_dump("Sent packet: ".get_class($packet));
                 }catch(\AssertionError){
                     continue 2;
                 }
@@ -312,6 +311,7 @@ class Client{
             }
             $this->lastTick = $time;
         }
+        $this->logger->info("Lost connection to client, attempting to reconnect.");
         $this->thread->setStatus(ThreadStatus::STARTED);
     }
 
