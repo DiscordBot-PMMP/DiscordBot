@@ -12,8 +12,11 @@
 
 namespace JaxkDev\DiscordBot\Models\Guild;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use pocketmine\utils\BinaryStream;
+
 /** @link https://discord.com/developers/docs/resources/guild#guild-object-premium-tier */
-enum PremiumTier: int implements \JsonSerializable{
+enum PremiumTier: int implements \JsonSerializable, BinarySerializable{
 
     /** Guild has not unlocked any Server Boost perks */
     case NONE = 0;
@@ -26,6 +29,16 @@ enum PremiumTier: int implements \JsonSerializable{
 
     /** Guild has unlocked Server Boost level 3 perks */
     case TIER_3 = 3;
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putByte($this->value);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return self::from($stream->getByte());
+    }
 
     public function jsonSerialize(): int{
         return $this->value;

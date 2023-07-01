@@ -12,8 +12,11 @@
 
 namespace JaxkDev\DiscordBot\Models\Guild;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use pocketmine\utils\BinaryStream;
+
 /** @link https://discord.com/developers/docs/resources/guild#guild-object-verification-level */
-enum VerificationLevel: int implements \JsonSerializable{
+enum VerificationLevel: int implements \JsonSerializable, BinarySerializable{
 
     /** Unrestricted */
     case NONE = 0;
@@ -29,6 +32,16 @@ enum VerificationLevel: int implements \JsonSerializable{
 
     /** Must have a verified phone number */
     case VERY_HIGH = 4;
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putByte($this->value);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return self::from($stream->getByte());
+    }
 
     public function jsonSerialize(): int{
         return $this->value;

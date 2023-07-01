@@ -12,8 +12,11 @@
 
 namespace JaxkDev\DiscordBot\Models\Guild;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use pocketmine\utils\BinaryStream;
+
 /** @link https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level */
-enum ExplicitContentFilterLevel: int implements \JsonSerializable{
+enum ExplicitContentFilterLevel: int implements \JsonSerializable, BinarySerializable{
 
     /** Media content will not be scanned */
     case DISABLED = 0;
@@ -23,6 +26,16 @@ enum ExplicitContentFilterLevel: int implements \JsonSerializable{
 
     /** Media content sent by all members will be scanned */
     case ALL_MEMBERS = 2;
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putByte($this->value);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return self::from($stream->getByte());
+    }
 
     public function jsonSerialize(): int{
         return $this->value;

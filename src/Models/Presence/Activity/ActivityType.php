@@ -12,10 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Models\Presence\Activity;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use pocketmine\utils\BinaryStream;
+
 /**
  * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
  */
-enum ActivityType: int implements \JsonSerializable{
+enum ActivityType: int implements \JsonSerializable, BinarySerializable{
 
     /** Playing {name} */
     case GAME = 0;
@@ -34,6 +37,16 @@ enum ActivityType: int implements \JsonSerializable{
 
     /** Competing in {name} */
     case COMPETING = 5;
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putByte($this->value);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return self::from($stream->getByte());
+    }
 
     public function jsonSerialize(): int{
         return $this->value;

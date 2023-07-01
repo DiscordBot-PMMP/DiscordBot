@@ -12,10 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use pocketmine\utils\BinaryStream;
+
 /**
  * @link https://discord.com/developers/docs/resources/webhook#webhook-object-webhook-types
  */
-enum WebhookType: int implements \JsonSerializable{
+enum WebhookType: int implements \JsonSerializable, BinarySerializable{
 
     /**
      * Standard webhook
@@ -33,6 +36,16 @@ enum WebhookType: int implements \JsonSerializable{
      * "Application webhooks are webhooks used with Interactions"
      */
     case APPLICATION = 3;
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putByte($this->value);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return self::from($stream->getByte());
+    }
 
     public function jsonSerialize(): int{
         return $this->value;
