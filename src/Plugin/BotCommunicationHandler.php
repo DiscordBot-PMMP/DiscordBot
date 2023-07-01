@@ -438,6 +438,10 @@ class BotCommunicationHandler{
         $this->plugin->getLogger()->debug("Handled data dump (".$packet->getTimestamp().") (".$packet->getSize().")");
     }
 
+    public function resetHeartbeat(): void{
+        $this->lastHeartbeat = null;
+    }
+
     /**
      * Checks last KNOWN Heartbeat timestamp with current time, does not check pre-start condition.
      */

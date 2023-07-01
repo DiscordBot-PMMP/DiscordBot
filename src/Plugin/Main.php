@@ -186,6 +186,9 @@ class Main extends PluginBase{
             if($this->discordBot->getStatus() === ThreadStatus::RUNNING){
                 $this->communicationHandler->checkHeartbeat();
                 $this->communicationHandler->sendHeartbeat();
+            }elseif($this->communicationHandler->getLastHeartbeat() !== null){
+                //Reset heartbeat if thread is not actively ready and running.
+                $this->communicationHandler->resetHeartbeat();
             }
             if($this->discordBot->getStatus() === ThreadStatus::STOPPED){
                 //Thread has crashed, we need to stop the plugin.
