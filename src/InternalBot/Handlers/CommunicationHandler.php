@@ -82,7 +82,7 @@ class CommunicationHandler{
 
     private Client $client;
 
-    private ?float $lastHeartbeat = null;
+    private ?int $lastHeartbeat = null;
 
     private Logger $logger;
 
@@ -876,7 +876,7 @@ class CommunicationHandler{
     }
 
     public function sendHeartbeat(): void{
-        $pk = new Heartbeat(microtime(true));
+        $pk = new Heartbeat(floor(microtime(true)));
         $this->client->getThread()->writeOutboundData($pk);
     }
 
@@ -888,7 +888,7 @@ class CommunicationHandler{
         }
     }
 
-    public function getLastHeartbeat(): ?float{
+    public function getLastHeartbeat(): ?int{
         return $this->lastHeartbeat;
     }
 }

@@ -81,7 +81,7 @@ class NetworkApi{
     //Version will change for any breaking changes to:
     //Models, Packets, Magic.
     public const VERSION = 1;
-    public const MAGIC = 0x4a61786b446576; //JaxkDev :)
+    public const MAGIC = 0x4a61786b; //Jaxk :) (max 4 bytes)
 
     //Map all packets to their ID.
     /** @var array<int, class-string>  */
@@ -89,7 +89,7 @@ class NetworkApi{
         Connect::ID => Connect::class,
         Heartbeat::ID => Heartbeat::class,
         Resolution::ID => Resolution::class,
-        RequestAddReaction::ID => RequestAddReaction::class,
+        /*RequestAddReaction::ID => RequestAddReaction::class,
         RequestAddRole::ID => RequestAddRole::class,
         RequestBroadcastTyping::ID => RequestBroadcastTyping::class,
         RequestCreateChannel::ID => RequestCreateChannel::class,
@@ -147,10 +147,12 @@ class NetworkApi{
         RoleCreate::ID => RoleCreate::class,
         RoleDelete::ID => RoleDelete::class,
         RoleUpdate::ID => RoleUpdate::class,
-        VoiceStateUpdate::ID => VoiceStateUpdate::class,
+        VoiceStateUpdate::ID => VoiceStateUpdate::class,*/
         Disconnect::ID => Disconnect::class,
         //64 Next ID
     ];
+
+    //TODO Map all models to a network ID.
 
     /**
      * @param int $id

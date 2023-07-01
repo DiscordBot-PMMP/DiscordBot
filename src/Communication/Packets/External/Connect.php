@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\External;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use pocketmine\utils\BinaryStream;
 
 /**
  * Packet for external bot to verify its connection with the correct Version and MAGIC.
@@ -24,8 +25,8 @@ class Connect extends Packet{
     private int $version;
     private int $magic;
 
-    public function __construct(int $version, int $magic){
-        parent::__construct();
+    public function __construct(int $version, int $magic, ?int $UID = null){
+        parent::__construct($UID);
         $this->version = $version;
         $this->magic = $magic;
     }
@@ -36,6 +37,25 @@ class Connect extends Packet{
 
     public function getMagic(): int{
         return $this->magic;
+    }
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putInt($this->UID);
+        $stream->putByte($this->version);
+        $stream->putInt($this->magic);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): Packet{
+        $uid = $stream->getInt();
+        $version = $stream->getByte();
+        $magic = $stream->getInt();
+        return new self(
+            $version,
+            $magic,
+            $uid
+        );
     }
 
     public function jsonSerialize(): array{

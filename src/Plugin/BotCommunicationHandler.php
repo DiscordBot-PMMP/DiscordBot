@@ -84,7 +84,7 @@ class BotCommunicationHandler{
 
     private Main $plugin;
 
-    private ?float $lastHeartbeat = null;
+    private ?int $lastHeartbeat = null;
 
     public function __construct(Main $plugin){
         $this->plugin = $plugin;
@@ -450,10 +450,10 @@ class BotCommunicationHandler{
     }
 
     public function sendHeartbeat(): void{
-        $this->plugin->writeOutboundData(new HeartbeatPacket(microtime(true)));
+        $this->plugin->writeOutboundData(new HeartbeatPacket(floor(microtime(true))));
     }
 
-    public function getLastHeartbeat(): ?float{
+    public function getLastHeartbeat(): ?int{
         return $this->lastHeartbeat;
     }
 }

@@ -13,6 +13,7 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\External;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use pocketmine\utils\BinaryStream;
 
 class Disconnect extends Packet{
 
@@ -27,6 +28,24 @@ class Disconnect extends Packet{
 
     public function getMessage(): string{
         return $this->message;
+    }
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putInt($this->UID);
+        $stream->putInt(strlen($this->message));
+        $stream->put($this->message);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
+        $length = $stream->getInt();
+        $message = $stream->get($length);
+        return new self(
+            $message,
+            $uid
+        );
     }
 
     public function jsonSerialize(): array{

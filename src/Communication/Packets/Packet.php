@@ -12,7 +12,10 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-abstract class Packet implements \JsonSerializable{
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use pocketmine\utils\BinaryStream;
+
+abstract class Packet implements \JsonSerializable, BinarySerializable{
 
     // Each packet has a unique ID, this will not change.
     public const ID = 0;
@@ -36,8 +39,8 @@ abstract class Packet implements \JsonSerializable{
         return $this->UID;
     }
 
-    // Serialise to a specific network format.
-    // TODO Packet Type ID's
+    abstract public function binarySerialize(): BinaryStream;
+    abstract public static function fromBinary(BinaryStream $stream): self; //Update self reference by adding abstract interface function.
 
     abstract public function jsonSerialize(): array;
     abstract public static function fromJson(array $data): self;

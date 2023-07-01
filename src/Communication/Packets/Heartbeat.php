@@ -12,19 +12,37 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
+use pocketmine\utils\BinaryStream;
+
 class Heartbeat extends Packet{
 
     public const ID = 1;
 
-    private float $heartbeat;
+    private int $heartbeat;
 
-    public function __construct(float $heartbeat, ?int $uid = null){
+    public function __construct(int $heartbeat, ?int $uid = null){
         parent::__construct($uid);
         $this->heartbeat = $heartbeat;
     }
 
-    public function getHeartbeat(): float{
+    public function getHeartbeat(): int{
         return $this->heartbeat;
+    }
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putInt($this->UID);
+        $stream->putInt($this->heartbeat);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
+        $heartbeat = $stream->getInt();
+        return new self(
+            $heartbeat,
+            $uid
+        );
     }
 
     public function jsonSerialize(): array{

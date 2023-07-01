@@ -21,6 +21,8 @@ use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level as LoggerLevel;
 use Monolog\Logger;
+use pocketmine\utils\BinaryDataException;
+use pocketmine\utils\BinaryStream;
 use Socket;
 
 //Small testing socket.
@@ -100,18 +102,14 @@ class ServerSocket{
     /**
      * @throws \AssertionError
      */
-    private static function writeDataPacket(Socket $sock, Packet|string $packet): void{
-        if($packet instanceof Packet){
-            $data = json_encode($packet, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-            if($data === false){
-                throw new \AssertionError("Failed to encode packet.");
-            }
-        }else{
-            $data = $packet;
-        }
+    private static function writeDataPacket(Socket $sock, Packet $packet): void{
         // data length (Unsigned 32bit BE) + packet id (Unsigned 16bit BE) + data (string)
-        $buf = pack("Nn", strlen($data) + 2, $packet::ID) . $data;
-        if(socket_write($sock, $buf) === false){
+        $data = $packet->binarySerialize()->getBuffer();
+        $stream = new BinaryStream();
+        $stream->putInt(strlen($data) + 2);
+        $stream->putShort($packet::ID);
+        $stream->put($data);
+        if(socket_write($sock, $stream->getBuffer()) === false){
             throw new \AssertionError("Failed to write packet.");
         }
     }
@@ -138,23 +136,24 @@ class ServerSocket{
             throw new \AssertionError("Failed to read data.");
         }
 
-        $id = unpack("n", substr($buf, 0, 2));
-        if($id === false){
+        $stream = new BinaryStream($buf);
+
+        try{
+            $id = $stream->getShort();
+        }catch(BinaryDataException){
             self::close($sock, "Failed to read packet id.");
             throw new \AssertionError("Failed to unpack packet id.");
         }
-        $data = (array)json_decode(substr($buf, 2));
-
         /** @var ?Packet $packet */
-        $packet = NetworkApi::getPacketClass($id[1]);
+        $packet = NetworkApi::getPacketClass($id);
         if($packet === null){
-            self::close($sock, "Unknown packet id $id[1] received.");
+            self::close($sock, "Unknown packet id $id received.");
             throw new \AssertionError("Unknown packet id received.");
         }
 
         try{
-            $packet = $packet::fromJson($data);
-        }catch(\Throwable $e){
+            $packet = $packet::fromBinary($stream);
+        }catch(BinaryDataException $e){
             self::close($sock, "Failed to parse packet - " . $e->getMessage());
             throw new \AssertionError("Failed to parse packet.", 0, $e);
         }
