@@ -450,7 +450,7 @@ class BotCommunicationHandler{
     }
 
     public function sendHeartbeat(): void{
-        $this->plugin->writeOutboundData(new HeartbeatPacket(floor(microtime(true))));
+        $this->plugin->writeOutboundData(new HeartbeatPacket((int)floor(microtime(true))));
     }
 
     public function getLastHeartbeat(): ?int{

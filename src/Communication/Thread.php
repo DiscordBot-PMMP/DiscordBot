@@ -13,8 +13,8 @@
 namespace JaxkDev\DiscordBot\Communication;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\ExternalBot\ServerSocket;
-use JaxkDev\DiscordBot\InternalBot\Client;
+use JaxkDev\DiscordBot\ExternalBot\Client as ExternalClient;
+use JaxkDev\DiscordBot\InternalBot\Client as InternalClient;
 use pmmp\thread\Thread as PMMPThread;
 use pmmp\thread\ThreadSafeArray;
 
@@ -46,9 +46,9 @@ use pmmp\thread\ThreadSafeArray;
         ini_set("date.timezone", "UTC");
 
         if($this->config["discord"]["type"] === "internal"){
-            new Client($this);
+            new InternalClient($this);
         }else{
-            new ServerSocket($this);
+            new ExternalClient($this);
         }
     }
 
@@ -61,7 +61,6 @@ use pmmp\thread\ThreadSafeArray;
     }
 
     /**
-     *
      * @see Thread::secureConfig() Recommended to secure config after getting token.
      */
     public function getConfig(): array{
@@ -73,6 +72,7 @@ use pmmp\thread\ThreadSafeArray;
      * This is recommended once token has been loaded to avoid token leaks on crashes etc.
      */
     public function secureConfig(): void{
+        /** @phpstan-ignore-next-line ThreadSafeArray */
         $this->config["discord"]["token"] = "**** Redacted Token ****";
     }
 

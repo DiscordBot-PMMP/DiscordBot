@@ -115,7 +115,7 @@ abstract class ConfigUtils{
             if(!array_key_exists("type", $config["discord"]) or $config["discord"]["type"] === null){
                 $result[] = "No 'discord.type' field found.";
             }else{
-                if(!is_string($config["discord"]["type"]) or !in_array($config["discord"]["type"], ["internal", "external"])){
+                if(!is_string($config["discord"]["type"]) or !in_array($config["discord"]["type"], ["internal", "external"], true)){
                     $result[] = "Invalid 'discord.token' ({$config["discord"]["token"]}), must be 'internal' or 'external'.";
                 }
             }

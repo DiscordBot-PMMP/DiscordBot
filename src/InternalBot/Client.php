@@ -56,8 +56,6 @@ class Client{
         set_exception_handler([$this, 'close']);
         register_shutdown_function([$this, 'close']);
 
-        Packet::$UID_COUNT = 1;
-
         $config = $this->getConfig();
 
         $this->logger = new Logger('DiscordThread-Internal');

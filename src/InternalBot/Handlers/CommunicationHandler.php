@@ -876,7 +876,7 @@ class CommunicationHandler{
     }
 
     public function sendHeartbeat(): void{
-        $pk = new Heartbeat(floor(microtime(true)));
+        $pk = new Heartbeat((int)floor(microtime(true)));
         $this->client->getThread()->writeOutboundData($pk);
     }
 

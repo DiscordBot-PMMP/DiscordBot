@@ -15,45 +15,42 @@ namespace JaxkDev\DiscordBot\Communication\Packets\External;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use pocketmine\utils\BinaryStream;
 
-class Disconnect extends Packet{
+class Ping extends Packet{
 
-    public const ID = 63;
+    public const ID = 64;
 
-    private string $message;
+    private int $ping;
 
-    public function __construct(?string $message = null){
+    public function __construct(int $ping){
         parent::__construct();
-        $this->message = $message ?? "Unknown";
+        $this->ping = $ping;
     }
 
-    public function getMessage(): string{
-        return $this->message;
+    public function getPing(): int{
+        return $this->ping;
     }
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putInt(strlen($this->message));
-        $stream->put($this->message);
+        $stream->putInt($this->ping);
         return $stream;
     }
 
-    public static function fromBinary(BinaryStream $stream): self{
-        $length = $stream->getInt();
-        $message = $stream->get($length);
-        return new self(
-            $message
-        );
+    public static function fromBinary(BinaryStream $stream): Packet{
+
     }
 
     public function jsonSerialize(): array{
         return [
-            "message" => $this->message
+            "uid" => $this->UID,
+            "ping" => $this->ping
         ];
     }
 
     public static function fromJson(array $data): self{
         return new self(
-            $data["message"] ?? "Unknown",
+            $data["ping"],
+            $data["uid"]
         );
     }
 }

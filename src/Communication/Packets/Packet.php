@@ -20,16 +20,13 @@ abstract class Packet implements \JsonSerializable, BinarySerializable{
     // Each packet has a unique ID, this will not change.
     public const ID = 0;
 
-    // Used for responses.
-    public static int $UID_COUNT = 0;
+    public static int $UID_COUNT = 1;
 
     protected int $UID;
 
     public function __construct(?int $uid = null){
         if($uid === null){
-            //Thread = Odd, Plugin = Even. (Keeps them unique, *shrugs*)
-            Packet::$UID_COUNT += 2;
-            $this->UID = Packet::$UID_COUNT;
+            $this->UID = Packet::$UID_COUNT++;
         }else{
             $this->UID = $uid;
         }
