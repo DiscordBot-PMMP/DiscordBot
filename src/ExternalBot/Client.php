@@ -127,9 +127,6 @@ class Client{
             throw new \AssertionError("No connection to write data to.");
         }
 
-        var_dump("Writing packet: ".$packet::ID);
-        var_dump($packet);
-
         // packet id (Unsigned 16bit BE) + data (string)
         $stream = new BinaryStream();
         $stream->putShort($packet::ID);
@@ -304,6 +301,9 @@ class Client{
                     continue 2;
                 }
             }
+
+            //Clear pending connections, we don't want to accept any new connections.
+            $this->socket->clearPendingConnections();
 
             //sleep dynamically to keep up with the tick rate (1/20).
             $time = (int)(microtime(true)*1000000);

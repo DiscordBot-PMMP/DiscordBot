@@ -12,7 +12,9 @@
 
 namespace JaxkDev\DiscordBot\ExternalBot\Socket;
 
+use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
 use Monolog\Logger;
+use pocketmine\utils\BinaryStream;
 
 class Socket{
 
@@ -67,6 +69,53 @@ class Socket{
             var_dump("New client accepted.");
         }
         return new SocketConnection($this->logger, $client);
+    }
+
+    public function reject(): bool{
+        if(!$this->open){
+            return false;
+        }
+
+        $client = @socket_accept($this->socket);
+        if($client === false and socket_last_error() !== SOCKET_EWOULDBLOCK){
+            return false;
+        }
+
+        if($client === false){
+            return false;
+        }
+
+        if(@socket_getpeername($client, $ip, $port)){
+            var_dump("Rejecting client from " . $ip . " on port " . $port . ".");
+        }else{
+            var_dump("New client rejected.");
+        }
+
+        $packet = (new Disconnect("Connection refused."))->binarySerialize()->getBuffer();
+        $stream = new BinaryStream();
+        $stream->putInt(2 + strlen($packet));
+        $stream->putShort(Disconnect::ID);
+        $stream->put($packet);
+        @socket_write($client, $stream->getBuffer());
+
+        @socket_close($client);
+
+        return true;
+    }
+
+    /**
+     * Clears up to 10 pending connections.
+     */
+    public function clearPendingConnections(): void{
+        if(!$this->open){
+            return;
+        }
+
+        $count = 0;
+        do{
+            $rejected = $this->reject();
+            $count += 1;
+        }while($rejected and $count < 10);
     }
 
     public function close(): void{
