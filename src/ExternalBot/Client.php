@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\ExternalBot;
 use JaxkDev\DiscordBot\Communication\NetworkApi;
 use JaxkDev\DiscordBot\Communication\Packets\External\Connect;
 use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
+use JaxkDev\DiscordBot\Communication\Packets\External\DiscordConfig;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Thread;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
@@ -260,11 +261,11 @@ class Client{
                 }catch(\AssertionError){}
                 continue;
             }
-            $this->getLogger()->debug("Connection verified, sending connection packet.");
-            //TODO Config packet here instead of another connect packet.
-            $connect = new Connect(NetworkApi::VERSION, NetworkApi::MAGIC);
+            $this->getLogger()->debug("Connection verified, sending config packet.");
+            //Yes I know this is plain text token, but unless you have a better way without setting up TLS/SSL, this is the best we can do.
+            //External client should still be hosted locally, so it's not over the internet, hopefully.
             try{
-                $this->writeDataPacket($connect);
+                $this->writeDataPacket(new DiscordConfig(["token" => base64_encode($this->thread->getConfig()["discord"]["token"])]));
             }catch(\AssertionError){
                 continue;
             }
@@ -289,6 +290,7 @@ class Client{
                 }
                 if($packet !== null){
                     $count += 1;
+                    var_dump("Received packet: ".get_class($packet));
                     $this->thread->writeOutboundData($packet);
                 }
             }while($packet !== null and $count < $this->thread->getConfig()["protocol"]["general"]["packets_per_tick"]);
@@ -297,6 +299,7 @@ class Client{
             foreach($packets as $packet){
                 try{
                     $this->writeDataPacket($packet);
+                    var_dump("Sent packet: ".get_class($packet));
                 }catch(\AssertionError){
                     continue 2;
                 }

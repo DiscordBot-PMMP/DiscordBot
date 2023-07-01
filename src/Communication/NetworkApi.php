@@ -42,6 +42,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\External\Connect;
 use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
+use JaxkDev\DiscordBot\Communication\Packets\External\DiscordConfig;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
@@ -149,7 +150,8 @@ class NetworkApi{
         RoleUpdate::ID => RoleUpdate::class,
         VoiceStateUpdate::ID => VoiceStateUpdate::class,*/
         Disconnect::ID => Disconnect::class,
-        //64 Next ID
+        DiscordConfig::ID => DiscordConfig::class,
+        //65 Next ID
     ];
 
     //TODO Map all models to a network ID.
