@@ -13,6 +13,8 @@
 namespace JaxkDev\DiscordBot\Models\Permissions;
 
 // Remember categories are classed as channels.
+use JaxkDev\DiscordBot\Communication\BinaryStream;
+
 class ChannelPermissions extends Permissions{
 
     /**
@@ -23,7 +25,11 @@ class ChannelPermissions extends Permissions{
             Permissions::VOICE_PERMISSIONS, Permissions::STAGE_PERMISSIONS);
     }
 
-    public static function fromJson(int $value): self{
-        return new self($value);
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self((int)$stream->getString());
+    }
+
+    public static function fromJson(int $bitwise): self{
+        return new self($bitwise);
     }
 }

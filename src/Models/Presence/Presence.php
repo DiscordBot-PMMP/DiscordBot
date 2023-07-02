@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models\Presence;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Plugin\Api;
 
@@ -73,6 +74,31 @@ class Presence implements \JsonSerializable{
     }
 
     //----- Serialization -----//
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->put($this->status->binarySerialize()->getBuffer());
+        $stream->putInt(sizeof($this->activities));
+        foreach($this->activities as $activity){
+            $stream->put($activity->binarySerialize()->getBuffer());
+        }
+        $stream->putBool($this->client_status !== null);
+        if($this->client_status !== null){
+            $stream->put($this->client_status->binarySerialize()->getBuffer());
+        }
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        $status = Status::fromBinary($stream);
+        $activities = [];
+        $size = $stream->getInt();
+        for($i = 0; $i < $size; $i++){
+            $activities[] = Activity::fromBinary($stream);
+        }
+        $client_status = $stream->getBool() ? ClientStatus::fromBinary($stream) : null;
+        return new self($status, $activities, $client_status);
+    }
 
     public function jsonSerialize(): array{
         return [
