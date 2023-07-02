@@ -293,9 +293,9 @@ class Client{
             }while($packet !== null and $count < $this->thread->getConfig()["protocol"]["general"]["packets_per_tick"]);
 
             $packets = $this->thread->readInboundData($this->thread->getConfig()["protocol"]["general"]["packets_per_tick"]);
-            foreach($packets as $packet){
+            foreach($packets as $data){
                 try{
-                    $this->writeDataPacket($packet);
+                    $this->writeDataPacket($data);
                 }catch(\AssertionError){
                     continue 2;
                 }

@@ -18,7 +18,6 @@ use Discord\WebSockets\Op;
 use Error;
 use ErrorException;
 use JaxkDev\DiscordBot\Communication\Thread;
-use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\InternalBot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\InternalBot\Handlers\CommunicationHandler;
@@ -154,7 +153,6 @@ class Client{
     }
 
     public function tick(): void{
-        /** @var Packet[] $data */
         $data = $this->thread->readInboundData($this->getConfig()["protocol"]["packets_per_tick"]);
 
         foreach($data as $d){

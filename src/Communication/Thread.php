@@ -45,6 +45,7 @@ use pmmp\thread\ThreadSafeArray;
         // Note, this does not affect outside thread.
         ini_set("date.timezone", "UTC");
 
+        /** @phpstan-ignore-next-line ThreadSafeArray */
         if($this->config["discord"]["type"] === "internal"){
             new InternalClient($this);
         }else{
@@ -76,48 +77,36 @@ use pmmp\thread\ThreadSafeArray;
         $this->config["discord"]["token"] = "**** Redacted Token ****";
     }
 
-    /**
-     * @param int  $count
-     * @param bool $raw
-     * @return array<Packet|string> If $raw is true, returns raw json encoded string data.
-     */
-    public function readInboundData(int $count = 1, bool $raw = false): array{
-        if($raw){
-            return $this->inboundData->chunk($count);
-        }else{
-            return array_map(function($raw_data){
-                $data = (array)json_decode($raw_data, true);
-                if(sizeof($data) !== 2){
-                    throw new \AssertionError("Invalid packet size - ".$raw_data);
-                }
-                if(!is_int($data[0])){
-                    throw new \AssertionError("Invalid packet ID - ".$raw_data);
-                }
-                if(!is_array($data[1])){
-                    throw new \AssertionError("Invalid packet data - ".$raw_data);
-                }
-                /** @var ?Packet $packet */
-                $packet = NetworkApi::getPacketClass($data[0]);
-                if($packet === null){
-                    throw new \AssertionError("Invalid packet ID - ".$raw_data);
-                }
-                return $packet::fromJson($data[1]);
-            }, $this->inboundData->chunk($count));
-        }
+    /** @return Packet[] */
+    public function readInboundData(int $count = 1): array{
+        return array_map(function($raw_data){
+            $data = (array)json_decode($raw_data, true);
+            if(sizeof($data) !== 2){
+                throw new \AssertionError("Invalid packet size - ".$raw_data);
+            }
+            if(!is_int($data[0])){
+                throw new \AssertionError("Invalid packet ID - ".$raw_data);
+            }
+            if(!is_array($data[1])){
+                throw new \AssertionError("Invalid packet data - ".$raw_data);
+            }
+            /** @var ?Packet $packet */
+            $packet = NetworkApi::getPacketClass($data[0]);
+            if($packet === null){
+                throw new \AssertionError("Invalid packet ID - ".$raw_data);
+            }
+            return $packet::fromJson($data[1]);
+        }, $this->inboundData->chunk($count));
     }
 
     /**
-     * @param string|Packet $data JSON encoded string or Packet object.
+     * @param Packet $data
      */
-    public function writeOutboundData(Packet|string $data): void{
-        if($data instanceof Packet){
-            try{
-                $this->outboundData[] = json_encode([$data::ID, $data], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-            }catch(\JsonException $e){
-                throw new \AssertionError("Failed to encode packet to JSON, ".$e->getMessage());
-            }
-        }else{
-            $this->outboundData[] = $data;
+    public function writeOutboundData(Packet $data): void{
+        try{
+            $this->outboundData[] = json_encode([$data::ID, $data], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }catch(\JsonException $e){
+            throw new \AssertionError("Failed to encode packet to JSON, ".$e->getMessage());
         }
     }
 }
