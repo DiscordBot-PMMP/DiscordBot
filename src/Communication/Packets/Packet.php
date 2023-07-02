@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
-use pocketmine\utils\BinaryStream;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 abstract class Packet implements \JsonSerializable, BinarySerializable{
 

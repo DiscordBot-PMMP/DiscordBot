@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Guild;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
-use pocketmine\utils\BinaryStream;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 /** @link https://discord.com/developers/docs/resources/guild#guild-object-premium-tier */
 enum PremiumTier: int implements \JsonSerializable, BinarySerializable{

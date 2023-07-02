@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
-use pocketmine\utils\BinaryStream;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 class Resolution extends Packet{
 
@@ -58,8 +58,7 @@ class Resolution extends Packet{
         $stream->putInt($this->UID);
         $stream->putInt($this->pid);
         $stream->putBool($this->successful);
-        $stream->putInt(strlen($this->response));
-        $stream->put($this->response);
+        $stream->putString($this->response);
         $stream->putInt(0); //temp 0 model count.
         /*$stream->putInt(count($this->data));
         foreach($this->data as $model){
@@ -76,8 +75,7 @@ class Resolution extends Packet{
         $uid = $stream->getInt();
         $pid = $stream->getInt();
         $successful = $stream->getBool();
-        $responseSize = $stream->getInt();
-        $response = $stream->get($responseSize);
+        $response = $stream->getString();
         $modelCount = $stream->getInt();
         $models = [];
         for($i = 0; $i < $modelCount; $i++){

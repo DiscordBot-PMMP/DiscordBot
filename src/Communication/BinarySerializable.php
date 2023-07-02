@@ -13,7 +13,6 @@
 namespace JaxkDev\DiscordBot\Communication;
 
 use pocketmine\utils\BinaryDataException;
-use pocketmine\utils\BinaryStream;
 
 interface BinarySerializable{
 

@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-use pocketmine\utils\BinaryStream;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 class Heartbeat extends Packet{
 

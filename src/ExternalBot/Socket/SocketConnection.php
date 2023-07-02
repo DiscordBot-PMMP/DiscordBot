@@ -12,8 +12,8 @@
 
 namespace JaxkDev\DiscordBot\ExternalBot\Socket;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use Monolog\Logger;
-use pocketmine\utils\BinaryStream;
 
 /**
  * Represents a connection to the socket server (a client).
@@ -48,13 +48,10 @@ class SocketConnection{
         if(!$this->open){
             throw new SocketException("Socket is not open.");
         }
-        //Network format: length (int32BE) + packet
-        $packet = $stream->getBuffer();
-        $stream = new BinaryStream();
-        $stream->putInt(strlen($packet));
-        $stream->put($packet);
+        $data = new BinaryStream();
+        $data->putString($stream->getBuffer());
 
-        $sent = @socket_write($this->socket, $stream->getBuffer());
+        $sent = @socket_write($this->socket, $data->getBuffer());
         if($sent === false){
             $this->close("Failed to send data to socket.");
             throw new SocketException("Failed to send data to socket: " . socket_strerror(socket_last_error()));

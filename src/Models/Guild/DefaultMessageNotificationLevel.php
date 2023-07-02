@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Guild;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
-use pocketmine\utils\BinaryStream;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 enum DefaultMessageNotificationLevel: int implements \JsonSerializable, BinarySerializable{
 

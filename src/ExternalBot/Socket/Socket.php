@@ -12,9 +12,9 @@
 
 namespace JaxkDev\DiscordBot\ExternalBot\Socket;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
 use Monolog\Logger;
-use pocketmine\utils\BinaryStream;
 
 class Socket{
 

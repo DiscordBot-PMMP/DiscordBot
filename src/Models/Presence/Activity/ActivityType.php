@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Presence\Activity;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
-use pocketmine\utils\BinaryStream;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 /**
  * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types

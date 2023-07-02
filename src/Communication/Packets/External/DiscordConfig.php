@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\External;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use pocketmine\utils\BinaryStream;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 class DiscordConfig extends Packet{
 
@@ -37,14 +37,12 @@ class DiscordConfig extends Packet{
         if($data === false){
             throw new \RuntimeException("Failed to encode config JSON to string.");
         }
-        $stream->putInt(strlen($data));
-        $stream->put($data);
+        $stream->putString($data);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        $length = $stream->getInt();
-        $data = $stream->get($length);
+        $data = $stream->getString();
         $config = json_decode($data, true);
         if($config === null){
             throw new \RuntimeException("Failed to decode config JSON from string.");

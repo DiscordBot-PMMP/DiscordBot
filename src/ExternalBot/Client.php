@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\ExternalBot;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\NetworkApi;
 use JaxkDev\DiscordBot\Communication\Packets\External\Connect;
 use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
@@ -24,7 +25,6 @@ use JaxkDev\DiscordBot\ExternalBot\Socket\SocketConnection;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level as LoggerLevel;
 use Monolog\Logger;
-use pocketmine\utils\BinaryStream;
 
 //Small testing socket.
 class Client{

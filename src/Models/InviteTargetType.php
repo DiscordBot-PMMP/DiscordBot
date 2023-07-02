@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
-use pocketmine\utils\BinaryStream;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 /** @link https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types */
 enum InviteTargetType: int implements \JsonSerializable, BinarySerializable{

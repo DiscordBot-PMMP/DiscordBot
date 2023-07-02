@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\Models\Presence;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
-use pocketmine\utils\BinaryStream;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 enum Status: string implements \JsonSerializable, BinarySerializable{
 
@@ -24,13 +24,12 @@ enum Status: string implements \JsonSerializable, BinarySerializable{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putInt(strlen($this->value));
-        $stream->put($this->value);
+        $stream->putString($this->value);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        return self::from($stream->get($stream->getInt()));
+        return self::from($stream->getString());
     }
 
     public function jsonSerialize(): string{
