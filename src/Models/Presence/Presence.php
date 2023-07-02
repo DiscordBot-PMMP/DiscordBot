@@ -82,10 +82,7 @@ class Presence implements \JsonSerializable{
         foreach($this->activities as $activity){
             $stream->put($activity->binarySerialize()->getBuffer());
         }
-        $stream->putBool($this->client_status !== null);
-        if($this->client_status !== null){
-            $stream->put($this->client_status->binarySerialize()->getBuffer());
-        }
+        $stream->putNullable($this->client_status?->binarySerialize()?->getBuffer());
         return $stream;
     }
 

@@ -12,10 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/resources/emoji#emoji-object */
-class Emoji implements \JsonSerializable{
+class Emoji implements \JsonSerializable, BinarySerializable{
 
     /** Emoji ID */
     private ?string $id;
@@ -145,6 +147,45 @@ class Emoji implements \JsonSerializable{
     }
 
     //----- Serialization -----//
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putNullableString($this->id);
+        $stream->putNullableString($this->name);
+        $stream->putBool($this->role_ids !== null);
+        if($this->role_ids !== null){
+            $stream->putInt(sizeof($this->role_ids));
+            foreach($this->role_ids as $role_id){
+                $stream->putString($role_id);
+            }
+        }
+        $stream->putNullableString($this->user_id);
+        $stream->putNullableBool($this->require_colons);
+        $stream->putNullableBool($this->managed);
+        $stream->putNullableBool($this->animated);
+        $stream->putNullableBool($this->available);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        $id = $stream->getNullableString();
+        $name = $stream->getNullableString();
+        if($stream->getBool()){
+            $role_ids = [];
+            $count = $stream->getInt();
+            for($i = 0; $i < $count; ++$i){
+                $role_ids[] = $stream->getString();
+            }
+        }else{
+            $role_ids = null;
+        }
+        $user_id = $stream->getNullableString();
+        $require_colons = $stream->getNullableBool();
+        $managed = $stream->getNullableBool();
+        $animated = $stream->getNullableBool();
+        $available = $stream->getNullableBool();
+        return new self($id, $name, $role_ids, $user_id, $require_colons, $managed, $animated, $available);
+    }
 
     public function jsonSerialize(): array{
         return [

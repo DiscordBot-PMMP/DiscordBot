@@ -12,9 +12,11 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class User implements \JsonSerializable{
+class User implements \JsonSerializable, BinarySerializable{
 
     /**
      * @link https://discord.com/developers/docs/resources/user#user-object-user-flags
@@ -348,6 +350,44 @@ class User implements \JsonSerializable{
     }
 
     //----- Serialization -----//
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->id);
+        $stream->putString($this->username);
+        $stream->putString($this->discriminator);
+        $stream->putNullableString($this->global_name);
+        $stream->putString($this->avatar);
+        $stream->putNullableBool($this->bot);
+        $stream->putNullableBool($this->system);
+        $stream->putNullableBool($this->mfa_enabled);
+        $stream->putNullableString($this->banner);
+        $stream->putNullableInt($this->accent_colour);
+        $stream->putNullableString($this->locale);
+        $stream->putInt($this->flags_bitwise);
+        $stream->putNullable($this->premium_type?->binarySerialize()?->getBuffer());
+        $stream->putInt($this->public_flags_bitwise);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(),                                               // id
+            $stream->getString(),                                               // username
+            $stream->getString(),                                               // discriminator
+            $stream->getNullableString(),                                       // global_name
+            $stream->getString(),                                               // avatar
+            $stream->getNullableBool(),                                         // bot
+            $stream->getNullableBool(),                                         // system
+            $stream->getNullableBool(),                                         // mfa_enabled
+            $stream->getNullableString(),                                       // banner
+            $stream->getNullableInt(),                                          // accent_colour
+            $stream->getNullableString(),                                       // locale
+            $stream->getInt(),                                                  // flags_bitwise
+            $stream->getBool() ? UserPremiumType::fromBinary($stream) : null,   // premium_type
+            $stream->getInt()                                                   // public_flags_bitwise
+        );
+    }
 
     public function jsonSerialize(): array{
         return [

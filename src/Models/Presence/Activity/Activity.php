@@ -440,83 +440,26 @@ final class Activity implements \JsonSerializable{
         $stream = new BinaryStream();
         $stream->putString($this->name);
         $stream->put($this->type->binarySerialize()->getBuffer());
-        $stream->putBool($this->url !== null);
-        if($this->url !== null){
-            $stream->putString($this->url);
-        }
+        $stream->putNullableString($this->url);
         $stream->putInt($this->created_at);
-        $stream->putBool($this->start_timestamp !== null);
-        if($this->start_timestamp !== null){
-            $stream->putInt($this->start_timestamp);
-        }
-        $stream->putBool($this->end_timestamp !== null);
-        if($this->end_timestamp !== null){
-            $stream->putInt($this->end_timestamp);
-        }
-        $stream->putBool($this->application_id !== null);
-        if($this->application_id !== null){
-            $stream->putString($this->application_id);
-        }
-        $stream->putBool($this->details !== null);
-        if($this->details !== null){
-            $stream->putString($this->details);
-        }
-        $stream->putBool($this->state !== null);
-        if($this->state !== null){
-            $stream->putString($this->state);
-        }
-        $stream->putBool($this->emoji !== null);
-        if($this->emoji !== null){
-            $stream->put($this->emoji->binarySerialize()->getBuffer());
-        }
-        $stream->putBool($this->party_id !== null);
-        if($this->party_id !== null){
-            $stream->putString($this->party_id);
-        }
-        $stream->putBool($this->party_size !== null);
-        if($this->party_size !== null){
-            $stream->putInt($this->party_size);
-        }
-        $stream->putBool($this->party_max_size !== null);
-        if($this->party_max_size !== null){
-            $stream->putInt($this->party_max_size);
-        }
-        $stream->putBool($this->asset_large_image !== null);
-        if($this->asset_large_image !== null){
-            $stream->putString($this->asset_large_image);
-        }
-        $stream->putBool($this->asset_large_text !== null);
-        if($this->asset_large_text !== null){
-            $stream->putString($this->asset_large_text);
-        }
-        $stream->putBool($this->asset_small_image !== null);
-        if($this->asset_small_image !== null){
-            $stream->putString($this->asset_small_image);
-        }
-        $stream->putBool($this->asset_small_text !== null);
-        if($this->asset_small_text !== null){
-            $stream->putString($this->asset_small_text);
-        }
-        $stream->putBool($this->secret_join !== null);
-        if($this->secret_join !== null){
-            $stream->putString($this->secret_join);
-        }
-        $stream->putBool($this->secret_spectate !== null);
-        if($this->secret_spectate !== null){
-            $stream->putString($this->secret_spectate);
-        }
-        $stream->putBool($this->secret_match !== null);
-        if($this->secret_match !== null){
-            $stream->putString($this->secret_match);
-        }
-        $stream->putBool($this->instance !== null);
-        if($this->instance !== null){
-            $stream->putBool($this->instance);
-        }
-        $stream->putBool($this->flags_bitwise !== null);
-        if($this->flags_bitwise !== null){
-            $stream->putInt($this->flags_bitwise);
-        }
+        $stream->putNullableInt($this->start_timestamp);
+        $stream->putNullableInt($this->end_timestamp);
+        $stream->putNullableInt($this->application_id);
+        $stream->putNullableString($this->details);
+        $stream->putNullableString($this->state);
+        $stream->putNullable($this->emoji?->binarySerialize()?->getBuffer());
+        $stream->putNullableString($this->party_id);
+        $stream->putNullableInt($this->party_size);
+        $stream->putNullableInt($this->party_max_size);
+        $stream->putNullableString($this->asset_large_image);
+        $stream->putNullableString($this->asset_large_text);
+        $stream->putNullableString($this->asset_small_image);
+        $stream->putNullableString($this->asset_small_text);
+        $stream->putNullableString($this->secret_join);
+        $stream->putNullableString($this->secret_spectate);
+        $stream->putNullableString($this->secret_match);
+        $stream->putNullableBool($this->instance);
+        $stream->putNullableInt($this->flags_bitwise);
         $stream->putInt(sizeof($this->buttons));
         foreach($this->buttons as $button){
             $stream->put($button->binarySerialize()->getBuffer());
@@ -528,26 +471,26 @@ final class Activity implements \JsonSerializable{
         $activity = new self(
             $stream->getString(),                                   // name
             ActivityType::fromBinary($stream),                      // type
-            $stream->getBool() ? $stream->getString() : null,       // url
+            $stream->getNullableString(),                           // url
             $stream->getInt(),                                      // created_at
-            $stream->getBool() ? $stream->getInt() : null,          // start_timestamp
-            $stream->getBool() ? $stream->getInt() : null,          // end_timestamp
-            $stream->getBool() ? $stream->getString() : null,       // application_id
-            $stream->getBool() ? $stream->getString() : null,       // details
-            $stream->getBool() ? $stream->getString() : null,       // state
+            $stream->getNullableInt(),                              // start_timestamp
+            $stream->getNullableInt(),                              // end_timestamp
+            $stream->getNullableString(),                           // application_id
+            $stream->getNullableString(),                           // details
+            $stream->getNullableString(),                           // state
             $stream->getBool() ? Emoji::fromBinary($stream) : null, // emoji
-            $stream->getBool() ? $stream->getString() : null,       // party_id
-            $stream->getBool() ? $stream->getInt() : null,          // party_size
-            $stream->getBool() ? $stream->getInt() : null,          // party_max_size
-            $stream->getBool() ? $stream->getString() : null,       // asset_large_image
-            $stream->getBool() ? $stream->getString() : null,       // asset_large_text
-            $stream->getBool() ? $stream->getString() : null,       // asset_small_image
-            $stream->getBool() ? $stream->getString() : null,       // asset_small_text
-            $stream->getBool() ? $stream->getString() : null,       // secret_join
-            $stream->getBool() ? $stream->getString() : null,       // secret_spectate
-            $stream->getBool() ? $stream->getString() : null,       // secret_match
-            $stream->getBool() ? $stream->getBool() : null,         // instance
-            $stream->getBool() ? $stream->getInt() : null,          // flags_bitwise
+            $stream->getNullableString(),                           // party_id
+            $stream->getNullableInt(),                              // party_size
+            $stream->getNullableInt(),                              // party_max_size
+            $stream->getNullableString(),                           // asset_large_image
+            $stream->getNullableString(),                           // asset_large_text
+            $stream->getNullableString(),                           // asset_small_image
+            $stream->getNullableString(),                           // asset_small_text
+            $stream->getNullableString(),                           // secret_join
+            $stream->getNullableString(),                           // secret_spectate
+            $stream->getNullableString(),                           // secret_match
+            $stream->getNullableBool(),                             // instance
+            $stream->getNullableInt(),                              // flags_bitwise
             []                                                      // buttons
         );
 

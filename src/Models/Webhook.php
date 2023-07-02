@@ -12,12 +12,14 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /**
  * @link https://discord.com/developers/docs/resources/webhook#webhook-object
  */
-class Webhook implements \JsonSerializable{
+class Webhook implements \JsonSerializable, BinarySerializable{
 
     /**
      * The type of the webhook
@@ -210,6 +212,38 @@ class Webhook implements \JsonSerializable{
     }
 
     //----- Serialization -----//
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->put($this->type->binarySerialize()->getBuffer());
+        $stream->putNullableString($this->id);
+        $stream->putNullableString($this->guild_id);
+        $stream->putNullableString($this->channel_id);
+        $stream->putNullableString($this->user_id);
+        $stream->putNullableString($this->name);
+        $stream->putNullableString($this->avatar);
+        $stream->putNullableString($this->token);
+        $stream->putNullableString($this->application_id);
+        $stream->putNullableString($this->source_guild_id);
+        $stream->putNullableString($this->source_channel_id);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            WebhookType::fromBinary($stream),   // type
+            $stream->getNullableString(),       // id
+            $stream->getNullableString(),       // guild_id
+            $stream->getNullableString(),       // channel_id
+            $stream->getNullableString(),       // user_id
+            $stream->getNullableString(),       // name
+            $stream->getNullableString(),       // avatar
+            $stream->getNullableString(),       // token
+            $stream->getNullableString(),       // application_id
+            $stream->getNullableString(),       // source_guild_id
+            $stream->getNullableString()        // source_channel_id
+        );
+    }
 
     public function jsonSerialize(): array{
         return [

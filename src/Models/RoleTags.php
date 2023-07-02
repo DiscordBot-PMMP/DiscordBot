@@ -12,12 +12,14 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /**
  * @link https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
  */
-class RoleTags implements \JsonSerializable{
+class RoleTags implements \JsonSerializable, BinarySerializable{
 
     /** The id of the bot this role belongs to */
     private ?string $bot_id;
@@ -108,6 +110,28 @@ class RoleTags implements \JsonSerializable{
     }
 
     //----- Serialization -----//
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putNullableString($this->bot_id);
+        $stream->putNullableString($this->integration_id);
+        $stream->putNullableBool($this->premium_subscriber);
+        $stream->putNullableString($this->subscription_listing_id);
+        $stream->putNullableBool($this->available_for_purchase);
+        $stream->putNullableBool($this->guild_connections);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getNullableString(),   // bot_id
+            $stream->getNullableString(),   // integration_id
+            $stream->getNullableBool(),     // premium_subscriber
+            $stream->getNullableString(),   // subscription_listing_id
+            $stream->getNullableBool(),     // available_for_purchase
+            $stream->getNullableBool()      // guild_connections
+        );
+    }
 
     public function jsonSerialize(): array{
         return [

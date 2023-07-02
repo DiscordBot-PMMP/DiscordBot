@@ -12,11 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/topics/permissions#role-object */
-class Role implements \JsonSerializable{
+class Role implements \JsonSerializable, BinarySerializable{
 
     /** Role ID, never null unless you are sending a new createRole via API. */
     private ?string $id;
@@ -190,6 +192,40 @@ class Role implements \JsonSerializable{
     }
 
     //----- Serialization -----//
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putNullableString($this->id);
+        $stream->putString($this->guild_id);
+        $stream->putString($this->name);
+        $stream->putInt($this->colour);
+        $stream->putBool($this->hoist);
+        $stream->putNullableString($this->icon);
+        $stream->putNullableString($this->unicode_emoji);
+        $stream->putInt($this->position);
+        $stream->put($this->permissions->binarySerialize()->getBuffer());
+        $stream->putBool($this->managed);
+        $stream->putBool($this->mentionable);
+        $stream->putNullable($this->tags?->binarySerialize()?->getBuffer());
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getNullableString(),                               // id
+            $stream->getString(),                                       // guild_id
+            $stream->getString(),                                       // name
+            $stream->getInt(),                                          // colour
+            $stream->getBool(),                                         // hoist
+            $stream->getNullableString(),                               // icon
+            $stream->getNullableString(),                               // unicode_emoji
+            $stream->getInt(),                                          // position
+            RolePermissions::fromBinary($stream),                       // permissions
+            $stream->getBool(),                                         // managed
+            $stream->getBool(),                                         // mentionable
+            $stream->getBool() ? RoleTags::fromBinary($stream) : null   // tags
+        );
+    }
 
     public function jsonSerialize(): array{
         return [

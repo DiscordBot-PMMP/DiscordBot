@@ -12,10 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/resources/invite#invite-object */
-class Invite implements \JsonSerializable{
+class Invite implements \JsonSerializable, BinarySerializable{
 
     /** Also used as ID internally, ONLY null when creating model. */
     private ?string $code;
@@ -120,6 +122,30 @@ class Invite implements \JsonSerializable{
     }
 
     //----- Serialization -----//
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putNullableString($this->code);
+        $stream->putNullableString($this->guild_id);
+        $stream->putString($this->channel_id);
+        $stream->putNullableString($this->inviter);
+        $stream->putNullable($this->target_type?->binarySerialize()?->getBuffer());
+        $stream->putNullableString($this->target_user);
+        $stream->putNullableInt($this->expires_at);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getNullableString(),
+            $stream->getNullableString(),
+            $stream->getString(),
+            $stream->getNullableString(),
+            $stream->getBool() ? InviteTargetType::fromBinary($stream) : null,
+            $stream->getNullableString(),
+            $stream->getNullableInt(),
+        );
+    }
 
     public function jsonSerialize(): array{
         return [

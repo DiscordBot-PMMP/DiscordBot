@@ -12,10 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/resources/voice#voice-state-object */
-class VoiceState implements \JsonSerializable{
+class VoiceState implements \JsonSerializable, BinarySerializable{
 
     /** The guild id this voice state is for, null for DMs. */
     private ?string $guild_id;
@@ -180,6 +182,40 @@ class VoiceState implements \JsonSerializable{
     }
 
     //----- Serialization -----//
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putNullableString($this->guild_id);
+        $stream->putNullableString($this->channel_id);
+        $stream->putString($this->user_id);
+        $stream->putNullableString($this->session_id);
+        $stream->putBool($this->deaf);
+        $stream->putBool($this->mute);
+        $stream->putBool($this->self_deaf);
+        $stream->putBool($this->self_mute);
+        $stream->putNullableBool($this->self_stream);
+        $stream->putBool($this->self_video);
+        $stream->putBool($this->suppress);
+        $stream->putNullableInt($this->request_to_speak_timestamp);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getNullableString(),   // guild_id
+            $stream->getNullableString(),   // channel_id
+            $stream->getString(),           // user_id
+            $stream->getNullableString(),   // session_id
+            $stream->getBool(),             // deaf
+            $stream->getBool(),             // mute
+            $stream->getBool(),             // self_deaf
+            $stream->getBool(),             // self_mute
+            $stream->getNullableBool(),     // self_stream
+            $stream->getBool(),             // self_video
+            $stream->getBool(),             // suppress
+            $stream->getNullableInt()       // request_to_speak_timestamp
+        );
+    }
 
     public function jsonSerialize(): array{
         return [

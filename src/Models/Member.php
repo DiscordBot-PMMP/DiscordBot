@@ -12,12 +12,14 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /** @link https://discord.com/developers/docs/resources/guild#guild-member-object */
-class Member implements \JsonSerializable{
+class Member implements \JsonSerializable, BinarySerializable{
 
     /**
      * @link https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
@@ -291,6 +293,52 @@ class Member implements \JsonSerializable{
     }
 
     //----- Serialization -----//
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->guild_id);
+        $stream->putString($this->user_id);
+        $stream->putNullableString($this->nickname);
+        $stream->putNullableString($this->avatar);
+        $stream->putInt(sizeof($this->roles));
+        foreach($this->roles as $role){
+            $stream->putString($role);
+        }
+        $stream->putNullableInt($this->join_timestamp);
+        $stream->putNullableInt($this->premium_since);
+        $stream->putBool($this->deaf);
+        $stream->putBool($this->mute);
+        $stream->putInt($this->flags_bitwise);
+        $stream->putNullableBool($this->pending);
+        $stream->put($this->permissions->binarySerialize()->getBuffer());
+        $stream->putNullableInt($this->communications_disabled_until);
+        $stream->putNullable($this->presence->binarySerialize()->getBuffer());
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        $guild_id = $stream->getString();
+        $user_id = $stream->getString();
+        $nickname = $stream->getNullableString();
+        $avatar = $stream->getNullableString();
+        $roles = [];
+        $count = $stream->getInt();
+        for($i = 0; $i < $count; ++$i){
+            $roles[] = $stream->getString();
+        }
+        $join_timestamp = $stream->getNullableInt();
+        $premium_since = $stream->getNullableInt();
+        $deaf = $stream->getBool();
+        $mute = $stream->getBool();
+        $flags_bitwise = $stream->getInt();
+        $pending = $stream->getNullableBool();
+        $permissions = RolePermissions::fromBinary($stream);
+        $communications_disabled_until = $stream->getNullableInt();
+        $presence = $stream->getBool() ? Presence::fromBinary($stream) : null;
+
+        return new self($guild_id, $user_id, $nickname, $avatar, $roles, $join_timestamp, $premium_since, $deaf, $mute,
+            $flags_bitwise, $pending, $permissions, $communications_disabled_until, $presence);
+    }
 
     public function jsonSerialize(): array{
         return [

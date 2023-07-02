@@ -64,17 +64,14 @@ class ActivityButton implements \JsonSerializable, BinarySerializable{
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->label);
-        $stream->putBool($this->url !== null);
-        if($this->url !== null){
-            $stream->putString($this->url);
-        }
+        $stream->putNullableString($this->url);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
             $stream->getString(),
-            $stream->getBool() ? $stream->getString() : null
+            $stream->getNullableString()
         );
     }
 
