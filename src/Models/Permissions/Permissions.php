@@ -169,7 +169,7 @@ abstract class Permissions implements \JsonSerializable, BinarySerializable{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putString($this->bitwise); // String to allow 32bit programs to have a chance...
+        $stream->putString((string)$this->bitwise); // String to allow 32bit programs to have a chance...
         return $stream;
     }
 

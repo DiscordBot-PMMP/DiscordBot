@@ -312,7 +312,7 @@ class Member implements \JsonSerializable, BinarySerializable{
         $stream->putNullableBool($this->pending);
         $stream->put($this->permissions->binarySerialize()->getBuffer());
         $stream->putNullableInt($this->communications_disabled_until);
-        $stream->putNullable($this->presence->binarySerialize()->getBuffer());
+        $stream->putNullable($this->presence?->binarySerialize()?->getBuffer());
         return $stream;
     }
 

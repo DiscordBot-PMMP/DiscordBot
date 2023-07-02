@@ -24,15 +24,17 @@ class Socket{
     private int $port;
 
     private bool $open = false;
-    private ?\Socket $socket;
+    private \Socket $socket;
 
     public function __construct(Logger $logger, string $address, int $port){
         $this->logger = $logger->withName("ExternalThread.Socket");
         $this->address = $address;
         $this->port = $port;
-        $this->socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if($this->socket === false){
+        $socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        if($socket === false){
             throw new SocketException("Failed to create socket: " . socket_strerror(socket_last_error()));
+        }else{
+            $this->socket = $socket;
         }
         if(@socket_set_nonblock($this->socket) === false){
             throw new SocketException("Failed to set socket to non-blocking: " . socket_strerror(socket_last_error()));
@@ -122,12 +124,13 @@ class Socket{
     }
 
     public function close(): void{
-        if($this->socket !== null){
+        if($this->open){
             @socket_close($this->socket);
-            $this->socket = null;
+            $this->open = false;
+            $this->logger->info("Socket closed.");
+        }else{
+            $this->logger->warning("Cannot close socket, socket is not open.");
         }
-        $this->open = false;
-        $this->logger->info("Socket closed.");
     }
 
     public function isOpen(): bool{

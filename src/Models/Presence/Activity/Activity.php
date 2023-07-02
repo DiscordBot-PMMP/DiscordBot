@@ -444,7 +444,7 @@ final class Activity implements \JsonSerializable{
         $stream->putInt($this->created_at);
         $stream->putNullableInt($this->start_timestamp);
         $stream->putNullableInt($this->end_timestamp);
-        $stream->putNullableInt($this->application_id);
+        $stream->putNullableString($this->application_id);
         $stream->putNullableString($this->details);
         $stream->putNullableString($this->state);
         $stream->putNullable($this->emoji?->binarySerialize()?->getBuffer());
