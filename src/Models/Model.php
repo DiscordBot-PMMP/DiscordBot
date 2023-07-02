@@ -10,36 +10,19 @@
  * Email   :: JaxkDev@gmail.com
  */
 
-namespace JaxkDev\DiscordBot\Communication\Packets;
+namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-abstract class Packet implements \JsonSerializable, BinarySerializable{
+abstract class Model implements \JsonSerializable, BinarySerializable{
 
-    public static int $UID_COUNT = 1;
-
-    protected int $UID;
-
-    public function __construct(?int $uid = null){
-        if($uid === null){
-            if(Packet::$UID_COUNT > 4294967295){
-                //32bit int overflow, reset.
-                Packet::$UID_COUNT = 1;
-            }
-            $this->UID = Packet::$UID_COUNT++;
-        }else{
-            $this->UID = $uid;
-        }
-    }
-
-    public function getUID(): int{
-        return $this->UID;
-    }
+    public const SERIALIZE_ID = 0;
 
     abstract public function binarySerialize(): BinaryStream;
     abstract public static function fromBinary(BinaryStream $stream): self; //Update self reference by adding abstract interface function.
 
     abstract public function jsonSerialize(): array;
     abstract public static function fromJson(array $data): self;
+
 }

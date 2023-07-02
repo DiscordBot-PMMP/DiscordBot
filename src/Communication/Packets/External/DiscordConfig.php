@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 class DiscordConfig extends Packet{
 
-    public const ID = 64;
+    public const SERIALIZE_ID = 3;
 
     private array $config;
 

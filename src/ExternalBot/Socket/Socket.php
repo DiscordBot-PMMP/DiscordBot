@@ -99,7 +99,7 @@ class Socket{
         $packet = (new Disconnect("Connection refused."))->binarySerialize()->getBuffer();
         $stream = new BinaryStream();
         $stream->putInt(2 + strlen($packet));
-        $stream->putShort(Disconnect::ID);
+        $stream->putShort(Disconnect::SERIALIZE_ID);
         $stream->put($packet);
         @socket_write($client, $stream->getBuffer());
 

@@ -44,6 +44,7 @@ use JaxkDev\DiscordBot\Communication\Packets\External\Connect;
 use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
 use JaxkDev\DiscordBot\Communication\Packets\External\DiscordConfig;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
@@ -84,12 +85,13 @@ class NetworkApi{
     public const VERSION = 1;
     public const MAGIC = 0x4a61786b; //Jaxk :) (max 4 bytes)
 
-    //Map all packets to their ID.
-    /** @var array<int, class-string>  */
-    public const PACKETS = [
-        Connect::ID => Connect::class,
-        Heartbeat::ID => Heartbeat::class,
-        Resolution::ID => Resolution::class,
+    /** @var array<int, class-string<Packet>>  */
+    public const PACKETS_MAP = [
+        Connect::SERIALIZE_ID => Connect::class,
+        Disconnect::SERIALIZE_ID => Disconnect::class,
+        DiscordConfig::SERIALIZE_ID => DiscordConfig::class,
+        Heartbeat::SERIALIZE_ID => Heartbeat::class,
+        Resolution::SERIALIZE_ID => Resolution::class,
         /*RequestAddReaction::ID => RequestAddReaction::class,
         RequestAddRole::ID => RequestAddRole::class,
         RequestBroadcastTyping::ID => RequestBroadcastTyping::class,
@@ -149,18 +151,23 @@ class NetworkApi{
         RoleDelete::ID => RoleDelete::class,
         RoleUpdate::ID => RoleUpdate::class,
         VoiceStateUpdate::ID => VoiceStateUpdate::class,*/
-        Disconnect::ID => Disconnect::class,
-        DiscordConfig::ID => DiscordConfig::class,
         //65 Next ID
     ];
 
-    //TODO Map all models to a network ID.
+    /** @var array<int, class-string>  */
+    public const MODELS_MAP = [
+        //TODO
+    ];
 
     /**
      * @param int $id
-     * @return ?class-string
+     * @return ?class-string<Packet>
      */
     public static function getPacketClass(int $id): ?string{
-        return self::PACKETS[$id] ?? null;
+        return self::PACKETS_MAP[$id] ?? null;
+    }
+
+    public static function getModelClass(int $id): ?string{
+        return null;
     }
 }

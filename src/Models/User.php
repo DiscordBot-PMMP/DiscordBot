@@ -365,27 +365,27 @@ class User implements \JsonSerializable, BinarySerializable{
         $stream->putNullableInt($this->accent_colour);
         $stream->putNullableString($this->locale);
         $stream->putInt($this->flags_bitwise);
-        $stream->putNullable($this->premium_type?->binarySerialize()?->getBuffer());
+        $stream->putNullableSerializable($this->premium_type);
         $stream->putInt($this->public_flags_bitwise);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getString(),                                               // id
-            $stream->getString(),                                               // username
-            $stream->getString(),                                               // discriminator
-            $stream->getNullableString(),                                       // global_name
-            $stream->getString(),                                               // avatar
-            $stream->getNullableBool(),                                         // bot
-            $stream->getNullableBool(),                                         // system
-            $stream->getNullableBool(),                                         // mfa_enabled
-            $stream->getNullableString(),                                       // banner
-            $stream->getNullableInt(),                                          // accent_colour
-            $stream->getNullableString(),                                       // locale
-            $stream->getInt(),                                                  // flags_bitwise
-            $stream->getBool() ? UserPremiumType::fromBinary($stream) : null,   // premium_type
-            $stream->getInt()                                                   // public_flags_bitwise
+            $stream->getString(),                                       // id
+            $stream->getString(),                                       // username
+            $stream->getString(),                                       // discriminator
+            $stream->getNullableString(),                               // global_name
+            $stream->getString(),                                       // avatar
+            $stream->getNullableBool(),                                 // bot
+            $stream->getNullableBool(),                                 // system
+            $stream->getNullableBool(),                                 // mfa_enabled
+            $stream->getNullableString(),                               // banner
+            $stream->getNullableInt(),                                  // accent_colour
+            $stream->getNullableString(),                               // locale
+            $stream->getInt(),                                          // flags_bitwise
+            $stream->getNullableSerializable(UserPremiumType::class),   // premium_type
+            $stream->getInt()                                           // public_flags_bitwise
         );
     }
 

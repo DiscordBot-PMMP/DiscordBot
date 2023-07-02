@@ -16,7 +16,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 class Heartbeat extends Packet{
 
-    public const ID = 1;
+    public const SERIALIZE_ID = 4;
 
     private int $heartbeat;
 
@@ -31,17 +31,17 @@ class Heartbeat extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        //$stream->putInt($this->UID);
+        $stream->putInt($this->UID);
         $stream->putInt($this->heartbeat);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        //$uid = $stream->getInt();
+        $uid = $stream->getInt();
         $heartbeat = $stream->getInt();
         return new self(
             $heartbeat,
-            //$uid
+            $uid
         );
     }
 

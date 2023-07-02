@@ -77,24 +77,18 @@ class Presence implements \JsonSerializable{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->put($this->status->binarySerialize()->getBuffer());
-        $stream->putInt(sizeof($this->activities));
-        foreach($this->activities as $activity){
-            $stream->put($activity->binarySerialize()->getBuffer());
-        }
-        $stream->putNullable($this->client_status?->binarySerialize()?->getBuffer());
+        $stream->putSerializable($this->status);
+        $stream->putSerializableArray($this->activities);
+        $stream->putNullableSerializable($this->client_status);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        $status = Status::fromBinary($stream);
-        $activities = [];
-        $size = $stream->getInt();
-        for($i = 0; $i < $size; $i++){
-            $activities[] = Activity::fromBinary($stream);
-        }
-        $client_status = $stream->getBool() ? ClientStatus::fromBinary($stream) : null;
-        return new self($status, $activities, $client_status);
+        return new self(
+            $stream->getSerializable(Status::class),                // status
+            $stream->getSerializableArray(Activity::class),         // activities
+            $stream->getNullableSerializable(ClientStatus::class)   // client_status
+        );
     }
 
     public function jsonSerialize(): array{

@@ -215,7 +215,7 @@ class Webhook implements \JsonSerializable, BinarySerializable{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->put($this->type->binarySerialize()->getBuffer());
+        $stream->putSerializable($this->type);
         $stream->putNullableString($this->id);
         $stream->putNullableString($this->guild_id);
         $stream->putNullableString($this->channel_id);
@@ -231,7 +231,7 @@ class Webhook implements \JsonSerializable, BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            WebhookType::fromBinary($stream),   // type
+            $stream->getSerializable(WebhookType::class),
             $stream->getNullableString(),       // id
             $stream->getNullableString(),       // guild_id
             $stream->getNullableString(),       // channel_id

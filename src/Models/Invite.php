@@ -129,7 +129,7 @@ class Invite implements \JsonSerializable, BinarySerializable{
         $stream->putNullableString($this->guild_id);
         $stream->putString($this->channel_id);
         $stream->putNullableString($this->inviter);
-        $stream->putNullable($this->target_type?->binarySerialize()?->getBuffer());
+        $stream->putNullableSerializable($this->target_type);
         $stream->putNullableString($this->target_user);
         $stream->putNullableInt($this->expires_at);
         return $stream;
@@ -137,13 +137,13 @@ class Invite implements \JsonSerializable, BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getNullableString(),
-            $stream->getNullableString(),
-            $stream->getString(),
-            $stream->getNullableString(),
-            $stream->getBool() ? InviteTargetType::fromBinary($stream) : null,
-            $stream->getNullableString(),
-            $stream->getNullableInt(),
+            $stream->getNullableString(),                               // code
+            $stream->getNullableString(),                               // guild_id
+            $stream->getString(),                                       // channel_id
+            $stream->getNullableString(),                               // inviter
+            $stream->getNullableSerializable(InviteTargetType::class),  // target_type
+            $stream->getNullableString(),                               // target_user
+            $stream->getNullableInt(),                                  // expires_at
         );
     }
 

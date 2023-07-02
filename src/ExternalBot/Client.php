@@ -39,6 +39,8 @@ class Client{
     private int $lastTick = 0;
 
     public function __construct(Thread $thread){
+        Packet::$UID_COUNT = 1000;
+
         $this->thread = $thread;
 
         //Setup logger.
@@ -128,7 +130,7 @@ class Client{
 
         // packet id (Unsigned 16bit BE) + data (string)
         $stream = new BinaryStream();
-        $stream->putShort($packet::ID);
+        $stream->putShort($packet::SERIALIZE_ID);
         $stream->put($packet->binarySerialize()->getBuffer());
         try{
             $this->connection->write($stream);

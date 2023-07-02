@@ -16,14 +16,23 @@ use pocketmine\utils\BinaryDataException;
 
 interface BinarySerializable{
 
-    // Serialise to a specific network format.
+    /**
+     * All serializable objects must have a unique ID to identify them.
+     * IDs must be unique to their type, and must not be changed. (Packet IDs may conflict with Model IDs)
+     * Modifying this value will break compatibility with other versions.
+     * @var int<0, 65535>
+     * @internal
+     */
+    public const SERIALIZE_ID = 0;
 
     /**
+     * @internal
      * @throws BinaryDataException If the packet data is invalid, should never happen.
      */
     public function binarySerialize(): BinaryStream;
 
     /**
+     * @internal
      * @throws BinaryDataException If the packet data is invalid, may happen on external thread inbound.
      */
     public static function fromBinary(BinaryStream $stream): self;

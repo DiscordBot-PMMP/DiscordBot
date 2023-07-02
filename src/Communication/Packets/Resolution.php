@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 class Resolution extends Packet{
 
-    public const ID = 2;
+    public const SERIALIZE_ID = 5;
 
     private int $pid;
 
@@ -59,15 +59,11 @@ class Resolution extends Packet{
         $stream->putInt($this->pid);
         $stream->putBool($this->successful);
         $stream->putString($this->response);
-        $stream->putInt(0); //temp 0 model count.
-        /*$stream->putInt(count($this->data));
+        $stream->putInt(count($this->data));
         foreach($this->data as $model){
-            //TODO Wait for models binary implementation.
-            $serialized = $model->binarySerialize()->getBuffer();
-            $stream->putInt(strlen($serialized));
-            //TODO Write model ID (n).
-            $stream->put($serialized);
-        }*/
+            //TODO Have a think about identifying model type, do we need IDs?
+            $stream->put($model->binarySerialize()->getBuffer());
+        }
         return $stream;
     }
 
@@ -79,9 +75,7 @@ class Resolution extends Packet{
         $modelCount = $stream->getInt();
         $models = [];
         for($i = 0; $i < $modelCount; $i++){
-            $length = $stream->getInt() - 4;
-            $modelID = $stream->getInt();
-            $model = $stream->get($length);
+            $modelID = $stream->getShort();
             //TODO Wait for models binary implementation.
             //Deserialize from class $modelID.
             //$models[] = $model;

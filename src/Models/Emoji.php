@@ -154,10 +154,7 @@ class Emoji implements \JsonSerializable, BinarySerializable{
         $stream->putNullableString($this->name);
         $stream->putBool($this->role_ids !== null);
         if($this->role_ids !== null){
-            $stream->putInt(sizeof($this->role_ids));
-            foreach($this->role_ids as $role_id){
-                $stream->putString($role_id);
-            }
+            $stream->putStringArray($this->role_ids);
         }
         $stream->putNullableString($this->user_id);
         $stream->putNullableBool($this->require_colons);
@@ -168,23 +165,16 @@ class Emoji implements \JsonSerializable, BinarySerializable{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        $id = $stream->getNullableString();
-        $name = $stream->getNullableString();
-        if($stream->getBool()){
-            $role_ids = [];
-            $count = $stream->getInt();
-            for($i = 0; $i < $count; ++$i){
-                $role_ids[] = $stream->getString();
-            }
-        }else{
-            $role_ids = null;
-        }
-        $user_id = $stream->getNullableString();
-        $require_colons = $stream->getNullableBool();
-        $managed = $stream->getNullableBool();
-        $animated = $stream->getNullableBool();
-        $available = $stream->getNullableBool();
-        return new self($id, $name, $role_ids, $user_id, $require_colons, $managed, $animated, $available);
+        return new self(
+            $stream->getNullableString(),                           // id
+            $stream->getNullableString(),                           // name
+            $stream->getBool() ? $stream->getStringArray() : null,  // role_ids
+            $stream->getNullableString(),                           // user_id
+            $stream->getNullableBool(),                             // require_colons
+            $stream->getNullableBool(),                             // managed
+            $stream->getNullableBool(),                             // animated
+            $stream->getNullableBool()                              // available
+        );
     }
 
     public function jsonSerialize(): array{

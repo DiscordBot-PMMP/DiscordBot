@@ -300,44 +300,36 @@ class Member implements \JsonSerializable, BinarySerializable{
         $stream->putString($this->user_id);
         $stream->putNullableString($this->nickname);
         $stream->putNullableString($this->avatar);
-        $stream->putInt(sizeof($this->roles));
-        foreach($this->roles as $role){
-            $stream->putString($role);
-        }
+        $stream->putStringArray($this->roles);
         $stream->putNullableInt($this->join_timestamp);
         $stream->putNullableInt($this->premium_since);
         $stream->putBool($this->deaf);
         $stream->putBool($this->mute);
         $stream->putInt($this->flags_bitwise);
         $stream->putNullableBool($this->pending);
-        $stream->put($this->permissions->binarySerialize()->getBuffer());
+        $stream->putSerializable($this->permissions);
         $stream->putNullableInt($this->communications_disabled_until);
-        $stream->putNullable($this->presence?->binarySerialize()?->getBuffer());
+        $stream->putNullableSerializable($this->presence);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        $guild_id = $stream->getString();
-        $user_id = $stream->getString();
-        $nickname = $stream->getNullableString();
-        $avatar = $stream->getNullableString();
-        $roles = [];
-        $count = $stream->getInt();
-        for($i = 0; $i < $count; ++$i){
-            $roles[] = $stream->getString();
-        }
-        $join_timestamp = $stream->getNullableInt();
-        $premium_since = $stream->getNullableInt();
-        $deaf = $stream->getBool();
-        $mute = $stream->getBool();
-        $flags_bitwise = $stream->getInt();
-        $pending = $stream->getNullableBool();
-        $permissions = RolePermissions::fromBinary($stream);
-        $communications_disabled_until = $stream->getNullableInt();
-        $presence = $stream->getBool() ? Presence::fromBinary($stream) : null;
-
-        return new self($guild_id, $user_id, $nickname, $avatar, $roles, $join_timestamp, $premium_since, $deaf, $mute,
-            $flags_bitwise, $pending, $permissions, $communications_disabled_until, $presence);
+        return new self(
+            $stream->getString(),           // guild_id
+            $stream->getString(),           // user_id
+            $stream->getNullableString(),   // nickname
+            $stream->getNullableString(),   // avatar
+            $stream->getStringArray(),      // roles
+            $stream->getNullableInt(),      // join_timestamp
+            $stream->getNullableInt(),      // premium_since
+            $stream->getBool(),             // deaf
+            $stream->getBool(),             // mute
+            $stream->getInt(),              // flags_bitwise
+            $stream->getNullableBool(),     // pending
+            $stream->getSerializable(RolePermissions::class),
+            $stream->getNullableInt(),      // communications_disabled_until
+            $stream->getNullableSerializable(Presence::class)
+        );
     }
 
     public function jsonSerialize(): array{

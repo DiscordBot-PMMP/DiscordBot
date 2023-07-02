@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
+use Discord\Parts\Permissions\RolePermission;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
@@ -203,27 +204,27 @@ class Role implements \JsonSerializable, BinarySerializable{
         $stream->putNullableString($this->icon);
         $stream->putNullableString($this->unicode_emoji);
         $stream->putInt($this->position);
-        $stream->put($this->permissions->binarySerialize()->getBuffer());
+        $stream->putSerializable($this->permissions);
         $stream->putBool($this->managed);
         $stream->putBool($this->mentionable);
-        $stream->putNullable($this->tags?->binarySerialize()?->getBuffer());
+        $stream->putNullableSerializable($this->tags);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getNullableString(),                               // id
-            $stream->getString(),                                       // guild_id
-            $stream->getString(),                                       // name
-            $stream->getInt(),                                          // colour
-            $stream->getBool(),                                         // hoist
-            $stream->getNullableString(),                               // icon
-            $stream->getNullableString(),                               // unicode_emoji
-            $stream->getInt(),                                          // position
-            RolePermissions::fromBinary($stream),                       // permissions
-            $stream->getBool(),                                         // managed
-            $stream->getBool(),                                         // mentionable
-            $stream->getBool() ? RoleTags::fromBinary($stream) : null   // tags
+            $stream->getNullableString(),                       // id
+            $stream->getString(),                               // guild_id
+            $stream->getString(),                               // name
+            $stream->getInt(),                                  // colour
+            $stream->getBool(),                                 // hoist
+            $stream->getNullableString(),                       // icon
+            $stream->getNullableString(),                       // unicode_emoji
+            $stream->getInt(),                                  // position
+            $stream->getSerializable(RolePermission::class),    // permissions
+            $stream->getBool(),                                 // managed
+            $stream->getBool(),                                 // mentionable
+            $stream->getNullableSerializable(RoleTags::class)   // tags
         );
     }
 

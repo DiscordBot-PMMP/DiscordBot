@@ -104,7 +104,7 @@ use pmmp\thread\ThreadSafeArray;
      */
     public function writeOutboundData(Packet $data): void{
         try{
-            $this->outboundData[] = json_encode([$data::ID, $data], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            $this->outboundData[] = json_encode([$data::SERIALIZE_ID, $data], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }catch(\JsonException $e){
             throw new \AssertionError("Failed to encode packet to JSON, ".$e->getMessage());
         }

@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 class Disconnect extends Packet{
 
-    public const ID = 63;
+    public const SERIALIZE_ID = 2;
 
     private string $message;
 

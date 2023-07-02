@@ -439,7 +439,7 @@ final class Activity implements \JsonSerializable{
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->name);
-        $stream->put($this->type->binarySerialize()->getBuffer());
+        $stream->putSerializable($this->type);
         $stream->putNullableString($this->url);
         $stream->putInt($this->created_at);
         $stream->putNullableInt($this->start_timestamp);
@@ -447,7 +447,7 @@ final class Activity implements \JsonSerializable{
         $stream->putNullableString($this->application_id);
         $stream->putNullableString($this->details);
         $stream->putNullableString($this->state);
-        $stream->putNullable($this->emoji?->binarySerialize()?->getBuffer());
+        $stream->putNullableSerializable($this->emoji);
         $stream->putNullableString($this->party_id);
         $stream->putNullableInt($this->party_size);
         $stream->putNullableInt($this->party_max_size);
@@ -460,17 +460,14 @@ final class Activity implements \JsonSerializable{
         $stream->putNullableString($this->secret_match);
         $stream->putNullableBool($this->instance);
         $stream->putNullableInt($this->flags_bitwise);
-        $stream->putInt(sizeof($this->buttons));
-        foreach($this->buttons as $button){
-            $stream->put($button->binarySerialize()->getBuffer());
-        }
+        $stream->putSerializableArray($this->buttons);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        $activity = new self(
+        return new self(
             $stream->getString(),                                   // name
-            ActivityType::fromBinary($stream),                      // type
+            $stream->getSerializable(ActivityType::class),          // type
             $stream->getNullableString(),                           // url
             $stream->getInt(),                                      // created_at
             $stream->getNullableInt(),                              // start_timestamp
@@ -478,7 +475,7 @@ final class Activity implements \JsonSerializable{
             $stream->getNullableString(),                           // application_id
             $stream->getNullableString(),                           // details
             $stream->getNullableString(),                           // state
-            $stream->getBool() ? Emoji::fromBinary($stream) : null, // emoji
+            $stream->getNullableSerializable(Emoji::class),         // emoji
             $stream->getNullableString(),                           // party_id
             $stream->getNullableInt(),                              // party_size
             $stream->getNullableInt(),                              // party_max_size
@@ -491,17 +488,8 @@ final class Activity implements \JsonSerializable{
             $stream->getNullableString(),                           // secret_match
             $stream->getNullableBool(),                             // instance
             $stream->getNullableInt(),                              // flags_bitwise
-            []                                                      // buttons
+            $stream->getSerializableArray(ActivityButton::class)    // buttons
         );
-
-        $buttonCount = $stream->getInt();
-        $buttons = [];
-        for($i = 0; $i < $buttonCount; $i++){
-            $buttons[] = ActivityButton::fromBinary($stream);
-        }
-        $activity->setButtons($buttons);
-
-        return $activity;
     }
 
     public function jsonSerialize(): array{
