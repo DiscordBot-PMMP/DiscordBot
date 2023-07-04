@@ -15,8 +15,11 @@ namespace JaxkDev\DiscordBot\Models\Presence\Activity;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-/** @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons */
-class ActivityButton implements \JsonSerializable, BinarySerializable{
+/**
+ * @implements BinarySerializable<ActivityButton>
+ * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons
+ */
+class ActivityButton implements BinarySerializable{
 
     /** Text shown on the button (1-32 characters) */
     private string $label;
@@ -72,20 +75,6 @@ class ActivityButton implements \JsonSerializable, BinarySerializable{
         return new self(
             $stream->getString(),           // label
             $stream->getNullableString()    // url
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "label" => $this->label,
-            "url" => $this->url,
-        ];
-    }
-
-    public static function fromJson(array $json): self{
-        return new self(
-            $json["label"],
-            $json["url"] ?? null
         );
     }
 }

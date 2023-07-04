@@ -15,8 +15,11 @@ namespace JaxkDev\DiscordBot\Models\Guild;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-/** @link https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level */
-enum NsfwLevel: int implements \JsonSerializable, BinarySerializable{
+/**
+ * @implements BinarySerializable<NsfwLevel>
+ * @link https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level
+ */
+enum NsfwLevel: int implements BinarySerializable{
 
     case DEFAULT = 0;
     case EXPLICIT = 1;
@@ -31,13 +34,5 @@ enum NsfwLevel: int implements \JsonSerializable, BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return self::from($stream->getByte());
-    }
-
-    public function jsonSerialize(): int{
-        return $this->value;
-    }
-
-    public static function fromJson(int $value): self{
-        return self::from($value);
     }
 }

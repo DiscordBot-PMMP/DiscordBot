@@ -12,13 +12,16 @@
 
 namespace JaxkDev\DiscordBot\Models\Guild;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Emoji;
-use JaxkDev\DiscordBot\Models\Model;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-/** @link https://discord.com/developers/docs/resources/guild#guild-resource */
-class Guild extends Model{
+/**
+ * @implements BinarySerializable<Guild>
+ * @link https://discord.com/developers/docs/resources/guild#guild-resource
+ */
+class Guild implements BinarySerializable{
 
     public const SERIALIZE_ID = 1;
 
@@ -666,84 +669,6 @@ class Guild extends Model{
             $stream->getSerializable(NsfwLevel::class),
             $stream->getBool(),             // premium_progress_bar_enabled
             $stream->getNullableString()    // safety_alerts_channel_id
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'icon' => $this->icon,
-            'splash' => $this->splash,
-            'discovery_splash' => $this->discovery_splash,
-            'owner_id' => $this->owner_id,
-            'afk_channel_id' => $this->afk_channel_id,
-            'afk_timeout' => $this->afk_timeout,
-            'widget_enabled' => $this->widget_enabled,
-            'widget_channel_id' => $this->widget_channel_id,
-            'verification_level' => $this->verification_level->jsonSerialize(),
-            'default_message_notifications' => $this->default_message_notifications->jsonSerialize(),
-            'explicit_content_filter' => $this->explicit_content_filter->jsonSerialize(),
-            'emojis' => array_map(fn(Emoji $e) => $e->jsonSerialize(), $this->emojis),
-            'features' => $this->features,
-            'mfa_level' => $this->mfa_level->jsonSerialize(),
-            'application_id' => $this->application_id,
-            'system_channel_id' => $this->system_channel_id,
-            'system_channel_flags' => $this->system_channel_flags,
-            'rules_channel_id' => $this->rules_channel_id,
-            'max_presences' => $this->max_presences,
-            'max_members' => $this->max_members,
-            'vanity_url_code' => $this->vanity_url_code,
-            'description' => $this->description,
-            'banner' => $this->banner,
-            'premium_tier' => $this->premium_tier->jsonSerialize(),
-            'premium_subscription_count' => $this->premium_subscription_count,
-            'preferred_locale' => $this->preferred_locale,
-            'public_updates_channel_id' => $this->public_updates_channel_id,
-            'max_video_channel_users' => $this->max_video_channel_users,
-            'max_stage_video_channel_users' => $this->max_stage_video_channel_users,
-            'nsfw_level' => $this->nsfw_level->jsonSerialize(),
-            'premium_progress_bar_enabled' => $this->premium_progress_bar_enabled,
-            'safety_alerts_channel_id' => $this->safety_alerts_channel_id
-        ];
-    }
-
-    public static function fromJson(array $data): self{
-        return new Guild(
-            $data['id'],
-            $data['name'],
-            $data['icon'] ?? null,
-            $data['splash'] ?? null,
-            $data['discovery_splash'] ?? null,
-            $data['owner_id'] ?? null,
-            $data['afk_channel_id'] ?? null,
-            $data['afk_timeout'],
-            $data['widget_enabled'] ?? null,
-            $data['widget_channel_id'] ?? null,
-            VerificationLevel::fromJson($data['verification_level']),
-            DefaultMessageNotificationLevel::fromJson($data['default_message_notifications']),
-            ExplicitContentFilterLevel::fromJson($data['explicit_content_filter']),
-            array_map(fn(array $e) => Emoji::fromJson($e), $data['emojis']),
-            $data['features'],
-            MfaLevel::fromJson($data['mfa_level']),
-            $data['application_id'] ?? null,
-            $data['system_channel_id'] ?? null,
-            $data['system_channel_flags'],
-            $data['rules_channel_id'] ?? null,
-            $data['max_presences'] ?? null,
-            $data['max_members'] ?? null,
-            $data['vanity_url_code'] ?? null,
-            $data['description'] ?? null,
-            $data['banner'] ?? null,
-            PremiumTier::fromJson($data['premium_tier']),
-            $data['premium_subscription_count'] ?? null,
-            $data['preferred_locale'],
-            $data['public_updates_channel_id'] ?? null,
-            $data['max_video_channel_users'] ?? null,
-            $data['max_stage_video_channel_users'] ?? null,
-            NsfwLevel::fromJson($data['nsfw_level']),
-            $data['premium_progress_bar_enabled'],
-            $data['safety_alerts_channel_id'] ?? null
         );
     }
 }

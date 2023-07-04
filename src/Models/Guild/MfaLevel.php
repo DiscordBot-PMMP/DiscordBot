@@ -15,8 +15,11 @@ namespace JaxkDev\DiscordBot\Models\Guild;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-/** @link https://discord.com/developers/docs/resources/guild#guild-object-mfa-level */
-enum MfaLevel: int implements \JsonSerializable, BinarySerializable{
+/**
+ * @implements BinarySerializable<MfaLevel>
+ * @link https://discord.com/developers/docs/resources/guild#guild-object-mfa-level
+ */
+enum MfaLevel: int implements BinarySerializable{
 
     /** Guild has no MFA/2FA requirement for moderation actions */
     case NONE = 0;
@@ -32,13 +35,5 @@ enum MfaLevel: int implements \JsonSerializable, BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return self::from($stream->getByte());
-    }
-
-    public function jsonSerialize(): int{
-        return $this->value;
-    }
-
-    public static function fromJson(int $value): self{
-        return self::from($value);
     }
 }

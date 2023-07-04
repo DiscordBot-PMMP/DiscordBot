@@ -12,14 +12,16 @@
 
 namespace JaxkDev\DiscordBot\Models;
 
-use Discord\Parts\Permissions\RolePermission;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-/** @link https://discord.com/developers/docs/topics/permissions#role-object */
-class Role implements \JsonSerializable, BinarySerializable{
+/**
+ * @implements BinarySerializable<Role>
+ * @link https://discord.com/developers/docs/topics/permissions#role-object
+ */
+class Role implements BinarySerializable{
 
     /** Role ID, never null unless you are sending a new createRole via API. */
     private ?string $id;
@@ -221,44 +223,10 @@ class Role implements \JsonSerializable, BinarySerializable{
             $stream->getNullableString(),                       // icon
             $stream->getNullableString(),                       // unicode_emoji
             $stream->getInt(),                                  // position
-            $stream->getSerializable(RolePermission::class),    // permissions
+            $stream->getSerializable(RolePermissions::class),   // permissions
             $stream->getBool(),                                 // managed
             $stream->getBool(),                                 // mentionable
             $stream->getNullableSerializable(RoleTags::class)   // tags
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "id" => $this->id,
-            "guild_id" => $this->guild_id,
-            "name" => $this->name,
-            "colour" => $this->colour,
-            "hoist" => $this->hoist,
-            "icon" => $this->icon,
-            "unicode_emoji" => $this->unicode_emoji,
-            "position" => $this->position,
-            "permissions" => $this->permissions->jsonSerialize(),
-            "managed" => $this->managed,
-            "mentionable" => $this->mentionable,
-            "tags" => $this->tags?->jsonSerialize()
-        ];
-    }
-
-    public static function fromJson(array $json): self{
-        return new self(
-            $json["id"] ?? null,
-            $json["guild_id"],
-            $json["name"],
-            $json["colour"],
-            $json["hoist"],
-            $json["icon"] ?? null,
-            $json["unicode_emoji"] ?? null,
-            $json["position"],
-            RolePermissions::fromJson($json["permissions"]),
-            $json["managed"],
-            $json["mentionable"],
-            ($json["tags"] ?? null) !== null ? RoleTags::fromJson($json["tags"]) : null
         );
     }
 }

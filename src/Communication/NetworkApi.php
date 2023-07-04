@@ -85,7 +85,7 @@ class NetworkApi{
     public const VERSION = 1;
     public const MAGIC = 0x4a61786b; //Jaxk :) (max 4 bytes)
 
-    /** @var array<int, class-string<Packet>>  */
+    /** @var array<int, class-string<Packet<object>>>  */
     public const PACKETS_MAP = [
         Connect::SERIALIZE_ID => Connect::class,
         Disconnect::SERIALIZE_ID => Disconnect::class,
@@ -161,7 +161,7 @@ class NetworkApi{
 
     /**
      * @param int $id
-     * @return ?class-string<Packet>
+     * @return class-string<Packet<object>>|null
      */
     public static function getPacketClass(int $id): ?string{
         return self::PACKETS_MAP[$id] ?? null;

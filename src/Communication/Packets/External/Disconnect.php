@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\External;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
+/** @extends Packet<Disconnect> */
 class Disconnect extends Packet{
 
     public const SERIALIZE_ID = 2;
@@ -39,18 +40,6 @@ class Disconnect extends Packet{
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
             $stream->getString()
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "message" => $this->message
-        ];
-    }
-
-    public static function fromJson(array $data): self{
-        return new self(
-            $data["message"] ?? "Unknown",
         );
     }
 }

@@ -23,12 +23,13 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
         return $this->get($this->getInt());
     }
 
+    /** @param BinarySerializable<object> $value */
     public function putSerializable(BinarySerializable $value): void{
         $this->put($value->binarySerialize()->getBuffer());
     }
 
     /**
-     * @template T of BinarySerializable
+     * @template T of BinarySerializable<object>
      * @param class-string<T> $class
      * @return T
      */
@@ -38,10 +39,7 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
         return $x;
     }
 
-    /**
-     * @template T of BinarySerializable
-     * @param T[] $values
-     */
+    /** @param BinarySerializable<object>[] $values */
     public function putSerializableArray(array $values): void{
         $this->putInt(sizeof($values));
         foreach($values as $value){
@@ -50,7 +48,7 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
     }
 
     /**
-     * @template T of BinarySerializable
+     * @template T of BinarySerializable<object>
      * @param class-string<T> $class
      * @return T[]
      */
@@ -150,6 +148,7 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
         return $this->getBool() ? $this->getString() : null;
     }
 
+    /** @param BinarySerializable<object>|null $value */
     public function putNullableSerializable(?BinarySerializable $value): void{
         $this->putBool($value !== null);
         if($value !== null){
@@ -158,17 +157,17 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
     }
 
     /**
-     * @template T of BinarySerializable
+     * @template T of BinarySerializable<object>
      * @param class-string<T> $class
      * @return T|null
      */
     public function getNullableSerializable(string $class){
-        //A bit of a hack due to fromBinary phpdoc not specifying return type T.
         if($this->getBool()){
             /** @var T $x */
             $x = $class::fromBinary($this);
             return $x;
+        }else{
+            return null;
         }
-        return null;
     }
 }

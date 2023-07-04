@@ -16,8 +16,11 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-/** @link https://discord.com/developers/docs/resources/guild#ban-object */
-class Ban implements \JsonSerializable, BinarySerializable{
+/**
+ * @implements BinarySerializable<Ban>
+ * @link https://discord.com/developers/docs/resources/guild#ban-object
+ */
+class Ban implements BinarySerializable{
 
     /** Guild the user is banned from */
     private string $guild_id;
@@ -94,21 +97,4 @@ class Ban implements \JsonSerializable, BinarySerializable{
             $stream->getNullableString()    // reason
         );
     }
-
-    public function jsonSerialize(): array{
-        return [
-            "guild_id" => $this->guild_id,
-            "user_id" => $this->user_id,
-            "reason" => $this->reason,
-        ];
-    }
-
-    public static function fromJson(array $data): self{
-        return new self(
-            $data["guild_id"],
-            $data["user_id"],
-            $data["reason"] ?? null
-        );
-    }
-
 }

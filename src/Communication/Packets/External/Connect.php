@@ -17,6 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 /**
  * Packet for external bot to verify its connection with the correct Version and MAGIC.
+ * @extends Packet<Connect>
  */
 class Connect extends Packet{
 
@@ -52,20 +53,6 @@ class Connect extends Packet{
         return new self(
             $version,
             $magic
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "version" => $this->version,
-            "magic" => $this->magic
-        ];
-    }
-
-    public static function fromJson(array $data): Packet{
-        return new self(
-            $data["version"],
-            $data["magic"]
         );
     }
 }

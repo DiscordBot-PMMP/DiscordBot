@@ -14,11 +14,12 @@ namespace JaxkDev\DiscordBot\Communication;
 
 use pocketmine\utils\BinaryDataException;
 
+/** @template-covariant T */
 interface BinarySerializable{
 
     /**
-     * All serializable objects must have a unique ID to identify them.
-     * IDs must be unique to their type, and must not be changed. (Packet IDs may conflict with Model IDs)
+     * All serializable CLASSES (not enums) must have a unique ID to identify them.
+     * IDs must be unique, and must not be changed.
      * Modifying this value will break compatibility with other versions.
      * @var int<0, 65535>
      * @internal
@@ -33,6 +34,7 @@ interface BinarySerializable{
 
     /**
      * @internal
+     * @return BinarySerializable<T>
      * @throws BinaryDataException If the packet data is invalid, may happen on external thread inbound.
      */
     public static function fromBinary(BinaryStream $stream): self;

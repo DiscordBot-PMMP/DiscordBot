@@ -12,12 +12,16 @@
 
 namespace JaxkDev\DiscordBot\Models\Presence;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Plugin\Api;
 
-/** A simple class to hold all presence data for members. */
-class Presence implements \JsonSerializable{
+/**
+ * A simple class to hold all presence data for members.
+ * @implements BinarySerializable<Presence>
+ */
+class Presence implements BinarySerializable{
 
     /** Current status */
     private Status $status;
@@ -88,22 +92,6 @@ class Presence implements \JsonSerializable{
             $stream->getSerializable(Status::class),                // status
             $stream->getSerializableArray(Activity::class),         // activities
             $stream->getNullableSerializable(ClientStatus::class)   // client_status
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "status" => $this->status->jsonSerialize(),
-            "activities" => array_map(fn(Activity $activity) => $activity->jsonSerialize(), $this->activities),
-            "client_status" => $this->client_status?->jsonSerialize()
-        ];
-    }
-
-    public static function fromJson(array $json): self{
-        return new self(
-            Status::fromJson($json["status"]),
-            array_map(fn(array $activity) => Activity::fromJson($activity), $json["activities"]),
-            $json["client_status"] === null ? null : ClientStatus::fromJson($json["client_status"])
         );
     }
 }

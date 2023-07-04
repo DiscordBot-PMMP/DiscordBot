@@ -16,8 +16,11 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-/** @link https://discord.com/developers/docs/resources/voice#voice-state-object */
-class VoiceState implements \JsonSerializable, BinarySerializable{
+/**
+ * @implements BinarySerializable<VoiceState>
+ * @link https://discord.com/developers/docs/resources/voice#voice-state-object
+ */
+class VoiceState implements BinarySerializable{
 
     /** The guild id this voice state is for, null for DMs. */
     private ?string $guild_id;
@@ -214,40 +217,6 @@ class VoiceState implements \JsonSerializable, BinarySerializable{
             $stream->getBool(),             // self_video
             $stream->getBool(),             // suppress
             $stream->getNullableInt()       // request_to_speak_timestamp
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "guild_id" => $this->guild_id,
-            "channel_id" => $this->channel_id,
-            "user_id" => $this->user_id,
-            "session_id" => $this->session_id,
-            "deaf" => $this->deaf,
-            "mute" => $this->mute,
-            "self_deaf" => $this->self_deaf,
-            "self_mute" => $this->self_mute,
-            "self_stream" => $this->self_stream,
-            "self_video" => $this->self_video,
-            "suppress" => $this->suppress,
-            "request_to_speak_timestamp" => $this->request_to_speak_timestamp
-        ];
-    }
-
-    public static function fromJson(array $data): self{
-        return new self(
-            $data["guild_id"] ?? null,
-            $data["channel_id"] ?? null,
-            $data["user_id"],
-            $data["session_id"] ?? null,
-            $data["deaf"],
-            $data["mute"],
-            $data["self_deaf"],
-            $data["self_mute"],
-            $data["self_stream"] ?? null,
-            $data["self_video"],
-            $data["suppress"],
-            $data["request_to_speak_timestamp"] ?? null
         );
     }
 }

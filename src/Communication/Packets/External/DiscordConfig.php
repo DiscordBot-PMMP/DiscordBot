@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\External;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
+/** @extends Packet<DiscordConfig> */
 class DiscordConfig extends Packet{
 
     public const SERIALIZE_ID = 3;
@@ -48,24 +49,7 @@ class DiscordConfig extends Packet{
             throw new \RuntimeException("Failed to decode config JSON from string.");
         }
         return new self(
-            $config
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "config" => json_encode($this->config, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
-        ];
-    }
-
-    public static function fromJson(array $data): Packet{
-        $config = json_decode($data["config"], true);
-        if($config === null){
-            throw new \RuntimeException("Failed to decode config JSON from string.");
-        }
-        return new self(
-            $config,
-            $data["uid"]
+            (array)$config
         );
     }
 }

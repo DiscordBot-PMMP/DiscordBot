@@ -14,11 +14,10 @@ namespace JaxkDev\DiscordBot\Models\Permissions;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
+/** @extends Permissions<RolePermissions> */
 class RolePermissions extends Permissions{
 
-    /**
-     * @return Array<string, int>
-     */
+    /** @return Array<string, int> */
     static function getPossiblePermissions(): array{
         return array_merge(Permissions::ALL_PERMISSIONS, Permissions::ROLE_PERMISSIONS, Permissions::TEXT_PERMISSIONS,
             Permissions::VOICE_PERMISSIONS, Permissions::STAGE_PERMISSIONS);
@@ -26,9 +25,5 @@ class RolePermissions extends Permissions{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self((int)$stream->getString());
-    }
-
-    public static function fromJson(int $bitwise): self{
-        return new self($bitwise);
     }
 }

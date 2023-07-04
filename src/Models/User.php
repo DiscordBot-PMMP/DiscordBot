@@ -16,7 +16,10 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class User implements \JsonSerializable, BinarySerializable{
+/**
+ * @implements BinarySerializable<User>
+ */
+class User implements BinarySerializable{
 
     /**
      * @link https://discord.com/developers/docs/resources/user#user-object-user-flags
@@ -386,44 +389,6 @@ class User implements \JsonSerializable, BinarySerializable{
             $stream->getInt(),                                          // flags_bitwise
             $stream->getNullableSerializable(UserPremiumType::class),   // premium_type
             $stream->getInt()                                           // public_flags_bitwise
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "id" => $this->id,
-            "username" => $this->username,
-            "discriminator" => $this->discriminator,
-            "global_name" => $this->global_name,
-            "avatar" => $this->avatar,
-            "bot" => $this->bot,
-            "system" => $this->system,
-            "mfa_enabled" => $this->mfa_enabled,
-            "banner" => $this->banner,
-            "accent_colour" => $this->accent_colour,
-            "locale" => $this->locale,
-            "flags_bitwise" => $this->flags_bitwise,
-            "premium_type" => $this->premium_type,
-            "public_flags_bitwise" => $this->public_flags_bitwise
-        ];
-    }
-
-    public static function fromJson(array $data): self{
-        return new self(
-            $data["id"],
-            $data["username"],
-            $data["discriminator"],
-            $data["global_name"] ?? null,
-            $data["avatar"],
-            $data["bot"] ?? null,
-            $data["system"] ?? null,
-            $data["mfa_enabled"] ?? null,
-            $data["banner"] ?? null,
-            $data["accent_colour"] ?? null,
-            $data["locale"] ?? null,
-            $data["flags_bitwise"],
-            ($data["premium_type"] ?? null) === null ? UserPremiumType::fromJson($data["premium_type"]) : null,
-            $data["public_flags_bitwise"]
         );
     }
 }

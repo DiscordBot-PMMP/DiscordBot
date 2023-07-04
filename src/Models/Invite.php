@@ -16,8 +16,11 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-/** @link https://discord.com/developers/docs/resources/invite#invite-object */
-class Invite implements \JsonSerializable, BinarySerializable{
+/**
+ * @implements BinarySerializable<Invite>
+ * @link https://discord.com/developers/docs/resources/invite#invite-object
+ */
+class Invite implements BinarySerializable{
 
     /** Also used as ID internally, ONLY null when creating model. */
     private ?string $code;
@@ -144,30 +147,6 @@ class Invite implements \JsonSerializable, BinarySerializable{
             $stream->getNullableSerializable(InviteTargetType::class),  // target_type
             $stream->getNullableString(),                               // target_user
             $stream->getNullableInt(),                                  // expires_at
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "code" => $this->code,
-            "guild_id" => $this->guild_id,
-            "channel_id" => $this->channel_id,
-            "inviter" => $this->inviter,
-            "target_type" => $this->target_type,
-            "target_user" => $this->target_user,
-            "expires_at" => $this->expires_at,
-        ];
-    }
-
-    public static function fromJson(array $json): self{
-        return new self(
-            $json["code"] ?? null,
-            $json["guild_id"] ?? null,
-            $json["channel_id"] ?? null,
-            $json["inviter"] ?? null,
-            $json["target_type"] ?? null,
-            $json["target_user"] ?? null,
-            $json["expires_at"] ?? null,
         );
     }
 }

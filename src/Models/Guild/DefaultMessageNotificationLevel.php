@@ -15,7 +15,8 @@ namespace JaxkDev\DiscordBot\Models\Guild;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-enum DefaultMessageNotificationLevel: int implements \JsonSerializable, BinarySerializable{
+/** @implements BinarySerializable<DefaultMessageNotificationLevel> */
+enum DefaultMessageNotificationLevel: int implements BinarySerializable{
 
     /** Members will receive notifications for all messages by default */
     case ALL_MESSAGES = 0;
@@ -31,13 +32,5 @@ enum DefaultMessageNotificationLevel: int implements \JsonSerializable, BinarySe
 
     public static function fromBinary(BinaryStream $stream): self{
         return self::from($stream->getByte());
-    }
-
-    public function jsonSerialize(): int{
-        return $this->value;
-    }
-
-    public static function fromJson(int $value): self{
-        return self::from($value);
     }
 }

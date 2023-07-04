@@ -15,7 +15,8 @@ namespace JaxkDev\DiscordBot\Models\Presence;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-class ClientStatus implements \JsonSerializable, BinarySerializable{
+/** @implements BinarySerializable<ClientStatus> */
+class ClientStatus implements BinarySerializable{
 
     private Status $desktop;
     private Status $mobile;
@@ -67,22 +68,6 @@ class ClientStatus implements \JsonSerializable, BinarySerializable{
             $stream->getSerializable(Status::class), // desktop
             $stream->getSerializable(Status::class), // mobile
             $stream->getSerializable(Status::class)  // web
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            'desktop' => $this->desktop->jsonSerialize(),
-            'mobile' => $this->mobile->jsonSerialize(),
-            'web' => $this->web->jsonSerialize()
-        ];
-    }
-
-    public static function fromJson(array $json): self{
-        return new self(
-            Status::fromJson($json['desktop']),
-            Status::fromJson($json['mobile']),
-            Status::fromJson($json['web'])
         );
     }
 }

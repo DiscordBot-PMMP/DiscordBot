@@ -20,8 +20,11 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
  * However, PMMP requires 64bit PHP so this is okay as ints for now.
  *
  * @link https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
+ *
+ * @template-covariant T
+ * @implements BinarySerializable<T>
  */
-abstract class Permissions implements \JsonSerializable, BinarySerializable{
+abstract class Permissions implements BinarySerializable{
 
     /** All Voice only permissions (v) */
     const VOICE_PERMISSIONS = [
@@ -93,7 +96,7 @@ abstract class Permissions implements \JsonSerializable, BinarySerializable{
         "send_voice_messages" => (1 << 46)
     ];
 
-    private int $bitwise;
+    protected int $bitwise;
 
     /** @var Array<string, bool> */
     private array $permissions = [];
@@ -165,19 +168,9 @@ abstract class Permissions implements \JsonSerializable, BinarySerializable{
      */
     abstract static function getPossiblePermissions(): array;
 
-    //----- Serialization -----//
-
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString((string)$this->bitwise); // String to allow 32bit programs to have a chance...
         return $stream;
     }
-
-    abstract public static function fromBinary(BinaryStream $stream): self;
-
-    public function jsonSerialize(): int{
-        return $this->bitwise;
-    }
-
-    abstract public static function fromJson(int $bitwise): self;
 }

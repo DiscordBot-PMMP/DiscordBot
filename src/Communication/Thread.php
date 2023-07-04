@@ -77,36 +77,35 @@ use pmmp\thread\ThreadSafeArray;
         $this->config["discord"]["token"] = "**** Redacted Token ****";
     }
 
-    /** @return Packet[] */
+    /** @return Packet<object>[] */
     public function readInboundData(int $count = 1): array{
         return array_map(function($raw_data){
-            $data = (array)json_decode($raw_data, true);
-            if(sizeof($data) !== 2){
-                throw new \AssertionError("Invalid packet size - ".$raw_data);
+            $stream = new BinaryStream($raw_data);
+            trY{
+                $pid = $stream->getShort();
+            }catch(\Exception){
+                throw new \AssertionError("Invalid packet received - " . bin2hex($raw_data));
             }
-            if(!is_int($data[0])){
-                throw new \AssertionError("Invalid packet ID - ".$raw_data);
-            }
-            if(!is_array($data[1])){
-                throw new \AssertionError("Invalid packet data - ".$raw_data);
-            }
-            /** @var ?Packet $packet */
-            $packet = NetworkApi::getPacketClass($data[0]);
+            /** @var Packet<object>|null $packet */
+            $packet = NetworkApi::getPacketClass($pid);
             if($packet === null){
-                throw new \AssertionError("Invalid packet ID - ".$raw_data);
+                throw new \AssertionError("Invalid packet ID $pid - " . bin2hex($raw_data));
             }
-            return $packet::fromJson($data[1]);
+            try{
+                /** @var Packet<object> $x */
+                $x = $packet::fromBinary($stream);
+                return $x;
+            }catch(\Exception $e){
+                throw new \AssertionError("Failed to parse packet($pid) - " . $e->getMessage(), 0, $e);
+            }
         }, $this->inboundData->chunk($count));
     }
 
-    /**
-     * @param Packet $data
-     */
+    /** @param Packet<object> $data */
     public function writeOutboundData(Packet $data): void{
-        try{
-            $this->outboundData[] = json_encode([$data::SERIALIZE_ID, $data], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        }catch(\JsonException $e){
-            throw new \AssertionError("Failed to encode packet to JSON, ".$e->getMessage());
-        }
+        $stream = new BinaryStream();
+        $stream->putShort($data::SERIALIZE_ID);
+        $stream->putSerializable($data);
+        $this->outboundData[] = $stream->getBuffer();
     }
 }

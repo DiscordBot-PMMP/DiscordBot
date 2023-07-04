@@ -15,7 +15,11 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-abstract class Packet implements \JsonSerializable, BinarySerializable{
+/**
+ * @template-covariant T
+ * @implements BinarySerializable<T>
+ */
+abstract class Packet implements BinarySerializable{
 
     public static int $UID_COUNT = 1;
 
@@ -36,10 +40,4 @@ abstract class Packet implements \JsonSerializable, BinarySerializable{
     public function getUID(): int{
         return $this->UID;
     }
-
-    abstract public function binarySerialize(): BinaryStream;
-    abstract public static function fromBinary(BinaryStream $stream): self; //Update self reference by adding abstract interface function.
-
-    abstract public function jsonSerialize(): array;
-    abstract public static function fromJson(array $data): self;
 }

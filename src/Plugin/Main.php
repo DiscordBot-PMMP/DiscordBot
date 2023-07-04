@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\NetworkApi;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Thread;
@@ -176,7 +177,7 @@ class Main extends PluginBase{
     private function tick(int $currentTick): void{
         $data = $this->readInboundData($this->config["protocol"]["general"]["packets_per_tick"]);
 
-        /** @var Packet $d */
+        /** @var Packet<object> $d */
         foreach($data as $d){
             $this->communicationHandler->handle($d);
         }
@@ -208,39 +209,43 @@ class Main extends PluginBase{
         }
     }
 
+
     /**
      * @internal
+     * @return Packet<object>[]
      */
-    private function readInboundData(int $count = 1): array{
+    public function readInboundData(int $count = 1): array{
         return array_map(function($raw_data){
-            $data = (array)json_decode($raw_data, true);
-            if(sizeof($data) !== 2){
-                throw new \AssertionError("Invalid packet size - " . $raw_data);
+            $stream = new BinaryStream($raw_data);
+            trY{
+                $pid = $stream->getShort();
+            }catch(\Exception){
+                throw new \AssertionError("Invalid packet received - " . bin2hex($raw_data));
             }
-            if(!is_int($data[0])){
-                throw new \AssertionError("Invalid packet ID - " . $raw_data);
-            }
-            if(!is_array($data[1])){
-                throw new \AssertionError("Invalid packet data - " . $raw_data);
-            }
-            /** @var ?Packet $packet */
-            $packet = NetworkApi::getPacketClass($data[0]);
+            /** @var Packet<object>|null $packet */
+            $packet = NetworkApi::getPacketClass($pid);
             if($packet === null){
-                throw new \AssertionError("Invalid packet ID - " . $raw_data);
+                throw new \AssertionError("Invalid packet ID $pid - " . bin2hex($raw_data));
             }
-            return $packet::fromJson($data[1]);
+            try{
+                /** @var Packet<object> $x */
+                $x = $packet::fromBinary($stream);
+                return $x;
+            }catch(\Exception $e){
+                throw new \AssertionError("Failed to parse packet($pid) - " . $e->getMessage(), 0, $e);
+            }
         }, $this->inboundData->chunk($count));
     }
 
     /**
      * @internal
+     * @param Packet<object> $data
      */
-    public function writeOutboundData(Packet $packet): void{
-        try{
-            $this->outboundData[] = json_encode([$packet::ID, $packet], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        }catch(\JsonException $e){
-            throw new \AssertionError("Failed to encode packet to JSON, " . $e->getMessage());
-        }
+    public function writeOutboundData(Packet $data): void{
+        $stream = new BinaryStream();
+        $stream->putShort($data::SERIALIZE_ID);
+        $stream->putSerializable($data);
+        $this->outboundData[] = $stream->getBuffer();
     }
 
     public function getBotCommunicationHandler(): BotCommunicationHandler{

@@ -15,8 +15,11 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-/** @link https://discord.com/developers/docs/resources/user#user-object-premium-types */
-enum UserPremiumType: int implements \JsonSerializable, BinarySerializable{
+/**
+ * @implements BinarySerializable<UserPremiumType>
+ * @link https://discord.com/developers/docs/resources/user#user-object-premium-types
+ */
+enum UserPremiumType: int implements BinarySerializable{
 
     case NONE = 0;
     case NITRO_CLASSIC = 1;
@@ -31,13 +34,5 @@ enum UserPremiumType: int implements \JsonSerializable, BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return self::from($stream->getByte());
-    }
-
-    public function jsonSerialize(): int{
-        return $this->value;
-    }
-
-    public static function fromJson(int $value): self{
-        return self::from($value);
     }
 }

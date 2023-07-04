@@ -90,6 +90,7 @@ class BotCommunicationHandler{
         $this->plugin = $plugin;
     }
 
+    /** @param Packet<object> $packet */
     public function handle(Packet $packet): void{
         // If's instances instead of ID switching due to phpstan/types.
         if($packet instanceof ResolutionPacket){

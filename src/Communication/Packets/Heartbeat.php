@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
+/** @extends Packet<Heartbeat> */
 class Heartbeat extends Packet{
 
     public const SERIALIZE_ID = 4;
@@ -42,20 +43,6 @@ class Heartbeat extends Packet{
         return new self(
             $heartbeat,
             $uid
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "heartbeat" => $this->heartbeat
-        ];
-    }
-
-    public static function fromJson(array $data): self{
-        return new self(
-            $data["heartbeat"],
-            $data["uid"]
         );
     }
 }

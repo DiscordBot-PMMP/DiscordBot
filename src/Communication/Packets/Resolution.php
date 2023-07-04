@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
+/** @extends Packet<Resolution> */
 class Resolution extends Packet{
 
     public const SERIALIZE_ID = 5;
@@ -25,10 +26,10 @@ class Resolution extends Packet{
 
     private string $response;
 
-    /** @var BinarySerializable[] */
+    /** @var BinarySerializable<object>[] */
     private array $data;
 
-    /** @param BinarySerializable[] $data */
+    /** @param BinarySerializable<object>[] $data */
     public function __construct(int $pid, bool $successful, string $response, array $data = [], int $UID = null){
         parent::__construct($UID);
         $this->pid = $pid;
@@ -86,26 +87,6 @@ class Resolution extends Packet{
             $response,
             $models,
             $uid
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "pid" => $this->pid,
-            "successful" => $this->successful,
-            "response" => $this->response,
-            "data" => json_encode($this->data)
-        ];
-    }
-
-    public static function fromJson(array $data): self{
-        return new self(
-            $data["pid"],
-            $data["successful"],
-            $data["response"],
-            (array)json_decode($data["data"], true),
-            $data["uid"]
         );
     }
 }

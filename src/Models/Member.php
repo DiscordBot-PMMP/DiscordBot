@@ -18,8 +18,11 @@ use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-/** @link https://discord.com/developers/docs/resources/guild#guild-member-object */
-class Member implements \JsonSerializable, BinarySerializable{
+/**
+ * @implements BinarySerializable<Member>
+ * @link https://discord.com/developers/docs/resources/guild#guild-member-object
+ */
+class Member implements BinarySerializable{
 
     /**
      * @link https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
@@ -329,44 +332,6 @@ class Member implements \JsonSerializable, BinarySerializable{
             $stream->getSerializable(RolePermissions::class),
             $stream->getNullableInt(),      // communications_disabled_until
             $stream->getNullableSerializable(Presence::class)
-        );
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "guild_id" => $this->guild_id,
-            "user_id" => $this->user_id,
-            "nickname" => $this->nickname,
-            "avatar" => $this->avatar,
-            "roles" => $this->roles,
-            "join_timestamp" => $this->join_timestamp,
-            "premium_since" => $this->premium_since,
-            "deaf" => $this->deaf,
-            "mute" => $this->mute,
-            "flags" => $this->flags_bitwise,
-            "pending" => $this->pending,
-            "permissions" => $this->permissions->jsonSerialize(),
-            "communications_disabled_until" => $this->communications_disabled_until,
-            "presence" => $this->presence?->jsonSerialize()
-        ];
-    }
-
-    public static function fromJson(array $data): self{
-        return new Member(
-            $data["guild_id"],
-            $data["user_id"],
-            $data["nickname"] ?? null,
-            $data["avatar"] ?? null,
-            $data["roles"],
-            $data["join_timestamp"] ?? null,
-            $data["premium_since"] ?? null,
-            $data["deaf"],
-            $data["mute"],
-            $data["flags"],
-            $data["pending"] ?? null,
-            RolePermissions::fromJson($data["permissions"]),
-            $data["communications_disabled_until"] ?? null,
-            ($data["presence"] ?? null) !== null ? Presence::fromJson($data["presence"]) : null
         );
     }
 }

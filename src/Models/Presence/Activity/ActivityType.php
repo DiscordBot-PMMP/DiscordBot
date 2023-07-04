@@ -16,9 +16,10 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 /**
+ * @implements BinarySerializable<ActivityType>
  * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
  */
-enum ActivityType: int implements \JsonSerializable, BinarySerializable{
+enum ActivityType: int implements BinarySerializable{
 
     /** Playing {name} */
     case GAME = 0;
@@ -46,13 +47,5 @@ enum ActivityType: int implements \JsonSerializable, BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return self::from($stream->getByte());
-    }
-
-    public function jsonSerialize(): int{
-        return $this->value;
-    }
-
-    public static function fromJson(int $value): self{
-        return self::from($value);
     }
 }
