@@ -222,7 +222,7 @@ class Main extends PluginBase{
             }catch(\Exception){
                 throw new \AssertionError("Invalid packet received - " . bin2hex($raw_data));
             }
-            /** @var Packet<object>|null $packet */
+            /** @var class-string<Packet<object>>|null $packet */
             $packet = NetworkApi::getPacketClass($pid);
             if($packet === null){
                 throw new \AssertionError("Invalid packet ID $pid - " . bin2hex($raw_data));

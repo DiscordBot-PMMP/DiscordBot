@@ -147,7 +147,9 @@ class BotCommunicationHandler{
 
     //Uses the storage (aka cache)
     private function handleVoiceStateUpdate(VoiceStateUpdatePacket $packet): void{
-        $member = Storage::getMember($packet->getMemberId());
+        //TODO
+        $this->plugin->getLogger()->notice("Not handling voice state update.");
+        /*$member = Storage::getMember($packet->getMemberId());
         if($member === null){
             throw new \AssertionError("Member '{$packet->getMemberId()}' not found in storage.");
         }
@@ -201,7 +203,7 @@ class BotCommunicationHandler{
                 Storage::updateChannel($channel);
                 Storage::setMembersVoiceChannel($packet->getMemberId(), $state->getChannelId());
             }
-        }
+        }*/
     }
 
     private function handlePresenceUpdate(PresenceUpdatePacket $packet): void{
