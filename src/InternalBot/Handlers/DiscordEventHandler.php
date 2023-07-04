@@ -223,7 +223,7 @@ array(5) {
             }
             $permissions = $m->getPermissions();
 
-            if($permissions->ban_members){
+            if($permissions?->ban_members === true){
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $guild->bans->freshen()->done(function() use ($guild){
                     $this->logger->debug("Successfully fetched ".sizeof($guild->bans)." bans from guild '".
@@ -257,7 +257,7 @@ array(5) {
 
             $statusCheck();
 
-            if($permissions->manage_guild){
+            if($permissions?->manage_guild === true){
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $guild->invites->freshen()->done(function() use ($guild){
                     $this->logger->debug("Successfully fetched ".sizeof($guild->invites).
@@ -373,7 +373,7 @@ array(5) {
     }
 
     public function onMessageReactionAdd(DiscordMessageReaction $reaction): void{
-        $packet = new MessageReactionAddPacket($reaction->message_id, $reaction->emoji->name,
+        $packet = new MessageReactionAddPacket($reaction->message_id, $reaction->emoji?->name,
             $reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
         $this->client->getThread()->writeOutboundData($packet);
     }

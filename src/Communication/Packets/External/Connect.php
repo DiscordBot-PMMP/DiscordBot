@@ -47,12 +47,10 @@ class Connect extends Packet{
         return $stream;
     }
 
-    public static function fromBinary(BinaryStream $stream): Packet{
-        $version = $stream->getByte();
-        $magic = $stream->getInt();
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $version,
-            $magic
+            $stream->getByte(),
+            $stream->getInt()
         );
     }
 }
