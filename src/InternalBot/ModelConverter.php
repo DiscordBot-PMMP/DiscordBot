@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\InternalBot;
 
 use AssertionError;
 use Carbon\Carbon;
+use Discord\Parts\Channel\Attachment as DiscordAttachment;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
@@ -103,8 +104,10 @@ abstract class ModelConverter{
         $emoji = ($discordActivity->emoji === null ? null : self::genModelEmoji($discordActivity->emoji));
         /** @var ?object{"join": string|null, "spectate": string|null, "match": string|null} $secrets */
         $secrets = $discordActivity->secrets;
+        /** @var object{"url": string|null, "label": string}[] $dButtons */
+        $dButtons = $discordActivity->buttons ?? [];
         /** @var ActivityButton[] $buttons */
-        $buttons = ($discordActivity->buttons === null ? [] : array_map(fn($button) => new ActivityButton(is_string($button) ? $button : $button->label, $button->url ?? null), $discordActivity->buttons));
+        $buttons = ($dButtons === [] ? [] : array_map(fn(/** @var ?object{"url": string|null, "label": string}[] $button */ $button) => new ActivityButton($button->label, $button->url ?? null), $dButtons));
 
         return new Activity($discordActivity->name, ActivityType::from($discordActivity->type), $discordActivity->url ?? null,
             $discordActivity->created_at?->getTimestamp(), $timestamps?->start ?? null, $timestamps?->end ?? null,
@@ -235,12 +238,12 @@ abstract class ModelConverter{
      */
     static public function genModelChannel(DiscordChannel $channel): ?GuildChannel{
         switch($channel->type){
-            case DiscordChannel::TYPE_TEXT:
-            case DiscordChannel::TYPE_NEWS:
+            case DiscordChannel::TYPE_GUILD_TEXT:
+            case DiscordChannel::TYPE_GUILD_ANNOUNCEMENT:
                 return self::genModelTextChannel($channel);
-            case DiscordChannel::TYPE_VOICE:
+            case DiscordChannel::TYPE_GUILD_VOICE:
                 return self::genModelVoiceChannel($channel);
-            case DiscordChannel::TYPE_CATEGORY:
+            case DiscordChannel::TYPE_GUILD_CATEGORY:
                 return self::genModelCategoryChannel($channel);
             default:
                 return null;
@@ -248,41 +251,42 @@ abstract class ModelConverter{
     }
 
     static public function genModelCategoryChannel(DiscordChannel $discordChannel): CategoryChannel{
-        if($discordChannel->type !== DiscordChannel::TYPE_CATEGORY){
+        if($discordChannel->type !== DiscordChannel::TYPE_GUILD_CATEGORY){
             throw new AssertionError("Discord channel type must be `category` to generate model category channel.");
         }
-        if($discordChannel->guild_id === null){
-            throw new AssertionError("Guild ID must be present.");
+        if($discordChannel->guild_id === null or ($discordChannel->name ?? null) === null or ($discordChannel->position ?? null) === null){
+            throw new AssertionError("Guild ID, name and position must be present.");
         }
-        return self::applyPermissionOverwrites($discordChannel, new CategoryChannel($discordChannel->name, $discordChannel->position,
+        return self::applyPermissionOverwrites($discordChannel, new CategoryChannel($discordChannel->name ?? "", $discordChannel->position,
             $discordChannel->guild_id, $discordChannel->id));
     }
 
     static public function genModelVoiceChannel(DiscordChannel $discordChannel): VoiceChannel{
-        if($discordChannel->type !== DiscordChannel::TYPE_VOICE){
+        if($discordChannel->type !== DiscordChannel::TYPE_GUILD_VOICE){
             throw new AssertionError("Discord channel type must be `voice` to generate model voice channel.");
         }
-        if($discordChannel->guild_id === null){
+        $gid = $discordChannel->guild_id ?? "";
+        if($gid === ""){
             throw new AssertionError("Guild ID must be present.");
         }
-        $ids = array_map(function($id) use($discordChannel){
-            return $discordChannel->guild->id.".$id";
+        $ids = array_map(function($id) use($gid){
+            return $gid . ".$id";
         }, array_keys($discordChannel->members->toArray()));
-        return self::applyPermissionOverwrites($discordChannel, new VoiceChannel($discordChannel->bitrate, $discordChannel->user_limit,
-            $discordChannel->name, $discordChannel->position, $discordChannel->guild_id, $ids,
-            $discordChannel->parent_id, $discordChannel->id));
+        return self::applyPermissionOverwrites($discordChannel, new VoiceChannel($discordChannel->bitrate ?? 0, $discordChannel->user_limit ?? 20,
+            $discordChannel->name ?? "", $discordChannel->position ?? 0, $gid, $ids,
+            $discordChannel->parent_id ?? null, $discordChannel->id));
     }
 
     static public function genModelTextChannel(DiscordChannel $discordChannel): TextChannel{
-        if($discordChannel->type !== DiscordChannel::TYPE_TEXT and $discordChannel->type !== DiscordChannel::TYPE_NEWS){
+        if($discordChannel->type !== DiscordChannel::TYPE_GUILD_TEXT and $discordChannel->type !== DiscordChannel::TYPE_GUILD_ANNOUNCEMENT){
             throw new AssertionError("Discord channel type must be `text|news` to generate model text channel.");
         }
         if($discordChannel->guild_id === null){
             throw new AssertionError("Guild ID must be present.");
         }
-        return self::applyPermissionOverwrites($discordChannel, new TextChannel($discordChannel->topic ?? "", $discordChannel->name,
-            $discordChannel->position, $discordChannel->guild_id, $discordChannel->nsfw ?? false, $discordChannel->rate_limit_per_user,
-            $discordChannel->parent_id, $discordChannel->id));
+        return self::applyPermissionOverwrites($discordChannel, new TextChannel($discordChannel->topic ?? "", $discordChannel->name ?? "",
+            $discordChannel->position ?? 0, $discordChannel->guild_id, $discordChannel->nsfw ?? false, $discordChannel->rate_limit_per_user,
+            $discordChannel->parent_id ?? null, $discordChannel->id));
     }
 
     //TODO allow several embeds in a single normal message.
@@ -295,7 +299,7 @@ abstract class ModelConverter{
             $attachments[] = self::genModelAttachment($attachment);
         }
         $guild_id = $discordMessage->guild_id ?? ($discordMessage->author instanceof DiscordMember ? $discordMessage->author->guild_id : null);
-        if($discordMessage->type === DiscordMessage::TYPE_NORMAL or $discordMessage->type === DiscordMessage::TYPE_APPLICATION_COMMAND){ #TODO Decide on application commands.
+        if($discordMessage->type === DiscordMessage::TYPE_DEFAULT or $discordMessage->type === DiscordMessage::TYPE_CHAT_INPUT_COMMAND){ #TODO Decide on application commands.
             if($discordMessage->webhook_id === null){
                 /** @var DiscordEmbed|null $e */
                 $e = $discordMessage->embeds->first();
@@ -334,7 +338,7 @@ abstract class ModelConverter{
         throw new AssertionError("Discord message type (" . $discordMessage->type . ") not supported.");
     }
 
-    static public function genModelAttachment(\stdClass $attachment): Attachment{
+    static public function genModelAttachment(DiscordAttachment $attachment): Attachment{
         return new Attachment($attachment->id, $attachment->filename, $attachment->content_type ?? null,
             $attachment->size, $attachment->url, $attachment->width ?? null, $attachment->height ?? null);
     }
@@ -371,7 +375,7 @@ abstract class ModelConverter{
     }
 
     static public function genModelEmbedField(DiscordField $field): Field{
-        return new Field($field->name, $field->value, $field->inline);
+        return new Field($field->name, $field->value, $field->inline ?? false);
     }
 
     static public function genModelRolePermission(DiscordRolePermission $rolePermission): RolePermissions{

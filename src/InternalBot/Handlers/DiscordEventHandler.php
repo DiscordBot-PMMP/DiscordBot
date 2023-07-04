@@ -373,13 +373,15 @@ array(5) {
     }
 
     public function onMessageReactionAdd(DiscordMessageReaction $reaction): void{
-        $packet = new MessageReactionAddPacket($reaction->message_id, $reaction->emoji?->name,
+        //todo reaction id
+        $packet = new MessageReactionAddPacket($reaction->message_id, $reaction->emoji?->name ?? $reaction->reaction_id,
             $reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onMessageReactionRemove(DiscordMessageReaction $reaction): void{
-        $packet = new MessageReactionRemovePacket($reaction->message_id, $reaction->emoji->name,
+        //todo
+        $packet = new MessageReactionRemovePacket($reaction->message_id, $reaction->emoji?->name ?? $reaction->reaction_id,
             $reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
         $this->client->getThread()->writeOutboundData($packet);
     }
@@ -395,6 +397,7 @@ array(5) {
     }
 
     public function onMemberJoin(DiscordMember $member, Discord $discord): void{
+        if($member->user === null) throw new \AssertionError("TODO, user is null on new member join."); //todo
         $packet = new MemberJoinPacket(ModelConverter::genModelMember($member), ModelConverter::genModelUser($member->user));
         $this->client->getThread()->writeOutboundData($packet);
     }
@@ -497,15 +500,19 @@ array(5) {
 
     public function onBanAdd(DiscordBan $ban, Discord $discord): void{
         //No reason unless you freshen bans which is only possible with ban_members permission.
-        $g = $ban->guild;
-        /** @var DiscordMember|null $m */
+        $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
+        $this->client->getThread()->writeOutboundData($packet);
+        return;
+        //todo
+        /*$g = $ban->guild;
+        /** @var DiscordMember|null $m *
         $m = $g->members->get("id", $discord->user->id);
         if($m !== null and $m->getPermissions()->ban_members){
             //Get ban reason.
-            /** @noinspection PhpUnhandledExceptionInspection */ //Impossible.
+            /** @noinspection PhpUnhandledExceptionInspection * //Impossible.
             $g->bans->freshen()->done(function() use ($ban, $g){
                 //Got latest bans so we can fetch reason unless it was unbanned in like 0.01s
-                /** @var DiscordBan|null $b */
+                /** @var DiscordBan|null $b *
                 $b = $g->bans->get("user_id", $ban->user_id);
                 if($b !== null){
                     $this->logger->debug("Successfully fetched bans, attached reason to new ban event.");
@@ -526,7 +533,7 @@ array(5) {
             $this->logger->debug("Bot does not have ban_members permission so no reason could be attached to this ban.");
             $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
             $this->client->getThread()->writeOutboundData($packet);
-        }
+        }*/
     }
 
     public function onBanRemove(DiscordBan $ban, Discord $discord): void{

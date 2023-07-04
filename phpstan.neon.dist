@@ -9,6 +9,8 @@ parameters:
     excludePaths:
         analyse:
             - vendor
+            - src/Communication/Packets/Discord
+            - src/Communication/Packets/Plugin
             - src/Libs
     bootstrapFiles:
         - test/phpstan/bootstrap.php

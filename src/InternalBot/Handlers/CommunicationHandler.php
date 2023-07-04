@@ -13,6 +13,7 @@
 
 namespace JaxkDev\DiscordBot\InternalBot\Handlers;
 
+use Discord\Builders\MessageBuilder;
 use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Invite as DiscordInvite;
@@ -93,6 +94,7 @@ class CommunicationHandler{
 
     //--- Handlers:
 
+    /** @param Packet<object> $pk */
     public function handle(Packet $pk): void{
         //Internals:
         if($pk instanceof Heartbeat){
@@ -158,8 +160,8 @@ class CommunicationHandler{
     }
 
     private function handleUpdateWebhook(RequestUpdateWebhook $pk): void{
-        if($pk->getWebhook()->getId() === null){
-            throw new \AssertionError("Webhook ID must be present.");
+        if($pk->getWebhook()->getId() === null || $pk->getWebhook()->getChannelId() === null){
+            throw new \AssertionError("Webhook ID & channel ID must be present.");
         }
         $this->getChannel($pk, $pk->getWebhook()->getChannelId(), function(DiscordChannel $channel) use($pk){
             $channel->webhooks->fetch($pk->getWebhook()->getId())->then(function(DiscordWebhook $webhook) use($channel, $pk){
@@ -179,6 +181,9 @@ class CommunicationHandler{
     }
 
     private function handleCreateWebhook(RequestCreateWebhook $pk): void{
+        if($pk->getWebhook()->getChannelId() === null){
+            throw new \AssertionError("Webhook channel ID must be present.");
+        }
         $this->getChannel($pk, $pk->getWebhook()->getChannelId(), function(DiscordChannel $channel) use($pk){
             $channel->webhooks->save($channel->webhooks->create([
                 'name' => $pk->getWebhook()->getName(),
@@ -274,9 +279,9 @@ class CommunicationHandler{
                 'name' => $r->getName(),
                 'color' => $r->getColour(),
                 'permissions' => $r->getPermissions()->getBitwise(),
-                'hoist' => $r->isHoisted(),
-                'position' => $r->getHoistedPosition(),
-                'mentionable' => $r->isMentionable()
+                'hoist' => $r->getHoist(),
+                'position' => $r->getPosition(),
+                'mentionable' => $r->getMentionable()
             ])->then(function(DiscordRole $role) use($pk){
                 $this->handleUpdateRolePosition($pk->getRole())->then(function() use($role, $pk){
                     $this->resolveRequest($pk->getUID(), true, "Created role.", [ModelConverter::genModelRole($role)]);
@@ -319,7 +324,7 @@ class CommunicationHandler{
                 return;
             }
             //shift
-            $diff = $role->getHoistedPosition()-$k->position; //How much are we shifting.
+            $diff = $role->getPosition()-$k->position; //How much are we shifting.
             if($diff === 0){
                 $this->logger->debug("Not updating role position ({$k->id}), no difference found.");
                 $promise->resolve();
@@ -360,9 +365,9 @@ class CommunicationHandler{
         }
         $this->getGuild($pk, $pk->getRole()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->roles->fetch($pk->getRole()->getId())->then(function(DiscordRole $role) use($guild, $pk){
-                $role->position = $pk->getRole()->getHoistedPosition();
-                $role->hoist = $pk->getRole()->isHoisted();
-                $role->mentionable = $pk->getRole()->isMentionable();
+                $role->position = $pk->getRole()->getPosition();
+                $role->hoist = $pk->getRole()->getHoist();
+                $role->mentionable = $pk->getRole()->getMentionable();
                 $role->name = $pk->getRole()->getName();
                 $role->color = $pk->getRole()->getColour();
                 $role->permissions->bitwise = $pk->getRole()->getPermissions()->getBitwise();
@@ -468,7 +473,7 @@ class CommunicationHandler{
                 'guild_id' => $guild->id
             ]);
             if($c->getCategoryId() !== null){
-                $dc->parent_id = $c->getCategoryId();
+                //$dc->parent_id = $c->getCategoryId(); TODO, move things to create()
             }
             foreach($c->getAllMemberPermissions() as $id => [$allowed, $denied]){
                 $dc->overwrites->push($dc->overwrites->create([
@@ -486,10 +491,11 @@ class CommunicationHandler{
                     "deny" => strval($denied === null ? 0 : $denied->getBitwise())
                 ]));
             }
+            /* TODO Move things to create()
             if($c instanceof CategoryChannel){
-                $dc->type = DiscordChannel::TYPE_CATEGORY;
+                $dc->type = DiscordChannel::TYPE_GUILD_CATEGORY;
             }elseif($c instanceof VoiceChannel){
-                $dc->type = DiscordChannel::TYPE_VOICE;
+                $dc->type = DiscordChannel::TYPE_GUILD_VOICE;
                 $dc->bitrate = $c->getBitrate();
                 $dc->user_limit = $c->getMemberLimit();
             }elseif($c instanceof TextChannel){
@@ -498,7 +504,7 @@ class CommunicationHandler{
                 $dc->rate_limit_per_user = $c->getRateLimit() ?? 0;
             }else{
                 throw new \AssertionError("What channel type is this ?? '".get_class($c)."'");
-            }
+            }*/
             $guild->channels->save($dc)->then(function(DiscordChannel $channel) use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Created channel.", [ModelConverter::genModelChannel($channel)]);
             }, function(\Throwable $e) use($pk){
@@ -516,12 +522,16 @@ class CommunicationHandler{
         $this->getGuild($pk, $pk->getChannel()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->channels->fetch($pk->getChannel()->getId())->then(function(DiscordChannel $dc) use($guild, $pk){
                 $channel = $pk->getChannel();
-                $dc->name = $pk->getChannel()->getName();
+                if(isset($dc->name)){
+                    $dc->name = $pk->getChannel()->getName();
+                }
                 $dc->position = $pk->getChannel()->getPosition();
                 if($pk->getChannel()->getCategoryId() !== null){
-                    $dc->parent_id = $pk->getChannel()->getCategoryId();
+                    if(isset($dc->parent_id)){
+                        $dc->parent_id = $pk->getChannel()->getCategoryId();
+                    }
                 }
-                $dc->overwrites->clear();
+                $dc->overwrites->cache->clear(); //todo promise.
                 foreach($channel->getAllMemberPermissions() as $id => [$allowed, $denied]){
                     $dc->overwrites->push($dc->overwrites->create([
                         'id' => $id,
@@ -539,23 +549,25 @@ class CommunicationHandler{
                     ]));
                 }
                 if($channel instanceof CategoryChannel){
-                    if($dc->type !== DiscordChannel::TYPE_CATEGORY){
+                    if($dc->type !== DiscordChannel::TYPE_GUILD_CATEGORY){
                         $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type change is not allowed."]);
                         return;
                     }
                 }elseif($channel instanceof VoiceChannel){
-                    if($dc->type !== DiscordChannel::TYPE_VOICE){
+                    if($dc->type !== DiscordChannel::TYPE_GUILD_VOICE){
                         $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type change is not allowed."]);
                         return;
                     }
                     $dc->bitrate = $channel->getBitrate();
                     $dc->user_limit = $channel->getMemberLimit();
                 }elseif($channel instanceof TextChannel){
-                    if($dc->type !== DiscordChannel::TYPE_TEXT){
+                    if($dc->type !== DiscordChannel::TYPE_GUILD_TEXT){
                         $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type change is not allowed."]);
                         return;
                     }
-                    $dc->topic = $channel->getTopic();
+                    if(isset($dc->topic)){
+                        $dc->topic = $channel->getTopic();
+                    }
                     $dc->nsfw = $channel->isNsfw();
                     $dc->rate_limit_per_user = $channel->getRateLimit() ?? 0;
                 }else{
@@ -633,17 +645,18 @@ class CommunicationHandler{
 
     private function handleSendFile(RequestSendFile $pk): void{
         $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
-            if(!$channel->allowText()){
+            if(!$channel->isTextBased()){
                 $this->resolveRequest($pk->getUID(), false, "Failed to send file, Invalid channel - text is not allowed.");
                 $this->logger->debug("Failed to send file ({$pk->getUID()}) - Channel does not allow text.");
                 return;
             }
-            $channel->sendFile($pk->getFilePath(), $pk->getFileName(), $pk->getMessage())->then(function(DiscordMessage $message) use($pk){
-                $this->resolveRequest($pk->getUID(), true, "Successfully sent file.", [ModelConverter::genModelMessage($message)]);
-            }, function(\Throwable $e) use($pk){
-                $this->resolveRequest($pk->getUID(), false, "Failed to send file.", [$e->getMessage(), $e->getTraceAsString()]);
-                $this->logger->debug("Failed to send file ({$pk->getUID()}) - {$e->getMessage()}");
-            });
+            $channel->sendMessage(MessageBuilder::new()->addFile($pk->getFilePath(), $pk->getFileName())->setContent($pk->getMessage()))
+                ->then(function(DiscordMessage $message) use($pk){
+                    $this->resolveRequest($pk->getUID(), true, "Successfully sent file.", [ModelConverter::genModelMessage($message)]);
+                }, function(\Throwable $e) use($pk){
+                    $this->resolveRequest($pk->getUID(), false, "Failed to send file.", [$e->getMessage(), $e->getTraceAsString()]);
+                    $this->logger->debug("Failed to send file ({$pk->getUID()}) - {$e->getMessage()}");
+                });
         });
     }
 
@@ -654,7 +667,7 @@ class CommunicationHandler{
             $de = null;
             if($e !== null){
                 $de = new DiscordEmbed($this->client->getDiscordClient());
-                if($e->getType() !== null) $de->setType($e->getType());
+                //if($e->getType() !== null) $de->setType($e->getType());
                 if($e->getTitle() !== null) $de->setTitle($e->getTitle());
                 if($e->getUrl() !== null) $de->setURL($e->getUrl());
                 if($e->getColour() !== null) $de->setColor($e->getColour());
@@ -675,7 +688,8 @@ class CommunicationHandler{
                     return;
                 }
                 $this->getMessage($pk, $m->getChannelId(), $m->getReferencedMessageId(), function(DiscordMessage $msg) use($channel, $pk, $de){
-                    $channel->sendMessage($pk->getMessage()->getContent(), false, $de, null, $msg)->done(function(DiscordMessage $msg) use($pk){
+                    $msgB = MessageBuilder::new()->setContent($pk->getMessage()->getContent())->setEmbeds($de === null ? [] : [$de])->setReplyTo($msg);
+                    $channel->sendMessage($msgB)->done(function(DiscordMessage $msg) use($pk){
                         $this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
                         $this->logger->debug("Sent message ({$pk->getUID()})");
                     }, function(\Throwable $e) use($pk){
@@ -684,7 +698,8 @@ class CommunicationHandler{
                     });
                 });
             }else{
-                $channel->sendMessage($m->getContent(), false, $de)->done(function(DiscordMessage $msg) use ($pk){
+                $msgB = MessageBuilder::new()->setContent($m->getContent())->setEmbeds($de === null ? [] : [$de]);
+                $channel->sendMessage($msgB)->done(function(DiscordMessage $msg) use ($pk){
                     $this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
                     $this->logger->debug("Sent message ({$pk->getUID()})");
                 }, function(\Throwable $e) use ($pk){
@@ -706,7 +721,7 @@ class CommunicationHandler{
             $de = null;
             if($e !== null){
                 $de = new DiscordEmbed($this->client->getDiscordClient());
-                if($e->getType() !== null) $de->setType($e->getType());
+                //if($e->getType() !== null) $de->setType($e->getType());
                 if($e->getTitle() !== null) $de->setTitle($e->getTitle());
                 if($e->getUrl() !== null) $de->setURL($e->getUrl());
                 if($e->getColour() !== null) $de->setColor($e->getColour());
@@ -758,7 +773,7 @@ class CommunicationHandler{
 
     private function handleInitialiseBan(RequestInitialiseBan $pk): void{
         $this->getGuild($pk, $pk->getBan()->getGuildId(), function(DiscordGuild $guild) use($pk){
-            $guild->bans->ban($pk->getBan()->getUserId(), $pk->getBan()->getDaysToDelete(), $pk->getBan()->getReason())->then(function() use($pk){
+            $guild->bans->ban($pk->getBan()->getUserId(), [], $pk->getBan()->getReason())->then(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Member banned.");
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to ban member.", [$e->getMessage(), $e->getTraceAsString()]);
@@ -780,10 +795,11 @@ class CommunicationHandler{
 
     private function handleInitialiseInvite(RequestInitialiseInvite $pk): void{
         $invite = $pk->getInvite();
-        $this->getChannel($pk, $invite->getChannelId(), function(DiscordChannel $channel) use($pk, $invite){
+        $this->getChannel($pk, $invite->getChannelId(), function(DiscordChannel $channel) use($pk/*, $invite*/){
             /** @phpstan-ignore-next-line Poorly documented function on discordphp side. */
             $channel->createInvite([
-                "max_age" => $invite->getMaxAge(), "max_uses" => $invite->getMaxUses(), "temporary" => $invite->isTemporary(), "unique" => true
+                //todo
+                /*"max_age" => $invite->getMaxAge(), "max_uses" => $invite->getMaxUses(), "temporary" => $invite->(),*/ "unique" => true
             ])->done(function(DiscordInvite $dInvite) use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Invite initialised.", [ModelConverter::genModelInvite($dInvite)]);
                 $this->logger->debug("Invite initialised ({$pk->getUID()})");
@@ -798,7 +814,7 @@ class CommunicationHandler{
         $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->invites->freshen()->done(function(DiscordInviteRepository $invites) use($pk){
                 /** @var DiscordInvite $dInvite */
-                $dInvite = $invites->offsetGet($pk->getInviteCode());
+                $dInvite = $invites->get("code", $pk->getInviteCode());
                 $invites->delete($dInvite)->done(function(DiscordInvite $dInvite) use($pk){
                     $this->resolveRequest($pk->getUID(), true, "Invite revoked.", [ModelConverter::genModelInvite($dInvite)]);
                     $this->logger->debug("Invite revoked ({$pk->getUID()})");
@@ -815,6 +831,10 @@ class CommunicationHandler{
 
     //---------------------------------------------------
 
+    /**
+     * @param Packet<object> $pk
+     * @param callable(DiscordGuild): void $cb
+     */
     private function getGuild(Packet $pk, string $guild_id, callable $cb): void{
         $this->client->getDiscordClient()->guilds->fetch($guild_id)->done(function(DiscordGuild $guild) use($cb){
             $cb($guild);
@@ -824,12 +844,16 @@ class CommunicationHandler{
         });
     }
 
-    //Includes DM Channels.
+    /**
+     * Includes DMs
+     * @param Packet<object> $pk
+     * @param callable(DiscordChannel): void $cb
+     */
     private function getChannel(Packet $pk, string $channel_id, callable $cb): void{
         $c = $this->client->getDiscordClient()->getChannel($channel_id);
         if($c === null){
             /** @var DiscordUser|null $u */
-            $u = $this->client->getDiscordClient()->users->offsetGet($channel_id);
+            $u = $this->client->getDiscordClient()->users->get("id", $channel_id);
             if($u === null){
                 $this->resolveRequest($pk->getUID(), false, "Failed to find channel/user.", ["Failed to find channel from local storage."]);
                 $this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - channel error: Failed to find channel from local storage.");
@@ -846,6 +870,10 @@ class CommunicationHandler{
         }
     }
 
+    /**
+     * @param Packet<object> $pk
+     * @param callable(DiscordMessage): void $cb
+     */
     private function getMessage(Packet $pk, string $channel_id, string $message_id, callable $cb): void{
         $this->getChannel($pk, $channel_id, function(DiscordChannel $channel) use($pk, $message_id, $cb){
             $channel->messages->fetch($message_id)->done(function(DiscordMessage $dMessage) use ($cb){
@@ -857,6 +885,10 @@ class CommunicationHandler{
         });
     }
 
+    /**
+     * @param Packet<object> $pk
+     * @param callable(DiscordMember, DiscordGuild): void $cb
+     */
     private function getMember(Packet $pk, string $guild_id, string $user_id, callable $cb): void{
         $this->getGuild($pk, $guild_id, function(DiscordGuild $guild) use($pk, $user_id, $cb){
             $guild->members->fetch($user_id)->then(function(DiscordMember $member) use($guild, $cb){
