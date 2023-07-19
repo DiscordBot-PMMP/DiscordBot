@@ -45,7 +45,6 @@ use pmmp\thread\ThreadSafeArray;
         // Note, this does not affect outside thread.
         ini_set("date.timezone", "UTC");
 
-        /** @phpstan-ignore-next-line ThreadSafeArray */
         if($this->config["type"] === "internal"){
             new InternalClient($this);
         }else{
