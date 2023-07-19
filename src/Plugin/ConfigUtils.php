@@ -68,7 +68,7 @@ abstract class ConfigUtils{
 
     static private function patch_3(array $config): array{
         $config["version"] = 4;
-        $config["discord"]["type"] = "internal";
+        $config["type"] = "internal";
         $old = $config["protocol"];
         $config["protocol"] = [
             "general" => [
@@ -76,14 +76,14 @@ abstract class ConfigUtils{
                 "heartbeat_allowance" => $old["heartbeat_allowance"] ?? 60
             ],
             "internal" => [
-                "use_plugin_cacert" => $config["discord"]["use_plugin_cacert"] ?? true
+                "token" => $config["discord"]["token"] ?? "Long Discord Token here."
             ],
             "external" => [
                 "host" => "0.0.0.0",
                 "port" => 22222
             ]
         ];
-        unset($config["discord"]["use_plugin_cacert"]);
+        unset($config["discord"]);
         return $config;
     }
 
@@ -102,22 +102,11 @@ abstract class ConfigUtils{
             }
         }
 
-        if(!array_key_exists("discord", $config) or $config["discord"] === null){
-            $result[] = "No 'discord' field found.";
+        if(!array_key_exists("type", $config) or $config["type"] === null){
+            $result[] = "No 'type' field found.";
         }else{
-            if(!array_key_exists("token", $config["discord"]) or $config["discord"]["token"] === null){
-                $result[] = "No 'discord.token' field found.";
-            }else{
-                if(!is_string($config["discord"]["token"]) or strlen($config["discord"]["token"]) < 59){
-                    $result[] = "Invalid 'discord.token' ({$config["discord"]["token"]}), did you follow the wiki ?";
-                }
-            }
-            if(!array_key_exists("type", $config["discord"]) or $config["discord"]["type"] === null){
-                $result[] = "No 'discord.type' field found.";
-            }else{
-                if(!is_string($config["discord"]["type"]) or !in_array($config["discord"]["type"], ["internal", "external"], true)){
-                    $result[] = "Invalid 'discord.token' ({$config["discord"]["token"]}), must be 'internal' or 'external'.";
-                }
+            if(!is_string($config["type"]) or !in_array($config["type"], ["internal", "external"], true)){
+                $result[] = "Invalid 'type' ({$config["type"]}), must be 'internal' or 'external'.";
             }
         }
 
@@ -166,11 +155,11 @@ abstract class ConfigUtils{
             if(!array_key_exists("internal", $config["protocol"]) or $config["protocol"]["internal"] === null){
                 $result[] = "No 'protocol.internal' field found.";
             }else{
-                if(!array_key_exists("use_plugin_cacert", $config["protocol"]["internal"]) or $config["protocol"]["internal"]["use_plugin_cacert"] === null){
-                    $result[] = "No 'protocol.internal.use_plugin_cacert' field found.";
+                if(!array_key_exists("token", $config["protocol"]["internal"]) or $config["protocol"]["internal"]["token"] === null){
+                    $result[] = "No 'protocol.internal.token' field found.";
                 }else{
-                    if(!is_bool($config["protocol"]["internal"]["use_plugin_cacert"])){
-                        $result[] = "Invalid 'protocol.internal.use_plugin_cacert' ({$config["protocol"]["internal"]["use_plugin_cacert"]}), Do not touch this without being told to explicitly by JaxkDev";
+                    if(!is_string($config["protocol"]["internal"]["token"]) or strlen($config["protocol"]["internal"]["token"]) < 59){
+                        $result[] = "Invalid 'protocol.internal.token' ({$config["protocol"]["internal"]["token"]}), did you follow the wiki ?";
                     }
                 }
             }

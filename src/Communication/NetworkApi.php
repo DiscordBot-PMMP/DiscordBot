@@ -42,7 +42,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\External\Connect;
 use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
-use JaxkDev\DiscordBot\Communication\Packets\External\DiscordConfig;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
@@ -89,7 +88,6 @@ class NetworkApi{
     public const PACKETS_MAP = [
         Connect::SERIALIZE_ID => Connect::class,
         Disconnect::SERIALIZE_ID => Disconnect::class,
-        DiscordConfig::SERIALIZE_ID => DiscordConfig::class,
         Heartbeat::SERIALIZE_ID => Heartbeat::class,
         Resolution::SERIALIZE_ID => Resolution::class,
         /*RequestAddReaction::ID => RequestAddReaction::class,

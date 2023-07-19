@@ -1,9 +1,7 @@
 ---
 version: 4
 
-discord:
-  token: "Long Discord Token here."
-  type: "internal"
+type: "internal"
 
 logging:
   max_files: 28
@@ -15,7 +13,7 @@ protocol:
     heartbeat_allowance: 60
 
   internal:
-    use_plugin_cacert: true
+    token: "Long Discord Token here."
 
   external:
     host: "0.0.0.0"
