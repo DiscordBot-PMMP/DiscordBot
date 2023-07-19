@@ -16,7 +16,6 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\NetworkApi;
 use JaxkDev\DiscordBot\Communication\Packets\External\Connect;
 use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
-use JaxkDev\DiscordBot\Communication\Packets\External\DiscordConfig;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Thread;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
@@ -262,14 +261,6 @@ class Client{
                     $this->writeDataPacket(new Disconnect("Invalid magic."));
                     $this->closeConnection();
                 }catch(\AssertionError){}
-                continue;
-            }
-            $this->getLogger()->debug("Connection checked, sending config packet.");
-            //Yes I know this is plain text token, but unless you have a better way without setting up TLS/SSL, this is the best we can do.
-            //External client should still be hosted locally, so it's not over the internet, hopefully.
-            try{
-                $this->writeDataPacket(new DiscordConfig(["token" => base64_encode($this->thread->getConfig()["discord"]["token"])]));
-            }catch(\AssertionError){
                 continue;
             }
             $this->getLogger()->debug("Connection established.");

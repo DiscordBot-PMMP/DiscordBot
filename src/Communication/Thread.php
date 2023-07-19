@@ -46,7 +46,7 @@ use pmmp\thread\ThreadSafeArray;
         ini_set("date.timezone", "UTC");
 
         /** @phpstan-ignore-next-line ThreadSafeArray */
-        if($this->config["discord"]["type"] === "internal"){
+        if($this->config["type"] === "internal"){
             new InternalClient($this);
         }else{
             new ExternalClient($this);
@@ -74,7 +74,7 @@ use pmmp\thread\ThreadSafeArray;
      */
     public function secureConfig(): void{
         /** @phpstan-ignore-next-line ThreadSafeArray */
-        $this->config["discord"]["token"] = "**** Redacted Token ****";
+        $this->config["protocol"]["internal"]["token"] = "**** Redacted Token ****";
     }
 
     /** @return Packet<object>[] */

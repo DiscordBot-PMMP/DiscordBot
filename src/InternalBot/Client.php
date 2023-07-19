@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\InternalBot;
 
+use Composer\CaBundle\CaBundle;
 use Discord\Exceptions\IntentException;
 use Discord\WebSockets\Intents;
 use Discord\WebSockets\Op;
@@ -66,17 +67,19 @@ class Client{
         $handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
         $this->logger->setHandlers(array($handler));
 
-        $socket_opts = [];
-        if($config["protocol"]["internal"]["use_plugin_cacert"]){
-            $this->logger->debug("TLS cafile set to '".\JaxkDev\DiscordBot\DATA_PATH."cacert.pem"."'");
-            $socket_opts["tls"] = [
-                "cafile" => \JaxkDev\DiscordBot\DATA_PATH."cacert.pem"
-            ];
-        }
+        /** @var string $ca IDE is stupid, this is always a string. */
+        $ca = CaBundle::getSystemCaRootBundlePath($this->logger);
+        $this->logger->debug("CaRootBundlePath set to '$ca'");
+
+        $socket_opts = [
+            "tls" => [
+                (is_dir($ca) ? "capath" : "cafile") => $ca
+            ]
+        ];
 
         try{
             $this->client = new Discord([
-                'token' => $config['discord']['token'],
+                'token' => $config['protocol']["internal"]['token'],
                 'logger' => $this->logger,
                 'socket_options' => $socket_opts,
                 'loadAllMembers' => true,

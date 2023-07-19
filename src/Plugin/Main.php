@@ -65,7 +65,6 @@ class Main extends PluginBase{
 
         $this->saveDefaultConfig();
         $this->saveResource("HELP_ENG.txt", true); //Always keep these up-to-date.
-        $this->saveResource("cacert.pem", true);
 
         $this->inboundData = new ThreadSafeArray();
         $this->outboundData = new ThreadSafeArray();
