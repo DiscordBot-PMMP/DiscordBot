@@ -12,21 +12,18 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class DiscordConnected extends Packet{
 
-    public const ID = 42;
+    public const SERIALIZE_ID = 5;
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID
-        ];
+    public function binarySerialize(): BinaryStream{
+        return new BinaryStream();
     }
 
-    public static function fromJson(array $data): self{
-        return new self(
-            $data["uid"]
-        );
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self();
     }
 }

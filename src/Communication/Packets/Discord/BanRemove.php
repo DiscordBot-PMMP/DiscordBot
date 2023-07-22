@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class BanRemove extends Packet{
 
-    public const ID = 36;
+    public const SERIALIZE_ID = 7;
 
     private string $ban_id;
 

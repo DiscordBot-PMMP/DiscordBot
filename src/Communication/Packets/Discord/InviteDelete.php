@@ -12,11 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class InviteDelete extends Packet{
 
-    public const ID = 47;
+    public const SERIALIZE_ID = 16;
 
     private string $invite_code;
 
@@ -29,17 +30,15 @@ class InviteDelete extends Packet{
         return $this->invite_code;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "invite_code" => $this->invite_code
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->invite_code);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["invite_code"],
-            $data["uid"]
+            $stream->getString()
         );
     }
 }

@@ -12,11 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class GuildLeave extends Packet{
 
-    public const ID = 44;
+    public const SERIALIZE_ID = 13;
 
     private string $guild_id;
 
@@ -29,17 +30,15 @@ class GuildLeave extends Packet{
         return $this->guild_id;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "guild_id" => $this->guild_id
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->guild_id);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["guild_id"],
-            $data["uid"]
+            $stream->getString()
         );
     }
 }

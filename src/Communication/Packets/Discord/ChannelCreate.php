@@ -15,10 +15,11 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
+use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 
 class ChannelCreate extends Packet{
 
-    public const ID = 37;
+    public const SERIALIZE_ID = 8;
 
     private GuildChannel $channel;
 

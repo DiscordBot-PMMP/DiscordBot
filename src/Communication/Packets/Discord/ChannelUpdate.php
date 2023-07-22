@@ -12,12 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 
 class ChannelUpdate extends Packet{
 
-    public const ID = 40;
+    public const SERIALIZE_ID = 11;
 
     private GuildChannel $channel;
 
@@ -30,17 +31,16 @@ class ChannelUpdate extends Packet{
         return $this->channel;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "channel" => $this->channel->jsonSerialize()
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        //$stream->putSerializable($this->channel); TODO
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
+        //TODO
         return new self(
-            GuildChannel::fromJson($data["channel"]),
-            $data["uid"]
+            $stream->getSerializable(GuildChannel::class)
         );
     }
 }

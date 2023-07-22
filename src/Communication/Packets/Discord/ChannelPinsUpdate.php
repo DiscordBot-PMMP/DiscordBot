@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class ChannelPinsUpdate extends Packet{
 
-    public const ID = 39;
+    public const SERIALIZE_ID = 10;
 
     private string $channel_id;
 

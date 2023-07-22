@@ -12,45 +12,34 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Member;
-use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MemberJoin extends Packet{
 
-    public const ID = 48;
+    public const SERIALIZE_ID = 17;
 
     private Member $member;
 
-    private User $user;
-
-    public function __construct(Member $member, User $user, ?int $uid = null){
+    public function __construct(Member $member, ?int $uid = null){
         parent::__construct($uid);
         $this->member = $member;
-        $this->user = $user;
     }
 
     public function getMember(): Member{
         return $this->member;
     }
 
-    public function getUser(): User{
-        return $this->user;
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putSerializable($this->member);
+        return $stream;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "member" => $this->member->jsonSerialize(),
-            "user" => $this->user->jsonSerialize()
-        ];
-    }
-
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            Member::fromJson($data["member"]),
-            User::fromJson($data["user"]),
-            $data["uid"]
+            $stream->getSerializable(Member::class)
         );
     }
 }

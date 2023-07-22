@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class BanAdd extends Packet{
 
-    public const ID = 35;
+    public const SERIALIZE_ID = 6;
 
     private Ban $ban;
 
