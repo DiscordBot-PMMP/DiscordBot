@@ -13,7 +13,6 @@
 namespace JaxkDev\DiscordBot\ExternalBot\Socket;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use JaxkDev\DiscordBot\Communication\Packets\External\Disconnect;
 use Monolog\Logger;
 
 class Socket{
@@ -42,95 +41,63 @@ class Socket{
     }
 
     public function open(): void{
-        if(@socket_bind($this->socket, $this->address, $this->port) === false){
-            throw new SocketException("Failed to bind socket: " . socket_strerror(socket_last_error()));
+        if(@socket_connect($this->socket, $this->address, $this->port) === false){
+            throw new SocketException("Failed to connect to socket: " . socket_strerror(socket_last_error()));
         }
-        if(@socket_listen($this->socket, 1) === false){
-            throw new SocketException("Failed to listen on socket: " . socket_strerror(socket_last_error()));
-        }
-        $this->logger->info("Socket listening on " . $this->address . ":" . $this->port . ".");
+        $this->logger->info("Socket connected to " . $this->address . ":" . $this->port . ".");
         $this->open = true;
     }
 
-    public function accept(): ?SocketConnection{
+    public function close(string $reason = "Unknown"): void{
+        if(!$this->open){
+            $this->logger->warning("Cannot close a non-open socket.");
+        }
+        @socket_close($this->socket);
+        $this->open = false;
+        $this->logger->debug("Socket closed, reason: $reason");
+    }
+
+    public function write(BinaryStream $stream): void{
+        if(!$this->open){
+            throw new SocketException("Socket is not open.");
+        }
+        $data = new BinaryStream();
+        $data->putString($stream->getBuffer());
+
+        $sent = @socket_write($this->socket, $data->getBuffer());
+        if($sent === false){
+            $this->close("Failed to send data to socket.");
+            throw new SocketException("Failed to send data to socket: " . socket_strerror(socket_last_error()));
+        }
+    }
+
+    public function read(): ?BinaryStream{
         if(!$this->open){
             throw new SocketException("Socket is not open.");
         }
 
-        $client = @socket_accept($this->socket);
-        if($client === false and ($e = socket_last_error()) !== SOCKET_EWOULDBLOCK){
-            throw new SocketException("Failed to accept client: " . $e);
+        $length = @socket_read($this->socket, 4);
+
+        if($length === false and ($e = socket_last_error()) !== SOCKET_EWOULDBLOCK){
+            $this->close("Failed to read data from socket.");
+            throw new SocketException("Failed to read data from socket: " . socket_strerror($e));
         }
 
-        if($client === false){
+        if($length === "" or $length === false){
+            //No data to read.
             return null;
         }
-
-        $id = SocketConnection::$idCounter++;
-
-        if(@socket_getpeername($client, $ip, $port)){
-            $this->logger->info("New client ID: $id, accepted from " . $ip . " on port " . $port . ".");
-        }else{
-            $this->logger->info("New client ID: $id, accepted.");
+        $length = unpack("N", $length);
+        if($length === false){
+            $this->close("Failed to unpack data from socket.");
+            throw new SocketException("Failed to unpack data from socket.");
         }
-        return new SocketConnection($this->logger, $client, $id);
-    }
-
-    public function reject(): bool{
-        if(!$this->open){
-            return false;
+        $data = @socket_read($this->socket, $length[1]);
+        if($data === false){
+            $this->close("Failed to read data from socket.");
+            throw new SocketException("Failed to read data from socket: " . socket_strerror(socket_last_error()));
         }
-
-        $client = @socket_accept($this->socket);
-        if($client === false and socket_last_error() !== SOCKET_EWOULDBLOCK){
-            return false;
-        }
-
-        if($client === false){
-            return false;
-        }
-
-        if(@socket_getpeername($client, $ip, $port)){
-            $this->logger->debug("Rejecting client from " . $ip . " on port " . $port . ".");
-        }else{
-            $this->logger->debug("New client rejected.");
-        }
-
-        $packet = (new Disconnect("Connection refused."))->binarySerialize()->getBuffer();
-        $stream = new BinaryStream();
-        $stream->putInt(2 + strlen($packet));
-        $stream->putShort(Disconnect::SERIALIZE_ID);
-        $stream->put($packet);
-        @socket_write($client, $stream->getBuffer());
-
-        @socket_close($client);
-
-        return true;
-    }
-
-    /**
-     * Clears up to 10 pending connections.
-     */
-    public function clearPendingConnections(): void{
-        if(!$this->open){
-            return;
-        }
-
-        $count = 0;
-        do{
-            $rejected = $this->reject();
-            $count += 1;
-        }while($rejected and $count < 10);
-    }
-
-    public function close(): void{
-        if($this->open){
-            @socket_close($this->socket);
-            $this->open = false;
-            $this->logger->info("Socket closed.");
-        }else{
-            $this->logger->warning("Cannot close socket, socket is not open.");
-        }
+        return new BinaryStream($data);
     }
 
     public function isOpen(): bool{

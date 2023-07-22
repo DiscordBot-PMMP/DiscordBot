@@ -71,17 +71,15 @@ class Client{
         $ca = CaBundle::getSystemCaRootBundlePath($this->logger);
         $this->logger->debug("CaRootBundlePath set to '$ca'");
 
-        $socket_opts = [
-            "tls" => [
-                (is_dir($ca) ? "capath" : "cafile") => $ca
-            ]
-        ];
-
         try{
             $this->client = new Discord([
                 'token' => $config['protocol']["internal"]['token'],
                 'logger' => $this->logger,
-                'socket_options' => $socket_opts,
+                'socket_options' => [
+                    "tls" => [
+                        (is_dir($ca) ? "capath" : "cafile") => $ca
+                    ]
+                ],
                 'loadAllMembers' => true,
                 'storeMessages' => true,
                 'intents' => Intents::getAllIntents()

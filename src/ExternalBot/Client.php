@@ -20,7 +20,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Thread;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\ExternalBot\Socket\Socket;
-use JaxkDev\DiscordBot\ExternalBot\Socket\SocketConnection;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level as LoggerLevel;
 use Monolog\Logger;
@@ -33,7 +32,6 @@ class Client{
     private Logger $logger;
 
     private Socket $socket;
-    private ?SocketConnection $connection = null;
 
     private int $lastTick = 0;
 
@@ -70,12 +68,12 @@ class Client{
     }
 
     private function start(): void{
-        $this->getLogger()->debug("Opening socket.");
+        $this->getLogger()->debug("Connecting to socket.");
         $this->thread->setStatus(ThreadStatus::STARTING);
         try{
             $this->socket->open();
         }catch(\RuntimeException $e){
-            $this->getLogger()->error("Failed to open socket: ".$e->getMessage());
+            $this->getLogger()->error("Failed to connect socket: ".$e->getMessage());
             $this->thread->setStatus(ThreadStatus::STOPPED);
             exit(1);
         }
@@ -85,38 +83,22 @@ class Client{
         $this->connectionLoop();
     }
 
+    /** @return never-returns */
     private function stop(): void{
         $this->getLogger()->notice("Stopping external client.");
         $this->thread->setStatus(ThreadStatus::STOPPING);
+        $this->getLogger()->debug("Closing socket.");
         try{
-            if($this->connection !== null){
-                $this->getLogger()->debug("Closing connection.");
-                try{
-                    $this->writeDataPacket(new Disconnect("Server closing."));
-                    $this->closeConnection();
-                }catch(\AssertionError){}
-            }
             if($this->socket->isOpen()){
-                $this->getLogger()->debug("Closing socket.");
-                $this->socket->close();
+                $this->writeDataPacket(new Disconnect("Server closing."));
+                $this->socket->close("Server closing.");
+            }else{
+                $this->getLogger()->debug("Socket already closed.");
             }
-        }catch(\RuntimeException $e){
-            $this->getLogger()->error("Failed to close socket: ".$e->getMessage());
-        }
+        }catch(\AssertionError){}
         $this->thread->setStatus(ThreadStatus::STOPPED);
         $this->logger->notice("External client stopped gracefully.");
         exit(0);
-    }
-
-    private function closeConnection(): void{
-        if($this->connection === null){
-            return;
-        }
-        $this->logger->debug("Closing main connection.");
-        if($this->connection->isOpen()){
-            $this->connection->close();
-        }
-        $this->connection = null;
     }
 
     /**
@@ -124,7 +106,7 @@ class Client{
      * @throws \AssertionError
      */
     public function writeDataPacket(Packet $packet): void{
-        if($this->connection === null){
+        if(!$this->socket->isOpen()){
             throw new \AssertionError("No connection to write data to.");
         }
 
@@ -133,9 +115,9 @@ class Client{
         $stream->putShort($packet::SERIALIZE_ID);
         $stream->put($packet->binarySerialize()->getBuffer());
         try{
-            $this->connection->write($stream);
+            $this->socket->write($stream);
         }catch(\RuntimeException $e){
-            $this->closeConnection();
+            $this->socket->close("Failed to write data.");
             throw new \AssertionError("Failed to write data.", 0, $e);
         }
     }
@@ -145,16 +127,16 @@ class Client{
      * @throws \AssertionError
      */
     public function readDataPacket(): ?Packet{
-        if($this->connection === null){
-            throw new \AssertionError("No connection to read data from.");
+        if(!$this->socket->isOpen()){
+            throw new \AssertionError("No open connection to read data from.");
         }
 
         try{
-            $stream = $this->connection->read();
+            $stream = $this->socket->read();
         }catch(\RuntimeException $e){
             try{
                 $this->writeDataPacket(new Disconnect("Failed to read data."));
-                $this->closeConnection();
+                $this->socket->close("Failed to read data.");
             }catch(\AssertionError){}
             throw new \AssertionError("Failed to read data.", 0, $e);
         }
@@ -169,7 +151,7 @@ class Client{
         }catch(\RuntimeException){
             try{
                 $this->writeDataPacket(new Disconnect("Failed to unpack packet id."));
-                $this->closeConnection();
+                $this->socket->close("Failed to unpack packet id.");
             }catch(\AssertionError){}
             throw new \AssertionError("Failed to unpack packet id.");
         }
@@ -178,7 +160,7 @@ class Client{
         if($packet === null){
             try{
                 $this->writeDataPacket(new Disconnect("Unknown packet id $id received."));
-                $this->closeConnection();
+                $this->socket->close("Unknown packet id $id received.");
             }catch(\AssertionError){}
             throw new \AssertionError("Unknown packet id received.");
         }
@@ -189,7 +171,7 @@ class Client{
         }catch(\RuntimeException $e){
             try{
                 $this->writeDataPacket(new Disconnect("Failed to parse packet - " . $e->getMessage()));
-                $this->closeConnection();
+                $this->socket->close("Failed to parse packet - " . $e->getMessage());
             }catch(\AssertionError){}
             throw new \AssertionError("Failed to parse packet.", 0, $e);
         }
@@ -198,36 +180,15 @@ class Client{
     }
 
     /**
-     * Loop new connections until a valid verify packet is received.
-     *
-     * @return bool false if socket closed before a connection was made.
-     */
-    private function getConnection(): bool{
-        while($this->socket->isOpen() and $this->connection === null){
-            $this->checkStatus();
-            try{
-                $this->connection = $this->socket->accept();
-            }catch(\RuntimeException $e){
-                $this->getLogger()->error("Failed to accept connection: ".$e->getMessage());
-                $this->stop();
-            }
-            usleep(50000);
-        }
-
-        return $this->connection !== null and $this->socket->isOpen();
-    }
-
-    /**
      * Loop that runs until the socket is closed or a verified connection is made (goes on to main loop).
      */
     private function connectionLoop(): void{
+        //Send connect packet to server.
+        $this->writeDataPacket(new Connect(NetworkApi::VERSION, NetworkApi::MAGIC));
+
+        //Listen for response.
         while($this->socket->isOpen()){
             $this->checkStatus();
-            if($this->connection === null){
-                if(!$this->getConnection()){
-                    break;
-                }
-            }
             try{
                 $packet = $this->readDataPacket();
             }catch(\AssertionError){
@@ -238,30 +199,31 @@ class Client{
                 usleep(50000);
                 continue;
             }
+            if($packet instanceof Disconnect){
+                $this->logger->emergency("Received disconnect packet before successful connection: " . $packet->getMessage());
+                $this->stop();
+            }
             if(!$packet instanceof Connect){
                 $this->logger->debug("Invalid packet type received, expecting Connect packet. Closing connection.");
                 try{
                     $this->writeDataPacket(new Disconnect("Invalid packet type, Expecting Connect packet."));
-                    $this->closeConnection();
                 }catch(\AssertionError){}
-                continue;
+                $this->stop();
             }
             $this->getLogger()->debug("Received connect packet.");
             if($packet->getVersion() !== NetworkApi::VERSION){
                 $this->getLogger()->debug("Invalid version, expecting " . NetworkApi::VERSION . " got " . $packet->getVersion() . ". Closing connection.");
                 try{
                     $this->writeDataPacket(new Disconnect("Invalid version, Expecting " . NetworkApi::VERSION . " got " . $packet->getVersion()));
-                    $this->closeConnection();
+                    $this->stop();
                 }catch(\AssertionError){}
-                continue;
             }
             if($packet->getMagic() !== NetworkApi::MAGIC){
                 $this->getLogger()->debug("Invalid magic, expecting " . NetworkApi::MAGIC . " got " . $packet->getMagic() . ". Closing connection.");
                 try{
                     $this->writeDataPacket(new Disconnect("Invalid magic."));
-                    $this->closeConnection();
+                    $this->stop();
                 }catch(\AssertionError){}
-                continue;
             }
             $this->getLogger()->debug("Connection established.");
             //Start the main loop, where we have an active verified connection.
@@ -271,7 +233,7 @@ class Client{
 
     private function loop(): void{
         $this->thread->setStatus(ThreadStatus::RUNNING);
-        while($this->connection?->isOpen() === true){
+        while($this->socket->isOpen()){
             $this->lastTick = (int)(microtime(true)*1000000);
             $this->checkStatus();
 
@@ -297,9 +259,6 @@ class Client{
                 }
             }
 
-            //Clear pending connections, we don't want to accept any new connections.
-            $this->socket->clearPendingConnections();
-
             //sleep dynamically to keep up with the tick rate (1/20).
             $time = (int)(microtime(true)*1000000);
             if($time - $this->lastTick < 49000){
@@ -307,8 +266,8 @@ class Client{
             }
             $this->lastTick = $time;
         }
-        $this->logger->info("Lost connection to client, attempting to reconnect.");
-        $this->thread->setStatus(ThreadStatus::STARTED);
+        $this->logger->emergency("Lost connection to client.");
+        $this->stop();
     }
 
     private function checkStatus(): void{
