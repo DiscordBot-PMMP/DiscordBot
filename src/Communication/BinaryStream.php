@@ -23,13 +23,13 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
         return $this->get($this->getInt());
     }
 
-    /** @param BinarySerializable<object> $value */
+    /** @param BinarySerializable<mixed> $value */
     public function putSerializable(BinarySerializable $value): void{
         $this->put($value->binarySerialize()->getBuffer());
     }
 
     /**
-     * @template T of BinarySerializable<object>
+     * @template T of BinarySerializable<mixed>
      * @param class-string<T> $class
      * @return T
      */
@@ -39,7 +39,7 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
         return $x;
     }
 
-    /** @param BinarySerializable<object>[] $values */
+    /** @param BinarySerializable<mixed>[] $values */
     public function putSerializableArray(array $values): void{
         $this->putInt(sizeof($values));
         foreach($values as $value){
@@ -48,7 +48,7 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
     }
 
     /**
-     * @template T of BinarySerializable<object>
+     * @template T of BinarySerializable<mixed>
      * @param class-string<T> $class
      * @return T[]
      */
@@ -148,7 +148,7 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
         return $this->getBool() ? $this->getString() : null;
     }
 
-    /** @param BinarySerializable<object>|null $value */
+    /** @param BinarySerializable<mixed>|null $value */
     public function putNullableSerializable(?BinarySerializable $value): void{
         $this->putBool($value !== null);
         if($value !== null){
@@ -157,7 +157,7 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
     }
 
     /**
-     * @template T of BinarySerializable<object>
+     * @template T of BinarySerializable<mixed>
      * @param class-string<T> $class
      * @return T|null
      */

@@ -76,7 +76,7 @@ use pmmp\thread\ThreadSafeArray;
         $this->config["protocol"]["internal"]["token"] = "**** Redacted Token ****";
     }
 
-    /** @return Packet<object>[] */
+    /** @return Packet<mixed>[] */
     public function readInboundData(int $count = 1): array{
         return array_map(function($raw_data){
             $stream = new BinaryStream($raw_data);
@@ -85,13 +85,13 @@ use pmmp\thread\ThreadSafeArray;
             }catch(\Exception){
                 throw new \AssertionError("Invalid packet received - " . bin2hex($raw_data));
             }
-            /** @var class-string<Packet<object>>|null $packet */
+            /** @var class-string<Packet<mixed>>|null $packet */
             $packet = NetworkApi::getPacketClass($pid);
             if($packet === null){
                 throw new \AssertionError("Invalid packet ID $pid - " . bin2hex($raw_data));
             }
             try{
-                /** @var Packet<object> $x */
+                /** @var Packet<mixed> $x */
                 $x = $packet::fromBinary($stream);
                 return $x;
             }catch(\Exception $e){
@@ -100,7 +100,7 @@ use pmmp\thread\ThreadSafeArray;
         }, $this->inboundData->chunk($count));
     }
 
-    /** @param Packet<object> $data */
+    /** @param Packet<mixed> $data */
     public function writeOutboundData(Packet $data): void{
         $stream = new BinaryStream();
         $stream->putShort($data::SERIALIZE_ID);
