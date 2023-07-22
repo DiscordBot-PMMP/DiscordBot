@@ -12,8 +12,10 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
+/** @extends Packet<ChannelDelete> */
 class ChannelDelete extends Packet{
 
     public const ID = 38;
@@ -29,17 +31,15 @@ class ChannelDelete extends Packet{
         return $this->channel_id;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "channel_id" => $this->channel_id
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->channel_id);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["channel_id"],
-            $data["uid"]
+            $stream->getString()
         );
     }
 }

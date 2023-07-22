@@ -14,7 +14,8 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class DiscordReady extends Packet{
+/** @extends Packet<DiscordConnected> */
+class DiscordConnected extends Packet{
 
     public const ID = 42;
 

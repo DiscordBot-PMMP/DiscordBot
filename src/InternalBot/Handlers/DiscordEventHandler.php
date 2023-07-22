@@ -52,7 +52,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady as DiscordReadyPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordConnected as DiscordReadyPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\Models\Presence\ClientStatus;

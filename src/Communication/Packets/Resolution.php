@@ -26,10 +26,10 @@ class Resolution extends Packet{
 
     private string $response;
 
-    /** @var BinarySerializable<object>[] */
+    /** @var BinarySerializable<mixed>[] */
     private array $data;
 
-    /** @param BinarySerializable<object>[] $data */
+    /** @param BinarySerializable<mixed>[] $data */
     public function __construct(int $pid, bool $successful, string $response, array $data = [], int $UID = null){
         parent::__construct($UID);
         $this->pid = $pid;

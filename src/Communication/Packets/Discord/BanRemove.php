@@ -12,8 +12,10 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
+/** @extends Packet<BanRemove> */
 class BanRemove extends Packet{
 
     public const ID = 36;
@@ -29,17 +31,15 @@ class BanRemove extends Packet{
         return $this->ban_id;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "ban_id" => $this->ban_id
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->ban_id);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["ban_id"],
-            $data["uid"]
+            $stream->getString()
         );
     }
 }

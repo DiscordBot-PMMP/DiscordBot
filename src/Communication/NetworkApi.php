@@ -18,8 +18,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelUpdate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordReady;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordConnected;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate;
@@ -127,8 +126,7 @@ class NetworkApi{
         ChannelDelete::ID => ChannelDelete::class,
         ChannelPinsUpdate::ID => ChannelPinsUpdate::class,
         ChannelUpdate::ID => ChannelUpdate::class,
-        DiscordDataDump::ID => DiscordDataDump::class,
-        DiscordReady::ID => DiscordReady::class,
+        DiscordConnected::ID => DiscordConnected::class,
         GuildJoin::ID => GuildJoin::class,
         GuildLeave::ID => GuildLeave::class,
         GuildUpdate::ID => GuildUpdate::class,
