@@ -18,7 +18,6 @@ use JaxkDev\DiscordBot\Models\Guild\Guild;
 use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Role;
 
-/** @extends Packet<GuildJoin> */
 class GuildJoin extends Packet{
 
     public const ID = 43;

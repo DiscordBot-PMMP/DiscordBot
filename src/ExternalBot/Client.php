@@ -120,7 +120,7 @@ class Client{
     }
 
     /**
-     * @param Packet<mixed> $packet
+     * @param Packet $packet
      * @throws \AssertionError
      */
     public function writeDataPacket(Packet $packet): void{
@@ -141,7 +141,7 @@ class Client{
     }
 
     /**
-     * @return Packet<mixed>|null
+     * @return Packet|null
      * @throws \AssertionError
      */
     public function readDataPacket(): ?Packet{
@@ -173,7 +173,7 @@ class Client{
             }catch(\AssertionError){}
             throw new \AssertionError("Failed to unpack packet id.");
         }
-        /** @var Packet<mixed>|null $packet */
+        /** @var Packet|null $packet */
         $packet = NetworkApi::getPacketClass($id);
         if($packet === null){
             try{
@@ -184,7 +184,7 @@ class Client{
         }
 
         try{
-            /** @var Packet<mixed> $packet */
+            /** @var Packet $packet */
             $packet = $packet::fromBinary($stream);
         }catch(\RuntimeException $e){
             try{

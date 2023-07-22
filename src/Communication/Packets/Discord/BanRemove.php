@@ -15,7 +15,6 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-/** @extends Packet<BanRemove> */
 class BanRemove extends Packet{
 
     public const ID = 36;

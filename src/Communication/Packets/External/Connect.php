@@ -17,7 +17,6 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 /**
  * Packet for external bot to verify its connection with the correct Version and MAGIC.
- * @extends Packet<Connect>
  */
 class Connect extends Packet{
 

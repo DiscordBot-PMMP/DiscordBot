@@ -16,7 +16,6 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-/** @extends Packet<BanAdd> */
 class BanAdd extends Packet{
 
     public const ID = 35;

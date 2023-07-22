@@ -16,7 +16,6 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 
-/** @extends Packet<ChannelCreate> */
 class ChannelCreate extends Packet{
 
     public const ID = 37;

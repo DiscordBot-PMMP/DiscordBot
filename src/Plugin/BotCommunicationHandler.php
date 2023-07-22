@@ -89,7 +89,6 @@ class BotCommunicationHandler{
         $this->plugin = $plugin;
     }
 
-    /** @param Packet<mixed> $packet */
     public function handle(Packet $packet): void{
         // If's instances instead of ID switching due to phpstan/types.
         if($packet instanceof ResolutionPacket){
@@ -127,7 +126,6 @@ class BotCommunicationHandler{
         elseif($packet instanceof GuildJoinPacket) $this->handleGuildJoin($packet);
         elseif($packet instanceof GuildLeavePacket) $this->handleGuildLeave($packet);
         elseif($packet instanceof GuildUpdatePacket) $this->handleGuildUpdate($packet);
-        elseif($packet instanceof DiscordDataDumpPacket) $this->handleDataDump($packet);
         elseif($packet instanceof DiscordReadyPacket) $this->handleReady();
     }
 
@@ -404,40 +402,6 @@ class BotCommunicationHandler{
         }
         (new GuildDeletedEvent($this->plugin, $guild))->call();
         Storage::removeGuild($packet->getGuildId());
-    }
-
-    private function handleDataDump(DiscordDataDumpPacket $packet): void{
-        foreach($packet->getGuilds() as $guild){
-            Storage::addGuild($guild);
-        }
-        foreach($packet->getChannels() as $channel){
-            Storage::addChannel($channel);
-            if($channel instanceof VoiceChannel){
-                foreach($channel->getMembers() as $member){
-                    Storage::setMembersVoiceChannel($member, $channel->getId() ?? "Never null here");
-                }
-            }
-        }
-        foreach($packet->getRoles() as $role){
-            Storage::addRole($role);
-        }
-        foreach($packet->getBans() as $ban){
-            Storage::addBan($ban);
-        }
-        foreach($packet->getInvites() as $invite){
-            Storage::addInvite($invite);
-        }
-        foreach($packet->getMembers() as $member){
-            Storage::addMember($member);
-        }
-        foreach($packet->getUsers() as $user){
-            Storage::addUser($user);
-        }
-        if($packet->getBotUser() !== null){
-            Storage::setBotUser($packet->getBotUser());
-        }
-        Storage::setTimestamp($packet->getTimestamp());
-        $this->plugin->getLogger()->debug("Handled data dump (".$packet->getTimestamp().") (".$packet->getSize().")");
     }
 
     public function resetHeartbeat(): void{

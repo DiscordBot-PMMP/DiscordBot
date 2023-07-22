@@ -16,8 +16,7 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 /**
- * @template-covariant T
- * @implements BinarySerializable<T>
+ * @implements BinarySerializable<self>
  */
 abstract class Packet implements BinarySerializable{
 

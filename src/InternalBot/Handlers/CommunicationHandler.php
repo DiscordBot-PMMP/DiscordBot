@@ -94,7 +94,6 @@ class CommunicationHandler{
 
     //--- Handlers:
 
-    /** @param Packet<mixed> $pk */
     public function handle(Packet $pk): void{
         //Internals:
         if($pk instanceof Heartbeat){
@@ -832,7 +831,6 @@ class CommunicationHandler{
     //---------------------------------------------------
 
     /**
-     * @param Packet<mixed> $pk
      * @param callable(DiscordGuild): void $cb
      */
     private function getGuild(Packet $pk, string $guild_id, callable $cb): void{
@@ -846,7 +844,6 @@ class CommunicationHandler{
 
     /**
      * Includes DMs
-     * @param Packet<mixed> $pk
      * @param callable(DiscordChannel): void $cb
      */
     private function getChannel(Packet $pk, string $channel_id, callable $cb): void{
@@ -871,7 +868,6 @@ class CommunicationHandler{
     }
 
     /**
-     * @param Packet<mixed> $pk
      * @param callable(DiscordMessage): void $cb
      */
     private function getMessage(Packet $pk, string $channel_id, string $message_id, callable $cb): void{
@@ -886,7 +882,6 @@ class CommunicationHandler{
     }
 
     /**
-     * @param Packet<mixed> $pk
      * @param callable(DiscordMember, DiscordGuild): void $cb
      */
     private function getMember(Packet $pk, string $guild_id, string $user_id, callable $cb): void{

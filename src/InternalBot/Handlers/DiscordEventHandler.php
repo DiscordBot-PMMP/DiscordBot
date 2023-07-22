@@ -20,14 +20,12 @@ use Discord\Parts\Guild\Ban as DiscordBan;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Member as DiscordMember;
-use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
 use Discord\Parts\WebSockets\PresenceUpdate as DiscordPresenceUpdate;
 use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
 use JaxkDev\DiscordBot\InternalBot\Client;
 use JaxkDev\DiscordBot\InternalBot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate as ChannelPinsUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordDataDump as DiscordDataDumpPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd as BanAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanRemove as BanRemovePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate as ChannelCreatePacket;
@@ -52,7 +50,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordConnected as DiscordReadyPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordConnected as DiscordConnectedPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\Models\Presence\ClientStatus;
@@ -189,122 +187,15 @@ array(5) {
      */
 
     public function onReady(): void{
-        //Checked frequently during data dump as this is the only time when it can cause the thread to hang during disable.
-        $statusCheck = function(){
-            if($this->client->getThread()->getStatus() !== ThreadStatus::STARTED){
-                $this->logger->warning("Closing thread, unexpected state change.");
-                $this->client->close();
-            }
-        };
-
         // Register all other events.
         $this->registerEvents();
 
-        // Dump all discord data.
-        $pk = new DiscordDataDumpPacket();
-        $pk->setTimestamp(time());
-
-        $this->logger->debug("Starting the data pack, please be patient.");
-        $t = microtime(true);
-        $mem = memory_get_usage(true);
-
         $client = $this->client->getDiscordClient();
-
-        /** @var DiscordGuild $guild */
-        foreach($client->guilds as $guild){
-            $statusCheck();
-
-            $pk->addGuild(ModelConverter::genModelGuild($guild));
-
-            /** @var DiscordMember|null $m */
-            $m = $guild->members->get("id", $client->id);
-            if($m === null){
-                throw new \AssertionError("Client member not found in guild '$guild->id'.");
-            }
-            $permissions = $m->getPermissions();
-
-            if($permissions?->ban_members === true){
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $guild->bans->freshen()->done(function() use ($guild){
-                    $this->logger->debug("Successfully fetched ".sizeof($guild->bans)." bans from guild '".
-                        $guild->name."' (".$guild->id.")");
-                    if(sizeof($guild->bans) === 0) return;
-                    $pk = new DiscordDataDumpPacket();
-                    $pk->setTimestamp(time());
-                    /** @var DiscordBan $ban */
-                    foreach($guild->bans as $ban){
-                        $pk->addBan(ModelConverter::genModelBan($ban));
-                    }
-                    $this->client->getThread()->writeOutboundData($pk);
-                }, function() use ($guild){
-                    $this->logger->warning("Failed to fetch bans from guild '".$guild->name."' (".$guild->id.")");
-                });
-            }else{
-                $this->logger->notice("Cannot fetch bans from guild '".$guild->name."' (".$guild->id.
-                    "), Bot does not have 'ban_members' permission.");
-            }
-
-            /** @var DiscordChannel $channel */
-            foreach($guild->channels as $channel){
-                $c = ModelConverter::genModelChannel($channel);
-                if($c !== null) $pk->addChannel($c);
-            }
-
-            /** @var DiscordRole $role */
-            foreach($guild->roles as $role){
-                $pk->addRole(ModelConverter::genModelRole($role));
-            }
-
-            $statusCheck();
-
-            if($permissions?->manage_guild === true){
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $guild->invites->freshen()->done(function() use ($guild){
-                    $this->logger->debug("Successfully fetched ".sizeof($guild->invites).
-                        " invites from guild '".$guild->name."' (".$guild->id.")");
-                    if(sizeof($guild->invites) === 0) return;
-                    $pk = new DiscordDataDumpPacket();
-                    $pk->setTimestamp(time());
-                    /** @var DiscordInvite $invite */
-                    foreach($guild->invites as $invite){
-                        $pk->addInvite(ModelConverter::genModelInvite($invite));
-                    }
-                    $this->client->getThread()->writeOutboundData($pk);
-                }, function() use ($guild){
-                    $this->logger->warning("Failed to fetch invites from guild '".$guild->name."' (".$guild->id.")");
-                });
-            }else{
-                $this->logger->notice("Cannot fetch invites from guild '".$guild->name."' (".$guild->id.
-                    "), Bot does not have 'manage_guild' permission.");
-            }
-
-            /** @var DiscordMember $member */
-            foreach($guild->members as $member){
-                $pk->addMember(ModelConverter::genModelMember($member));
-            }
-        }
-
-        $statusCheck();
-
-        /** @var DiscordUser $user */
-        foreach($client->users as $user){
-            $pk->addUser(ModelConverter::genModelUser($user));
-        }
-
-        //Very important to check status before overwriting, can cause dangerous behaviour.
-        $statusCheck();
-
-        $pk->setBotUser(ModelConverter::genModelUser($client->user));
-
-        $this->logger->debug("Data pack took: ".round(microtime(true)-$t, 5)."s & ".
-            round(((memory_get_usage(true)-$mem)/1024)/1024, 4)."mb of memory, Final size: ".$pk->getSize());
-
-        $this->client->getThread()->writeOutboundData($pk);
 
         $this->client->getThread()->setStatus(ThreadStatus::RUNNING);
         $this->logger->info("Client '".$client->username."#".$client->discriminator."' ready.");
 
-        $this->client->getThread()->writeOutboundData(new DiscordReadyPacket());
+        $this->client->getThread()->writeOutboundData(new DiscordConnectedPacket());
         $this->client->getCommunicationHandler()->sendHeartbeat();
     }
 

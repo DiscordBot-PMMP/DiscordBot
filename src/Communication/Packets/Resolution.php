@@ -15,7 +15,6 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-/** @extends Packet<Resolution> */
 class Resolution extends Packet{
 
     public const SERIALIZE_ID = 4;

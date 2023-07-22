@@ -176,7 +176,6 @@ class Main extends PluginBase{
     private function tick(int $currentTick): void{
         $data = $this->readInboundData($this->config["protocol"]["general"]["packets_per_tick"]);
 
-        /** @var Packet<mixed> $d */
         foreach($data as $d){
             $this->communicationHandler->handle($d);
         }
@@ -211,7 +210,7 @@ class Main extends PluginBase{
 
     /**
      * @internal
-     * @return Packet<mixed>[]
+     * @return Packet[]
      */
     public function readInboundData(int $count = 1): array{
         return array_map(function($raw_data){
@@ -221,13 +220,13 @@ class Main extends PluginBase{
             }catch(\Exception){
                 throw new \AssertionError("Invalid packet received - " . bin2hex($raw_data));
             }
-            /** @var class-string<Packet<mixed>>|null $packet */
+            /** @var class-string<Packet>|null $packet */
             $packet = NetworkApi::getPacketClass($pid);
             if($packet === null){
                 throw new \AssertionError("Invalid packet ID $pid - " . bin2hex($raw_data));
             }
             try{
-                /** @var Packet<mixed> $x */
+                /** @var Packet $x */
                 $x = $packet::fromBinary($stream);
                 return $x;
             }catch(\Exception $e){
@@ -238,7 +237,6 @@ class Main extends PluginBase{
 
     /**
      * @internal
-     * @param Packet<mixed> $data
      */
     public function writeOutboundData(Packet $data): void{
         $stream = new BinaryStream();
