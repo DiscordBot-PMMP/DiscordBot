@@ -60,7 +60,6 @@ use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
  * For internal and developers use for interacting with the discord bot.
  *
  * @see Main::getApi() To get instance.
- * @see Storage For all discord data.
  */
 class Api{
 

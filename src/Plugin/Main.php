@@ -130,7 +130,7 @@ class Main extends PluginBase{
 
         $sender->sendMessage(TextFormat::YELLOW."Building debug file, please be patient this can take several seconds.");
 
-        $task = new DebugData($this, $sender, Storage::serializeStorage());
+        $task = new DebugData($this, $sender);
         $this->getServer()->getAsyncPool()->submitTask($task);
 
         return true;
