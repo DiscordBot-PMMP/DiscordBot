@@ -70,13 +70,9 @@ class Client{
     private function start(): void{
         $this->getLogger()->debug("Connecting to socket.");
         $this->thread->setStatus(ThreadStatus::STARTING);
-        try{
-            $this->socket->open();
-        }catch(\RuntimeException $e){
-            $this->getLogger()->error("Failed to connect socket: ".$e->getMessage());
-            $this->thread->setStatus(ThreadStatus::STOPPED);
-            exit(1);
-        }
+
+        //Blocking.
+        $this->socket->open();
 
         $this->thread->setStatus(ThreadStatus::STARTED);
 

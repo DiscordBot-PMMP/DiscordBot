@@ -41,8 +41,12 @@ class Socket{
     }
 
     public function open(): void{
-        if(@socket_connect($this->socket, $this->address, $this->port) === false){
-            throw new SocketException("Failed to connect to socket: " . socket_strerror(socket_last_error()));
+        if(@socket_connect($this->socket, $this->address, $this->port) === false and ($e = socket_last_error()) !== SOCKET_EINPROGRESS){
+            throw new SocketException("Failed to connect to socket: " . socket_strerror($e));
+        }
+        $s = [$this->socket];
+        if(@socket_select($s, $s, $s, 0) === false){
+            throw new SocketException("Failed to select socket: " . socket_strerror(socket_last_error()));
         }
         $this->logger->info("Socket connected to " . $this->address . ":" . $this->port . ".");
         $this->open = true;
@@ -91,6 +95,11 @@ class Socket{
         if($length === false){
             $this->close("Failed to unpack data from socket.");
             throw new SocketException("Failed to unpack data from socket.");
+        }
+        //Check int bounds to avoid memory overflow/attacks.
+        if($length[1] > 1024 * 1024){
+            $this->close("Data length exceeds 1MB.");
+            throw new SocketException("Data length exceeds 1MB.");
         }
         $data = @socket_read($this->socket, $length[1]);
         if($data === false){
