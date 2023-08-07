@@ -12,8 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Channels\Channel;
-use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -29,16 +28,24 @@ class MessageReactionRemove extends DiscordBotEvent{
 
     private string $message_id;
 
-    private Channel $channel;
+    private string $channel_id;
 
-    private Member $member;
+    private string $member_id;
 
-    public function __construct(Plugin $plugin, string $emoji, string $message_id, Channel $channel, Member $member){
+    public function __construct(Plugin $plugin, string $emoji, string $message_id, string $channel_id, string $member_id){
         parent::__construct($plugin);
         $this->emoji = $emoji;
         $this->message_id = $message_id;
-        $this->channel = $channel;
-        $this->member = $member;
+        if(Utils::validDiscordSnowflake($channel_id)){
+            $this->channel_id = $channel_id;
+        }else{
+            throw new \AssertionError("Invalid channel id given.");
+        }
+        if(Utils::validDiscordSnowflake($member_id)){
+            $this->member_id = $member_id;
+        }else{
+            throw new \AssertionError("Invalid member id given.");
+        }
     }
 
     public function getEmoji(): string{
@@ -49,11 +56,11 @@ class MessageReactionRemove extends DiscordBotEvent{
         return $this->message_id;
     }
 
-    public function getChannel(): Channel{
-        return $this->channel;
+    public function getChannelId(): string{
+        return $this->channel_id;
     }
 
-    public function getMember(): Member{
-        return $this->member;
+    public function getMemberId(): string{
+        return $this->member_id;
     }
 }

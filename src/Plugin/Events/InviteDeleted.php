@@ -12,7 +12,6 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Invite;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -22,14 +21,14 @@ use pocketmine\plugin\Plugin;
  */
 class InviteDeleted extends DiscordBotEvent{
 
-    private Invite $invite;
+    private string $invite_code;
 
-    public function __construct(Plugin $plugin, Invite $invite){
+    public function __construct(Plugin $plugin, string $invite_code){
         parent::__construct($plugin);
-        $this->invite = $invite;
+        $this->invite_code = $invite_code;
     }
 
-    public function getInvite(): Invite{
-        return $this->invite;
+    public function getInviteCode(): string{
+        return $this->invite_code;
     }
 }

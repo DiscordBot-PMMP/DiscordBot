@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Guild\Guild;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -23,14 +23,18 @@ use pocketmine\plugin\Plugin;
  */
 class GuildDeleted extends DiscordBotEvent{
 
-    private Guild $guild;
+    private string $guild_id;
 
-    public function __construct(Plugin $plugin, Guild $guild){
+    public function __construct(Plugin $plugin, string $guild_id){
         parent::__construct($plugin);
-        $this->guild = $guild;
+        if(Utils::validDiscordSnowflake($guild_id)){
+            $this->guild_id = $guild_id;
+        }else{
+            throw new \AssertionError("Invalid guild_id given.");
+        }
     }
 
-    public function getGuild(): Guild{
-        return $this->guild;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 }

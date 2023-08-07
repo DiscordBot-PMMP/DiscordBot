@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Role;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -23,14 +23,18 @@ use pocketmine\plugin\Plugin;
  */
 class RoleDeleted extends DiscordBotEvent{
 
-    private Role $role;
+    private string $role_id;
 
-    public function __construct(Plugin $plugin, Role $role){
+    public function __construct(Plugin $plugin, string $role_id){
         parent::__construct($plugin);
-        $this->role = $role;
+        if(Utils::validDiscordSnowflake($role_id)){
+            $this->role_id = $role_id;
+        }else{
+            throw new \AssertionError("Invalid role_id given.");
+        }
     }
 
-    public function getRole(): Role{
-        return $this->role;
+    public function getRoleId(): string{
+        return $this->role_id;
     }
 }

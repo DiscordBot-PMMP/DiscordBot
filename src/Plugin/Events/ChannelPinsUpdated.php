@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Channels\TextChannel;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -20,14 +20,18 @@ use pocketmine\plugin\Plugin;
  */
 class ChannelPinsUpdated extends DiscordBotEvent{
 
-    private TextChannel $channel;
+    private string $channel_id;
 
-    public function __construct(Plugin $plugin, TextChannel $channel){
+    public function __construct(Plugin $plugin, string $channel_id){
         parent::__construct($plugin);
-        $this->channel = $channel;
+        if(Utils::validDiscordSnowflake($channel_id)){
+            $this->channel_id = $channel_id;
+        }else{
+            throw new \AssertionError("Invalid channel ID given.");
+        }
     }
 
-    public function getChannel(): TextChannel{
-        return $this->channel;
+    public function getChannelId(): string{
+        return $this->channel_id;
     }
 }

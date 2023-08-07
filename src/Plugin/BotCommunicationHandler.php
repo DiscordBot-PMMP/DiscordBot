@@ -42,8 +42,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceSt
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution as ResolutionPacket;
-use JaxkDev\DiscordBot\Models\Channels\TextChannel;
-use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
+use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityType;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
@@ -73,10 +72,6 @@ use JaxkDev\DiscordBot\Plugin\Events\PresenceUpdated as PresenceUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberJoined as VoiceChannelMemberJoinedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberLeft as VoiceChannelMemberLeftEvent;
-use JaxkDev\DiscordBot\Plugin\Events\VoiceChannelMemberMoved as VoiceChannelMemberMovedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\VoiceStateUpdated as VoiceStateUpdatedEvent;
 use pocketmine\VersionInfo;
 
 class BotCommunicationHandler{
@@ -204,14 +199,14 @@ class BotCommunicationHandler{
     }
 
     private function handlePresenceUpdate(PresenceUpdatePacket $packet): void{
-        $member = Storage::getMember($packet->getMemberId());
+        //TODO
+        /*$member = Storage::getMember($packet->getMemberId());
         if($member === null){
             throw new \AssertionError("Member '{$packet->getMemberId()}' not found in storage.");
         }
         $presence = $packet->getPresence();
         (new PresenceUpdatedEvent($this->plugin, $member, $presence))->call();
-        $member->setPresence($presence);
-        Storage::updateMember($member);
+        $member->setPresence($presence);*/
     }
 
     private function handleMessageSent(MessageSentPacket $packet): void{
@@ -227,181 +222,91 @@ class BotCommunicationHandler{
     }
 
     private function handleMessageReactionAdd(MessageReactionAddPacket $packet): void{
-        $channel = Storage::getChannel($packet->getChannelId());
-        if($channel === null){
-            throw new \AssertionError("Channel '{$packet->getChannelId()}' does not exist in storage.");
-        }
-        $member = Storage::getMember($packet->getMemberId());
-        if($member === null){
-            throw new \AssertionError("Member '{$packet->getMemberId()}' does not exist in storage.");
-        }
-        (new MessageReactionAddEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $channel, $member))->call();
+        (new MessageReactionAddEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $packet->getChannelId(), $packet->getMemberId()))->call();
     }
 
     private function handleMessageReactionRemove(MessageReactionRemovePacket $packet): void{
-        $channel = Storage::getChannel($packet->getChannelId());
-        if($channel === null){
-            throw new \AssertionError("Channel '{$packet->getChannelId()}' does not exist in storage.");
-        }
-        $member = Storage::getMember($packet->getMemberId());
-        if($member === null){
-            throw new \AssertionError("Member '{$packet->getMemberId()}' does not exist in storage.");
-        }
-        (new MessageReactionRemoveEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $channel, $member))->call();
+        (new MessageReactionRemoveEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $packet->getChannelId(), $packet->getMemberId()))->call();
     }
 
     private function handleMessageReactionRemoveAll(MessageReactionRemoveAllPacket $packet): void{
-        $channel = Storage::getChannel($packet->getChannelId());
-        if($channel === null){
-            throw new \AssertionError("Channel '{$packet->getChannelId()}' does not exist in storage.");
-        }
-        (new MessageReactionRemoveAllEvent($this->plugin, $packet->getMessageId(), $channel))->call();
+        (new MessageReactionRemoveAllEvent($this->plugin, $packet->getMessageId(), $packet->getChannelId()))->call();
     }
 
     private function handleMessageReactionRemoveEmoji(MessageReactionRemoveEmojiPacket $packet): void{
-        $channel = Storage::getChannel($packet->getChannelId());
-        if($channel === null){
-            throw new \AssertionError("Channel '{$packet->getChannelId()}' does not exist in storage.");
-        }
-        (new MessageReactionRemoveEmojiEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $channel))->call();
+        (new MessageReactionRemoveEmojiEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $packet->getChannelId()))->call();
     }
 
     private function handleChannelCreate(ChannelCreatePacket $packet): void{
         (new ChannelUpdatedEvent($this->plugin, $packet->getChannel()))->call();
-        Storage::addChannel($packet->getChannel());
     }
 
     private function handleChannelUpdate(ChannelUpdatePacket $packet): void{
         (new ChannelUpdatedEvent($this->plugin, $packet->getChannel()))->call();
-        Storage::updateChannel($packet->getChannel());
     }
 
     private function handleChannelDelete(ChannelDeletePacket $packet): void{
-        $c = Storage::getChannel($packet->getChannelId());
-        if($c === null){
-            throw new \AssertionError("Guild Channel '{$packet->getChannelId()}' not found in storage.");
-        }
-        (new ChannelDeletedEvent($this->plugin, $c))->call();
-        Storage::removeChannel($packet->getChannelId());
+        (new ChannelDeletedEvent($this->plugin, $packet->getChannelId()))->call();
     }
 
     private function handleChannelPinsUpdate(ChannelPinsUpdatePacket $packet): void{
-        $c = Storage::getChannel($packet->getChannelId());
-        if($c === null or !$c instanceof TextChannel){
-            throw new \AssertionError("Text Channel '{$packet->getChannelId()}' not found in storage.");
-        }
-        (new ChannelPinsUpdatedEvent($this->plugin, $c))->call();
+        (new ChannelPinsUpdatedEvent($this->plugin, $packet->getChannelId()))->call();
     }
 
     private function handleRoleCreate(RoleCreatePacket $packet): void{
         (new RoleCreatedEvent($this->plugin, $packet->getRole()))->call();
-        Storage::addRole($packet->getRole());
     }
 
     private function handleRoleUpdate(RoleUpdatePacket $packet): void{
         (new RoleUpdatedEvent($this->plugin, $packet->getRole()))->call();
-        Storage::updateRole($packet->getRole());
     }
 
     private function handleRoleDelete(RoleDeletePacket $packet): void{
-        $r = Storage::getRole($packet->getRoleId());
-        if($r === null){
-            throw new \AssertionError("Role '{$packet->getRoleId()}' not found in storage.");
-        }
-        (new RoleDeletedEvent($this->plugin, $r))->call();
-        Storage::removeRole($packet->getRoleId());
+        (new RoleDeletedEvent($this->plugin, $packet->getRoleId()))->call();
     }
 
     private function handleInviteCreate(InviteCreatePacket $packet): void{
         (new InviteCreatedEvent($this->plugin, $packet->getInvite()))->call();
-        Storage::addInvite($packet->getInvite());
     }
 
     private function handleInviteDelete(InviteDeletePacket $packet): void{
-        $i = Storage::getInvite($packet->getInviteCode());
-        if($i === null){
-            throw new \AssertionError("Invite '{$packet->getInviteCode()}' not found in storage.");
-        }
-        (new InviteDeletedEvent($this->plugin, $i))->call();
-        Storage::removeInvite($packet->getInviteCode());
+        (new InviteDeletedEvent($this->plugin, $packet->getInviteCode()))->call();
     }
 
     private function handleBanAdd(BanAddPacket $packet): void{
         (new BanCreatedEvent($this->plugin, $packet->getBan()))->call();
-        Storage::addBan($packet->getBan());
     }
 
     private function handleBanRemove(BanRemovePacket $packet): void{
-        $ban = Storage::getBan($packet->getBanId());
-        if($ban === null){
-            throw new \AssertionError("Ban '{$packet->getBanId()}' not found in storage.");
-        }
-        (new BanDeletedEvent($this->plugin, $ban))->call();
-        Storage::removeBan($packet->getBanId());
+        [$guild, $user] = explode(".", $packet->getBanId());
+        (new BanDeletedEvent($this->plugin, new Ban($guild, $user)))->call();
     }
 
     private function handleMemberJoin(MemberJoinPacket $packet): void{
-        $guild = Storage::getGuild($packet->getMember()->getGuildId());
-        if($guild === null){
-            throw new \AssertionError("Guild '{$packet->getMember()->getGuildId()}' not found for member '{$packet->getMember()->getId()}'");
-        }
         (new MemberJoinedEvent($this->plugin, $packet->getMember()))->call();
-        Storage::addMember($packet->getMember());
-        Storage::addUser($packet->getUser());
     }
 
     private function handleMemberUpdate(MemberUpdatePacket $packet): void{
         (new MemberUpdatedEvent($this->plugin, $packet->getMember()))->call();
-        Storage::updateMember($packet->getMember());
     }
 
     private function handleMemberLeave(MemberLeavePacket $packet): void{
-        //When leaving guild this is emitted.
-        if(($u = Storage::getBotUser()) !== null and $u->getId() === explode(".", $packet->getMemberID())[1]) return;
+        //When leaving guild this is emitted. TODO bot user data.
+        //if(($u = Storage::getBotUser()) !== null and $u->getId() === explode(".", $packet->getMemberID())[1]) return;
 
-        $member = Storage::getMember($packet->getMemberID());
-        if($member === null){
-            throw new \AssertionError("Member '{$packet->getMemberID()}' not found in storage.");
-        }
-
-        $guild = Storage::getGuild($member->getGuildId());
-        if($guild === null){
-            throw new \AssertionError("Guild '{$member->getGuildId()}' not found for member '{$member->getId()}'");
-        }
-
-        (new MemberLeftEvent($this->plugin, $member))->call();
-
-        Storage::removeMember($packet->getMemberID());
+        (new MemberLeftEvent($this->plugin, $packet->getMemberID()))->call();
     }
 
     private function handleGuildJoin(GuildJoinPacket $packet): void{
-        (new GuildJoinedEvent($this->plugin, $packet->getGuild(), $packet->getRoles(),
-            $packet->getChannels(), $packet->getMembers()))->call();
-
-        Storage::addGuild($packet->getGuild());
-        foreach($packet->getMembers() as $member){
-            Storage::addMember($member);
-        }
-        foreach($packet->getRoles() as $role){
-            Storage::addRole($role);
-        }
-        foreach($packet->getChannels() as $channel){
-            Storage::addChannel($channel);
-        }
+        (new GuildJoinedEvent($this->plugin, $packet->getGuild()))->call();
     }
 
     private function handleGuildUpdate(GuildUpdatePacket $packet): void{
         (new GuildUpdatedEvent($this->plugin, $packet->getGuild()))->call();
-        Storage::updateGuild($packet->getGuild());
     }
 
     private function handleGuildLeave(GuildLeavePacket $packet): void{
-        $guild = Storage::getGuild($packet->getGuildId());
-        if($guild === null){
-            throw new \AssertionError("Guild '{$packet->getGuildId()}' not found in storage.");
-        }
-        (new GuildDeletedEvent($this->plugin, $guild))->call();
-        Storage::removeGuild($packet->getGuildId());
+        (new GuildDeletedEvent($this->plugin, $packet->getGuildId()))->call();
     }
 
     public function resetHeartbeat(): void{

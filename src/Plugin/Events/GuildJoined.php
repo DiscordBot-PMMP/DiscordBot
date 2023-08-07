@@ -12,10 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Guild\Guild;
-use JaxkDev\DiscordBot\Models\Member;
-use JaxkDev\DiscordBot\Models\Role;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -28,50 +25,12 @@ class GuildJoined extends DiscordBotEvent{
 
     private Guild $guild;
 
-    /** @var Role[] */
-    private array $roles;
-
-    /** @var Channel[] */
-    private array $channels;
-
-    /** @var Member[] */
-    private array $members;
-
-    /**
-     * @param Role[]    $roles
-     * @param Channel[] $channels
-     * @param Member[]  $members
-     */
-    public function __construct(Plugin $plugin, Guild $guild, array $roles, array $channels, array $members){
+    public function __construct(Plugin $plugin, Guild $guild){
         parent::__construct($plugin);
         $this->guild = $guild;
-        $this->roles = $roles;
-        $this->channels = $channels;
-        $this->members = $members;
     }
 
     public function getGuild(): Guild{
         return $this->guild;
-    }
-
-    /**
-     * @return Role[]
-     */
-    public function getRoles(): array{
-        return $this->roles;
-    }
-
-    /**
-     * @return Channel[]
-     */
-    public function getChannels(): array{
-        return $this->channels;
-    }
-
-    /**
-     * @return Member[]
-     */
-    public function getMembers(): array{
-        return $this->members;
     }
 }

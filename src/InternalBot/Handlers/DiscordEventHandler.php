@@ -288,8 +288,7 @@ array(5) {
     }
 
     public function onMemberJoin(DiscordMember $member, Discord $discord): void{
-        if($member->user === null) throw new \AssertionError("TODO, user is null on new member join."); //todo
-        $packet = new MemberJoinPacket(ModelConverter::genModelMember($member), ModelConverter::genModelUser($member->user));
+        $packet = new MemberJoinPacket(ModelConverter::genModelMember($member));
         $this->client->getThread()->writeOutboundData($packet);
     }
 
@@ -304,24 +303,7 @@ array(5) {
     }
 
     public function onGuildJoin(DiscordGuild $guild, Discord $discord): void{
-        $channels = [];
-        /** @var DiscordChannel $channel */
-        foreach($guild->channels as $channel){
-            $c = ModelConverter::genModelChannel($channel);
-            if($c !== null) $channels[] = $c;
-        }
-        $roles = [];
-        /** @var DiscordRole $role */
-        foreach($guild->roles as $role){
-            $roles[] = ModelConverter::genModelRole($role);
-        }
-        $members = [];
-        /** @var DiscordMember $member */
-        foreach($guild->members as $member){
-            $members[] = ModelConverter::genModelMember($member);
-        }
-
-        $packet = new GuildJoinPacket(ModelConverter::genModelGuild($guild), $channels, $members, $roles);
+        $packet = new GuildJoinPacket(ModelConverter::genModelGuild($guild));
         $this->client->getThread()->writeOutboundData($packet);
     }
 

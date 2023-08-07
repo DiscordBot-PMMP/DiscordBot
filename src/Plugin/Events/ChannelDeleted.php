@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -23,14 +23,18 @@ use pocketmine\plugin\Plugin;
  */
 class ChannelDeleted extends DiscordBotEvent{
 
-    private GuildChannel $channel;
+    private string $channel_id;
 
-    public function __construct(Plugin $plugin, GuildChannel $channel){
+    public function __construct(Plugin $plugin, string $channel_id){
         parent::__construct($plugin);
-        $this->channel = $channel;
+        if(Utils::validDiscordSnowflake($channel_id)){
+            $this->channel_id = $channel_id;
+        }else{
+            throw new \AssertionError("Invalid channel id given.");
+        }
     }
 
-    public function getChannel(): GuildChannel{
-        return $this->channel;
+    public function getChannelId(): string{
+        return $this->channel_id;
     }
 }

@@ -12,7 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -23,14 +23,18 @@ use pocketmine\plugin\Plugin;
  */
 class MemberLeft extends DiscordBotEvent{
 
-    private Member $member;
+    private string $member_id;
 
-    public function __construct(Plugin $plugin, Member $member){
+    public function __construct(Plugin $plugin, string $member_id){
         parent::__construct($plugin);
-        $this->member = $member;
+        if(Utils::validDiscordSnowflake($member_id)){
+            $this->member_id = $member_id;
+        }else{
+            throw new \AssertionError("Invalid member_id given.");
+        }
     }
 
-    public function getMember(): Member{
-        return $this->member;
+    public function getMemberId(): string{
+        return $this->member_id;
     }
 }
