@@ -74,16 +74,11 @@ class Api{
      *
      * @return PromiseInterface Resolves with a Webhook model.
      */
-    public function createWebhook(Webhook $webhook): PromiseInterface{
-        if($webhook->getType() !== WebhookType::INCOMING){
-            return rejectPromise(new ApiRejection("Only Incoming Webhooks can be created."));
-        }
-        if(!Utils::validDiscordSnowflake($webhook->getChannelId()??"")){
+    public function createWebhook(string $channel_id, string $name): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Webhook channel ID is invalid."));
         }
-        if($webhook->getId() !== null or $webhook->getToken() !== null){
-            return rejectPromise(new ApiRejection("Webhook already has an ID/token, it cannot be created twice."));
-        }
+        $webhook = new Webhook(WebhookType::INCOMING, channel_id: $channel_id, name: $name);
         $pk = new RequestCreateWebhook($webhook);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
@@ -126,6 +121,20 @@ class Api{
         return ApiResolver::create($pk->getUID());
     }
 
+    /**
+     * Fetch all webhooks that are linked to a channel.
+     *
+     * @return PromiseInterface Resolves with an array of Webhook models.
+     */
+    public function fetchWebhooks(string $channel_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+        }
+        $pk = new RequestFetchWebhooks($channel_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
     //createGuild will not be added due to security issues,
     //If you find a genuine use for createGuild please open an issue.
 
@@ -139,20 +148,6 @@ class Api{
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         $pk = new RequestLeaveGuild($guild_id);
-        $this->plugin->writeOutboundData($pk);
-        return ApiResolver::create($pk->getUID());
-    }
-
-    /**
-     * Fetch all webhooks that are linked to a channel.
-     *
-     * @return PromiseInterface Resolves with an array of Webhook models.
-     */
-    public function fetchWebhooks(string $channel_id): PromiseInterface{
-        if(!Utils::validDiscordSnowflake($channel_id)){
-            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
-        }
-        $pk = new RequestFetchWebhooks($channel_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

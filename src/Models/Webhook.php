@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
+use JaxkDev\DiscordBot\Plugin\Api;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
 /**
@@ -62,14 +63,9 @@ class Webhook implements BinarySerializable{
     private ?string $source_channel_id;
 
     /**
-     * Create a base webhook model with only required fields, ready for creation.
-     *
+     * @internal
      * @see Api::createWebhook()
      */
-    public static function create(string $channel_id, string $name): self{
-        return new self(WebhookType::INCOMING, channel_id: $channel_id, name: $name);
-    }
-
     public function __construct(WebhookType $type, ?string $id = null, ?string $guild_id = null, ?string $channel_id = null,
                                 ?string $user_id = null, ?string $name = null, ?string $avatar = null, ?string $token = null,
                                 ?string $application_id = null, ?string $source_guild_id = null, ?string $source_channel_id = null){
