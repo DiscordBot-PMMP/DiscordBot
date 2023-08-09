@@ -19,37 +19,28 @@ class PresenceUpdate extends Packet{
 
     public const ID = 58;
 
-    private string $member_id;
+    private string $guild_id;
+
+    private string $user_id;
 
     private Presence $presence;
 
-    public function __construct(string $member_id, Presence $presence, ?int $uid = null){
+    public function __construct(string $guild_id, string $user_id, Presence $presence, ?int $uid = null){
         parent::__construct($uid);
-        $this->member_id = $member_id;
+        $this->guild_id = $guild_id;
+        $this->user_id = $user_id;
         $this->presence = $presence;
     }
 
-    public function getMemberId(): string{
-        return $this->member_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
+    }
+
+    public function getUserId(): string{
+        return $this->user_id;
     }
 
     public function getPresence(): Presence{
         return $this->presence;
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "member_id" => $this->member_id,
-            "presence" => $this->presence->jsonSerialize()
-        ];
-    }
-
-    public static function fromJson(array $data): self{
-        return new self(
-            $data["member_id"],
-            Presence::fromJson($data["presence"]),
-            $data["uid"]
-        );
     }
 }

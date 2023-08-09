@@ -23,18 +23,29 @@ use pocketmine\plugin\Plugin;
  */
 class MemberLeft extends DiscordBotEvent{
 
-    private string $member_id;
+    private string $guild_id;
 
-    public function __construct(Plugin $plugin, string $member_id){
+    private string $user_id;
+
+    public function __construct(Plugin $plugin, string $guild_id, string $user_id){
         parent::__construct($plugin);
-        if(Utils::validDiscordSnowflake($member_id)){
-            $this->member_id = $member_id;
+        if(Utils::validDiscordSnowflake($guild_id)){
+            $this->guild_id = $guild_id;
         }else{
-            throw new \AssertionError("Invalid member_id given.");
+            throw new \AssertionError("Invalid guild_id provided.");
+        }
+        if(Utils::validDiscordSnowflake($user_id)){
+            $this->user_id = $user_id;
+        }else{
+            throw new \AssertionError("Invalid user_id provided.");
         }
     }
 
-    public function getMemberId(): string{
-        return $this->member_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
+    }
+
+    public function getUserId(): string{
+        return $this->user_id;
     }
 }

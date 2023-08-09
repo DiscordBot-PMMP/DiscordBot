@@ -219,11 +219,11 @@ class BotCommunicationHandler{
     }
 
     private function handleMessageReactionAdd(MessageReactionAddPacket $packet): void{
-        (new MessageReactionAddEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $packet->getChannelId(), $packet->getMemberId()))->call();
+        (new MessageReactionAddEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $packet->getChannelId(), $packet->getGuildId(), $packet->getUserId()))->call();
     }
 
     private function handleMessageReactionRemove(MessageReactionRemovePacket $packet): void{
-        (new MessageReactionRemoveEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $packet->getChannelId(), $packet->getMemberId()))->call();
+        (new MessageReactionRemoveEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $packet->getChannelId(), $packet->getGuildId(), $packet->getUserId()))->call();
     }
 
     private function handleMessageReactionRemoveAll(MessageReactionRemoveAllPacket $packet): void{
@@ -291,7 +291,7 @@ class BotCommunicationHandler{
         //When leaving guild this is emitted. TODO bot user data.
         //if(($u = Storage::getBotUser()) !== null and $u->getId() === explode(".", $packet->getMemberID())[1]) return;
 
-        (new MemberLeftEvent($this->plugin, $packet->getMemberID()))->call();
+        (new MemberLeftEvent($this->plugin, $packet->getGuildId(), $packet->getUserId()))->call();
     }
 
     private function handleGuildJoin(GuildJoinPacket $packet): void{

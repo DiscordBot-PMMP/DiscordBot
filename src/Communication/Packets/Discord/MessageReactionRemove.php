@@ -22,15 +22,18 @@ class MessageReactionRemove extends Packet{
 
     private string $emoji;
 
-    private string $member_id;
+    private string $guild_id;
+
+    private string $user_id;
 
     private string $channel_id;
 
-    public function __construct(string $message_id, string $emoji, string $member_id, string $channel_id, ?int $uid = null){
+    public function __construct(string $message_id, string $emoji, string $guild_id, string $user_id, string $channel_id, ?int $uid = null){
         parent::__construct($uid);
         $this->message_id = $message_id;
         $this->emoji = $emoji;
-        $this->member_id = $member_id;
+        $this->guild_id = $guild_id;
+        $this->user_id = $user_id;
         $this->channel_id = $channel_id;
     }
 
@@ -42,31 +45,15 @@ class MessageReactionRemove extends Packet{
         return $this->emoji;
     }
 
-    public function getMemberId(): string{
-        return $this->member_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
+    }
+
+    public function getUserId(): string{
+        return $this->user_id;
     }
 
     public function getChannelId(): string{
         return $this->channel_id;
-    }
-
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "message_id" => $this->message_id,
-            "emoji" => $this->emoji,
-            "member_id" => $this->member_id,
-            "channel_id" => $this->channel_id
-        ];
-    }
-
-    public static function fromJson(array $data): self{
-        return new self(
-            $data["message_id"],
-            $data["emoji"],
-            $data["member_id"],
-            $data["channel_id"],
-            $data["uid"]
-        );
     }
 }

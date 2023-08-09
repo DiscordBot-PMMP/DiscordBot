@@ -19,26 +19,34 @@ class MemberLeave extends Packet{
 
     public const SERIALIZE_ID = 18;
 
-    private string $member_id;
+    private string $guild_id;
+    private string $user_id;
 
-    public function __construct(string $member_id, ?int $uid = null){
+    public function __construct(string $guild_id, string $user_id, ?int $uid = null){
         parent::__construct($uid);
-        $this->member_id = $member_id;
+        $this->guild_id = $guild_id;
+        $this->user_id = $user_id;
     }
 
-    public function getMemberID(): string{
-        return $this->member_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
+    }
+
+    public function getUserId(): string{
+        return $this->user_id;
     }
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putString($this->member_id);
+        $stream->putString($this->guild_id);
+        $stream->putString($this->user_id);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getString()
+            $stream->getString(), // guild_id
+            $stream->getString()  // user_id
         );
     }
 }

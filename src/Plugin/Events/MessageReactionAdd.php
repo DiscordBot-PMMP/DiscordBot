@@ -31,21 +31,28 @@ class MessageReactionAdd extends DiscordBotEvent{
 
     private string $channel_id;
 
-    private string $member_id;
+    private string $guild_id;
 
-    public function __construct(Plugin $plugin, string $emoji, string $message_id, string $channel_id, string $member_id){
+    private string $user_id;
+
+    public function __construct(Plugin $plugin, string $emoji, string $message_id, string $channel_id, string $guild_id, string $user_id){
         parent::__construct($plugin);
         $this->emoji = $emoji;
         $this->message_id = $message_id;
         if(Utils::validDiscordSnowflake($channel_id)){
             $this->channel_id = $channel_id;
         }else{
-            throw new \AssertionError("Invalid channel id given.");
+            throw new \AssertionError("Invalid channel_id provided.");
         }
-        if(Utils::validDiscordSnowflake($member_id)){
-            $this->member_id = $member_id;
+        if(Utils::validDiscordSnowflake($guild_id)){
+            $this->guild_id = $guild_id;
         }else{
-            throw new \AssertionError("Invalid member id given.");
+            throw new \AssertionError("Invalid guild_id provided.");
+        }
+        if(Utils::validDiscordSnowflake($user_id)){
+            $this->user_id = $user_id;
+        }else{
+            throw new \AssertionError("Invalid user_id provided.");
         }
     }
 
@@ -61,7 +68,11 @@ class MessageReactionAdd extends DiscordBotEvent{
         return $this->channel_id;
     }
 
-    public function getMemberId(): string{
-        return $this->member_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
+    }
+
+    public function getUserId(): string{
+        return $this->user_id;
     }
 }

@@ -115,15 +115,6 @@ class Member implements BinarySerializable{
         $this->setPresence($presence);
     }
 
-    /**
-     * Composite key guild_id.user_id
-     * @see Member::getGuildId()
-     * @see Member::getUserId()
-     */
-    public function getId(): string{
-        return $this->guild_id.".".$this->user_id;
-    }
-
     public function getGuildId(): string{
         return $this->guild_id;
     }
