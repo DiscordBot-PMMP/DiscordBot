@@ -45,7 +45,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Resolution as ResolutionPacket;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityType;
-use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Plugin\Events\BanCreated as BanCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\BanDeleted as BanDeletedEvent;
@@ -68,7 +67,6 @@ use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveAll as MessageReaction
 use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveEmoji as MessageReactionRemoveEmojiEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
-use JaxkDev\DiscordBot\Plugin\Events\PresenceUpdated as PresenceUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;

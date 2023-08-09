@@ -277,15 +277,17 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function removeRole(string $member_id, string $role_id): PromiseInterface{
-        [$sid, $uid] = explode(".", $member_id);
-        if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
-            return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
+    public function removeRole(string $guild_id, string $user_id, string $role_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        if(!Utils::validDiscordSnowflake($user_id)){
+            return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
         if(!Utils::validDiscordSnowflake($role_id)){
             return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
         }
-        $pk = new RequestRemoveRole($sid, $uid, $role_id);
+        $pk = new RequestRemoveRole($guild_id, $user_id, $role_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -295,15 +297,17 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function addRole(string $member_id, string $role_id): PromiseInterface{
-        [$sid, $uid] = explode(".", $member_id);
-        if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
-            return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
+    public function addRole(string $guild_id, string $user_id, string $role_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        if(!Utils::validDiscordSnowflake($user_id)){
+            return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
         if(!Utils::validDiscordSnowflake($role_id)){
             return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
         }
-        $pk = new RequestAddRole($sid, $uid, $role_id);
+        $pk = new RequestAddRole($guild_id, $user_id, $role_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -436,12 +440,14 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function kickMember(string $member_id): PromiseInterface{
-        [$sid, $uid] = explode(".", $member_id);
-        if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
-            return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
+    public function kickMember(string $guild_id, string $user_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        $pk = new RequestKickMember($sid, $uid);
+        if(!Utils::validDiscordSnowflake($user_id)){
+            return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
+        }
+        $pk = new RequestKickMember($guild_id, $user_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -573,7 +579,7 @@ class Api{
     /**
      * Initialise if possible the given invite.
      *
-     * @return PromiseInterface Resolves with a Invite model.
+     * @return PromiseInterface Resolves with an Invite model.
      */
     public function createInvite(Invite $invite): PromiseInterface{
         $pk = new RequestInitialiseInvite($invite);
@@ -598,15 +604,16 @@ class Api{
     /**
      * Update a members nickname (set to null to remove)
      *
-     * @param null|string $nickname Null to remove nickname.
      * @return PromiseInterface Resolves with no data.
      */
-    public function updateNickname(string $member_id, ?string $nickname = null): PromiseInterface{
-        [$sid, $uid] = explode(".", $member_id);
-        if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
-            return rejectPromise(new ApiRejection("Invalid member ID '$member_id'."));
+    public function updateNickname(string $guild_id, string $user_id, ?string $nickname = null): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        $pk = new RequestUpdateNickname($sid, $uid, $nickname);
+        if(!Utils::validDiscordSnowflake($user_id)){
+            return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
+        }
+        $pk = new RequestUpdateNickname($guild_id, $user_id, $nickname);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
