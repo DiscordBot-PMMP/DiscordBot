@@ -36,15 +36,10 @@ class Presence implements BinarySerializable{
     private ?ClientStatus $client_status;
 
     /**
-     * Create a new presence instance for the bot.
-     *
-     * @see Api::updateBotPresence() To update bots presence.
+     * @param Activity[] $activities
+     * @internal
+     * @see Api::updateBotPresence() To update bot presence.
      */
-    public static function create(Status $status = Status::ONLINE, Activity $activity = null): self{
-        return new self($status, $activity === null ? [] : [$activity], null);
-    }
-
-    /** @param Activity[] $activities */
     public function __construct(Status $status, array $activities, ?ClientStatus $client_status){
         $this->setStatus($status);
         $this->setActivities($activities);

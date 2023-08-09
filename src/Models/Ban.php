@@ -32,14 +32,9 @@ class Ban implements BinarySerializable{
     private ?string $reason;
 
     /**
-     * The only parameters required to create a new ban model ready to send.
-     *
-     * @see Api::initialiseBan()
+     * @internal See API::banMember()
+     * @see API::banMember()
      */
-    public static function create(string $guild_id, string $user_id, ?string $reason = null): self{
-        return new self($guild_id, $user_id, $reason);
-    }
-
     public function __construct(string $guild_id, string $user_id, ?string $reason = null){
         $this->setGuildId($guild_id);
         $this->setUserId($user_id);

@@ -50,7 +50,10 @@ use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
+use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
+use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
+use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\WebhookType;
@@ -224,7 +227,11 @@ class Api{
      *
      * @return PromiseInterface Resolves with Role model.
      */
-    public function createRole(Role $role): PromiseInterface{
+    public function createRole(string $guild_id, string $name, RolePermissions $permissions = null,
+                                     int $colour = 0, bool $hoist = false, ?string $icon = null,
+                                     ?string $unicode_emoji = null, bool $mentionable = false): PromiseInterface{
+        $role = new Role(null, $guild_id, $name, $colour, $hoist, $icon, $unicode_emoji,
+0, $permissions ?? new RolePermissions(0), false, $mentionable, null);
         $pk = new RequestCreateRole($role);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
@@ -382,12 +389,10 @@ class Api{
     /**
      * Sends a new presence to replace the current one the bot has.
      *
-     * @see Presence::create()
-     * @param Presence $presence
      * @return PromiseInterface Resolves with no data.
      */
-    public function updateBotPresence(Presence $presence): PromiseInterface{
-        $pk = new RequestUpdatePresence($presence);
+    public function updateBotPresence(Status $status = Status::ONLINE, Activity $activity = null): PromiseInterface{
+        $pk = new RequestUpdatePresence(new Presence($status, $activity === null ? [] : [$activity], null));
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -397,8 +402,14 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function initialiseBan(Ban $ban): PromiseInterface{
-        $pk = new RequestInitialiseBan($ban);
+    public function banMember(string $guild_id, string $user_id, ?string $reason = null): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        if(!Utils::validDiscordSnowflake($user_id)){
+            return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
+        }
+        $pk = new RequestInitialiseBan(new Ban($guild_id, $user_id, $reason));
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -408,7 +419,7 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function revokeBan(string $guild_id, string $user_id): PromiseInterface{
+    public function unbanMember(string $guild_id, string $user_id): PromiseInterface{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -564,7 +575,7 @@ class Api{
      *
      * @return PromiseInterface Resolves with a Invite model.
      */
-    public function initialiseInvite(Invite $invite): PromiseInterface{
+    public function createInvite(Invite $invite): PromiseInterface{
         $pk = new RequestInitialiseInvite($invite);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
@@ -575,7 +586,7 @@ class Api{
      *
      * @return PromiseInterface Resolves with a Invite model.
      */
-    public function revokeInvite(string $guild_id, string $invite_code): PromiseInterface{
+    public function deleteInvite(string $guild_id, string $invite_code): PromiseInterface{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }

@@ -60,17 +60,9 @@ class Role implements BinarySerializable{
     private ?RoleTags $tags;
 
     /**
-     * Required/possible parameters that can be specified when creating a new Role.
-     *
-     * @see Api::createRole()
+     * @internal See API::createRole()
+     * @see API::createRole()
      */
-    public static function create(string $guild_id, string $name, RolePermissions $permissions = null,
-                                  int $colour = 0, bool $hoist = false, ?string $icon = null,
-                                  ?string $unicode_emoji = null, bool $mentionable = false): self{
-        return new self(null, $guild_id, $name, $colour, $hoist, $icon, $unicode_emoji,
-            0, $permissions ?? new RolePermissions(0), false, $mentionable, null);
-    }
-
     public function __construct(?string $id, string $guild_id, string $name, int $colour, bool $hoist, ?string $icon,
                                 ?string $unicode_emoji, int $position, RolePermissions $permissions, bool $managed,
                                 bool $mentionable, ?RoleTags $tags){

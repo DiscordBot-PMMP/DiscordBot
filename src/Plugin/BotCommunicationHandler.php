@@ -128,9 +128,8 @@ class BotCommunicationHandler{
         //TODO Move default activity text to event.
         //Default activity, Feel free to change activity after ReadyEvent.
         $ac = Activity::create(VersionInfo::NAME." v".VersionInfo::BASE_VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION, ActivityType::GAME, "https://github/com");
-        $pc = Presence::create(Status::ONLINE, $ac);
 
-        $this->plugin->getApi()->updateBotPresence($pc)->otherwise(function(ApiRejection $a){
+        $this->plugin->getApi()->updateBotPresence(Status::ONLINE, $ac)->otherwise(function(ApiRejection $a){
             $this->plugin->getLogger()->logException($a);
         });
 
