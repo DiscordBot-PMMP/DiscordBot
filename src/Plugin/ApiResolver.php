@@ -61,7 +61,7 @@ abstract class ApiResolver{
                     throw new \RuntimeException("Failed to fetch DiscordBot logger.");
                 }
             }
-            self::$logger->debug("A unidentified resolution has been received, ID: {$packet->getPid()}, Successful: {$packet->wasSuccessful()}, Message: {$packet->getResponse()}");
+            self::$logger->debug("An unidentified resolution has been received, ID: {$packet->getPid()}, Successful: {$packet->wasSuccessful()}, Message: {$packet->getResponse()}");
         }
     }
 }

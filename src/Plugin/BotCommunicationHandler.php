@@ -275,8 +275,7 @@ class BotCommunicationHandler{
     }
 
     private function handleBanRemove(BanRemovePacket $packet): void{
-        [$guild, $user] = explode(".", $packet->getBanId());
-        (new BanDeletedEvent($this->plugin, new Ban($guild, $user)))->call();
+        (new BanDeletedEvent($this->plugin, new Ban($packet->getGuildId(), $packet->getUserId())))->call();
     }
 
     private function handleMemberJoin(MemberJoinPacket $packet): void{

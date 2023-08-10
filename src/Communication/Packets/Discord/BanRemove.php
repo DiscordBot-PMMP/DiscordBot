@@ -19,26 +19,35 @@ class BanRemove extends Packet{
 
     public const SERIALIZE_ID = 7;
 
-    private string $ban_id;
+    private string $guild_id;
 
-    public function __construct(string $ban_id, ?int $uid = null){
+    private string $user_id;
+
+    public function __construct(string $guild_id, string $user_id, ?int $uid = null){
         parent::__construct($uid);
-        $this->ban_id = $ban_id;
+        $this->guild_id = $guild_id;
+        $this->user_id = $user_id;
     }
 
-    public function getBanId(): string{
-        return $this->ban_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
+    }
+
+    public function getUserId(): string{
+        return $this->user_id;
     }
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putString($this->ban_id);
+        $stream->putString($this->guild_id);
+        $stream->putString($this->user_id);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getString()
+            $stream->getString(), // guild_id
+            $stream->getString()  // user_id
         );
     }
 }
