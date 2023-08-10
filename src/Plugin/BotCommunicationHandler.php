@@ -12,8 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd as BanAddPacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\BanRemove as BanRemovePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\BanCreate as BanAddPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\BanDelete as BanRemovePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate as ChannelCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelDelete as ChannelDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate as ChannelPinsUpdatePacket;

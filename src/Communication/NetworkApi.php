@@ -12,8 +12,8 @@
 
 namespace JaxkDev\DiscordBot\Communication;
 
-use JaxkDev\DiscordBot\Communication\Packets\Discord\BanAdd;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\BanRemove;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\BanCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\BanDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate;
@@ -92,8 +92,8 @@ class NetworkApi{
         Heartbeat::SERIALIZE_ID => Heartbeat::class,
         Resolution::SERIALIZE_ID => Resolution::class,
         DiscordConnected::SERIALIZE_ID => DiscordConnected::class,
-        BanAdd::SERIALIZE_ID => BanAdd::class,
-        BanRemove::SERIALIZE_ID => BanRemove::class,
+        BanCreate::SERIALIZE_ID => BanCreate::class,
+        BanDelete::SERIALIZE_ID => BanDelete::class,
         ChannelCreate::SERIALIZE_ID => ChannelCreate::class,
         ChannelDelete::SERIALIZE_ID => ChannelDelete::class,
         ChannelPinsUpdate::SERIALIZE_ID => ChannelPinsUpdate::class,

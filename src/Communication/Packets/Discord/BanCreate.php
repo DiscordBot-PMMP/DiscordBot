@@ -13,41 +13,33 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
+use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class BanRemove extends Packet{
+class BanCreate extends Packet{
 
-    public const SERIALIZE_ID = 7;
+    public const SERIALIZE_ID = 6;
 
-    private string $guild_id;
+    private Ban $ban;
 
-    private string $user_id;
-
-    public function __construct(string $guild_id, string $user_id, ?int $uid = null){
+    public function __construct(Ban $ban, ?int $uid = null){
         parent::__construct($uid);
-        $this->guild_id = $guild_id;
-        $this->user_id = $user_id;
+        $this->ban = $ban;
     }
 
-    public function getGuildId(): string{
-        return $this->guild_id;
-    }
-
-    public function getUserId(): string{
-        return $this->user_id;
+    public function getBan(): Ban{
+        return $this->ban;
     }
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putString($this->guild_id);
-        $stream->putString($this->user_id);
+        $stream->putSerializable($this->ban);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getString(), // guild_id
-            $stream->getString()  // user_id
+            $stream->getSerializable(Ban::class)
         );
     }
 }
