@@ -81,16 +81,21 @@ class NetworkApi{
     //Version will change for any breaking changes to:
     //Models, Packets, Magic.
     public const VERSION = 1;
-    public const MAGIC = 0x4a61786b; //Jaxk :) (max 4 bytes)
+    public const MAGIC = 0x4a61786b; //Jaxk (max 4 bytes)
 
     /**
      * @var array<int, class-string<Packet>>
      */
     public const PACKETS_MAP = [
-        Connect::SERIALIZE_ID => Connect::class,
-        Disconnect::SERIALIZE_ID => Disconnect::class,
+        //1-2 Misc Packets
         Heartbeat::SERIALIZE_ID => Heartbeat::class,
         Resolution::SERIALIZE_ID => Resolution::class,
+
+        //3-4 External->PMMP Packets
+        Connect::SERIALIZE_ID => Connect::class,
+        Disconnect::SERIALIZE_ID => Disconnect::class,
+
+        //5-31 Discord->PMMP Packets
         DiscordConnected::SERIALIZE_ID => DiscordConnected::class,
         BanCreate::SERIALIZE_ID => BanCreate::class,
         BanDelete::SERIALIZE_ID => BanDelete::class,
@@ -106,6 +111,18 @@ class NetworkApi{
         MemberJoin::SERIALIZE_ID => MemberJoin::class,
         MemberLeave::SERIALIZE_ID => MemberLeave::class,
         MemberUpdate::SERIALIZE_ID => MemberUpdate::class,
+        MessageDelete::SERIALIZE_ID => MessageDelete::class,
+        MessageReactionAdd::SERIALIZE_ID => MessageReactionAdd::class,
+        MessageReactionRemove::SERIALIZE_ID => MessageReactionRemove::class,
+        MessageReactionRemoveAll::SERIALIZE_ID => MessageReactionRemoveAll::class,
+        MessageReactionRemoveEmoji::SERIALIZE_ID => MessageReactionRemoveEmoji::class,
+        MessageSent::SERIALIZE_ID => MessageSent::class,
+        MessageUpdate::SERIALIZE_ID => MessageUpdate::class,
+        PresenceUpdate::SERIALIZE_ID => PresenceUpdate::class,
+        RoleCreate::SERIALIZE_ID => RoleCreate::class,
+        RoleDelete::SERIALIZE_ID => RoleDelete::class,
+        RoleUpdate::SERIALIZE_ID => RoleUpdate::class,
+        VoiceStateUpdate::SERIALIZE_ID => VoiceStateUpdate::class
 
         /*RequestAddReaction::ID => RequestAddReaction::class,
         RequestAddRole::ID => RequestAddRole::class,
@@ -139,18 +156,7 @@ class NetworkApi{
         RequestUpdateRole::ID => RequestUpdateRole::class,
         RequestUpdateWebhook::ID => RequestUpdateWebhook::class,
 
-        MessageDelete::ID => MessageDelete::class,
-        MessageReactionAdd::ID => MessageReactionAdd::class,
-        MessageReactionRemove::ID => MessageReactionRemove::class,
-        MessageReactionRemoveAll::ID => MessageReactionRemoveAll::class,
-        MessageReactionRemoveEmoji::ID => MessageReactionRemoveEmoji::class,
-        MessageSent::ID => MessageSent::class,
-        MessageUpdate::ID => MessageUpdate::class,
-        PresenceUpdate::ID => PresenceUpdate::class,
-        RoleCreate::ID => RoleCreate::class,
-        RoleDelete::ID => RoleDelete::class,
-        RoleUpdate::ID => RoleUpdate::class,
-        VoiceStateUpdate::ID => VoiceStateUpdate::class,*/
+        */
         //65 Next ID
     ];
 

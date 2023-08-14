@@ -20,7 +20,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
  */
 class Connect extends Packet{
 
-    public const SERIALIZE_ID = 1;
+    public const SERIALIZE_ID = 3;
 
     private int $version;
     private int $magic;

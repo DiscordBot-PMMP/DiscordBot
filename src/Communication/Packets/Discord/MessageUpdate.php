@@ -12,12 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MessageUpdate extends Packet{
 
-    public const ID = 57;
+    public const SERIALIZE_ID = 26;
 
     private Message $message;
 
@@ -30,17 +31,15 @@ class MessageUpdate extends Packet{
         return $this->message;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "message" => $this->message->jsonSerialize()
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putSerializable($this->message);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            Message::fromJson($data["message"]),
-            $data["uid"]
+            $stream->getSerializable(Message::class)
         );
     }
 }

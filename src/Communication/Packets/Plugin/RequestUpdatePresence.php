@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 
@@ -30,17 +31,13 @@ class RequestUpdatePresence extends Packet{
         return $this->presence;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "presence" => $this->presence->jsonSerialize()
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putSerializable($this->presence);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
-        return new self(
-            Presence::fromJson($data["presence"]),
-            $data["uid"]
-        );
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self($stream->getSerializable(Presence::class));
     }
 }

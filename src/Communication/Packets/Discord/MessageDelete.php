@@ -12,12 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 
 class MessageDelete extends Packet{
 
-    public const ID = 51;
+    public const SERIALIZE_ID = 20;
 
     /**
      * @var Message|array{"message_id": string, "channel_id": string, "guild_id": string}
@@ -39,17 +40,32 @@ class MessageDelete extends Packet{
         return $this->message;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "message" => [] //$this->message->jsonSerialize() TODO
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putBool($this->message instanceof Message);
+        if($this->message instanceof Message){
+            $stream->putSerializable($this->message);
+        }else{
+            $stream->putString($this->message["message_id"]);
+            $stream->putString($this->message["guild_id"]);
+            $stream->putString($this->message["channel_id"]);
+        }
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
-        return new self(
-            [], //Message::fromJson($data["message"]), TODO
-            $data["uid"]
-        );
+    public static function fromBinary(BinaryStream $stream): self{
+        if($stream->getBool()){
+            return new self(
+                $stream->getSerializable(Message::class)
+            );
+        }else{
+            return new self(
+                [
+                    "message_id" => $stream->getString(),
+                    "guild_id" => $stream->getString(),
+                    "channel_id" => $stream->getString()
+                ]
+            );
+        }
     }
 }

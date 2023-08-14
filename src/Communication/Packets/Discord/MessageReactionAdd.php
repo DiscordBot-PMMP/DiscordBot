@@ -12,11 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class MessageReactionAdd extends Packet{
 
-    public const ID = 52;
+    public const SERIALIZE_ID = 21;
 
     private string $message_id;
 
@@ -55,5 +56,25 @@ class MessageReactionAdd extends Packet{
 
     public function getChannelId(): string{
         return $this->channel_id;
+    }
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->message_id);
+        $stream->putString($this->emoji);
+        $stream->putString($this->guild_id);
+        $stream->putString($this->user_id);
+        $stream->putString($this->channel_id);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(), // message_id
+            $stream->getString(), // emoji
+            $stream->getString(), // guild_id
+            $stream->getString(), // user_id
+            $stream->getString()  // channel_id
+        );
     }
 }

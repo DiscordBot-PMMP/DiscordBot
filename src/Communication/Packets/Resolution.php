@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 class Resolution extends Packet{
 
-    public const SERIALIZE_ID = 4;
+    public const SERIALIZE_ID = 2;
 
     private int $pid;
 

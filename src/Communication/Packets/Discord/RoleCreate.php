@@ -12,12 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RoleCreate extends Packet{
 
-    public const ID = 59;
+    public const SERIALIZE_ID = 28;
 
     private Role $role;
 
@@ -30,17 +31,15 @@ class RoleCreate extends Packet{
         return $this->role;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "role" => $this->role->jsonSerialize()
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putSerializable($this->role);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            Role::fromJson($data["role"]),
-            $data["uid"]
+            $stream->getSerializable(Role::class)
         );
     }
 }

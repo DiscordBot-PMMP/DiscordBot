@@ -12,12 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 
 class PresenceUpdate extends Packet{
 
-    public const ID = 58;
+    public const SERIALIZE_ID = 27;
 
     private string $guild_id;
 
@@ -42,5 +43,21 @@ class PresenceUpdate extends Packet{
 
     public function getPresence(): Presence{
         return $this->presence;
+    }
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->guild_id);
+        $stream->putString($this->user_id);
+        $stream->putSerializable($this->presence);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(), // guild_id
+            $stream->getString(), // user_id
+            $stream->getSerializable(Presence::class) // presence
+        );
     }
 }

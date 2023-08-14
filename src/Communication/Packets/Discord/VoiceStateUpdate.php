@@ -12,12 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\VoiceState;
 
 class VoiceStateUpdate extends Packet{
 
-    public const ID = 62;
+    public const SERIALIZE_ID = 31;
 
     private string $guild_id;
     private string $user_id;
@@ -41,5 +42,21 @@ class VoiceStateUpdate extends Packet{
 
     public function getVoiceState(): VoiceState{
         return $this->voice_state;
+    }
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->guild_id);
+        $stream->putString($this->user_id);
+        $stream->putSerializable($this->voice_state);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(), // guild_id
+            $stream->getString(), // user_id
+            $stream->getSerializable(VoiceState::class) // voice_state
+        );
     }
 }

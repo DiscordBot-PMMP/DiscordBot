@@ -12,11 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RoleDelete extends Packet{
 
-    public const ID = 60;
+    public const SERIALIZE_ID = 29;
 
     private string $role_id;
 
@@ -29,17 +30,15 @@ class RoleDelete extends Packet{
         return $this->role_id;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "role_id" => $this->role_id
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->role_id);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["role_id"],
-            $data["uid"]
+            $stream->getString() // role_id
         );
     }
 }

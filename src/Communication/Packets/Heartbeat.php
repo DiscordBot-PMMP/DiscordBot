@@ -16,7 +16,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 class Heartbeat extends Packet{
 
-    public const SERIALIZE_ID = 3;
+    public const SERIALIZE_ID = 1;
 
     private int $heartbeat;
 
