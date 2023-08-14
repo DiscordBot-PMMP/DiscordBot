@@ -443,7 +443,7 @@ final class Activity implements BinarySerializable{
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->name);
-        $stream->putSerializable($this->type);
+        $stream->putByte($this->type->value);
         $stream->putNullableString($this->url);
         $stream->putInt($this->created_at);
         $stream->putNullableInt($this->start_timestamp);
@@ -471,7 +471,7 @@ final class Activity implements BinarySerializable{
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
             $stream->getString(),                                   // name
-            $stream->getSerializable(ActivityType::class),          // type
+            ActivityType::from($stream->getByte()),                 // type
             $stream->getNullableString(),                           // url
             $stream->getInt(),                                      // created_at
             $stream->getNullableInt(),                              // start_timestamp

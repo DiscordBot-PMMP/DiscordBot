@@ -57,17 +57,17 @@ class ClientStatus implements BinarySerializable{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putSerializable($this->desktop);
-        $stream->putSerializable($this->mobile);
-        $stream->putSerializable($this->web);
+        $stream->putString($this->desktop->value);
+        $stream->putString($this->mobile->value);
+        $stream->putString($this->web->value);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getSerializable(Status::class), // desktop
-            $stream->getSerializable(Status::class), // mobile
-            $stream->getSerializable(Status::class)  // web
+            Status::from($stream->getString()),   // desktop
+            Status::from($stream->getString()),   // mobile
+            Status::from($stream->getString())    // web
         );
     }
 }

@@ -368,7 +368,7 @@ class User implements BinarySerializable{
         $stream->putNullableInt($this->accent_colour);
         $stream->putNullableString($this->locale);
         $stream->putInt($this->flags_bitwise);
-        $stream->putNullableSerializable($this->premium_type);
+        $stream->putNullableByte($this->premium_type?->value);
         $stream->putInt($this->public_flags_bitwise);
         return $stream;
     }
@@ -387,7 +387,7 @@ class User implements BinarySerializable{
             $stream->getNullableInt(),                                  // accent_colour
             $stream->getNullableString(),                               // locale
             $stream->getInt(),                                          // flags_bitwise
-            $stream->getNullableSerializable(UserPremiumType::class),   // premium_type
+            UserPremiumType::tryFrom($stream->getNullableByte() ?? -1), // premium_type
             $stream->getInt()                                           // public_flags_bitwise
         );
     }

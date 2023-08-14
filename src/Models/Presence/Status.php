@@ -12,26 +12,10 @@
 
 namespace JaxkDev\DiscordBot\Models\Presence;
 
-use JaxkDev\DiscordBot\Communication\BinarySerializable;
-use JaxkDev\DiscordBot\Communication\BinaryStream;
-
-/**
- * @implements BinarySerializable<Status>
- */
-enum Status: string implements BinarySerializable{
+enum Status: string{
 
     case ONLINE = "online";
     case IDLE = "idle";
     case DND = "dnd";
     case OFFLINE = "offline";
-
-    public function binarySerialize(): BinaryStream{
-        $stream = new BinaryStream();
-        $stream->putString($this->value);
-        return $stream;
-    }
-
-    public static function fromBinary(BinaryStream $stream): self{
-        return self::from($stream->getString());
-    }
 }

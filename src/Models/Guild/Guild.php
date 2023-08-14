@@ -606,12 +606,12 @@ class Guild implements BinarySerializable{
         $stream->putInt($this->afk_timeout);
         $stream->putNullableBool($this->widget_enabled);
         $stream->putNullableString($this->widget_channel_id);
-        $stream->putSerializable($this->verification_level);
-        $stream->putSerializable($this->default_message_notifications);
-        $stream->putSerializable($this->explicit_content_filter);
+        $stream->putByte($this->verification_level->value);
+        $stream->putByte($this->default_message_notifications->value);
+        $stream->putByte($this->explicit_content_filter->value);
         $stream->putSerializableArray($this->emojis);
         $stream->putStringArray($this->features);
-        $stream->putSerializable($this->mfa_level);
+        $stream->putByte($this->mfa_level->value);
         $stream->putNullableString($this->application_id);
         $stream->putNullableString($this->system_channel_id);
         $stream->putInt($this->system_channel_flags);
@@ -621,13 +621,13 @@ class Guild implements BinarySerializable{
         $stream->putNullableString($this->vanity_url_code);
         $stream->putNullableString($this->description);
         $stream->putNullableString($this->banner);
-        $stream->putSerializable($this->premium_tier);
+        $stream->putByte($this->premium_tier->value);
         $stream->putNullableInt($this->premium_subscription_count);
         $stream->putString($this->preferred_locale);
         $stream->putNullableString($this->public_updates_channel_id);
         $stream->putNullableInt($this->max_video_channel_users);
         $stream->putNullableInt($this->max_stage_video_channel_users);
-        $stream->putSerializable($this->nsfw_level);
+        $stream->putByte($this->nsfw_level->value);
         $stream->putBool($this->premium_progress_bar_enabled);
         $stream->putNullableString($this->safety_alerts_channel_id);
         return $stream;
@@ -645,12 +645,12 @@ class Guild implements BinarySerializable{
             $stream->getInt(),              // afk_timeout
             $stream->getNullableBool(),     // widget_enabled
             $stream->getNullableString(),   // widget_channel_id
-            $stream->getSerializable(VerificationLevel::class),
-            $stream->getSerializable(DefaultMessageNotificationLevel::class),
-            $stream->getSerializable(ExplicitContentFilterLevel::class),
+            VerificationLevel::from($stream->getByte()),
+            DefaultMessageNotificationLevel::from($stream->getByte()),
+            ExplicitContentFilterLevel::from($stream->getByte()),
             $stream->getSerializableArray(Emoji::class),
             $stream->getStringArray(),      // features
-            $stream->getSerializable(MfaLevel::class),
+            MfaLevel::from($stream->getByte()),
             $stream->getNullableString(),   // application_id
             $stream->getNullableString(),   // system_channel_id
             $stream->getInt(),              // system_channel_flags
@@ -660,13 +660,13 @@ class Guild implements BinarySerializable{
             $stream->getNullableString(),   // vanity_url_code
             $stream->getNullableString(),   // description
             $stream->getNullableString(),   // banner
-            $stream->getSerializable(PremiumTier::class),
+            PremiumTier::from($stream->getByte()),
             $stream->getNullableInt(),      // premium_subscription_count
             $stream->getString(),           // preferred_locale
             $stream->getNullableString(),   // public_updates_channel_id
             $stream->getNullableInt(),      // max_video_channel_users
             $stream->getNullableInt(),      // max_stage_video_channel_users
-            $stream->getSerializable(NsfwLevel::class),
+            NsfwLevel::from($stream->getByte()),
             $stream->getBool(),             // premium_progress_bar_enabled
             $stream->getNullableString()    // safety_alerts_channel_id
         );

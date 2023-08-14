@@ -12,14 +12,10 @@
 
 namespace JaxkDev\DiscordBot\Models\Guild;
 
-use JaxkDev\DiscordBot\Communication\BinarySerializable;
-use JaxkDev\DiscordBot\Communication\BinaryStream;
-
 /**
- * @implements BinarySerializable<VerificationLevel>
  * @link https://discord.com/developers/docs/resources/guild#guild-object-verification-level
  */
-enum VerificationLevel: int implements BinarySerializable{
+enum VerificationLevel: int{
 
     /** Unrestricted */
     case NONE = 0;
@@ -35,14 +31,4 @@ enum VerificationLevel: int implements BinarySerializable{
 
     /** Must have a verified phone number */
     case VERY_HIGH = 4;
-
-    public function binarySerialize(): BinaryStream{
-        $stream = new BinaryStream();
-        $stream->putByte($this->value);
-        return $stream;
-    }
-
-    public static function fromBinary(BinaryStream $stream): self{
-        return self::from($stream->getByte());
-    }
 }

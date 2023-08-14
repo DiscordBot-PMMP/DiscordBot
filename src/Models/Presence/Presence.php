@@ -76,7 +76,7 @@ class Presence implements BinarySerializable{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putSerializable($this->status);
+        $stream->putString($this->status->value);
         $stream->putSerializableArray($this->activities);
         $stream->putNullableSerializable($this->client_status);
         return $stream;
@@ -84,7 +84,7 @@ class Presence implements BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getSerializable(Status::class),                // status
+            Status::from($stream->getString()),                     // status
             $stream->getSerializableArray(Activity::class),         // activities
             $stream->getNullableSerializable(ClientStatus::class)   // client_status
         );
