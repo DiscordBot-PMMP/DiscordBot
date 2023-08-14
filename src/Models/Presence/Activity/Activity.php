@@ -117,7 +117,7 @@ final class Activity implements BinarySerializable{
     private array $buttons;
 
     /**
-     * The only parameters required (and allowed) to be set on creation for bot activity.
+     * The only parameters required (and allowed) to be set on creation for bot activity. TODO Check custom
      *
      * @see Api::updateBotPresence()
      */
@@ -126,7 +126,7 @@ final class Activity implements BinarySerializable{
     }
 
     /** @param ActivityButton[] $buttons Max 2 buttons. */
-    public function __construct(string  $name, ActivityType $type, ?string $url = null, ?int $created_at = null,
+    public function __construct(string $name, ActivityType $type, ?string $url = null, ?int $created_at = null,
                                 ?int $start_timestamp = null, ?int $end_timestamp = null, ?string $application_id = null,
                                 ?string $details = null, ?string $state = null, ?Emoji $emoji = null, ?string $party_id = null,
                                 ?int $party_size = null, ?int $party_max_size = null, ?string $asset_large_image = null,

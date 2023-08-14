@@ -29,7 +29,7 @@ enum ActivityType: int{
     /** Watching {name} */
     case WATCHING = 3;
 
-    /** {emoji} {name} */
+    /** {emoji} {state} */
     case CUSTOM = 4;
 
     /** Competing in {name} */
