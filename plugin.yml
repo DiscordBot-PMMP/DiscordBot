@@ -9,6 +9,7 @@ website: https://github.com/DiscordBot-PMMP/DiscordBot
 api: 5.0.0
 extensions:
   core: ">=8.1" #aka PHP Version.
+  pmmpthread: ">=6.0.8" #Due to pmmp/ext-pmmpthread#128
 
 commands:
   debugdiscord:
