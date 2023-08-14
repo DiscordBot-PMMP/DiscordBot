@@ -65,6 +65,10 @@ class Main extends PluginBase{
 
         $this->saveDefaultConfig();
         $this->saveResource("HELP_ENG.txt", true); //Always keep these up-to-date.
+        if(file_exists($this->getDataFolder()."cacert.pem")){
+            unlink($this->getDataFolder()."cacert.pem");
+            $this->getLogger()->debug("Removed old cacert.pem file from plugin_data.");
+        }
 
         $this->inboundData = new ThreadSafeArray();
         $this->outboundData = new ThreadSafeArray();
