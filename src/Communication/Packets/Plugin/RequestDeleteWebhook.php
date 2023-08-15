@@ -12,11 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestDeleteWebhook extends Packet{
 
-    public const ID = 12;
+    public const SERIALIZE_ID = 49;
 
     private string $webhook_id;
 
@@ -36,19 +37,17 @@ class RequestDeleteWebhook extends Packet{
         return $this->webhook_id;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "channel_id" => $this->channel_id,
-            "webhook_id" => $this->webhook_id,
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->channel_id);
+        $stream->putString($this->webhook_id);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["channel_id"],
-            $data["webhook_id"],
-            $data["uid"]
+            $stream->getString(), // channel_id
+            $stream->getString()  // webhook_id
         );
     }
 }

@@ -12,12 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Invite;
 
 class RequestInitialiseInvite extends Packet{
 
-    public const ID = 18;
+    public const SERIALIZE_ID = 67;
 
     private Invite $invite;
 
@@ -30,17 +31,15 @@ class RequestInitialiseInvite extends Packet{
         return $this->invite;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "invite" => $this->invite->jsonSerialize()
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putSerializable($this->invite);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            Invite::fromJson($data["invite"]),
-            $data["uid"]
+            $stream->getSerializable(Invite::class)
         );
     }
 }

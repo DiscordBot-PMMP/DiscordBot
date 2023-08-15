@@ -12,34 +12,33 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestFetchWebhooks extends Packet{
 
-    public const ID = 16;
+    public const SERIALIZE_ID = 65;
 
-    private string $channel_id;
+    private string $guild_id;
 
-    public function __construct(string $channel_id, ?int $uid = null){
+    public function __construct(string $guild_id, ?int $uid = null){
         parent::__construct($uid);
-        $this->channel_id = $channel_id;
+        $this->guild_id = $guild_id;
     }
 
-    public function getChannelId(): string{
-        return $this->channel_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "channel_id" => $this->channel_id
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->guild_id);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["channel_id"],
-            $data["uid"]
+            $stream->getString()
         );
     }
 }

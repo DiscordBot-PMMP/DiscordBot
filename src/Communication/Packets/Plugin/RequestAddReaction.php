@@ -12,11 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestAddReaction extends Packet{
 
-    public const ID = 3;
+    public const SERIALIZE_ID = 40;
 
     private string $channel_id;
 
@@ -43,20 +44,19 @@ class RequestAddReaction extends Packet{
         return $this->emoji;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "channel_id" => $this->channel_id,
-            "message_id" => $this->message_id,
-            "emoji" => $this->emoji
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->channel_id);
+        $stream->putString($this->message_id);
+        $stream->putString($this->emoji);
+        return $stream;
     }
-    public static function fromJson(array $data): self{
+
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["channel_id"],
-            $data["message_id"],
-            $data["emoji"],
-            $data["uid"]
+            $stream->getString(), // channel_id
+            $stream->getString(), // message_id
+            $stream->getString() // emoji
         );
     }
 }

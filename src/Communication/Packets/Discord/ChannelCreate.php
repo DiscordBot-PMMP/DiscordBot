@@ -38,7 +38,7 @@ class ChannelCreate extends Packet{
         return $stream;
     }
 
-    public static function fromBinary(BinaryStream $stream): \JaxkDev\DiscordBot\Communication\BinarySerializable{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
             //$stream->getSerializable(g)
         );

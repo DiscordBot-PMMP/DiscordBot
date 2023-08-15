@@ -13,33 +13,33 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\Presence\Presence;
 
-class RequestSendMessage extends Packet{
+class RequestUpdateBotPresence extends Packet{
 
-    public const SERIALIZE_ID = 77;
+    public const SERIALIZE_ID = 79;
 
-    private Message $message;
+    private Presence $presence;
 
-    public function __construct(Message $message, ?int $uid = null){
+    public function __construct(Presence $presence, ?int $uid = null){
         parent::__construct($uid);
-        $this->message = $message;
+        $this->presence = $presence;
     }
 
-    public function getMessage(): Message{
-        return $this->message;
+    public function getPresence(): Presence{
+        return $this->presence;
     }
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putSerializable($this->message);
+        $stream->putSerializable($this->presence);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getSerializable(Message::class)
+            $stream->getSerializable(Presence::class)
         );
     }
 }

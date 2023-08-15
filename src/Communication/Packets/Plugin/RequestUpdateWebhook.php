@@ -12,12 +12,13 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Webhook;
 
 class RequestUpdateWebhook extends Packet{
 
-    public const ID = 34;
+    public const SERIALIZE_ID = 83;
 
     private Webhook $webhook;
 
@@ -30,17 +31,15 @@ class RequestUpdateWebhook extends Packet{
         return $this->webhook;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "webhook" => $this->webhook->jsonSerialize()
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putSerializable($this->webhook);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            Webhook::fromJson($data["webhook"]),
-            $data["uid"]
+            $stream->getSerializable(Webhook::class)
         );
     }
 }

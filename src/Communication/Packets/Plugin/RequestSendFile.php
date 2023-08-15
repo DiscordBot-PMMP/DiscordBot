@@ -12,11 +12,14 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestSendFile extends Packet{
 
-    public const ID = 27;
+    public const SERIALIZE_ID = 76;
+
+    private string $guild_id;
 
     private string $channel_id;
 
@@ -26,12 +29,18 @@ class RequestSendFile extends Packet{
 
     private string $message;
 
-    public function __construct(string $channel_id, string $file_name, string $file_path, string $message, ?int $uid = null){
+    public function __construct(string $guild_id, string $channel_id, string $file_name, string $file_path,
+                                string $message, ?int $uid = null){
         parent::__construct($uid);
+        $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
         $this->file_name = $file_name;
         $this->file_path = $file_path;
         $this->message = $message;
+    }
+
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
     public function getChannelId(): string{
@@ -50,23 +59,23 @@ class RequestSendFile extends Packet{
         return $this->message;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "channel_id" => $this->channel_id,
-            "file_name" => $this->file_name,
-            "file_path" => $this->file_path,
-            "message" => $this->message
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->guild_id);
+        $stream->putString($this->channel_id);
+        $stream->putString($this->file_name);
+        $stream->putString($this->file_path);
+        $stream->putString($this->message);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["channel_id"],
-            $data["file_name"],
-            $data["file_path"],
-            $data["message"],
-            $data["uid"]
+            $stream->getString(), // guild_id
+            $stream->getString(), // channel_id
+            $stream->getString(), // file_name
+            $stream->getString(), // file_path
+            $stream->getString()  // message
         );
     }
 }

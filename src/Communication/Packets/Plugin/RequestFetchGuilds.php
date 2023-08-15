@@ -15,30 +15,15 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestLeaveGuild extends Packet{
+class RequestFetchGuilds extends Packet{
 
-    public const SERIALIZE_ID = 69;
-
-    private string $guild_id;
-
-    public function __construct(string $guild_id, ?int $uid = null){
-        parent::__construct($uid);
-        $this->guild_id = $guild_id;
-    }
-
-    public function getGuildId(): string{
-        return $this->guild_id;
-    }
+    public const SERIALIZE_ID = 55;
 
     public function binarySerialize(): BinaryStream{
-        $stream = new BinaryStream();
-        $stream->putString($this->guild_id);
-        return $stream;
+        return new BinaryStream();
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        return new self(
-            $stream->getString()
-        );
+        return new self();
     }
 }

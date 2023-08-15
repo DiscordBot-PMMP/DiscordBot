@@ -13,33 +13,32 @@
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestSendMessage extends Packet{
+class RequestFetchBans extends Packet{
 
-    public const SERIALIZE_ID = 77;
+    public const SERIALIZE_ID = 51;
 
-    private Message $message;
+    private string $guild_id;
 
-    public function __construct(Message $message, ?int $uid = null){
+    public function __construct(string $guild_id, ?int $uid = null){
         parent::__construct($uid);
-        $this->message = $message;
+        $this->guild_id = $guild_id;
     }
 
-    public function getMessage(): Message{
-        return $this->message;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putSerializable($this->message);
+        $stream->putString($this->guild_id);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getSerializable(Message::class)
+            $stream->getString()
         );
     }
 }

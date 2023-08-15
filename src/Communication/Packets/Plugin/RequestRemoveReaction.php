@@ -12,11 +12,14 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestRemoveReaction extends Packet{
 
-    public const ID = 23;
+    public const SERIALIZE_ID = 72;
+
+    private string $guild_id;
 
     private string $channel_id;
 
@@ -26,12 +29,17 @@ class RequestRemoveReaction extends Packet{
 
     private string $emoji;
 
-    public function __construct(string $channel_id, string $message_id, string $user_id, string $emoji, ?int $uid = null){
+    public function __construct(string $guild_id, string $channel_id, string $message_id, string $user_id, string $emoji, ?int $uid = null){
         parent::__construct($uid);
+        $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
         $this->message_id = $message_id;
         $this->user_id = $user_id;
         $this->emoji = $emoji;
+    }
+
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
     public function getChannelId(): string{
@@ -50,23 +58,23 @@ class RequestRemoveReaction extends Packet{
         return $this->emoji;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "channel_id" => $this->channel_id,
-            "message_id" => $this->message_id,
-            "user_id" => $this->user_id,
-            "emoji" => $this->emoji
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->guild_id);
+        $stream->putString($this->channel_id);
+        $stream->putString($this->message_id);
+        $stream->putString($this->user_id);
+        $stream->putString($this->emoji);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["channel_id"],
-            $data["message_id"],
-            $data["user_id"],
-            $data["emoji"],
-            $data["uid"]
+            $stream->getString(), // guild_id
+            $stream->getString(), // channel_id
+            $stream->getString(), // message_id
+            $stream->getString(), // user_id
+            $stream->getString()  // emoji
         );
     }
 }

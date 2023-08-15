@@ -12,11 +12,12 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 class RequestRevokeBan extends Packet{
 
-    public const ID = 25;
+    public const SERIALIZE_ID = 74;
 
     private string $guild_id;
 
@@ -36,19 +37,17 @@ class RequestRevokeBan extends Packet{
         return $this->user_id;
     }
 
-    public function jsonSerialize(): array{
-        return [
-            "uid" => $this->UID,
-            "guild_id" => $this->guild_id,
-            "user_id" => $this->user_id
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->guild_id);
+        $stream->putString($this->user_id);
+        return $stream;
     }
 
-    public static function fromJson(array $data): self{
+    public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $data["guild_id"],
-            $data["user_id"],
-            $data["uid"]
+            $stream->getString(), // guild_id
+            $stream->getString()  // user_id
         );
     }
 }

@@ -54,8 +54,20 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchBans;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchChannel;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchChannels;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchGuild;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchGuilds;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchInvites;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMembers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRoles;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
@@ -64,14 +76,15 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateBotPresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdatePresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
@@ -122,42 +135,57 @@ class NetworkApi{
         RoleCreate::SERIALIZE_ID => RoleCreate::class,
         RoleDelete::SERIALIZE_ID => RoleDelete::class,
         RoleUpdate::SERIALIZE_ID => RoleUpdate::class,
-        VoiceStateUpdate::SERIALIZE_ID => VoiceStateUpdate::class
+        VoiceStateUpdate::SERIALIZE_ID => VoiceStateUpdate::class,
+        //Reserved 31-39
 
-        /*RequestAddReaction::ID => RequestAddReaction::class,
-        RequestAddRole::ID => RequestAddRole::class,
-        RequestBroadcastTyping::ID => RequestBroadcastTyping::class,
-        RequestCreateChannel::ID => RequestCreateChannel::class,
-        RequestCreateRole::ID => RequestCreateRole::class,
-        RequestCreateWebhook::ID => RequestCreateWebhook::class,
-        RequestDeleteChannel::ID => RequestDeleteChannel::class,
-        RequestDeleteMessage::ID => RequestDeleteMessage::class,
-        RequestDeleteRole::ID => RequestDeleteRole::class,
-        RequestDeleteWebhook::ID => RequestDeleteWebhook::class,
-        RequestEditMessage::ID => RequestEditMessage::class,
-        RequestFetchMessage::ID => RequestFetchMessage::class,
-        RequestFetchPinnedMessages::ID => RequestFetchPinnedMessages::class,
-        RequestFetchWebhooks::ID => RequestFetchWebhooks::class,
-        RequestInitialiseBan::ID => RequestInitialiseBan::class,
-        RequestInitialiseInvite::ID => RequestInitialiseInvite::class,
-        RequestKickMember::ID => RequestKickMember::class,
-        RequestLeaveGuild::ID => RequestLeaveGuild::class,
-        RequestPinMessage::ID => RequestPinMessage::class,
-        RequestRemoveAllReactions::ID => RequestRemoveAllReactions::class,
-        RequestRemoveReaction::ID => RequestRemoveReaction::class,
-        RequestRevokeBan::ID => RequestRevokeBan::class,
-        RequestRevokeInvite::ID => RequestRevokeInvite::class,
-        RequestSendFile::ID => RequestSendFile::class,
-        RequestSendMessage::ID => RequestSendMessage::class,
-        RequestUnpinMessage::ID => RequestUnpinMessage::class,
-        RequestUpdateChannel::ID => RequestUpdateChannel::class,
-        RequestUpdateNickname::ID => RequestUpdateNickname::class,
-        RequestUpdatePresence::ID => RequestUpdatePresence::class,
-        RequestUpdateRole::ID => RequestUpdateRole::class,
-        RequestUpdateWebhook::ID => RequestUpdateWebhook::class,
+        //40-83 PMMP->Discord Packets
+        RequestAddReaction::SERIALIZE_ID => RequestAddReaction::class,
+        RequestAddRole::SERIALIZE_ID => RequestAddRole::class,
+        RequestBroadcastTyping::SERIALIZE_ID => RequestBroadcastTyping::class,
+        RequestCreateChannel::SERIALIZE_ID => RequestCreateChannel::class,
+        RequestCreateRole::SERIALIZE_ID => RequestCreateRole::class,
+        RequestCreateWebhook::SERIALIZE_ID => RequestCreateWebhook::class,
+        RequestDeleteChannel::SERIALIZE_ID => RequestDeleteChannel::class,
+        RequestDeleteMessage::SERIALIZE_ID => RequestDeleteMessage::class,
+        RequestDeleteRole::SERIALIZE_ID => RequestDeleteRole::class,
+        RequestDeleteWebhook::SERIALIZE_ID => RequestDeleteWebhook::class,
+        RequestEditMessage::SERIALIZE_ID => RequestEditMessage::class,
+        RequestFetchBans::SERIALIZE_ID => RequestFetchBans::class,
+        RequestFetchChannel::SERIALIZE_ID => RequestFetchChannel::class,
+        RequestFetchChannels::SERIALIZE_ID => RequestFetchChannels::class,
+        RequestFetchGuild::SERIALIZE_ID => RequestFetchGuild::class,
+        RequestFetchGuilds::SERIALIZE_ID => RequestFetchGuilds::class,
+        RequestFetchInvites::SERIALIZE_ID => RequestFetchInvites::class,
+        RequestFetchMember::SERIALIZE_ID => RequestFetchMember::class,
+        RequestFetchMembers::SERIALIZE_ID => RequestFetchMembers::class,
+        RequestFetchMessage::SERIALIZE_ID => RequestFetchMessage::class,
+        RequestFetchPinnedMessages::SERIALIZE_ID => RequestFetchPinnedMessages::class,
+        RequestFetchRole::SERIALIZE_ID => RequestFetchRole::class,
+        RequestFetchRoles::SERIALIZE_ID => RequestFetchRoles::class,
+        RequestFetchUser::SERIALIZE_ID => RequestFetchUser::class,
+        RequestFetchUsers::SERIALIZE_ID => RequestFetchUsers::class,
+        RequestFetchWebhooks::SERIALIZE_ID => RequestFetchWebhooks::class,
+        RequestInitialiseBan::SERIALIZE_ID => RequestInitialiseBan::class,
+        RequestInitialiseInvite::SERIALIZE_ID => RequestInitialiseInvite::class,
+        RequestKickMember::SERIALIZE_ID => RequestKickMember::class,
+        RequestLeaveGuild::SERIALIZE_ID => RequestLeaveGuild::class,
+        RequestPinMessage::SERIALIZE_ID => RequestPinMessage::class,
+        RequestRemoveAllReactions::SERIALIZE_ID => RequestRemoveAllReactions::class,
+        RequestRemoveReaction::SERIALIZE_ID => RequestRemoveReaction::class,
+        RequestRemoveRole::SERIALIZE_ID => RequestRemoveRole::class,
+        RequestRevokeBan::SERIALIZE_ID => RequestRevokeBan::class,
+        RequestRevokeInvite::SERIALIZE_ID => RequestRevokeInvite::class,
+        RequestSendFile::SERIALIZE_ID => RequestSendFile::class,
+        RequestSendMessage::SERIALIZE_ID => RequestSendMessage::class,
+        RequestUnpinMessage::SERIALIZE_ID => RequestUnpinMessage::class,
+        RequestUpdateBotPresence::SERIALIZE_ID => RequestUpdateBotPresence::class,
+        RequestUpdateChannel::SERIALIZE_ID => RequestUpdateChannel::class,
+        RequestUpdateNickname::SERIALIZE_ID => RequestUpdateNickname::class,
+        RequestUpdateRole::SERIALIZE_ID => RequestUpdateRole::class,
+        RequestUpdateWebhook::SERIALIZE_ID => RequestUpdateWebhook::class
+        //Reserved 84-99
 
-        */
-        //65 Next ID
+        //100 Next ID
     ];
 
     /** @var array<int, class-string>  */

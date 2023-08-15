@@ -39,9 +39,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateBotPresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdatePresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
@@ -396,7 +396,7 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function updateBotPresence(Status $status = Status::ONLINE, Activity $activity = null): PromiseInterface{
-        $pk = new RequestUpdatePresence(new Presence($status, $activity === null ? [] : [$activity], null));
+        $pk = new RequestUpdateBotPresence(new Presence($status, $activity === null ? [] : [$activity], null));
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
