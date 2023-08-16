@@ -481,7 +481,7 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function banMember(string $guild_id, string $user_id, ?string $reason = null, int $delete_message_seconds = 0): PromiseInterface{
+    public function banMember(string $guild_id, string $user_id, int $delete_message_seconds = 0, ?string $reason = null): PromiseInterface{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -491,7 +491,7 @@ class Api{
         if($delete_message_seconds < 0 or $delete_message_seconds > 604800){
             return rejectPromise(new ApiRejection("Delete message seconds must be between 0 and 604800 (7days)."));
         }
-        $pk = new RequestBanMember($guild_id, $user_id, $reason, $delete_message_seconds);
+        $pk = new RequestBanMember($guild_id, $user_id, $delete_message_seconds, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
