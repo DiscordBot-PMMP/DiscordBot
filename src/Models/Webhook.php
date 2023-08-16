@@ -48,7 +48,7 @@ class Webhook implements BinarySerializable{
     private ?string $name;
 
     /** The user avatar hash of the webhook */
-    private ?string $avatar;
+    private ?string $avatar_hash;
 
     /** The secure token of the webhook (only for Incoming Webhooks) */
     private ?string $token;
@@ -67,7 +67,7 @@ class Webhook implements BinarySerializable{
      * @see Api::createWebhook()
      */
     public function __construct(WebhookType $type, string $id, ?string $guild_id = null, ?string $channel_id = null,
-                                ?string $user_id = null, ?string $name = null, ?string $avatar = null, ?string $token = null,
+                                ?string $user_id = null, ?string $name = null, ?string $avatar_hash = null, ?string $token = null,
                                 ?string $application_id = null, ?string $source_guild_id = null, ?string $source_channel_id = null){
         $this->setType($type);
         $this->setId($id);
@@ -75,7 +75,7 @@ class Webhook implements BinarySerializable{
         $this->setChannelId($channel_id);
         $this->setUserId($user_id);
         $this->setName($name);
-        $this->setAvatar($avatar);
+        $this->setAvatarHash($avatar_hash);
         $this->setToken($token);
         $this->setApplicationId($application_id);
         $this->setSourceGuildId($source_guild_id);
@@ -152,12 +152,15 @@ class Webhook implements BinarySerializable{
         $this->name = $name;
     }
 
-    public function getAvatar(): ?string{
-        return $this->avatar;
+    public function getAvatarHash(): ?string{
+        return $this->avatar_hash;
     }
 
-    public function setAvatar(?string $avatar): void{
-        $this->avatar = $avatar;
+    public function setAvatarHash(?string $avatar_hash): void{
+        if($avatar_hash !== null and !Utils::validImageHash($avatar_hash)){
+            throw new \AssertionError("Avatar hash '$avatar_hash' is invalid.");
+        }
+        $this->avatar_hash = $avatar_hash;
     }
 
     public function getToken(): ?string{
@@ -202,7 +205,7 @@ class Webhook implements BinarySerializable{
     }
 
     public function getURL(): ?string{
-        if($this->id === null or $this->token === null){
+        if($this->token === null){
             return null;
         }
         return "https://discord.com/api/webhooks/{$this->id}/{$this->token}";
@@ -218,7 +221,7 @@ class Webhook implements BinarySerializable{
         $stream->putNullableString($this->channel_id);
         $stream->putNullableString($this->user_id);
         $stream->putNullableString($this->name);
-        $stream->putNullableString($this->avatar);
+        $stream->putNullableString($this->avatar_hash);
         $stream->putNullableString($this->token);
         $stream->putNullableString($this->application_id);
         $stream->putNullableString($this->source_guild_id);
@@ -234,7 +237,7 @@ class Webhook implements BinarySerializable{
             $stream->getNullableString(),       // channel_id
             $stream->getNullableString(),       // user_id
             $stream->getNullableString(),       // name
-            $stream->getNullableString(),       // avatar
+            $stream->getNullableString(),       // avatar_hash
             $stream->getNullableString(),       // token
             $stream->getNullableString(),       // application_id
             $stream->getNullableString(),       // source_guild_id

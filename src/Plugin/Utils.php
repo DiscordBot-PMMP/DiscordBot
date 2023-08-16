@@ -60,7 +60,7 @@ abstract class Utils{
             throw new \InvalidArgumentException("Failed to get mime type of file - " . $file);
         }
 
-        if(!in_array($type, ['image/jpeg', 'image/png', 'image/gif'])) {
+        if(!in_array($type, ['image/jpeg', 'image/png', 'image/gif'], true)) {
             throw new \InvalidArgumentException("Invalid mime type - " . $type);
         }
 

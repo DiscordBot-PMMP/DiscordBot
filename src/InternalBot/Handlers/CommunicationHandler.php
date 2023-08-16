@@ -158,13 +158,13 @@ class CommunicationHandler{
     }
 
     private function handleUpdateWebhook(RequestUpdateWebhook $pk): void{
-        if($pk->getWebhook()->getId() === null || $pk->getWebhook()->getChannelId() === null){
-            throw new \AssertionError("Webhook ID & channel ID must be present.");
+        if($pk->getWebhook()->getChannelId() === null){
+            throw new \AssertionError("Webhook channel ID must be present.");
         }
         $this->getChannel($pk, $pk->getWebhook()->getChannelId(), function(DiscordChannel $channel) use($pk){
             $channel->webhooks->fetch($pk->getWebhook()->getId())->then(function(DiscordWebhook $webhook) use($channel, $pk){
                 $webhook->name = $pk->getWebhook()->getName();
-                $webhook->avatar = $pk->getWebhook()->getAvatar();
+                $webhook->avatar = $pk->getWebhook()->getAvatarHash();
                 $channel->webhooks->save($webhook)->then(function(DiscordWebhook $webhook) use($pk){
                     $this->resolveRequest($pk->getUID(), true, "Successfully updated webhook.", [ModelConverter::genModelWebhook($webhook)]);
                 }, function(\Throwable $e) use($pk){
@@ -179,13 +179,10 @@ class CommunicationHandler{
     }
 
     private function handleCreateWebhook(RequestCreateWebhook $pk): void{
-        if($pk->getWebhook()->getChannelId() === null){
-            throw new \AssertionError("Webhook channel ID must be present.");
-        }
-        $this->getChannel($pk, $pk->getWebhook()->getChannelId(), function(DiscordChannel $channel) use($pk){
+        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
             $channel->webhooks->save($channel->webhooks->create([
-                'name' => $pk->getWebhook()->getName(),
-                'avatar' => $pk->getWebhook()->getAvatar()
+                'name' => $pk->getName(),
+                'avatar' => $pk->getAvatarHash()
             ]))->then(function(DiscordWebhook $webhook) use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Successfully created webhook.", [ModelConverter::genModelWebhook($webhook)]);
             }, function(\Throwable $e) use($pk){

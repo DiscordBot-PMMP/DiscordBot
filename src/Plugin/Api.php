@@ -75,20 +75,29 @@ class Api{
     /**
      * Creates a normal webhook inside a channel.
      *
+     * @param string $name max 80chars, 'clyde' and 'discord' not allowed in name.
+     * @param ?string $avatar_hash If null, the default webhook avatar will be used. (see Utils::imageToHash())
+     * @see Utils::imageToHash()
+     *
      * @return PromiseInterface Resolves with a Webhook model.
      */
-    public function createWebhook(string $channel_id, string $name): PromiseInterface{
+    public function createWebhook(string $guild_id, string $channel_id, string $name, ?string $avatar_hash = null): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Webhook guild ID is invalid."));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Webhook channel ID is invalid."));
         }
-        $webhook = new Webhook(WebhookType::INCOMING, channel_id: $channel_id, name: $name);
-        $pk = new RequestCreateWebhook($webhook); //todo
+        if($avatar_hash !== null and !Utils::validImageHash($avatar_hash)){
+            return rejectPromise(new ApiRejection("Webhook avatar hash is invalid."));
+        }
+        $pk = new RequestCreateWebhook($guild_id, $channel_id, $name, $avatar_hash);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
 
     /**
-     * Update a webhooks name or avatar.
+     * Update a webhooks name or avatar hash.
      *
      * @return PromiseInterface Resolves with a Webhook model.
      */
@@ -96,8 +105,8 @@ class Api{
         if($webhook->getType() !== WebhookType::INCOMING){
             return rejectPromise(new ApiRejection("Only Incoming webhooks can be edited."));
         }
-        if($webhook->getId() === null or $webhook->getToken() === null){
-            return rejectPromise(new ApiRejection("Webhook does not have an ID/token, it cannot be edited before being created."));
+        if($webhook->getToken() === null){
+            return rejectPromise(new ApiRejection("Webhook does not have a token, it cannot be edited before being created."));
         }
         if(!Utils::validDiscordSnowflake($webhook->getId())){
             return rejectPromise(new ApiRejection("Invalid webhook ID '{$webhook->getId()}'."));
@@ -112,14 +121,17 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function deleteWebhook(string $channel_id, string $webhook_id): PromiseInterface{
-        if(!Utils::validDiscordSnowflake($webhook_id)){
-            return rejectPromise(new ApiRejection("Invalid webhook ID '$webhook_id'."));
+    public function deleteWebhook(string $guild_id, string $channel_id, string $webhook_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Webhook guild ID is invalid."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        $pk = new RequestDeleteWebhook($channel_id, $webhook_id);
+        if(!Utils::validDiscordSnowflake($webhook_id)){
+            return rejectPromise(new ApiRejection("Invalid webhook ID '$webhook_id'."));
+        }
+        $pk = new RequestDeleteWebhook($guild_id, $channel_id, $webhook_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

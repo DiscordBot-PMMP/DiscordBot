@@ -19,14 +19,21 @@ class RequestDeleteWebhook extends Packet{
 
     public const SERIALIZE_ID = 49;
 
-    private string $webhook_id;
+    private string $guild_id;
 
     private string $channel_id;
 
-    public function __construct(string $channel_id, string $webhook_id, ?int $uid = null){
+    private string $webhook_id;
+
+    public function __construct(string $guild_id, string $channel_id, string $webhook_id, ?int $uid = null){
         parent::__construct($uid);
-        $this->webhook_id = $webhook_id;
+        $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
+        $this->webhook_id = $webhook_id;
+    }
+
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
     public function getChannelId(): string{
@@ -39,6 +46,7 @@ class RequestDeleteWebhook extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putString($this->guild_id);
         $stream->putString($this->channel_id);
         $stream->putString($this->webhook_id);
         return $stream;
@@ -46,6 +54,7 @@ class RequestDeleteWebhook extends Packet{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
+            $stream->getString(), // guild_id
             $stream->getString(), // channel_id
             $stream->getString()  // webhook_id
         );
