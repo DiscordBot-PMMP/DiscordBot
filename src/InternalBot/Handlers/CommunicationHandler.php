@@ -760,9 +760,9 @@ class CommunicationHandler{
     }
 
     private function handleDeleteMessage(RequestDeleteMessage $pk): void{
-        $this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $dMessage) use($pk){
-            $dMessage->delete()->done(function() use ($pk){
-                $this->resolveRequest($pk->getUID());
+        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+            $channel->messages->delete($pk->getMessageId(), $pk->getReason())->done(function() use($pk){
+                $this->resolveRequest($pk->getUID(), true, "Message deleted.");
             }, function(\Throwable $e) use ($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to delete message.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to delete message ({$pk->getUID()}) - {$e->getMessage()}");
