@@ -144,7 +144,7 @@ class CommunicationHandler{
     private function handleDeleteWebhook(RequestDeleteWebhook $pk): void{
         $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
             $channel->webhooks->fetch($pk->getWebhookId())->then(function(DiscordWebhook $webhook) use($channel, $pk){
-                $channel->webhooks->delete($webhook)->then(function() use($pk){
+                $channel->webhooks->delete($webhook, $pk->getReason())->then(function() use($pk){
                     $this->resolveRequest($pk->getUID());
                 }, function(\Throwable $e) use($pk){
                     $this->resolveRequest($pk->getUID(), false, "Failed to delete webhook.", [$e->getMessage(), $e->getTraceAsString()]);
@@ -165,7 +165,7 @@ class CommunicationHandler{
             $channel->webhooks->fetch($pk->getWebhook()->getId())->then(function(DiscordWebhook $webhook) use($channel, $pk){
                 $webhook->name = $pk->getWebhook()->getName();
                 $webhook->avatar = $pk->getWebhook()->getAvatarHash();
-                $channel->webhooks->save($webhook)->then(function(DiscordWebhook $webhook) use($pk){
+                $channel->webhooks->save($webhook, $pk->getReason())->then(function(DiscordWebhook $webhook) use($pk){
                     $this->resolveRequest($pk->getUID(), true, "Successfully updated webhook.", [ModelConverter::genModelWebhook($webhook)]);
                 }, function(\Throwable $e) use($pk){
                     $this->resolveRequest($pk->getUID(), false, "Failed to update webhook.", [$e->getMessage(), $e->getTraceAsString()]);
@@ -183,7 +183,7 @@ class CommunicationHandler{
             $channel->webhooks->save($channel->webhooks->create([
                 'name' => $pk->getName(),
                 'avatar' => $pk->getAvatarHash()
-            ]))->then(function(DiscordWebhook $webhook) use($pk){
+            ]), $pk->getReason())->then(function(DiscordWebhook $webhook) use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Successfully created webhook.", [ModelConverter::genModelWebhook($webhook)]);
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to create webhook.", [$e->getMessage(), $e->getTraceAsString()]);

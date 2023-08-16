@@ -27,13 +27,16 @@ class RequestCreateWebhook extends Packet{
 
     private ?string $avatar_hash;
 
+    private ?string $reason;
+
     public function __construct(string $guild_id, string $channel_id, string $name, ?string $avatar_hash = null,
-                                ?int $uid = null){
+                                ?string $reason = null, ?int $uid = null){
         parent::__construct($uid);
         $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
         $this->name = $name;
         $this->avatar_hash = $avatar_hash;
+        $this->reason = $reason;
     }
 
     public function getGuildId(): string{
@@ -52,12 +55,17 @@ class RequestCreateWebhook extends Packet{
         return $this->avatar_hash;
     }
 
+    public function getReason(): ?string{
+        return $this->reason;
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->guild_id);
         $stream->putString($this->channel_id);
         $stream->putString($this->name);
         $stream->putNullableString($this->avatar_hash);
+        $stream->putNullableString($this->reason);
         return $stream;
     }
 
@@ -66,7 +74,8 @@ class RequestCreateWebhook extends Packet{
             $stream->getString(),        // guild_id
             $stream->getString(),        // channel_id
             $stream->getString(),        // name
-            $stream->getNullableString() // avatar_hash
+            $stream->getNullableString(),// avatar_hash
+            $stream->getNullableString() // reason
         );
     }
 }

@@ -22,24 +22,33 @@ class RequestUpdateWebhook extends Packet{
 
     private Webhook $webhook;
 
-    public function __construct(Webhook $webhook, ?int $uid = null){
+    private ?string $reason;
+
+    public function __construct(Webhook $webhook, ?string $reason = null, ?int $uid = null){
         parent::__construct($uid);
         $this->webhook = $webhook;
+        $this->reason = $reason;
     }
 
     public function getWebhook(): Webhook{
         return $this->webhook;
     }
 
+    public function getReason(): ?string{
+        return $this->reason;
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putSerializable($this->webhook);
+        $stream->putNullableString($this->reason);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getSerializable(Webhook::class)
+            $stream->getSerializable(Webhook::class),
+            $stream->getNullableString()
         );
     }
 }
