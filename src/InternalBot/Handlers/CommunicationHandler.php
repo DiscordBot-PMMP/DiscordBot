@@ -772,7 +772,7 @@ class CommunicationHandler{
 
     private function handleKickMember(RequestKickMember $pk): void{
         $this->getMember($pk, $pk->getGuildId(), $pk->getUserId(), function(DiscordMember $member, DiscordGuild $guild) use($pk){
-            $guild->members->kick($member)->then(function() use($pk){
+            $guild->members->kick($member, $pk->getReason())->then(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Member kicked.");
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to kick member.", [$e->getMessage(), $e->getTraceAsString()]);
