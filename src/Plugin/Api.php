@@ -70,6 +70,9 @@ class Api{
 
     private Main $plugin;
 
+    /** @var bool If the API is ready to be used. */
+    private bool $ready = false;
+
     /** @var User The connected bot user */
     private User $bot_user;
 
@@ -78,10 +81,18 @@ class Api{
         try{
             $this->plugin->getServer()->getPluginManager()->registerEvent(DiscordReady::class, function(DiscordReady $event){
                 $this->bot_user = $event->getBotUser();
+                $this->ready = true;
             }, EventPriority::LOWEST, $this->plugin, true);
         }catch(\Throwable $e){
             $this->plugin->getLogger()->logException($e);
         }
+    }
+
+    /**
+     * @return bool Whether the API is ready to be used.
+     */
+    public function isReady(): bool{
+        return $this->ready;
     }
 
     public function getBotUser(): User{
@@ -99,6 +110,9 @@ class Api{
      */
     public function createWebhook(string $guild_id, string $channel_id, string $name, ?string $avatar_hash = null,
                                   ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Webhook guild ID is invalid."));
         }
@@ -119,6 +133,9 @@ class Api{
      * @return PromiseInterface Resolves with a Webhook model.
      */
     public function updateWebhook(Webhook $webhook, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if($webhook->getType() !== WebhookType::INCOMING){
             return rejectPromise(new ApiRejection("Only Incoming webhooks can be edited."));
         }
@@ -139,6 +156,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function deleteWebhook(string $guild_id, string $channel_id, string $webhook_id, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Webhook guild ID is invalid."));
         }
@@ -159,6 +179,9 @@ class Api{
      * @return PromiseInterface Resolves with an array of Webhook models.
      */
     public function fetchWebhooks(string $guild_id, ?string $channel_id = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -179,6 +202,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function leaveGuild(string $guild_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -195,6 +221,9 @@ class Api{
      * @return PromiseInterface Resolves with an array of Message models.
      */
     public function fetchPinnedMessages(string $guild_id, string $channel_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -212,6 +241,9 @@ class Api{
      * @return PromiseInterface Resolves with a Message model.
      */
     public function fetchMessage(string $guild_id, string $channel_id, string $message_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -232,6 +264,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function pinMessage(string $guild_id, string $channel_id, string $message_id, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -252,6 +287,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function unpinMessage(string $guild_id, string $channel_id, string $message_id, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -276,6 +314,9 @@ class Api{
     public function createRole(string $guild_id, string $name = "new role", RolePermissions $permissions = null,
                                      int $colour = 0, bool $hoist = false, ?string $icon_hash = null,
                                      ?string $unicode_emoji = null, bool $mentionable = false, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if($icon_hash !== null and !Utils::validImageHash($icon_hash)){
             return rejectPromise(new ApiRejection("Invalid icon hash '$icon_hash'."));
         }
@@ -298,6 +339,9 @@ class Api{
      * @return PromiseInterface Resolves with a Role model.
      */
     public function updateRole(Role $role, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if($role->getId() === null){
             return rejectPromise(new ApiRejection("Role must be created before being able to update (missing ID)."));
         }
@@ -312,6 +356,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function deleteRole(string $guild_id, string $role_id, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -329,6 +376,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function removeRole(string $guild_id, string $user_id, string $role_id, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -349,6 +399,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function addRole(string $guild_id, string $user_id, string $role_id, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -373,6 +426,9 @@ class Api{
      */
     public function removeReaction(string $guild_id, string $channel_id, string $message_id, string $user_id,
                                    string $emoji): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -402,6 +458,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function removeAllReactions(string $guild_id, string $channel_id, string $message_id, ?string $emoji = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -427,6 +486,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function addReaction(string $guild_id, string $channel_id, string $message_id, string $emoji): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -451,6 +513,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function broadcastTyping(string $guild_id, string $channel_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -468,6 +533,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function updateBotPresence(Status $status = Status::ONLINE, Activity $activity = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         $pk = new RequestUpdateBotPresence(new Presence($status, $activity === null ? [] : [$activity], null));
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
@@ -481,6 +549,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function banMember(string $guild_id, string $user_id, int $delete_message_seconds = 0, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -501,6 +572,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function unbanMember(string $guild_id, string $user_id, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -518,6 +592,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function kickMember(string $guild_id, string $user_id, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -535,6 +612,9 @@ class Api{
      * @return PromiseInterface Resolves with a Message model.
      */
     public function sendMessage(Message $message): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if($message instanceof WebhookMessage){
             //You can execute webhooks yourself using Api::fetchWebhooks() and use its token.
             return rejectPromise(new ApiRejection("Webhook messages cannot be sent, only received."));
@@ -557,6 +637,9 @@ class Api{
      */
     public function sendFile(string $guild_id, string $channel_id, string $file_path, string $message = "",
                              string $file_name = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -585,6 +668,9 @@ class Api{
      * @return PromiseInterface Resolves with a Message model.
      */
     public function editMessage(Message $message): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if($message->getId() === null){
             return rejectPromise(new ApiRejection("Message must have a valid ID to be able to edit it."));
         }
@@ -602,6 +688,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function deleteMessage(string $guild_id, string $channel_id, string $message_id, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -622,6 +711,9 @@ class Api{
      * @return PromiseInterface Resolves with a Channel model of same type provided.
      */
     public function createChannel(GuildChannel $channel): PromiseInterface{ //TODO
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         $pk = new RequestCreateChannel($channel);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
@@ -638,6 +730,9 @@ class Api{
      * @return PromiseInterface Resolves with a Channel model of same type provided.
      */
     public function updateChannel(GuildChannel $channel): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         $pk = new RequestUpdateChannel($channel);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
@@ -649,6 +744,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function deleteChannel(string $guild_id, string $channel_id, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -667,6 +765,9 @@ class Api{
      */
     public function createInvite(string $guild_id, string $channel_id, int $max_age = 86400, int $max_uses = 0,
                                  bool $temporary = false, bool $unique = false, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -690,6 +791,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function deleteInvite(string $guild_id, string $invite_code, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -704,6 +808,9 @@ class Api{
      * @return PromiseInterface Resolves with no data.
      */
     public function updateNickname(string $guild_id, string $user_id, ?string $nickname = null, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
