@@ -267,7 +267,7 @@ class BotCommunicationHandler{
     }
 
     private function handleInviteDelete(InviteDeletePacket $packet): void{
-        (new InviteDeletedEvent($this->plugin, $packet->getInviteCode()))->call();
+        (new InviteDeletedEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId(), $packet->getInviteCode()))->call();
     }
 
     private function handleBanAdd(BanAddPacket $packet): void{

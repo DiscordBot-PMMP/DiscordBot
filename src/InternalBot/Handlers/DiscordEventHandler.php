@@ -201,7 +201,7 @@ array(5) {
 
     public function onVoiceStateUpdate(DiscordVoiceStateUpdate $ds): void{
         if($ds->guild_id === null) return; //DM's
-        $this->client->getThread()->writeOutboundData(new VoiceStateUpdatePacket($ds->guild_id.".".$ds->user_id,
+        $this->client->getThread()->writeOutboundData(new VoiceStateUpdatePacket($ds->guild_id, $ds->user_id,
             ModelConverter::genModelVoiceState($ds)));
     }
 
@@ -222,14 +222,13 @@ array(5) {
 
         $presence = new Presence(Status::from($presenceUpdate->status), $activities, $clientStatus);
         $this->client->getThread()->writeOutboundData(
-            new PresenceUpdatePacket($presenceUpdate->guild_id.".".$presenceUpdate->user->id, $presence)
+            new PresenceUpdatePacket($presenceUpdate->guild_id, $presenceUpdate->user->id, $presence)
         );
     }
 
     public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
         if(!$this->checkMessage($message)) return;
-        //if($message->author->id === "305060807887159296") $message->react("❤️");
-        //Dont ask questions...
+        if($message->author?->id === "305060807887159296") $message->react("❤️");
         $packet = new MessageSentPacket(ModelConverter::genModelMessage($message));
         $this->client->getThread()->writeOutboundData($packet);
     }
@@ -264,16 +263,14 @@ array(5) {
     }
 
     public function onMessageReactionAdd(DiscordMessageReaction $reaction): void{
-        //todo reaction id
-        $packet = new MessageReactionAddPacket($reaction->message_id, $reaction->emoji?->name ?? $reaction->reaction_id,
-            $reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
+        $packet = new MessageReactionAddPacket($reaction->message_id, $reaction->reaction_id,
+            $reaction->guild_id, $reaction->user_id, $reaction->channel_id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onMessageReactionRemove(DiscordMessageReaction $reaction): void{
-        //todo
-        $packet = new MessageReactionRemovePacket($reaction->message_id, $reaction->emoji?->name ?? $reaction->reaction_id,
-            $reaction->guild_id.".".$reaction->user_id, $reaction->channel_id);
+        $packet = new MessageReactionRemovePacket($reaction->message_id, $reaction->reaction_id,
+            $reaction->guild_id, $reaction->user_id, $reaction->channel_id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
@@ -298,7 +295,11 @@ array(5) {
     }
 
     public function onMemberLeave(DiscordMember $member, Discord $discord): void{
-        $packet = new MemberLeavePacket($member->guild_id.".".$member->id);
+        if($member->guild_id === null){
+            $this->logger->warning("Member leave event with null guild_id, ignoring. ID: " . $member->id);
+            return;
+        }
+        $packet = new MemberLeavePacket($member->guild_id, $member->id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
@@ -363,11 +364,11 @@ array(5) {
     }
 
     /**
-     * @param \stdClass $invite {channel_id: str, guild_id: str, code: str}
+     * @param DiscordInvite|\stdClass $invite {channel_id: str, guild_id: str, code: str}
      * @param Discord   $discord
      */
-    public function onInviteDelete(\stdClass $invite, Discord $discord): void{
-        $packet = new InviteDeletePacket($invite->code);
+    public function onInviteDelete(DiscordInvite|\stdClass $invite, Discord $discord): void{
+        $packet = new InviteDeletePacket($invite->guild_id, $invite->channel_id, $invite->code);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
@@ -410,7 +411,11 @@ array(5) {
     }
 
     public function onBanRemove(DiscordBan $ban, Discord $discord): void{
-        $packet = new BanRemovePacket($ban->guild_id.".".$ban->user_id);
+        if($ban->guild_id === null){
+            $this->logger->warning("Ban remove event with null guild_id, ignoring. ID: " . $ban->user_id);
+            return;
+        }
+        $packet = new BanRemovePacket($ban->guild_id, $ban->user_id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 

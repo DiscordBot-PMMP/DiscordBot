@@ -82,6 +82,7 @@ class Api{
             $this->plugin->getServer()->getPluginManager()->registerEvent(DiscordReady::class, function(DiscordReady $event){
                 $this->bot_user = $event->getBotUser();
                 $this->ready = true;
+                $this->plugin->getLogger()->debug("API Ready for requests.");
             }, EventPriority::LOWEST, $this->plugin, true);
         }catch(\Throwable $e){
             $this->plugin->getLogger()->logException($e);
