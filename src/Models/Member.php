@@ -44,7 +44,7 @@ class Member implements BinarySerializable{
     /** The user's guild nickname */
     private ?string $nickname;
 
-    /** The user's guild avatar  */
+    /** The user's guild avatar */
     private ?string $avatar;
 
     /**
@@ -143,6 +143,10 @@ class Member implements BinarySerializable{
 
     public function setNickname(?string $nickname): void{
         $this->nickname = $nickname;
+    }
+
+    public function getAvatarUrl(): ?string{
+        return $this->avatar === null ? null : "https://cdn.discordapp.com/guilds/{$this->guild_id}/users/{$this->user_id}/avatars/{$this->avatar}.png";
     }
 
     public function getAvatar(): ?string{

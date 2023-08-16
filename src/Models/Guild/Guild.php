@@ -198,15 +198,15 @@ class Guild implements BinarySerializable{
     //No create method. This is a read-update-only object, guilds cannot be created by my API.
 
     //Only ModelConverter should create this object, so we don't need to pad it out with defaults and make it look nice.
-    public function __construct(string                     $id, string $name, ?string $icon, ?string $splash, ?string $discovery_splash,
-                                ?string                    $owner_id, ?string $afk_channel_id, int $afk_timeout, ?bool $widget_enabled, ?string $widget_channel_id,
-                                VerificationLevel          $verification_level, DefaultMessageNotificationLevel $default_message_notifications,
+    public function __construct(string $id, string $name, ?string $icon, ?string $splash, ?string $discovery_splash,
+                                ?string $owner_id, ?string $afk_channel_id, int $afk_timeout, ?bool $widget_enabled, ?string $widget_channel_id,
+                                VerificationLevel $verification_level, DefaultMessageNotificationLevel $default_message_notifications,
                                 ExplicitContentFilterLevel $explicit_content_filter, array $emojis, array $features, MfaLevel $mfa_level,
-                                ?string                    $application_id, ?string $system_channel_id, int $system_channel_flags, ?string $rules_channel_id,
-                                ?int                       $max_presences, ?int $max_members, ?string $vanity_url_code, ?string $description, ?string $banner,
-                                PremiumTier                $premium_tier, ?int $premium_subscription_count, string $preferred_locale,
-                                ?string                    $public_updates_channel_id, ?int $max_video_channel_users, ?int $max_stage_video_channel_users,
-                                NsfwLevel                  $nsfw_level, /*array $stickers,*/ bool $premium_progress_bar_enabled, ?string $safety_alerts_channel_id
+                                ?string $application_id, ?string $system_channel_id, int $system_channel_flags, ?string $rules_channel_id,
+                                ?int $max_presences, ?int $max_members, ?string $vanity_url_code, ?string $description, ?string $banner,
+                                PremiumTier $premium_tier, ?int $premium_subscription_count, string $preferred_locale,
+                                ?string $public_updates_channel_id, ?int $max_video_channel_users, ?int $max_stage_video_channel_users,
+                                NsfwLevel $nsfw_level, /*array $stickers,*/ bool $premium_progress_bar_enabled, ?string $safety_alerts_channel_id
     ){
         $this->setId($id);
         $this->setName($name);
@@ -264,6 +264,10 @@ class Guild implements BinarySerializable{
         $this->name = $name;
     }
 
+    public function getIconUrl(): ?string{
+        return $this->icon === null ? null : "https://cdn.discordapp.com/icons/{$this->id}/{$this->icon}.png";
+    }
+
     public function getIcon(): ?string{
         return $this->icon;
     }
@@ -272,12 +276,20 @@ class Guild implements BinarySerializable{
         $this->icon = $icon;
     }
 
+    public function getSplashUrl(): ?string{
+        return $this->splash === null ? null : "https://cdn.discordapp.com/splashes/{$this->id}/{$this->splash}.png";
+    }
+
     public function getSplash(): ?string{
         return $this->splash;
     }
 
     public function setSplash(?string $splash): void{
         $this->splash = $splash;
+    }
+
+    public function getDiscoverySplashUrl(): ?string{
+        return $this->discovery_splash === null ? null : "https://cdn.discordapp.com/discovery-splashes/{$this->id}/{$this->discovery_splash}.png";
     }
 
     public function getDiscoverySplash(): ?string{
@@ -378,20 +390,6 @@ class Guild implements BinarySerializable{
     public function setExplicitContentFilter(ExplicitContentFilterLevel $explicit_content_filter): void{
         $this->explicit_content_filter = $explicit_content_filter;
     }
-
-    /**
-     * @return Emoji[]
-     */
-    /*public function getEmojis(): array{
-        return $this->emojis;
-    }*/
-
-    /**
-     * @param Emoji[] $emojis
-     */
-    /*public function setEmojis(array $emojis): void{
-        $this->emojis = $emojis;
-    }*/
 
     /** @return string[] */
     public function getFeatures(): array{
@@ -495,6 +493,10 @@ class Guild implements BinarySerializable{
 
     public function setDescription(?string $description): void{
         $this->description = $description;
+    }
+
+    public function getBannerUrl(): ?string{
+        return $this->banner === null ? null : "https://cdn.discordapp.com/banners/{$this->id}/{$this->banner}.png";
     }
 
     public function getBanner(): ?string{

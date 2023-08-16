@@ -104,12 +104,12 @@ class Api{
      * Creates a normal webhook inside a channel.
      *
      * @param string $name max 80chars, 'clyde' and 'discord' not allowed in name.
-     * @param ?string $avatar_hash If null, the default webhook avatar will be used. (see Utils::imageToHash())
-     * @see Utils::imageToHash()
+     * @param ?string $avatar_data If null, the default webhook avatar will be used. (see Utils::imageToDiscordData())
+     * @see Utils::imageToDiscordData()
      *
      * @return PromiseInterface Resolves with a Webhook model.
      */
-    public function createWebhook(string $guild_id, string $channel_id, string $name, ?string $avatar_hash = null,
+    public function createWebhook(string $guild_id, string $channel_id, string $name, ?string $avatar_data = null,
                                   ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
@@ -120,10 +120,10 @@ class Api{
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Webhook channel ID is invalid."));
         }
-        if($avatar_hash !== null and !Utils::validImageHash($avatar_hash)){
-            return rejectPromise(new ApiRejection("Webhook avatar hash is invalid."));
+        if($avatar_data !== null and !Utils::validImageData($avatar_data)){
+            return rejectPromise(new ApiRejection("Webhook avatar data is invalid."));
         }
-        $pk = new RequestCreateWebhook($guild_id, $channel_id, $name, $avatar_hash, $reason);
+        $pk = new RequestCreateWebhook($guild_id, $channel_id, $name, $avatar_data, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -308,23 +308,23 @@ class Api{
     /**
      * Create a role.
      *
-     * (Note, icon_hash and unicode_emoji only work with guilds with the ROLE_ICONS feature)
+     * (Note, icon_data and unicode_emoji only work with guilds with the ROLE_ICONS feature)
      *
      * @return PromiseInterface Resolves with Role model.
      */
     public function createRole(string $guild_id, string $name = "new role", RolePermissions $permissions = null,
-                                     int $colour = 0, bool $hoist = false, ?string $icon_hash = null,
+                                     int $colour = 0, bool $hoist = false, ?string $icon_data = null,
                                      ?string $unicode_emoji = null, bool $mentionable = false, ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($icon_hash !== null and !Utils::validImageHash($icon_hash)){
-            return rejectPromise(new ApiRejection("Invalid icon hash '$icon_hash'."));
+        if($icon_data !== null and !Utils::validImageData($icon_data)){
+            return rejectPromise(new ApiRejection("Invalid icon data '$icon_data'."));
         }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        $pk = new RequestCreateRole($guild_id, $name, $permissions ?? new RolePermissions(), $colour, $hoist, $icon_hash,
+        $pk = new RequestCreateRole($guild_id, $name, $permissions ?? new RolePermissions(), $colour, $hoist, $icon_data,
             $unicode_emoji, $mentionable, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());

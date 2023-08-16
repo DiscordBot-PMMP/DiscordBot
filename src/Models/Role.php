@@ -38,8 +38,8 @@ class Role implements BinarySerializable{
     /** If this role is pinned in the user listing */
     private bool $hoist;
 
-    /** Role icon hash */
-    private ?string $icon_hash;
+    /** Role icon */
+    private ?string $icon;
 
     /** Role unicode emoji */
     private ?string $unicode_emoji;
@@ -63,7 +63,7 @@ class Role implements BinarySerializable{
      * @internal See API::createRole()
      * @see API::createRole()
      */
-    public function __construct(?string $id, string $guild_id, string $name, int $colour, bool $hoist, ?string $icon_hash,
+    public function __construct(?string $id, string $guild_id, string $name, int $colour, bool $hoist, ?string $icon,
                                 ?string $unicode_emoji, int $position, RolePermissions $permissions, bool $managed,
                                 bool $mentionable, ?RoleTags $tags){
         $this->setId($id);
@@ -71,7 +71,7 @@ class Role implements BinarySerializable{
         $this->setName($name);
         $this->setColour($colour);
         $this->setHoist($hoist);
-        $this->setIconHash($icon_hash);
+        $this->setIcon($icon);
         $this->setUnicodeEmoji($unicode_emoji);
         $this->setPosition($position);
         $this->setPermissions($permissions);
@@ -130,15 +130,16 @@ class Role implements BinarySerializable{
         $this->hoist = $hoist;
     }
 
-    public function getIconHash(): ?string{
-        return $this->icon_hash;
+    public function getIconUrl(): ?string{
+        return ($this->id === null || $this->icon === null) ? null : "https://cdn.discordapp.com/role-icons/{$this->id}/{$this->icon}.png";
     }
 
-    public function setIconHash(?string $icon_hash): void{
-        if($icon_hash !== null and !Utils::validImageHash($icon_hash)){
-            throw new \AssertionError("Icon hash '$icon_hash' is invalid.");
-        }
-        $this->icon_hash = $icon_hash;
+    public function getIcon(): ?string{
+        return $this->icon;
+    }
+
+    public function setIcon(?string $icon): void{
+        $this->icon = $icon;
     }
 
     public function getUnicodeEmoji(): ?string{
@@ -198,7 +199,7 @@ class Role implements BinarySerializable{
         $stream->putString($this->name);
         $stream->putInt($this->colour);
         $stream->putBool($this->hoist);
-        $stream->putNullableString($this->icon_hash);
+        $stream->putNullableString($this->icon);
         $stream->putNullableString($this->unicode_emoji);
         $stream->putInt($this->position);
         $stream->putSerializable($this->permissions);
@@ -215,7 +216,7 @@ class Role implements BinarySerializable{
             $stream->getString(),                               // name
             $stream->getInt(),                                  // colour
             $stream->getBool(),                                 // hoist
-            $stream->getNullableString(),                       // icon_hash
+            $stream->getNullableString(),                       // icon
             $stream->getNullableString(),                       // unicode_emoji
             $stream->getInt(),                                  // position
             $stream->getSerializable(RolePermissions::class),   // permissions

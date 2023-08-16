@@ -57,8 +57,8 @@ class User implements BinarySerializable{
     /** The user's display name, if it is set. For bots, this is the application name */
     private ?string $global_name;
 
-    /** The user's avatar hash */
-    private string $avatar;
+    /** The user's avatar */
+    private ?string $avatar;
 
     /** Whether the user belongs to an OAuth2 application */
     private ?bool $bot;
@@ -69,7 +69,7 @@ class User implements BinarySerializable{
     /** Whether the user has two factor enabled on their account */
     private ?bool $mfa_enabled;
 
-    /** The user's banner hash */
+    /** The user's banner URL */
     private ?string $banner;
 
     /** The user's banner color encoded as an integer representation of hexadecimal color code */
@@ -104,7 +104,7 @@ class User implements BinarySerializable{
 
     //No create method, this is read only.
 
-    public function __construct(string $id, string $username, string $discriminator, ?string $global_name, string $avatar,
+    public function __construct(string $id, string $username, string $discriminator, ?string $global_name, ?string $avatar,
                                 ?bool $bot, ?bool $system, ?bool $mfa_enabled, ?string $banner, ?int $accent_colour,
                                 ?string $locale, int $flags_bitwise, ?UserPremiumType $premium_type, ?int $public_flags){
         $this->setId($id);
@@ -174,11 +174,19 @@ class User implements BinarySerializable{
         $this->global_name = $global_name;
     }
 
-    public function getAvatar(): string{
+    public function getAvatarUrl(): string{
+        if($this->avatar === null){
+            $index = ((int)$this->discriminator === 0) ? (((int)$this->id >> 22) % 6) : ((int)$this->discriminator % 5);
+            return "https://cdn.discordapp.com/embed/avatars/{$index}.png";
+        }
+        return "https://cdn.discordapp.com/avatars/{$this->id}/{$this->avatar}.png";
+    }
+
+    public function getAvatar(): ?string{
         return $this->avatar;
     }
 
-    public function setAvatar(string $avatar): void{
+    public function setAvatar(?string $avatar): void{
         $this->avatar = $avatar;
     }
 
@@ -360,7 +368,7 @@ class User implements BinarySerializable{
         $stream->putString($this->username);
         $stream->putString($this->discriminator);
         $stream->putNullableString($this->global_name);
-        $stream->putString($this->avatar);
+        $stream->putNullableString($this->avatar);
         $stream->putNullableBool($this->bot);
         $stream->putNullableBool($this->system);
         $stream->putNullableBool($this->mfa_enabled);
@@ -379,7 +387,7 @@ class User implements BinarySerializable{
             $stream->getString(),                                       // username
             $stream->getString(),                                       // discriminator
             $stream->getNullableString(),                               // global_name
-            $stream->getString(),                                       // avatar
+            $stream->getNullableString(),                               // avatar
             $stream->getNullableBool(),                                 // bot
             $stream->getNullableBool(),                                 // system
             $stream->getNullableBool(),                                 // mfa_enabled

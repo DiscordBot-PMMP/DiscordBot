@@ -38,19 +38,19 @@ abstract class Utils{
         return true;
     }
 
-    /** Checks a discord image hash by verifying the format. */
-    public static function validImageHash(string $hash): bool{
+    /** Checks a image hash for discord by verifying the format. */
+    public static function validImageData(string $hash): bool{
         return preg_match('/^data:(image\/(jpeg|png|gif));base64,([a-zA-Z0-9+\/]+={0,2})$/', $hash) === 1;
     }
 
     /**
-     * Creates an image hash based on discord docs.
+     * Creates image data based on discord docs.
      *
      * @param string $file The file path to the image (jpeg/png/gif only)
      *
      * @see https://discord.com/developers/docs/reference#image-data
      */
-    public static function imageToHash(string $file): string{
+    public static function imageToDiscordData(string $file): string{
         if(!file_exists($file)){
             throw new \InvalidArgumentException("File does not exist - " . $file);
         }

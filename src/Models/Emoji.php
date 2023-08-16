@@ -73,6 +73,13 @@ class Emoji implements BinarySerializable{
         $this->setAvailable($available);
     }
 
+    public function getUrl(): ?string{
+        if($this->id === null){
+            return null;
+        }
+        return "https://cdn.discordapp.com/emojis/{$this->id}." . ($this->animated??false ? "gif" : "png");
+    }
+
     public function getId(): ?string{
         return $this->id;
     }

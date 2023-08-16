@@ -107,85 +107,6 @@ class DiscordEventHandler{
         $discord->on("VOICE_STATE_UPDATE", [$this, "onVoiceStateUpdate"]);
     }
 
-    /*
-Some timing notes.
-array(5) {
-  ["guild"]=>
-  array(2) {
-    [0]=>
-    float(0.00259)
-    [1]=>
-    int(46)
-  }
-  ["channel"]=>
-  array(2) {
-    [0]=>
-    float(0.33944)
-    [1]=>
-    int(2721)
-  }
-  ["role"]=>
-  array(2) {
-    [0]=>
-    float(0.03372)
-    [1]=>
-    int(1497)
-  }
-  ["member"]=>
-  array(2) {
-    [0]=>
-    float(0.11359)
-    [1]=>
-    int(436)
-  }
-  ["user"]=>
-  array(2) {
-    [0]=>
-    float(0.00466)
-    [1]=>
-    int(259)
-  }
-}
-
-array(5) {
-  ["guild"]=>
-  array(2) {
-    [0]=>
-    float(0.012749999999999975)
-    [1]=>
-    int(46)
-  }
-  ["channel"]=>
-  array(2) {
-    [0]=>
-    float(0.30067999999999995)
-    [1]=>
-    int(2721)
-  }
-  ["role"]=>
-  array(2) {
-    [0]=>
-    float(0.03301)
-    [1]=>
-    int(1497)
-  }
-  ["member"]=>
-  array(2) {
-    [0]=>
-    float(0.17436000000000001)
-    [1]=>
-    int(435)
-  }
-  ["user"]=>
-  array(2) {
-    [0]=>
-    float(0.01252)
-    [1]=>
-    int(258)
-  }
-}
-     */
-
     public function onReady(): void{
         // Register all other events.
         $this->registerEvents();
@@ -262,26 +183,28 @@ array(5) {
         $this->client->getThread()->writeOutboundData($packet);
     }
 
+    //TODO, Reactions can be added to DM's too so guild_id needs rework.
+
     public function onMessageReactionAdd(DiscordMessageReaction $reaction): void{
-        $packet = new MessageReactionAddPacket($reaction->message_id, $reaction->reaction_id,
+        /*$packet = new MessageReactionAddPacket($reaction->message_id, $reaction->reaction_id,
             $reaction->guild_id, $reaction->user_id, $reaction->channel_id);
-        $this->client->getThread()->writeOutboundData($packet);
+        $this->client->getThread()->writeOutboundData($packet);*/
     }
 
     public function onMessageReactionRemove(DiscordMessageReaction $reaction): void{
-        $packet = new MessageReactionRemovePacket($reaction->message_id, $reaction->reaction_id,
+        /*$packet = new MessageReactionRemovePacket($reaction->message_id, $reaction->reaction_id,
             $reaction->guild_id, $reaction->user_id, $reaction->channel_id);
-        $this->client->getThread()->writeOutboundData($packet);
+        $this->client->getThread()->writeOutboundData($packet);*/
     }
 
     public function onMessageReactionRemoveAll(DiscordMessageReaction $reaction): void{
-        $packet = new MessageReactionRemoveAllPacket($reaction->message_id, $reaction->channel_id);
-        $this->client->getThread()->writeOutboundData($packet);
+        /*$packet = new MessageReactionRemoveAllPacket($reaction->message_id, $reaction->channel_id);
+        $this->client->getThread()->writeOutboundData($packet);*/
     }
 
     /* \stdClass{"message_id": string, "emoji": \stdClass{"name": string}, "channel_id": string, "guild_id": string} */
     public function onMessageReactionRemoveEmoji(\stdClass $data): void{
-        $this->client->getThread()->writeOutboundData(new MessageReactionRemoveEmojiPacket($data->message_id, $data->channel_id, $data->emoji->name));
+        //$this->client->getThread()->writeOutboundData(new MessageReactionRemoveEmojiPacket($data->message_id, $data->channel_id, $data->emoji->name));
     }
 
     public function onMemberJoin(DiscordMember $member, Discord $discord): void{

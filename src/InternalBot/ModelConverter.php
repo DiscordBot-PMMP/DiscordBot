@@ -170,15 +170,15 @@ abstract class ModelConverter{
         $perms = new RolePermissions((($bitwise & RolePermissions::ROLE_PERMISSIONS["administrator"]) !== 0) ? 2147483647 : $bitwise);
 
         return new Member($discordMember->guild_id, $discordMember->id, $discordMember->nick ?? null,
-            $discordMember->getAvatarAttribute(), $roles, $discordMember->joined_at?->getTimestamp(),
+            $discordMember->avatar_hash/** @phpstan-ignore-line */, $roles, $discordMember->joined_at?->getTimestamp(),
             $discordMember->premium_since?->getTimestamp(), $discordMember->deaf, $discordMember->mute, $discordMember->flags,
             $discordMember->pending ?? null, $perms, $discordMember->communication_disabled_until?->getTimestamp(), $presence);
     }
 
     static public function genModelUser(DiscordUser $user): User{
         $discriminator = ($user->discriminator === "0" ? "0000" : $user->discriminator); //Assume it got cast to int somewhere in lib.
-        return new User($user->id, $user->username, $discriminator, $user->global_name, $user->getAvatarAttribute(), $user->bot, $user->system,
-            $user->mfa_enabled, $user->banner ?? null, $user->accent_color ?? null, $user->locale, $user->flags ?? 0, UserPremiumType::from($user->premium_type ?? 0),
+        return new User($user->id, $user->username, $discriminator, $user->global_name, $user->avatar_hash, $user->bot, $user->system,
+            $user->mfa_enabled, $user->banner_hash, $user->accent_color ?? null, $user->locale, $user->flags ?? 0, UserPremiumType::from($user->premium_type ?? 0),
             $user->public_flags ?? 0);
     }
 
@@ -188,11 +188,14 @@ abstract class ModelConverter{
         foreach($discordGuild->emojis as $emoji){
             $emojis[] = self::genModelEmoji($emoji);
         }
-        //TODO Pending features
-        $features = [];
 
-        return new Guild($discordGuild->id, $discordGuild->name, $discordGuild->getIconAttribute(),
-            $discordGuild->getSplashAttribute(), $discordGuild->discovery_splash, $discordGuild->owner_id,
+        $features = [];
+        foreach($discordGuild->features as $feature){
+            $features[] = $feature;
+        }
+
+        return new Guild($discordGuild->id, $discordGuild->name, $discordGuild->icon_hash/** @phpstan-ignore-line */,
+            $discordGuild->splash_hash/** @phpstan-ignore-line */, $discordGuild->discovery_splash, $discordGuild->owner_id,
             $discordGuild->afk_channel_id, $discordGuild->afk_timeout, $discordGuild->widget_enabled,
             $discordGuild->widget_channel_id ?? null, VerificationLevel::from($discordGuild->verification_level),
             DefaultMessageNotificationLevel::from($discordGuild->default_message_notifications),
@@ -212,6 +215,7 @@ abstract class ModelConverter{
      * @param DiscordChannel $dc
      * @param T $c
      * @return T
+     * @noinspection PhpMissingParamTypeInspection
      */
     static private function applyPermissionOverwrites(DiscordChannel $dc, $c){
         /** @var DiscordOverwrite $overwrite */
@@ -400,7 +404,7 @@ abstract class ModelConverter{
         }
         $tags = ($discordRole->tags === null) ? null : self::genModelRoleTags($discordRole->tags);
         return new Role($discordRole->id, $discordRole->guild_id, $discordRole->name, $discordRole->color,
-            $discordRole->hoist, $discordRole->getIconAttribute(), $discordRole->unicode_emoji ?? null,
+            $discordRole->hoist, $discordRole->icon_hash, $discordRole->unicode_emoji ?? null,
             $discordRole->position, self::genModelRolePermission($discordRole->permissions), $discordRole->managed,
             $discordRole->mentionable, $tags);
     }

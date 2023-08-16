@@ -163,7 +163,7 @@ class CommunicationHandler{
         $this->getChannel($pk, $pk->getWebhook()->getChannelId(), function(DiscordChannel $channel) use($pk){
             $channel->webhooks->fetch($pk->getWebhook()->getId())->then(function(DiscordWebhook $webhook) use($channel, $pk){
                 $webhook->name = $pk->getWebhook()->getName();
-                $webhook->avatar = $pk->getWebhook()->getAvatarHash();
+                //$webhook->avatar = $pk->getWebhook()->getAvatar(); TODO image data not hash from model
                 $channel->webhooks->save($webhook, $pk->getReason())->then(function(DiscordWebhook $webhook) use($pk){
                     $this->resolveRequest($pk->getUID(), true, "Successfully updated webhook.", [ModelConverter::genModelWebhook($webhook)]);
                 }, function(\Throwable $e) use($pk){
@@ -374,8 +374,8 @@ class CommunicationHandler{
             $guild->roles->fetch($pk->getRole()->getId())->then(function(DiscordRole $role) use($guild, $pk){
                 $role->position = $pk->getRole()->getPosition();
                 $role->hoist = $pk->getRole()->getHoist();
-                $role->icon = $pk->getRole()->getIconHash();              /** @phpstan-ignore-line */
-                $role->unicode_emoji = $pk->getRole()->getUnicodeEmoji(); /** @phpstan-ignore-line */
+                //$role->icon = $pk->getRole()->getIcon();                  TODO Image data not hash from model
+                //$role->unicode_emoji = $pk->getRole()->getUnicodeEmoji();
                 $role->mentionable = $pk->getRole()->getMentionable();
                 $role->name = $pk->getRole()->getName();
                 $role->color = $pk->getRole()->getColour();
