@@ -154,15 +154,15 @@ class Emoji implements BinarySerializable{
 
     public function toApiString(): string{
         if($this->id === null){
-            return $this->name;
+            return $this->name??"";
         }
-        return ($this->animated ? "a" : "") . ":{$this->name}:{$this->id}";
+        return (($this->animated??false) ? "a" : "") . ":{$this->name}:{$this->id}";
     }
     public function __toString(): string{
         if($this->id === null){
-            return $this->name;
+            return $this->name??"";
         }
-        return "<" . ($this->animated ? "a" : "") . ":{$this->name}:{$this->id}>";
+        return "<" . (($this->animated??false) ? "a" : "") . ":{$this->name}:{$this->id}>";
     }
 
     //----- Serialization -----//

@@ -69,7 +69,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRoles;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
@@ -77,7 +77,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
@@ -165,7 +165,7 @@ class NetworkApi{
         RequestFetchUser::SERIALIZE_ID => RequestFetchUser::class,
         RequestFetchUsers::SERIALIZE_ID => RequestFetchUsers::class,
         RequestFetchWebhooks::SERIALIZE_ID => RequestFetchWebhooks::class,
-        RequestInitialiseBan::SERIALIZE_ID => RequestInitialiseBan::class,
+        RequestBanMember::SERIALIZE_ID => RequestBanMember::class,
         RequestInitialiseInvite::SERIALIZE_ID => RequestInitialiseInvite::class,
         RequestKickMember::SERIALIZE_ID => RequestKickMember::class,
         RequestLeaveGuild::SERIALIZE_ID => RequestLeaveGuild::class,
@@ -173,7 +173,7 @@ class NetworkApi{
         RequestRemoveAllReactions::SERIALIZE_ID => RequestRemoveAllReactions::class,
         RequestRemoveReaction::SERIALIZE_ID => RequestRemoveReaction::class,
         RequestRemoveRole::SERIALIZE_ID => RequestRemoveRole::class,
-        RequestRevokeBan::SERIALIZE_ID => RequestRevokeBan::class,
+        RequestUnbanMember::SERIALIZE_ID => RequestUnbanMember::class,
         RequestRevokeInvite::SERIALIZE_ID => RequestRevokeInvite::class,
         RequestSendFile::SERIALIZE_ID => RequestSendFile::class,
         RequestSendMessage::SERIALIZE_ID => RequestSendMessage::class,

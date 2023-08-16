@@ -26,7 +26,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
@@ -34,7 +34,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
@@ -45,7 +45,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
-use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Invite;
@@ -477,22 +476,27 @@ class Api{
     /**
      * Attempt to ban a member.
      *
+     * @param int $delete_message_seconds number of seconds to delete messages for, between 0 and 604800 (7 days)
+     *
      * @return PromiseInterface Resolves with no data.
      */
-    public function banMember(string $guild_id, string $user_id, ?string $reason = null): PromiseInterface{
+    public function banMember(string $guild_id, string $user_id, ?string $reason = null, int $delete_message_seconds = 0): PromiseInterface{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
-        $pk = new RequestInitialiseBan(new Ban($guild_id, $user_id, $reason));
+        if($delete_message_seconds < 0 or $delete_message_seconds > 604800){
+            return rejectPromise(new ApiRejection("Delete message seconds must be between 0 and 604800 (7days)."));
+        }
+        $pk = new RequestBanMember($guild_id, $user_id, $reason, $delete_message_seconds);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
 
     /**
-     * Attempt to revoke a ban.
+     * Attempt to unban a member.
      *
      * @return PromiseInterface Resolves with no data.
      */
@@ -503,7 +507,7 @@ class Api{
         if(!Utils::validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
-        $pk = new RequestRevokeBan($guild_id, $user_id);
+        $pk = new RequestUnbanMember($guild_id, $user_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

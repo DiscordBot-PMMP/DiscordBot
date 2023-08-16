@@ -45,7 +45,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseBan;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
@@ -53,7 +53,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
@@ -133,8 +133,8 @@ class CommunicationHandler{
         elseif($pk instanceof RequestCreateChannel) $this->handleCreateChannel($pk);
         elseif($pk instanceof RequestUpdateChannel) $this->handleUpdateChannel($pk);
         elseif($pk instanceof RequestDeleteChannel) $this->handleDeleteChannel($pk);
-        elseif($pk instanceof RequestInitialiseBan) $this->handleInitialiseBan($pk);
-        elseif($pk instanceof RequestRevokeBan) $this->handleRevokeBan($pk);
+        elseif($pk instanceof RequestBanMember) $this->handleBanMember($pk);
+        elseif($pk instanceof RequestUnbanMember) $this->handleUnbanMember($pk);
         elseif($pk instanceof RequestCreateWebhook) $this->handleCreateWebhook($pk);
         elseif($pk instanceof RequestUpdateWebhook) $this->handleUpdateWebhook($pk);
         elseif($pk instanceof RequestDeleteWebhook) $this->handleDeleteWebhook($pk);
@@ -375,8 +375,8 @@ class CommunicationHandler{
             $guild->roles->fetch($pk->getRole()->getId())->then(function(DiscordRole $role) use($guild, $pk){
                 $role->position = $pk->getRole()->getPosition();
                 $role->hoist = $pk->getRole()->getHoist();
-                $role->icon = $pk->getRole()->getIconHash();
-                $role->unicode_emoji = $pk->getRole()->getUnicodeEmoji();
+                $role->icon = $pk->getRole()->getIconHash();              /** @phpstan-ignore-line */
+                $role->unicode_emoji = $pk->getRole()->getUnicodeEmoji(); /** @phpstan-ignore-line */
                 $role->mentionable = $pk->getRole()->getMentionable();
                 $role->name = $pk->getRole()->getName();
                 $role->color = $pk->getRole()->getColour();
@@ -781,9 +781,11 @@ class CommunicationHandler{
         });
     }
 
-    private function handleInitialiseBan(RequestInitialiseBan $pk): void{
-        $this->getGuild($pk, $pk->getBan()->getGuildId(), function(DiscordGuild $guild) use($pk){
-            $guild->bans->ban($pk->getBan()->getUserId(), [], $pk->getBan()->getReason())->then(function() use($pk){
+    private function handleBanMember(RequestBanMember $pk): void{
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
+            $guild->bans->ban($pk->getUserId(), [
+                "delete_message_seconds" => $pk->getDeleteMessageSeconds(),
+            ], $pk->getReason())->then(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Member banned.");
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to ban member.", [$e->getMessage(), $e->getTraceAsString()]);
@@ -792,7 +794,7 @@ class CommunicationHandler{
         });
     }
 
-    private function handleRevokeBan(RequestRevokeBan $pk): void{
+    private function handleUnbanMember(RequestUnbanMember $pk): void{
         $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->unban($pk->getUserId())->then(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Member unbanned.");
