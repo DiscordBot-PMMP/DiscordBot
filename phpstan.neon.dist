@@ -5,8 +5,8 @@ parameters:
     excludePaths:
         analyse:
             - vendor
-            - src/Communication/Packets/Discord
-            - src/Communication/Packets/Plugin
+            - src/Communication/Packets/*/*Message*.php
+            - src/Communication/Packets/*/*Channel*.php
             - src/Libs
     bootstrapFiles:
         - test/phpstan/bootstrap.php
