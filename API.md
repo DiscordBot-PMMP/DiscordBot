@@ -1,18 +1,20 @@
 # DiscordBot API
 
-Would love to have this as a github site, However i don't have the time.
+Would love to have this as a GitHub site, However I don't have the time.
 
-**Version 2.x documentation.**
+**Version 3.x documentation.**
 
 ---
 
 ## API Structure
 Firstly a quick few notes about the API and what it covers.
 
-+ These namespaces are **INTERNAL ONLY**:
++ These namespaces are **INTERNAL ONLY** and not to be used:
     + `JaxkDev\DiscordBot\Bot`
     + `JaxkDev\DiscordBot\Communication`
-    + vendor libs, (Not actually autoloaded in the main thread)
+    + `JaxkDev\DiscordBot\ExternalBot`
+    + `JaxkDev\DiscordBot\InternalBot`
+    + vendor libs, (Not actually loaded in the main thread)
 
 
  + All API Calls can be made through `JaxkDev\DiscordBot\Plugin\Api.php` an instance is available from the plugin instance
@@ -24,11 +26,11 @@ That is all located in the namespace `JaxkDev\DiscordBot\Models` all type info a
 in the relevant file.
 
 
-+ All the actual discord data such as guilds, roles members can be found in plugin storage anywhere from 
-5seconds to 500seconds after the plugin enables.
++ All the actual discord data such as guilds, roles, members etc. can be obtained via `Api->fetchXYZ()` methods after 
+the API is ready for requests (`Api->isReady()`).
 
     + Listen to `JaxkDev\DiscordBot\Plugin\Events\DiscordReady.php` this is emitted when bot is connected
-**and** initial data has been received, only use the API and Storage after this event.
+, only use the API after this event.
 
 ---
 
@@ -105,7 +107,7 @@ For information on the data thats returned with `$resolution->getData()` see the
 
 Discord does do some fancy weird things a lot like minecraft, so I've listed a few things that are important to note.
 
-`discord gateway v8` The default and current version DiscordBot/DiscordPHP uses.
+`discord gateway v10` The current version DiscordBot/DiscordPHP uses.
 
 + DM Channels (TODO Confirm on v8)
     + Each DM has its own channel however because discord makes ID's for those channels irrelevant of any user IDs so dphp sends a channel create event before any update to a DM such
@@ -113,6 +115,3 @@ Discord does do some fancy weird things a lot like minecraft, so I've listed a f
 
 + Voice Channels
     + Due to binaries required and resources this plugin does not support any interaction with voice channels (joining/playing sounds/leaving)
-
-+ Discord gateway v9
-    + Threads...
