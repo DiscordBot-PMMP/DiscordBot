@@ -375,6 +375,8 @@ class CommunicationHandler{
             $guild->roles->fetch($pk->getRole()->getId())->then(function(DiscordRole $role) use($guild, $pk){
                 $role->position = $pk->getRole()->getPosition();
                 $role->hoist = $pk->getRole()->getHoist();
+                $role->icon = $pk->getRole()->getIconHash();
+                $role->unicode_emoji = $pk->getRole()->getUnicodeEmoji();
                 $role->mentionable = $pk->getRole()->getMentionable();
                 $role->name = $pk->getRole()->getName();
                 $role->color = $pk->getRole()->getColour();

@@ -299,7 +299,7 @@ class Api{
      */
     public function updateRole(Role $role): PromiseInterface{
         if($role->getId() === null){
-            return rejectPromise(new ApiRejection("Role ID must be present when updating."));
+            return rejectPromise(new ApiRejection("Role must be created before being able to update (missing ID)."));
         }
         $pk = new RequestUpdateRole($role);
         $this->plugin->writeOutboundData($pk);
