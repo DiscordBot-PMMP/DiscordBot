@@ -276,7 +276,7 @@ class Api{
      */
     public function createRole(string $guild_id, string $name = "new role", RolePermissions $permissions = null,
                                      int $colour = 0, bool $hoist = false, ?string $icon_hash = null,
-                                     ?string $unicode_emoji = null, bool $mentionable = false): PromiseInterface{
+                                     ?string $unicode_emoji = null, bool $mentionable = false, ?string $reason = null): PromiseInterface{
         if($icon_hash !== null and !Utils::validImageHash($icon_hash)){
             return rejectPromise(new ApiRejection("Invalid icon hash '$icon_hash'."));
         }
@@ -284,7 +284,7 @@ class Api{
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         $pk = new RequestCreateRole($guild_id, $name, $permissions ?? new RolePermissions(), $colour, $hoist, $icon_hash,
-            $unicode_emoji, $mentionable);
+            $unicode_emoji, $mentionable, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -298,11 +298,11 @@ class Api{
      *
      * @return PromiseInterface Resolves with a Role model.
      */
-    public function updateRole(Role $role): PromiseInterface{
+    public function updateRole(Role $role, ?string $reason = null): PromiseInterface{
         if($role->getId() === null){
             return rejectPromise(new ApiRejection("Role must be created before being able to update (missing ID)."));
         }
-        $pk = new RequestUpdateRole($role);
+        $pk = new RequestUpdateRole($role, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -312,14 +312,14 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function deleteRole(string $guild_id, string $role_id): PromiseInterface{
+    public function deleteRole(string $guild_id, string $role_id, ?string $reason = null): PromiseInterface{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($role_id)){
             return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
         }
-        $pk = new RequestDeleteRole($guild_id, $role_id);
+        $pk = new RequestDeleteRole($guild_id, $role_id, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -329,7 +329,7 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function removeRole(string $guild_id, string $user_id, string $role_id): PromiseInterface{
+    public function removeRole(string $guild_id, string $user_id, string $role_id, ?string $reason = null): PromiseInterface{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
@@ -339,7 +339,7 @@ class Api{
         if(!Utils::validDiscordSnowflake($role_id)){
             return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
         }
-        $pk = new RequestRemoveRole($guild_id, $user_id, $role_id);
+        $pk = new RequestRemoveRole($guild_id, $user_id, $role_id, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -349,7 +349,7 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function addRole(string $guild_id, string $user_id, string $role_id): PromiseInterface{
+    public function addRole(string $guild_id, string $user_id, string $role_id, ?string $reason = null): PromiseInterface{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }

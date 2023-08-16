@@ -294,7 +294,7 @@ class CommunicationHandler{
                 'icon' => $pk->getIconHash(),
                 'unicode_emoji' => $pk->getUnicodeEmoji(),
                 'mentionable' => $pk->getMentionable()
-            ])->then(function(DiscordRole $role) use($pk){
+            ], $pk->getReason())->then(function(DiscordRole $role) use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Created role.", [ModelConverter::genModelRole($role)]);
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to create role.", [$e->getMessage(), $e->getTraceAsString()]);
@@ -381,7 +381,7 @@ class CommunicationHandler{
                 $role->name = $pk->getRole()->getName();
                 $role->color = $pk->getRole()->getColour();
                 $role->permissions->bitwise = $pk->getRole()->getPermissions()->getBitwise();
-                $guild->roles->save($role)->then(function(DiscordRole $role) use($pk){
+                $guild->roles->save($role, $pk->getReason())->then(function(DiscordRole $role) use($pk){
                     if($pk->getRole()->getId() !== $pk->getRole()->getGuildId()){
                         $this->handleUpdateRolePosition($pk->getRole())->then(function() use ($role, $pk){
                             $this->resolveRequest($pk->getUID(), true, "Updated role & position.", [ModelConverter::genModelRole($role)]);
@@ -405,7 +405,7 @@ class CommunicationHandler{
     private function handleDeleteRole(RequestDeleteRole $pk): void{
         $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->roles->fetch($pk->getRoleId())->then(function(DiscordRole $role) use($pk, $guild){
-                $guild->roles->delete($role)->then(function() use($pk){
+                $guild->roles->delete($role, $pk->getReason())->then(function() use($pk){
                     $this->resolveRequest($pk->getUID(), true, "Deleted role.");
                 }, function(\Throwable $e) use($pk){
                     $this->resolveRequest($pk->getUID(), false, "Failed to delete role.", [$e->getMessage(), $e->getTraceAsString()]);
@@ -420,7 +420,7 @@ class CommunicationHandler{
 
     private function handleRemoveRole(RequestRemoveRole $pk): void{
         $this->getMember($pk, $pk->getGuildId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
-            $dMember->removeRole($pk->getRoleId())->done(function() use($pk){
+            $dMember->removeRole($pk->getRoleId(), $pk->getReason())->done(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Removed role.");
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to remove role.", [$e->getMessage(), $e->getTraceAsString()]);
@@ -431,7 +431,7 @@ class CommunicationHandler{
 
     private function handleAddRole(RequestAddRole $pk): void{
         $this->getMember($pk, $pk->getGuildId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
-            $dMember->addRole($pk->getRoleId())->done(function() use($pk){
+            $dMember->addRole($pk->getRoleId(), $pk->getReason())->done(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Added role.");
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to add role.", [$e->getMessage(), $e->getTraceAsString()]);

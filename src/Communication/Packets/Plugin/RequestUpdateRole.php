@@ -22,24 +22,33 @@ class RequestUpdateRole extends Packet{
 
     private Role $role;
 
-    public function __construct(Role $role, ?int $uid = null){
+    private ?string $reason;
+
+    public function __construct(Role $role, ?string $reason = null, ?int $uid = null){
         parent::__construct($uid);
         $this->role = $role;
+        $this->reason = $reason;
     }
 
     public function getRole(): Role{
         return $this->role;
     }
 
+    public function getReason(): ?string{
+        return $this->reason;
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putSerializable($this->role);
+        $stream->putNullableString($this->reason);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getSerializable(Role::class)
+            $stream->getSerializable(Role::class),
+            $stream->getNullableString()
         );
     }
 }

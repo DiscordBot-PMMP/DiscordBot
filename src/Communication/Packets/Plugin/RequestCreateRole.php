@@ -36,8 +36,11 @@ class RequestCreateRole extends Packet{
 
     private bool $mentionable;
 
+    private ?string $reason;
+
     public function __construct(string $guild_id, string $name, RolePermissions $permissions, int $colour, bool $hoist,
-                                ?string $icon_hash, ?string $unicode_emoji, bool $mentionable, ?int $uid = null){
+                                ?string $icon_hash, ?string $unicode_emoji, bool $mentionable, ?string $reason = null,
+                                ?int $uid = null){
         parent::__construct($uid);
         $this->guild_id = $guild_id;
         $this->name = $name;
@@ -47,6 +50,7 @@ class RequestCreateRole extends Packet{
         $this->icon_hash = $icon_hash;
         $this->unicode_emoji = $unicode_emoji;
         $this->mentionable = $mentionable;
+        $this->reason = $reason;
     }
 
     public function getGuildId(): string{
@@ -81,6 +85,10 @@ class RequestCreateRole extends Packet{
         return $this->mentionable;
     }
 
+    public function getReason(): ?string{
+        return $this->reason;
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->guild_id);
@@ -91,6 +99,7 @@ class RequestCreateRole extends Packet{
         $stream->putNullableString($this->icon_hash);
         $stream->putNullableString($this->unicode_emoji);
         $stream->putBool($this->mentionable);
+        $stream->putNullableString($this->reason);
         return $stream;
     }
 
@@ -103,7 +112,8 @@ class RequestCreateRole extends Packet{
             $stream->getBool(),                               // hoist
             $stream->getNullableString(),                     // icon_hash
             $stream->getNullableString(),                     // unicode_emoji
-            $stream->getBool()                                // mentionable
+            $stream->getBool(),                               // mentionable
+            $stream->getNullableString()                      // reason
         );
     }
 }
