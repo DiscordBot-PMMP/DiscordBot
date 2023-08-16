@@ -119,19 +119,19 @@ class BotCommunicationHandler{
         elseif($packet instanceof GuildJoinPacket) $this->handleGuildJoin($packet);
         elseif($packet instanceof GuildLeavePacket) $this->handleGuildLeave($packet);
         elseif($packet instanceof GuildUpdatePacket) $this->handleGuildUpdate($packet);
-        elseif($packet instanceof DiscordReadyPacket) $this->handleReady();
+        elseif($packet instanceof DiscordReadyPacket) $this->handleReady($packet);
     }
 
-    private function handleReady(): void{
-        //TODO Move default activity text to event.
-        //Default activity, Feel free to change activity after ReadyEvent.
-        $ac = Activity::create(VersionInfo::NAME." v".VersionInfo::BASE_VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION, ActivityType::GAME, "https://github/com");
+    private function handleReady(DiscordReadyPacket $packet): void{
+        //Default activity, Feel free to change in event / later time
+        $ac = Activity::create(VersionInfo::NAME." v".VersionInfo::BASE_VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION, ActivityType::GAME, "https://github.com/DiscordBotPMMP/DiscordBot");
 
-        $this->plugin->getApi()->updateBotPresence(Status::ONLINE, $ac)->otherwise(function(ApiRejection $a){
+        $event = new DiscordReadyEvent($this->plugin, $packet->getBotUser(), $ac, Status::ONLINE);
+        $event->call();
+
+        $this->plugin->getApi()->updateBotPresence($event->getStatus(), $event->getActivity())->otherwise(function(ApiRejection $a){
             $this->plugin->getLogger()->logException($a);
         });
-
-        (new DiscordReadyEvent($this->plugin))->call();
     }
 
     //Uses the storage (aka cache)
@@ -287,8 +287,8 @@ class BotCommunicationHandler{
     }
 
     private function handleMemberLeave(MemberLeavePacket $packet): void{
-        //When leaving guild this is emitted. TODO bot user data.
-        //if(($u = Storage::getBotUser()) !== null and $u->getId() === explode(".", $packet->getMemberID())[1]) return;
+        //When leaving guild this is emitted.
+        if($this->plugin->getApi()->getBotUser()->getId() === $packet->getUserId()) return;
 
         (new MemberLeftEvent($this->plugin, $packet->getGuildId(), $packet->getUserId()))->call();
     }

@@ -24,7 +24,6 @@ use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level as LoggerLevel;
 use Monolog\Logger;
 
-//Small testing socket.
 class Client{
 
     private Thread $thread;

@@ -14,16 +14,32 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\User;
 
 class DiscordConnected extends Packet{
 
     public const SERIALIZE_ID = 5;
 
+    private User $bot_user;
+
+    public function __construct(User $bot_user, ?int $UID = null){
+        parent::__construct($UID);
+        $this->bot_user = $bot_user;
+    }
+
+    public function getBotUser(): User{
+        return $this->bot_user;
+    }
+
     public function binarySerialize(): BinaryStream{
-        return new BinaryStream();
+        $stream = new BinaryStream();
+        $stream->putSerializable($this->bot_user);
+        return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        return new self();
+        return new self(
+            $stream->getSerializable(User::class)
+        );
     }
 }

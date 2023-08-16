@@ -55,8 +55,11 @@ use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
+use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\WebhookType;
+use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
+use pocketmine\event\EventPriority;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 
 /**
@@ -68,8 +71,22 @@ class Api{
 
     private Main $plugin;
 
+    /** @var User The connected bot user */
+    private User $bot_user;
+
     public function __construct(Main $plugin){
         $this->plugin = $plugin;
+        try{
+            $this->plugin->getServer()->getPluginManager()->registerEvent(DiscordReady::class, function(DiscordReady $event){
+                $this->bot_user = $event->getBotUser();
+            }, EventPriority::LOWEST, $this->plugin, true);
+        }catch(\Throwable $e){
+            $this->plugin->getLogger()->logException($e);
+        }
+    }
+
+    public function getBotUser(): User{
+        return $this->bot_user;
     }
 
     /**

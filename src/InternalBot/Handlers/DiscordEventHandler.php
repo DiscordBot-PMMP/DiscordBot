@@ -195,7 +195,7 @@ array(5) {
         $this->client->getThread()->setStatus(ThreadStatus::RUNNING);
         $this->logger->info("Client '".$client->username."#".$client->discriminator."' ready.");
 
-        $this->client->getThread()->writeOutboundData(new DiscordConnectedPacket());
+        $this->client->getThread()->writeOutboundData(new DiscordConnectedPacket(ModelConverter::genModelUser($client->user)));
         $this->client->getCommunicationHandler()->sendHeartbeat();
     }
 
