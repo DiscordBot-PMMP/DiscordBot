@@ -23,10 +23,13 @@ class RequestUnbanMember extends Packet{
 
     private string $user_id;
 
-    public function __construct(string $guild_id, string $user_id, ?int $uid = null){
+    private ?string $reason;
+
+    public function __construct(string $guild_id, string $user_id, ?string $reason = null, ?int $uid = null){
         parent::__construct($uid);
         $this->guild_id = $guild_id;
         $this->user_id = $user_id;
+        $this->reason = $reason;
     }
 
     public function getGuildId(): string{
@@ -37,17 +40,23 @@ class RequestUnbanMember extends Packet{
         return $this->user_id;
     }
 
+    public function getReason(): ?string{
+        return $this->reason;
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->guild_id);
         $stream->putString($this->user_id);
+        $stream->putNullableString($this->reason);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getString(), // guild_id
-            $stream->getString()  // user_id
+            $stream->getString(),        // guild_id
+            $stream->getString(),        // user_id
+            $stream->getNullableString() // reason
         );
     }
 }

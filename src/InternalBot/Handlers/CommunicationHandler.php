@@ -796,7 +796,7 @@ class CommunicationHandler{
 
     private function handleUnbanMember(RequestUnbanMember $pk): void{
         $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
-            $guild->unban($pk->getUserId())->then(function() use($pk){
+            $guild->bans->unban($pk->getUserId(), $pk->getReason())->then(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Member unbanned.");
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to unban member.", [$e->getMessage(), $e->getTraceAsString()]);
