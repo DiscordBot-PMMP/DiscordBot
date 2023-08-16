@@ -28,6 +28,7 @@ use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use Discord\Repository\Channel\WebhookRepository as DiscordWebhookRepository;
 use Discord\Repository\Guild\InviteRepository as DiscordInviteRepository;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateBotPresence;
 use JaxkDev\DiscordBot\InternalBot\Client;
 use JaxkDev\DiscordBot\InternalBot\ModelConverter;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
@@ -56,7 +57,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeBan;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdatePresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
@@ -69,7 +69,6 @@ use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
-use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Messages\Reply;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
@@ -109,7 +108,7 @@ class CommunicationHandler{
 
         //API Packets:
         if($pk instanceof RequestUpdateNickname) $this->handleUpdateNickname($pk);
-        elseif($pk instanceof RequestUpdatePresence) $this->handleUpdatePresence($pk);
+        elseif($pk instanceof RequestUpdateBotPresence) $this->handleUpdateBotPresence($pk);
         elseif($pk instanceof RequestBroadcastTyping) $this->handleBroadcastTyping($pk);
         elseif($pk instanceof RequestSendMessage) $this->handleSendMessage($pk);
         elseif($pk instanceof RequestSendFile) $this->handleSendFile($pk);
@@ -622,7 +621,7 @@ class CommunicationHandler{
         });
     }
 
-    private function handleUpdatePresence(RequestUpdatePresence $pk): void{
+    private function handleUpdateBotPresence(RequestUpdateBotPresence $pk): void{
         $presence = $pk->getPresence();
         $activity = $presence->getActivities()[0] ?? null;
         $dactivity = null;

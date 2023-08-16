@@ -144,7 +144,7 @@ class Invite implements BinarySerializable{
             $stream->getNullableString(),                               // guild_id
             $stream->getString(),                                       // channel_id
             $stream->getNullableString(),                               // inviter
-            InviteTargetType::tryFrom($stream->getNullableByte() ?? -1), // target_type
+            InviteTargetType::tryFrom($stream->getNullableByte() ?? -1),// target_type
             $stream->getNullableString(),                               // target_user
             $stream->getNullableInt(),                                  // expires_at
         );

@@ -162,11 +162,14 @@ class Api{
      *
      * @return PromiseInterface Resolves with an array of Message models.
      */
-    public function fetchPinnedMessages(string $channel_id): PromiseInterface{
+    public function fetchPinnedMessages(string $guild_id, string $channel_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        $pk = new RequestFetchPinnedMessages($channel_id);
+        $pk = new RequestFetchPinnedMessages($guild_id, $channel_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -176,14 +179,17 @@ class Api{
      *
      * @return PromiseInterface Resolves with a Message model.
      */
-    public function fetchMessage(string $channel_id, string $message_id): PromiseInterface{
+    public function fetchMessage(string $guild_id, string $channel_id, string $message_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         if(!Utils::validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
-        $pk = new RequestFetchMessage($channel_id, $message_id);
+        $pk = new RequestFetchMessage($guild_id, $channel_id, $message_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -193,14 +199,17 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function pinMessage(string $channel_id, string $message_id): PromiseInterface{
+    public function pinMessage(string $guild_id, string $channel_id, string $message_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         if(!Utils::validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
-        $pk = new RequestPinMessage($channel_id, $message_id);
+        $pk = new RequestPinMessage($guild_id, $channel_id, $message_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -210,14 +219,17 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function unpinMessage(string $channel_id, string $message_id): PromiseInterface{
+    public function unpinMessage(string $guild_id, string $channel_id, string $message_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         if(!Utils::validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
-        $pk = new RequestUnpinMessage($channel_id, $message_id);
+        $pk = new RequestUnpinMessage($guild_id, $channel_id, $message_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -230,6 +242,9 @@ class Api{
     public function createRole(string $guild_id, string $name, RolePermissions $permissions = null,
                                      int $colour = 0, bool $hoist = false, ?string $icon = null,
                                      ?string $unicode_emoji = null, bool $mentionable = false): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
         $role = new Role(null, $guild_id, $name, $colour, $hoist, $icon, $unicode_emoji,
 0, $permissions ?? new RolePermissions(0), false, $mentionable, null);
         $pk = new RequestCreateRole($role);
@@ -318,7 +333,11 @@ class Api{
      * @param string $emoji Raw emoji eg '👍'
      * @return PromiseInterface Resolves with no data.
      */
-    public function removeReaction(string $channel_id, string $message_id, string $user_id, string $emoji): PromiseInterface{
+    public function removeReaction(string $guild_id, string $channel_id, string $message_id, string $user_id,
+                                   string $emoji): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
@@ -328,7 +347,7 @@ class Api{
         if(!Utils::validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
-        $pk = new RequestRemoveReaction($channel_id, $message_id, $user_id, $emoji);
+        $pk = new RequestRemoveReaction($guild_id, $channel_id, $message_id, $user_id, $emoji);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -340,14 +359,17 @@ class Api{
      *                           if specified everyone's reaction with that emoji will be removed.
      * @return PromiseInterface Resolves with no data.
      */
-    public function removeAllReactions(string $channel_id, string $message_id, ?string $emoji = null): PromiseInterface{
+    public function removeAllReactions(string $guild_id, string $channel_id, string $message_id, ?string $emoji = null): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         if(!Utils::validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
-        $pk = new RequestRemoveAllReactions($channel_id, $message_id, $emoji);
+        $pk = new RequestRemoveAllReactions($guild_id, $channel_id, $message_id, $emoji);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -360,14 +382,17 @@ class Api{
      * @param string $emoji            MUST BE THE ACTUAL EMOJI CHARACTER, (Custom/Private emoji's not yet supported) eg '👍'
      * @return PromiseInterface Resolves with no data.
      */
-    public function addReaction(string $channel_id, string $message_id, string $emoji): PromiseInterface{
+    public function addReaction(string $guild_id, string $channel_id, string $message_id, string $emoji): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         if(!Utils::validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
-        $pk = new RequestAddReaction($channel_id, $message_id, $emoji);
+        $pk = new RequestAddReaction($guild_id, $channel_id, $message_id, $emoji);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -381,11 +406,14 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function broadcastTyping(string $channel_id): PromiseInterface{
+    public function broadcastTyping(string $guild_id, string $channel_id): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        $pk = new RequestBroadcastTyping($channel_id);
+        $pk = new RequestBroadcastTyping($guild_id, $channel_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -478,7 +506,11 @@ class Api{
      * @param string|null $file_name Optional file_name to show in discord, Prefix with 'SPOILER_' to make as spoiler.
      * @return PromiseInterface Resolves with a Message model.
      */
-    public function sendFile(string $channel_id, string $file_path, string $message = "", string $file_name = null): PromiseInterface{
+    public function sendFile(string $guild_id, string $channel_id, string $file_path, string $message = "",
+                             string $file_name = null): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
@@ -491,7 +523,7 @@ class Api{
         if($file_name === null){
             $file_name = basename($file_path);
         }
-        $pk = new RequestSendFile($channel_id, $file_name, $file_path, $message);
+        $pk = new RequestSendFile($guild_id, $channel_id, $file_name, $file_path, $message);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
@@ -537,7 +569,7 @@ class Api{
      *
      * @return PromiseInterface Resolves with a Channel model of same type provided.
      */
-    public function createChannel(GuildChannel $channel): PromiseInterface{
+    public function createChannel(GuildChannel $channel): PromiseInterface{ //TODO
         $pk = new RequestCreateChannel($channel);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
@@ -581,7 +613,7 @@ class Api{
      *
      * @return PromiseInterface Resolves with an Invite model.
      */
-    public function createInvite(Invite $invite): PromiseInterface{
+    public function createInvite(Invite $invite): PromiseInterface{ //TODO no invite model on create param
         $pk = new RequestInitialiseInvite($invite);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());

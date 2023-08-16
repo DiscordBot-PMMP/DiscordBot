@@ -19,17 +19,24 @@ class RequestAddReaction extends Packet{
 
     public const SERIALIZE_ID = 40;
 
+    private string $guild_id;
+
     private string $channel_id;
 
     private string $message_id;
 
     private string $emoji;
 
-    public function __construct(string $channel_id, string $message_id, string $emoji, ?int $uid = null){
+    public function __construct(string $guild_id, string $channel_id, string $message_id, string $emoji, ?int $uid = null){
         parent::__construct($uid);
+        $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
         $this->message_id = $message_id;
         $this->emoji = $emoji;
+    }
+
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
     public function getChannelId(): string{
@@ -46,6 +53,7 @@ class RequestAddReaction extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putString($this->guild_id);
         $stream->putString($this->channel_id);
         $stream->putString($this->message_id);
         $stream->putString($this->emoji);
@@ -54,6 +62,7 @@ class RequestAddReaction extends Packet{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
+            $stream->getString(), // guild_id
             $stream->getString(), // channel_id
             $stream->getString(), // message_id
             $stream->getString() // emoji
