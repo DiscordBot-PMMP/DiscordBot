@@ -269,17 +269,21 @@ class Api{
     /**
      * Create a role.
      *
+     * (Note, icon_hash and unicode_emoji only work with guilds with the ROLE_ICONS feature)
+     *
      * @return PromiseInterface Resolves with Role model.
      */
-    public function createRole(string $guild_id, string $name, RolePermissions $permissions = null,
-                                     int $colour = 0, bool $hoist = false, ?string $icon = null,
+    public function createRole(string $guild_id, string $name = "new role", RolePermissions $permissions = null,
+                                     int $colour = 0, bool $hoist = false, ?string $icon_hash = null,
                                      ?string $unicode_emoji = null, bool $mentionable = false): PromiseInterface{
+        if($icon_hash !== null and !Utils::validImageHash($icon_hash)){
+            return rejectPromise(new ApiRejection("Invalid icon hash '$icon_hash'."));
+        }
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        $role = new Role(null, $guild_id, $name, $colour, $hoist, $icon, $unicode_emoji,
-0, $permissions ?? new RolePermissions(0), false, $mentionable, null);
-        $pk = new RequestCreateRole($role);
+        $pk = new RequestCreateRole($guild_id, $name, $permissions ?? new RolePermissions(), $colour, $hoist, $icon_hash,
+            $unicode_emoji, $mentionable);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

@@ -285,21 +285,17 @@ class CommunicationHandler{
     }
 
     private function handleCreateRole(RequestCreateRole $pk): void{
-        $this->getGuild($pk, $pk->getRole()->getGuildId(), function(DiscordGuild $guild) use($pk){
-            $r = $pk->getRole();
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->createRole([
-                'name' => $r->getName(),
-                'color' => $r->getColour(),
-                'permissions' => $r->getPermissions()->getBitwise(),
-                'hoist' => $r->getHoist(),
-                'position' => $r->getPosition(),
-                'mentionable' => $r->getMentionable()
+                'name' => $pk->getName(),
+                'color' => $pk->getColour(),
+                'permissions' => $pk->getPermissions()->getBitwise(),
+                'hoist' => $pk->getHoist(),
+                'icon' => $pk->getIconHash(),
+                'unicode_emoji' => $pk->getUnicodeEmoji(),
+                'mentionable' => $pk->getMentionable()
             ])->then(function(DiscordRole $role) use($pk){
-                $this->handleUpdateRolePosition($pk->getRole())->then(function() use($role, $pk){
-                    $this->resolveRequest($pk->getUID(), true, "Created role.", [ModelConverter::genModelRole($role)]);
-                }, function(ApiRejection $rejection) use($pk){
-                    $this->resolveRequest($pk->getUID(), false, $rejection->getMessage(), [$rejection->getMessage(), $rejection->getTraceAsString()]);
-                });
+                $this->resolveRequest($pk->getUID(), true, "Created role.", [ModelConverter::genModelRole($role)]);
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to create role.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to create role ({$pk->getUID()}) - {$e->getMessage()}");
