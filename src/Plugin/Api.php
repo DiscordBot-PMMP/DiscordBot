@@ -703,14 +703,14 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function updateNickname(string $guild_id, string $user_id, ?string $nickname = null): PromiseInterface{
+    public function updateNickname(string $guild_id, string $user_id, ?string $nickname = null, ?string $reason = null): PromiseInterface{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
-        $pk = new RequestUpdateNickname($guild_id, $user_id, $nickname);
+        $pk = new RequestUpdateNickname($guild_id, $user_id, $nickname, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

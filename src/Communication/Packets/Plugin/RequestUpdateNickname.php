@@ -25,11 +25,15 @@ class RequestUpdateNickname extends Packet{
 
     private ?string $nickname;
 
-    public function __construct(string $guild_id, string $user_id, ?string $nickname = null, ?int $uid = null){
+    private ?string $reason;
+
+    public function __construct(string $guild_id, string $user_id, ?string $nickname = null, ?string $reason = null,
+                                ?int $uid = null){
         parent::__construct($uid);
         $this->guild_id = $guild_id;
         $this->user_id = $user_id;
         $this->nickname = $nickname;
+        $this->reason = $reason;
     }
 
     public function getGuildId(): string{
@@ -44,11 +48,16 @@ class RequestUpdateNickname extends Packet{
         return $this->nickname;
     }
 
+    public function getReason(): ?string{
+        return $this->reason;
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->guild_id);
         $stream->putString($this->user_id);
         $stream->putNullableString($this->nickname);
+        $stream->putNullableString($this->reason);
         return $stream;
     }
 
@@ -56,7 +65,8 @@ class RequestUpdateNickname extends Packet{
         return new self(
             $stream->getString(),        // guild_id
             $stream->getString(),        // user_id
-            $stream->getNullableString() // nickname
+            $stream->getNullableString(),// nickname
+            $stream->getNullableString() // reason
         );
     }
 }

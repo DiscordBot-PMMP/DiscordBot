@@ -623,7 +623,7 @@ class CommunicationHandler{
 
     private function handleUpdateNickname(RequestUpdateNickname $pk): void{
         $this->getMember($pk, $pk->getGuildId(), $pk->getUserId(), function(DiscordMember $dMember) use($pk){
-            $dMember->setNickname($pk->getNickname())->done(function() use($pk){
+            $dMember->setNickname($pk->getNickname(), $pk->getReason())->done(function() use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Updated nickname.");
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to update nickname.", [$e->getMessage(), $e->getTraceAsString()]);
