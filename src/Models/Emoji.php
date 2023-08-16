@@ -55,7 +55,10 @@ class Emoji implements BinarySerializable{
     /** Whether this emoji can be used, may be false due to loss of Server Boosts */
     private ?bool $available;
 
-    //No support for create/update emoji.
+    //No support for create/update/delete emoji.
+
+    //Standard emoji constructor new Emoji(null, "✅") = ✅
+    //Custom emoji constructor new Emoji("123456789", "test", ["123456789"], "123456789", true, false, false, true) = a:test:123456789
 
     /** @param ?string[] $role_ids Role IDs */
     public function __construct(?string $id, ?string $name, ?array $role_ids, ?string $user_id, ?bool $require_colons,
@@ -147,6 +150,19 @@ class Emoji implements BinarySerializable{
 
     public function setAvailable(?bool $available): void{
         $this->available = $available;
+    }
+
+    public function toApiString(): string{
+        if($this->id === null){
+            return $this->name;
+        }
+        return ($this->animated ? "a" : "") . ":{$this->name}:{$this->id}";
+    }
+    public function __toString(): string{
+        if($this->id === null){
+            return $this->name;
+        }
+        return "<" . ($this->animated ? "a" : "") . ":{$this->name}:{$this->id}>";
     }
 
     //----- Serialization -----//

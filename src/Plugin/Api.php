@@ -47,6 +47,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
+use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
@@ -366,7 +367,9 @@ class Api{
     /**
      * Remove a single reaction.
      *
-     * @param string $emoji Raw emoji eg '👍'
+     * @param string $emoji Raw emoji eg '👍' or 'a:NAME:ID' for custom animated or ':NAME:ID' for custom non-animated.
+     *                      See Emoji::toApiString() for more info.
+     * @see Emoji::toApiString()
      * @return PromiseInterface Resolves with no data.
      */
     public function removeReaction(string $guild_id, string $channel_id, string $message_id, string $user_id,
@@ -393,6 +396,10 @@ class Api{
      *
      * @param string|null $emoji If no emoji specified ALL reactions by EVERYONE will be deleted,
      *                           if specified everyone's reaction with that emoji will be removed.
+     *
+     *                           Raw emoji eg '👍' or 'a:NAME:ID' for custom animated or ':NAME:ID' for custom non-animated.
+     *                           See Emoji::toApiString() for more info.
+     * @see Emoji::toApiString()
      * @return PromiseInterface Resolves with no data.
      */
     public function removeAllReactions(string $guild_id, string $channel_id, string $message_id, ?string $emoji = null): PromiseInterface{
@@ -415,7 +422,9 @@ class Api{
      *
      * Note, If you have already reacted with the emoji provided it will still respond with a successful promise resolution.
      *
-     * @param string $emoji            MUST BE THE ACTUAL EMOJI CHARACTER, (Custom/Private emoji's not yet supported) eg '👍'
+     * @param string $emoji emoji string eg '👍' OR 'a:NAME:ID' for custom animated or ':NAME:ID' for custom non-animated.
+     *                      See Emoji::toApiString() for more info.
+     * @see Emoji::toApiString()
      * @return PromiseInterface Resolves with no data.
      */
     public function addReaction(string $guild_id, string $channel_id, string $message_id, string $emoji): PromiseInterface{
