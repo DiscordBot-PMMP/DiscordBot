@@ -845,6 +845,7 @@ class CommunicationHandler{
 
     /**
      * @param callable(DiscordGuild): void $cb
+     * @noinspection PhpDocMissingThrowsInspection (fetch does not throw it but reject promise, but that is handled.)
      */
     private function getGuild(Packet $pk, string $guild_id, callable $cb): void{
         $this->client->getDiscordClient()->guilds->fetch($guild_id)->done(function(DiscordGuild $guild) use($cb){
@@ -882,6 +883,7 @@ class CommunicationHandler{
 
     /**
      * @param callable(DiscordMessage): void $cb
+     * @noinspection PhpDocMissingThrowsInspection (fetch does not throw it but reject promise, but that is handled.)
      */
     private function getMessage(Packet $pk, string $channel_id, string $message_id, callable $cb): void{
         $this->getChannel($pk, $channel_id, function(DiscordChannel $channel) use($pk, $message_id, $cb){
