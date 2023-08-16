@@ -21,24 +21,33 @@ class RequestFetchWebhooks extends Packet{
 
     private string $guild_id;
 
-    public function __construct(string $guild_id, ?int $uid = null){
+    private ?string $channel_id;
+
+    public function __construct(string $guild_id, ?string $channel_id = null, ?int $uid = null){
         parent::__construct($uid);
         $this->guild_id = $guild_id;
+        $this->channel_id = $channel_id;
     }
 
     public function getGuildId(): string{
         return $this->guild_id;
     }
 
+    public function getChannelId(): ?string{
+        return $this->channel_id;
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->guild_id);
+        $stream->putNullableString($this->channel_id);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getString()
+            $stream->getString(),        // guild_id
+            $stream->getNullableString() // channel_id
         );
     }
 }

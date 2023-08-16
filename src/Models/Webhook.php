@@ -30,7 +30,7 @@ class Webhook implements BinarySerializable{
     private WebhookType $type;
 
     /** The ID of the webhook */
-    private ?string $id;
+    private string $id;
 
     /** The guild ID this webhook is for, if any */
     private ?string $guild_id;
@@ -66,7 +66,7 @@ class Webhook implements BinarySerializable{
      * @internal
      * @see Api::createWebhook()
      */
-    public function __construct(WebhookType $type, ?string $id = null, ?string $guild_id = null, ?string $channel_id = null,
+    public function __construct(WebhookType $type, string $id, ?string $guild_id = null, ?string $channel_id = null,
                                 ?string $user_id = null, ?string $name = null, ?string $avatar = null, ?string $token = null,
                                 ?string $application_id = null, ?string $source_guild_id = null, ?string $source_channel_id = null){
         $this->setType($type);
@@ -90,12 +90,12 @@ class Webhook implements BinarySerializable{
         $this->type = $type;
     }
 
-    public function getId(): ?string{
+    public function getId(): string{
         return $this->id;
     }
 
-    public function setId(?string $id): void{
-        if($id !== null and !Utils::validDiscordSnowflake($id)){
+    public function setId(string $id): void{
+        if(!Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -213,7 +213,7 @@ class Webhook implements BinarySerializable{
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putByte($this->type->value);
-        $stream->putNullableString($this->id);
+        $stream->putString($this->id);
         $stream->putNullableString($this->guild_id);
         $stream->putNullableString($this->channel_id);
         $stream->putNullableString($this->user_id);
@@ -229,7 +229,7 @@ class Webhook implements BinarySerializable{
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
             WebhookType::from($stream->getByte()),
-            $stream->getNullableString(),       // id
+            $stream->getString(),               // id
             $stream->getNullableString(),       // guild_id
             $stream->getNullableString(),       // channel_id
             $stream->getNullableString(),       // user_id

@@ -196,19 +196,36 @@ class CommunicationHandler{
     }
 
     private function handleFetchWebhooks(RequestFetchWebhooks $pk): void{
-        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
-            $channel->webhooks->freshen()->then(function(DiscordWebhookRepository $repository) use($pk){
+        if($pk->getChannelId() !== null){
+            $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+                $channel->webhooks->freshen()->then(function(DiscordWebhookRepository $repository) use($pk){
+                    $webhooks = [];
+                    /** @var DiscordWebhook $webhook */
+                    foreach($repository->toArray() as $webhook){
+                        $webhooks[] = ModelConverter::genModelWebhook($webhook);
+                    }
+                    $this->resolveRequest($pk->getUID(), true, "Fetched webhooks.", $webhooks);
+                }, function(\Throwable $e) use($pk){
+                    $this->resolveRequest($pk->getUID(), false, "Failed to fetch webhooks.", [$e->getMessage(), $e->getTraceAsString()]);
+                    $this->logger->debug("Failed to fetch webhooks ({$pk->getUID()}) - freshen error: {$e->getMessage()}");
+                });
+            });
+        }else{
+            $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use ($pk){
                 $webhooks = [];
-                /** @var DiscordWebhook $webhook */
-                foreach($repository->toArray() as $webhook){
-                    $webhooks[] = ModelConverter::genModelWebhook($webhook);
+                foreach($guild->channels->toArray() as $channel){
+                    $channel->webhooks->freshen()->then(function(DiscordWebhookRepository $repository) use (&$webhooks){
+                        /** @var DiscordWebhook $webhook */
+                        foreach($repository->toArray() as $webhook){
+                            $webhooks[] = ModelConverter::genModelWebhook($webhook);
+                        }
+                    }, function(\Throwable $e) use ($pk){
+                        $this->logger->debug("[Non-fatal] Failed to fetch webhooks ({$pk->getUID()}) - freshen error: {$e->getMessage()}");
+                    });
                 }
                 $this->resolveRequest($pk->getUID(), true, "Fetched webhooks.", $webhooks);
-            }, function(\Throwable $e) use($pk){
-                $this->resolveRequest($pk->getUID(), false, "Failed to fetch webhooks.", [$e->getMessage(), $e->getTraceAsString()]);
-                $this->logger->debug("Failed to fetch webhooks ({$pk->getUID()}) - freshen error: {$e->getMessage()}");
             });
-        });
+        }
     }
 
     private function handleFetchPinnedMessages(RequestFetchPinnedMessages $pk): void{
