@@ -445,7 +445,7 @@ class Api{
     /**
      * "Generally bots should not implement this. However, if a bot is responding to a command and expects the computation
      * to take a few seconds, this endpoint may be called to let the user know that the bot is processing their message."
-     * The 'typing' effect will last for 10s
+     * The 'typing' effect will last for 5s
      *
      * DO NOT ABUSE THIS.
      *
