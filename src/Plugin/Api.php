@@ -27,7 +27,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
@@ -35,7 +35,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
@@ -47,7 +47,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Emoji;
-use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
@@ -662,26 +661,39 @@ class Api{
     }
 
     /**
-     * Initialise if possible the given invite.
+     * Create a new Invite.
      *
      * @return PromiseInterface Resolves with an Invite model.
      */
-    public function createInvite(Invite $invite): PromiseInterface{ //TODO no invite model on create param
-        $pk = new RequestInitialiseInvite($invite);
+    public function createInvite(string $guild_id, string $channel_id, int $max_age = 86400, int $max_uses = 0,
+                                 bool $temporary = false, bool $unique = false, ?string $reason = null): PromiseInterface{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+        }
+        if($max_age < 0 or $max_age > 86400){
+            return rejectPromise(new ApiRejection("Max age must be between 0(never) and 604800seconds (7 days)."));
+        }
+        if($max_uses < 0 or $max_uses > 100){
+            return rejectPromise(new ApiRejection("Max uses must be between 0(unlimited) and 100."));
+        }
+        $pk = new RequestCreateInvite($guild_id, $channel_id, $max_age, $max_uses, $temporary, $unique, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
 
     /**
-     * Revoke an initialised invite.
+     * Delete an Invite.
      *
-     * @return PromiseInterface Resolves with a Invite model.
+     * @return PromiseInterface Resolves with no data.
      */
-    public function deleteInvite(string $guild_id, string $invite_code): PromiseInterface{
+    public function deleteInvite(string $guild_id, string $invite_code, ?string $reason = null): PromiseInterface{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        $pk = new RequestRevokeInvite($guild_id, $invite_code);
+        $pk = new RequestDeleteInvite($guild_id, $invite_code, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

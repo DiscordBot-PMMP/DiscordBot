@@ -27,7 +27,6 @@ use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use Discord\Repository\Channel\WebhookRepository as DiscordWebhookRepository;
-use Discord\Repository\Guild\InviteRepository as DiscordInviteRepository;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateBotPresence;
 use JaxkDev\DiscordBot\InternalBot\Client;
 use JaxkDev\DiscordBot\InternalBot\ModelConverter;
@@ -46,7 +45,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInitialiseInvite;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
@@ -54,7 +53,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRevokeInvite;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
@@ -128,8 +127,8 @@ class CommunicationHandler{
         elseif($pk instanceof RequestUpdateRole) $this->handleUpdateRole($pk);
         elseif($pk instanceof RequestDeleteRole) $this->handleDeleteRole($pk);
         elseif($pk instanceof RequestKickMember) $this->handleKickMember($pk);
-        elseif($pk instanceof RequestInitialiseInvite) $this->handleInitialiseInvite($pk);
-        elseif($pk instanceof RequestRevokeInvite) $this->handleRevokeInvite($pk);
+        elseif($pk instanceof RequestCreateInvite) $this->handleCreateInvite($pk);
+        elseif($pk instanceof RequestDeleteInvite) $this->handleDeleteInvite($pk);
         elseif($pk instanceof RequestCreateChannel) $this->handleCreateChannel($pk);
         elseif($pk instanceof RequestUpdateChannel) $this->handleUpdateChannel($pk);
         elseif($pk instanceof RequestDeleteChannel) $this->handleDeleteChannel($pk);
@@ -805,38 +804,32 @@ class CommunicationHandler{
         });
     }
 
-    private function handleInitialiseInvite(RequestInitialiseInvite $pk): void{
-        $invite = $pk->getInvite();
-        $this->getChannel($pk, $invite->getChannelId(), function(DiscordChannel $channel) use($pk/*, $invite*/){
-            /** @phpstan-ignore-next-line Poorly documented function on discordphp side. */
+    private function handleCreateInvite(RequestCreateInvite $pk): void{
+        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+            /** @phpstan-ignore-next-line Incorrect typehints used by DiscordPHP */
             $channel->createInvite([
-                //todo
-                /*"max_age" => $invite->getMaxAge(), "max_uses" => $invite->getMaxUses(), "temporary" => $invite->(),*/ "unique" => true
-            ])->done(function(DiscordInvite $dInvite) use($pk){
-                $this->resolveRequest($pk->getUID(), true, "Invite initialised.", [ModelConverter::genModelInvite($dInvite)]);
-                $this->logger->debug("Invite initialised ({$pk->getUID()})");
+                "max_age" => $pk->getMaxAge(),
+                "max_uses" => $pk->getMaxUses(),
+                "temporary" => $pk->getTemporary(),
+                "unique" => $pk->getUnique()
+            ], $pk->getReason())->done(function(DiscordInvite $dInvite) use($pk){
+                $this->resolveRequest($pk->getUID(), true, "Invite created.", [ModelConverter::genModelInvite($dInvite)]);
+                $this->logger->debug("Invite created ({$pk->getUID()})");
             }, function(\Throwable $e) use($pk){
-                $this->resolveRequest($pk->getUID(), false, "Failed to initialise.", [$e->getMessage(), $e->getTraceAsString()]);
-                $this->logger->debug("Failed to initialise invite ({$pk->getUID()}) - {$e->getMessage()}");
+                $this->resolveRequest($pk->getUID(), false, "Failed to create Invite.", [$e->getMessage(), $e->getTraceAsString()]);
+                $this->logger->debug("Failed to create Invite ({$pk->getUID()}) - {$e->getMessage()}");
             });
         });
     }
 
-    private function handleRevokeInvite(RequestRevokeInvite $pk): void{
+    private function handleDeleteInvite(RequestDeleteInvite $pk): void{
         $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
-            $guild->invites->freshen()->done(function(DiscordInviteRepository $invites) use($pk){
-                /** @var DiscordInvite $dInvite */
-                $dInvite = $invites->get("code", $pk->getInviteCode());
-                $invites->delete($dInvite)->done(function(DiscordInvite $dInvite) use($pk){
-                    $this->resolveRequest($pk->getUID(), true, "Invite revoked.", [ModelConverter::genModelInvite($dInvite)]);
-                    $this->logger->debug("Invite revoked ({$pk->getUID()})");
-                }, function(\Throwable $e) use($pk){
-                    $this->resolveRequest($pk->getUID(), false, "Failed to revoke.", [$e->getMessage(), $e->getTraceAsString()]);
-                    $this->logger->debug("Failed to revoke invite ({$pk->getUID()}) - {$e->getMessage()}");
-                });
+            $guild->invites->delete($pk->getInviteCode(), $pk->getReason())->done(function(DiscordInvite $dInvite) use($pk){
+                    $this->resolveRequest($pk->getUID(), true, "Invite deleted.");
+                    $this->logger->debug("Invite deleted ({$pk->getUID()})");
             }, function(\Throwable $e) use($pk){
-                $this->resolveRequest($pk->getUID(), false, "Failed to freshen invites.", [$e->getMessage(), $e->getTraceAsString()]);
-                $this->logger->debug("Failed to revoke invite ({$pk->getUID()}) - invite freshen error: {$e->getMessage()}");
+                $this->resolveRequest($pk->getUID(), false, "Failed to delete Invite.", [$e->getMessage(), $e->getTraceAsString()]);
+                $this->logger->debug("Failed to delete Invite ({$pk->getUID()}) - {$e->getMessage()}");
             });
         });
     }

@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestRevokeInvite extends Packet{
+class RequestDeleteInvite extends Packet{
 
     public const SERIALIZE_ID = 75;
 
@@ -23,10 +23,13 @@ class RequestRevokeInvite extends Packet{
 
     private string $invite_code;
 
-    public function __construct(string $guild_id, string $invite_code, ?int $uid = null){
+    private ?string $reason;
+
+    public function __construct(string $guild_id, string $invite_code, ?string $reason = null, ?int $uid = null){
         parent::__construct($uid);
         $this->guild_id = $guild_id;
         $this->invite_code = $invite_code;
+        $this->reason = $reason;
     }
 
     public function getGuildId(): string{
@@ -37,17 +40,23 @@ class RequestRevokeInvite extends Packet{
         return $this->invite_code;
     }
 
+    public function getReason(): ?string{
+        return $this->reason;
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->guild_id);
         $stream->putString($this->invite_code);
+        $stream->putNullableString($this->reason);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getString(), // guild_id
-            $stream->getString()  // invite_code
+            $stream->getString(),        // guild_id
+            $stream->getString(),        // invite_code
+            $stream->getNullableString() // reason
         );
     }
 }
