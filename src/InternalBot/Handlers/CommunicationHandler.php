@@ -600,7 +600,7 @@ class CommunicationHandler{
     private function handleDeleteChannel(RequestDeleteChannel $pk): void{
         $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
             $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($guild, $pk){
-                $guild->channels->delete($channel)->then(function() use($pk){
+                $guild->channels->delete($channel, $pk->getReason())->then(function() use($pk){
                     $this->resolveRequest($pk->getUID(), true, "Channel deleted.");
                 }, function(\Throwable $e) use($pk){
                     $this->resolveRequest($pk->getUID(), false, "Failed to delete channel.", [$e->getMessage(), $e->getTraceAsString()]);

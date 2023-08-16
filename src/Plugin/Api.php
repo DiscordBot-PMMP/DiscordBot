@@ -649,14 +649,14 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function deleteChannel(string $guild_id, string $channel_id): PromiseInterface{
+    public function deleteChannel(string $guild_id, string $channel_id, ?string $reason = null): PromiseInterface{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        $pk = new RequestDeleteChannel($guild_id, $channel_id);
+        $pk = new RequestDeleteChannel($guild_id, $channel_id, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
