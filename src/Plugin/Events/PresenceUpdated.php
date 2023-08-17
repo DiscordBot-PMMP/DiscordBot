@@ -13,7 +13,6 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use pocketmine\plugin\Plugin;
 
@@ -22,26 +21,25 @@ use pocketmine\plugin\Plugin;
  */
 class PresenceUpdated extends DiscordBotEvent{
 
-    private Member $member;
+    private string $guild_id;
+
+    private string $user_id;
 
     private Presence $new_presence;
 
-    public function __construct(Plugin $plugin, Member $member, Presence $new_presence){
+    public function __construct(Plugin $plugin, string $guild_id, string $user_id, Presence $new_presence){
         parent::__construct($plugin);
-        $this->member = $member;
+        $this->guild_id = $guild_id;
+        $this->user_id = $user_id;
         $this->new_presence = $new_presence;
     }
 
-    public function getMember(): Member{
-        return $this->member;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
-    /**
-     * Alias, Member still has old presence at time of event.
-     * @see Member::getPresence()
-     */
-    public function getOldPresence(): ?Presence{
-        return $this->member->getPresence();
+    public function getUserId(): string{
+        return $this->user_id;
     }
 
     public function getNewPresence(): Presence{

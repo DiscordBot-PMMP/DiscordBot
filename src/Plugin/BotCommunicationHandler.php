@@ -68,6 +68,7 @@ use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveAll as MessageReaction
 use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveEmoji as MessageReactionRemoveEmojiEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\PresenceUpdated as PresenceUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
@@ -199,14 +200,7 @@ class BotCommunicationHandler{
     }
 
     private function handlePresenceUpdate(PresenceUpdatePacket $packet): void{
-        //TODO
-        /*$member = Storage::getMember($packet->getMemberId());
-        if($member === null){
-            throw new \AssertionError("Member '{$packet->getMemberId()}' not found in storage.");
-        }
-        $presence = $packet->getPresence();
-        (new PresenceUpdatedEvent($this->plugin, $member, $presence))->call();
-        $member->setPresence($presence);*/
+        (new PresenceUpdatedEvent($this->plugin, $packet->getGuildId(), $packet->getUserId(), $packet->getPresence()))->call();
     }
 
     private function handleMessageSent(MessageSentPacket $packet): void{
