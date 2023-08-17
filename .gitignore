@@ -2,13 +2,13 @@
 /dist/
 /.cache/
 /code-coverage/
+/tools/php-cs-fixer/vendor/
 
 *.phar
 *.txt
 *.DS_STORE
 
-TEST.php
-PHPSTAN.php
+tools/TEST.php
+tools/PHPSTAN.php
 phpstan.neon
-phpunit.xml
-.phpunit.result.cache
+.php-cs-fixer.cache
