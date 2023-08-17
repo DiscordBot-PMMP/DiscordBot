@@ -13,26 +13,19 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
-use function in_array;
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use function sizeof;
 use function strlen;
 
-//Yes quite a lot of nullables... (https://discord.com/developers/docs/resources/channel#embed-object)
-class Embed{
+/**
+ * @implements BinarySerializable<Embed>
+ * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-structure
+ */
+class Embed implements BinarySerializable{
 
-    // https://discord.com/developers/docs/resources/channel#embed-object-embed-types
-    const
-        TYPE_RICH = 'rich',
-        TYPE_IMAGE = 'image',
-        TYPE_VIDEO = 'video',
-        TYPE_GIFV = 'gifv',
-        TYPE_ARTICLE = 'article',
-        TYPE_LINK = 'link';
-
-    /** 2048 characters */
+    /** 256 characters */
     private ?string $title;
-
-    private ?string $type;
 
     /** 4096 characters */
     private ?string $description;
@@ -43,17 +36,17 @@ class Embed{
 
     private ?int $colour;
 
-    //Provider?? https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
+    private ?Footer $footer;
 
-    private Footer $footer;
+    private ?Image $image;
 
-    private Image $image;
+    private ?Image $thumbnail;
 
-    private Image $thumbnail;
+    private ?Video $video;
 
-    private Video $video;
+    private ?Provider $provider;
 
-    private Author $author;
+    private ?Author $author;
 
     /** @var Field[] 25 max */
     private array $fields = [];
@@ -61,20 +54,21 @@ class Embed{
     /**
      * @param Field[] $fields
      */
-    public function __construct(?string $title = null, ?string $type = null, ?string $description = null, ?string $url = null,
-                                   ?int $timestamp = null, ?int $colour = null, Footer $footer = null, Image $image = null,
-                                   Image $thumbnail = null, Video $video = null, Author $author = null, array $fields = []){
+    public function __construct(?string $title = null, ?string $description = null, ?string $url = null,
+                                ?int $timestamp = null, ?int $colour = null, ?Footer $footer = null,
+                                ?Image $image = null, ?Image $thumbnail = null, ?Video $video = null,
+                                ?Provider $provider = null, ?Author $author = null, array $fields = []){
         $this->setTitle($title);
-        $this->setType($type);
         $this->setDescription($description);
         $this->setUrl($url);
         $this->setTimestamp($timestamp);
         $this->setColour($colour);
-        $this->setFooter($footer ?? new Footer());
-        $this->setImage($image ?? new Image());
-        $this->setThumbnail($thumbnail ?? new Image());
-        $this->setVideo($video ?? new Video());
-        $this->setAuthor($author ?? new Author());
+        $this->setFooter($footer);
+        $this->setImage($image);
+        $this->setThumbnail($thumbnail);
+        $this->setVideo($video);
+        $this->setProvider($provider);
+        $this->setAuthor($author);
         $this->setFields($fields);
     }
 
@@ -83,21 +77,10 @@ class Embed{
     }
 
     public function setTitle(?string $title): void{
-        if($title !== null && strlen($title) > 2048){
-            throw new \AssertionError("Embed title can only have up to 2048 characters.");
+        if($title !== null && strlen($title) > 256){
+            throw new \AssertionError("Embed title can only have up to 256 characters.");
         }
         $this->title = $title;
-    }
-
-    public function getType(): ?string{
-        return $this->type;
-    }
-
-    public function setType(?string $type): void{
-        if($type !== null && (!in_array($type, [self::TYPE_LINK, self::TYPE_ARTICLE, self::TYPE_GIFV, self::TYPE_VIDEO, self::TYPE_IMAGE, self::TYPE_RICH], true))){
-            throw new \AssertionError("Invalid embed type '{$type}' provided.");
-        }
-        $this->type = $type;
     }
 
     public function getDescription(): ?string{
@@ -135,43 +118,51 @@ class Embed{
         $this->colour = $colour;
     }
 
-    public function getFooter(): Footer{
+    public function getFooter(): ?Footer{
         return $this->footer;
     }
 
-    public function setFooter(Footer $footer): void{
+    public function setFooter(?Footer $footer): void{
         $this->footer = $footer;
     }
 
-    public function getImage(): Image{
+    public function getImage(): ?Image{
         return $this->image;
     }
 
-    public function setImage(Image $image): void{
+    public function setImage(?Image $image): void{
         $this->image = $image;
     }
 
-    public function getThumbnail(): Image{
+    public function getThumbnail(): ?Image{
         return $this->thumbnail;
     }
 
-    public function setThumbnail(Image $thumbnail): void{
+    public function setThumbnail(?Image $thumbnail): void{
         $this->thumbnail = $thumbnail;
     }
 
-    public function getVideo(): Video{
+    public function getVideo(): ?Video{
         return $this->video;
     }
 
-    public function setVideo(Video $video): void{
+    public function setVideo(?Video $video): void{
         $this->video = $video;
     }
 
-    public function getAuthor(): Author{
+    public function getProvider(): ?Provider{
+        return $this->provider;
+    }
+
+    public function setProvider(?Provider $provider): void{
+        $this->provider = $provider;
+    }
+
+    public function getAuthor(): ?Author{
         return $this->author;
     }
 
-    public function setAuthor(Author $author): void{
+    public function setAuthor(?Author $author): void{
         $this->author = $author;
     }
 
@@ -185,42 +176,45 @@ class Embed{
         if(sizeof($fields) > 25){
             throw new \AssertionError("Embed can only have up to 25 fields.");
         }
+        foreach($fields as $field){
+            if(!($field instanceof Field)){
+                throw new \AssertionError("Embed fields must be of type Field.");
+            }
+        }
         $this->fields = $fields;
     }
 
-    //----- Serialization -----//
-
-    public function __serialize(): array{
-        return [
-            $this->title,
-            $this->type,
-            $this->description,
-            $this->url,
-            $this->timestamp,
-            $this->colour,
-            $this->footer,
-            $this->image,
-            $this->thumbnail,
-            $this->video,
-            $this->author,
-            $this->fields
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putNullableString($this->title);
+        $stream->putNullableString($this->description);
+        $stream->putNullableString($this->url);
+        $stream->putNullableLong($this->timestamp);
+        $stream->putNullableInt($this->colour);
+        $stream->putNullableSerializable($this->footer);
+        $stream->putNullableSerializable($this->image);
+        $stream->putNullableSerializable($this->thumbnail);
+        $stream->putNullableSerializable($this->video);
+        $stream->putNullableSerializable($this->provider);
+        $stream->putNullableSerializable($this->author);
+        $stream->putSerializableArray($this->fields);
+        return $stream;
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->title,
-            $this->type,
-            $this->description,
-            $this->url,
-            $this->timestamp,
-            $this->colour,
-            $this->footer,
-            $this->image,
-            $this->thumbnail,
-            $this->video,
-            $this->author,
-            $this->fields
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getNullableString(),                      // title
+            $stream->getNullableString(),                      // description
+            $stream->getNullableString(),                      // url
+            $stream->getNullableLong(),                        // timestamp
+            $stream->getNullableInt(),                         // colour
+            $stream->getNullableSerializable(Footer::class),   // footer
+            $stream->getNullableSerializable(Image::class),    // image
+            $stream->getNullableSerializable(Image::class),    // thumbnail
+            $stream->getNullableSerializable(Video::class),    // video
+            $stream->getNullableSerializable(Provider::class), // provider
+            $stream->getNullableSerializable(Author::class),   // author
+            $stream->getSerializableArray(Field::class)        // fields
+        );
     }
 }

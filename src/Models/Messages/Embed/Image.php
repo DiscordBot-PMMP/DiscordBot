@@ -13,33 +13,44 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
-use function strpos;
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-// https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
-class Image{
+/**
+ * @implements BinarySerializable<Image>
+ * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
+ */
+class Image implements BinarySerializable{
 
-    /** Must be prefixed with `https` */
-    private ?string $url;
+    private string $url;
+
+    private ?string $proxy_url;
 
     private ?int $width;
 
     private ?int $height;
 
-    public function __construct(?string $url = null, ?int $width = null, ?int $height = null){
+    public function __construct(string $url, ?string $proxy_url = null, ?int $width = null, ?int $height = null){
         $this->setUrl($url);
+        $this->setProxyUrl($proxy_url);
         $this->setWidth($width);
         $this->setHeight($height);
     }
 
-    public function getUrl(): ?string{
+    public function getUrl(): string{
         return $this->url;
     }
 
-    public function setUrl(?string $url): void{
-        if($url !== null && strpos($url , "https" ) !== 0){
-            throw new \AssertionError("URL '$url' must start with https.");
-        }
+    public function setUrl(string $url): void{
         $this->url = $url;
+    }
+
+    public function getProxyUrl(): ?string{
+        return $this->proxy_url;
+    }
+
+    public function setProxyUrl(?string $proxy_url): void{
+        $this->proxy_url = $proxy_url;
     }
 
     public function getWidth(): ?int{
@@ -58,21 +69,21 @@ class Image{
         $this->height = $height;
     }
 
-    //----- Serialization -----//
-
-    public function __serialize(): array{
-        return [
-            $this->url,
-            $this->width,
-            $this->height
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->getUrl());
+        $stream->putNullableString($this->getProxyUrl());
+        $stream->putNullableInt($this->getWidth());
+        $stream->putNullableInt($this->getHeight());
+        return $stream;
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->url,
-            $this->width,
-            $this->height
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(),         // url
+            $stream->getNullableString(), // proxy_url
+            $stream->getNullableInt(),    // width
+            $stream->getNullableInt()     // height
+        );
     }
 }

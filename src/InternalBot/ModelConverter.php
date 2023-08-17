@@ -58,6 +58,7 @@ use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Field;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Footer;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Image;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Provider;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Video;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Messages\Reply as ReplyMessage;
@@ -353,30 +354,35 @@ abstract class ModelConverter{
         foreach(array_values($discordEmbed->fields->toArray()) as $field){
             $fields[] = self::genModelEmbedField($field);
         }
-        return new Embed($discordEmbed->title, $discordEmbed->type, $discordEmbed->description, $discordEmbed->url,
+        return new Embed(
+            $discordEmbed->title,
+            $discordEmbed->description,
+            $discordEmbed->url,
             $discordEmbed->timestamp instanceof Carbon ? $discordEmbed->timestamp->getTimestamp() : (int)$discordEmbed->timestamp,
-            $discordEmbed->color, $discordEmbed->footer === null ? new Footer() : self::genModelEmbedFooter($discordEmbed->footer),
-            $discordEmbed->image === null ? new Image() : self::genModelEmbedImage($discordEmbed->image),
-            $discordEmbed->thumbnail === null ? new Image() : self::genModelEmbedImage($discordEmbed->thumbnail),
-            $discordEmbed->video === null ? new Video() : self::genModelEmbedVideo($discordEmbed->video),
-            $discordEmbed->author === null ? new Author() : self::genModelEmbedAuthor($discordEmbed->author),
+            $discordEmbed->color, $discordEmbed->footer === null ? null : self::genModelEmbedFooter($discordEmbed->footer),
+            $discordEmbed->image === null ? null : self::genModelEmbedImage($discordEmbed->image),
+            $discordEmbed->thumbnail === null ? null : self::genModelEmbedImage($discordEmbed->thumbnail),
+            $discordEmbed->video === null ? null : self::genModelEmbedVideo($discordEmbed->video),
+            /** @phpstan-ignore-next-line Poorly documented provider object */
+            $discordEmbed->provider === null ? null : new Provider($discordEmbed->provider?->name, $discordEmbed->provider?->url),
+            $discordEmbed->author === null ? null : self::genModelEmbedAuthor($discordEmbed->author),
             $fields);
     }
 
     static public function genModelEmbedFooter(DiscordFooter $footer): Footer{
-        return new Footer($footer->text, $footer->icon_url);
+        return new Footer($footer->text, $footer->icon_url, $footer->proxy_icon_url);
     }
 
     static public function genModelEmbedImage(DiscordImage $image): Image{
-        return new Image($image->url, $image->width, $image->height);
+        return new Image($image->url, $image->proxy_url, $image->width, $image->height);
     }
 
     static public function genModelEmbedVideo(DiscordVideo $video): Video{
-        return new Video($video->url, $video->width, $video->height);
+        return new Video($video->url, $video->proxy_url, $video->width, $video->height);
     }
 
     static public function genModelEmbedAuthor(DiscordAuthor $author): Author{
-        return new Author($author->name, $author->url, $author->icon_url);
+        return new Author($author->name, $author->url, $author->icon_url, $author->proxy_icon_url);
     }
 
     static public function genModelEmbedField(DiscordField $field): Field{

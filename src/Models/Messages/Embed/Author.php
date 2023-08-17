@@ -13,33 +13,39 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use function strlen;
-use function strpos;
 
-// https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
-class Author{
+/**
+ * @implements BinarySerializable<Author>
+ * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
+ */
+class Author implements BinarySerializable{
 
-    /** 2048 characters */
-    private ?string $name;
+    /** 256 characters */
+    private string $name;
 
     private ?string $url;
 
-    /** Must be prefixed with `https` */
     private ?string $icon_url;
 
-    public function __construct(?string $name = null, ?string $url = null, ?string $icon_url = null){
+    private ?string $proxy_icon_url;
+
+    public function __construct(string $name, ?string $url = null, ?string $icon_url = null, ?string $proxy_icon_url = null){
         $this->setName($name);
         $this->setUrl($url);
         $this->setIconUrl($icon_url);
+        $this->setProxyIconUrl($proxy_icon_url);
     }
 
-    public function getName(): ?string{
+    public function getName(): string{
         return $this->name;
     }
 
-    public function setName(?string $name): void{
-        if($name !== null && strlen($name) > 2048){
-            throw new \AssertionError("Embed author name can only have up to 2048 characters.");
+    public function setName(string $name): void{
+        if(strlen($name) > 256){
+            throw new \AssertionError("Embed author name can only have up to 256 characters.");
         }
         $this->name = $name;
     }
@@ -57,27 +63,34 @@ class Author{
     }
 
     public function setIconUrl(?string $icon_url): void{
-        if($icon_url !== null && strpos($icon_url , "https" ) !== 0){
-            throw new \AssertionError("Embed author icon url '$icon_url' must start with https.");
-        }
         $this->icon_url = $icon_url;
+    }
+
+    public function getProxyIconUrl(): ?string{
+        return $this->proxy_icon_url;
+    }
+
+    public function setProxyIconUrl(?string $proxy_icon_url): void{
+        $this->proxy_icon_url = $proxy_icon_url;
     }
 
     //----- Serialization -----//
 
-    public function __serialize(): array{
-        return [
-            $this->name,
-            $this->url,
-            $this->icon_url
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->name);
+        $stream->putNullableString($this->url);
+        $stream->putNullableString($this->icon_url);
+        $stream->putNullableString($this->proxy_icon_url);
+        return $stream;
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->name,
-            $this->url,
-            $this->icon_url
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(),         // name
+            $stream->getNullableString(), // url
+            $stream->getNullableString(), // icon_url
+            $stream->getNullableString()  // proxy_icon_url
+        );
     }
 }

@@ -13,18 +13,23 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use function strlen;
 
-// https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
-class Field{
+/**
+ * @implements BinarySerializable<Field>
+ * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
+ */
+class Field implements BinarySerializable{
 
     /** 256 characters */
     private string $name;
 
-    /** 2048 characters */
+    /** 1024 characters */
     private string $value;
 
-    private bool $inline = false;
+    private bool $inline;
 
     public function __construct(string $name, string $value, bool $inline = false){
         $this->setName($name);
@@ -48,13 +53,13 @@ class Field{
     }
 
     public function setValue(string $value): void{
-        if(strlen($value) > 2048){
-            throw new \AssertionError("Embed field value can only have up to 2048 characters.");
+        if(strlen($value) > 1024){
+            throw new \AssertionError("Embed field value can only have up to 1024 characters.");
         }
         $this->value = $value;
     }
 
-    public function isInline(): bool{
+    public function getInline(): bool{
         return $this->inline;
     }
 
@@ -62,21 +67,19 @@ class Field{
         $this->inline = $inline;
     }
 
-    //----- Serialization -----//
-
-    public function __serialize(): array{
-        return [
-            $this->name,
-            $this->value,
-            $this->inline
-        ];
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->name);
+        $stream->putString($this->value);
+        $stream->putBool($this->inline);
+        return $stream;
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->name,
-            $this->value,
-            $this->inline
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(), // name
+            $stream->getString(), // value
+            $stream->getBool()    // inline
+        );
     }
 }
