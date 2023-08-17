@@ -23,6 +23,8 @@ use JaxkDev\DiscordBot\Plugin\Utils;
  */
 class Ban implements BinarySerializable{
 
+    public const SERIALIZE_ID = 4;
+
     /** Guild the user is banned from */
     private string $guild_id;
 

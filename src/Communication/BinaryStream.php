@@ -142,6 +142,17 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
         return $this->getBool() ? $this->getInt() : null;
     }
 
+    public function putNullableLong(?int $value): void{
+        $this->putBool($value !== null);
+        if($value !== null){
+            $this->putLong($value);
+        }
+    }
+
+    public function getNullableLong(): ?int{
+        return $this->getBool() ? $this->getLong() : null;
+    }
+
     public function putNullableString(?string $value): void{
         $this->putBool($value !== null);
         if($value !== null){

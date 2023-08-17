@@ -23,6 +23,8 @@ use JaxkDev\DiscordBot\Plugin\Utils;
  */
 class Invite implements BinarySerializable{
 
+    public const SERIALIZE_ID = 6;
+
     /** Also used as ID internally, ONLY null when creating model. */
     private ?string $code;
 
@@ -135,7 +137,7 @@ class Invite implements BinarySerializable{
         $stream->putNullableString($this->inviter);
         $stream->putNullableByte($this->target_type?->value);
         $stream->putNullableString($this->target_user);
-        $stream->putNullableInt($this->expires_at);
+        $stream->putNullableLong($this->expires_at);
         return $stream;
     }
 
@@ -147,7 +149,7 @@ class Invite implements BinarySerializable{
             $stream->getNullableString(),                               // inviter
             InviteTargetType::tryFrom($stream->getNullableByte() ?? -1),// target_type
             $stream->getNullableString(),                               // target_user
-            $stream->getNullableInt(),                                  // expires_at
+            $stream->getNullableLong(),                                  // expires_at
         );
     }
 }

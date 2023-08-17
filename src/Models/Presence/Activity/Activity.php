@@ -29,6 +29,8 @@ use function time;
  */
 final class Activity implements BinarySerializable{
 
+    public const SERIALIZE_ID = 2;
+
     /** @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags */
     public const FLAGS = [
         "INSTANCE" => (1 << 0),
@@ -451,9 +453,9 @@ final class Activity implements BinarySerializable{
         $stream->putString($this->name);
         $stream->putByte($this->type->value);
         $stream->putNullableString($this->url);
-        $stream->putInt($this->created_at);
-        $stream->putNullableInt($this->start_timestamp);
-        $stream->putNullableInt($this->end_timestamp);
+        $stream->putLong($this->created_at);
+        $stream->putNullableLong($this->start_timestamp);
+        $stream->putNullableLong($this->end_timestamp);
         $stream->putNullableString($this->application_id);
         $stream->putNullableString($this->details);
         $stream->putNullableString($this->state);
@@ -479,9 +481,9 @@ final class Activity implements BinarySerializable{
             $stream->getString(),                                   // name
             ActivityType::from($stream->getByte()),                 // type
             $stream->getNullableString(),                           // url
-            $stream->getInt(),                                      // created_at
-            $stream->getNullableInt(),                              // start_timestamp
-            $stream->getNullableInt(),                              // end_timestamp
+            $stream->getLong(),                                     // created_at
+            $stream->getNullableLong(),                             // start_timestamp
+            $stream->getNullableLong(),                             // end_timestamp
             $stream->getNullableString(),                           // application_id
             $stream->getNullableString(),                           // details
             $stream->getNullableString(),                           // state

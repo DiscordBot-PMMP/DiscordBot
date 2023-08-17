@@ -23,6 +23,8 @@ use JaxkDev\DiscordBot\Plugin\Utils;
  */
 class Emoji implements BinarySerializable{
 
+    public const SERIALIZE_ID = 5;
+
     /** Emoji ID */
     private ?string $id;
 

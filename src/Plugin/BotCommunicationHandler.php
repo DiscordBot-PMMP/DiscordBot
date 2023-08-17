@@ -88,16 +88,13 @@ class BotCommunicationHandler{
 
     public function handle(Packet $packet): void{
         // If's instances instead of ID switching due to phpstan/types.
-        if($packet instanceof ResolutionPacket){
-            ApiResolver::handleResolution($packet);
-            return;
-        }
         if($packet instanceof HeartbeatPacket){
             $this->lastHeartbeat = $packet->getHeartbeat();
             return;
         }
 
-        if($packet instanceof PresenceUpdatePacket) $this->handlePresenceUpdate($packet);
+        if($packet instanceof ResolutionPacket) ApiResolver::handleResolution($packet);
+        elseif($packet instanceof PresenceUpdatePacket) $this->handlePresenceUpdate($packet);
         elseif($packet instanceof VoiceStateUpdatePacket) $this->handleVoiceStateUpdate($packet);
         elseif($packet instanceof MemberJoinPacket) $this->handleMemberJoin($packet);
         elseif($packet instanceof MemberLeavePacket) $this->handleMemberLeave($packet);

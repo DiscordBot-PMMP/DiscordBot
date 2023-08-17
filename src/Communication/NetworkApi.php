@@ -89,6 +89,17 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
+use JaxkDev\DiscordBot\Models\Ban;
+use JaxkDev\DiscordBot\Models\Emoji;
+use JaxkDev\DiscordBot\Models\Guild\Guild;
+use JaxkDev\DiscordBot\Models\Invite;
+use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
+use JaxkDev\DiscordBot\Models\Presence\Presence;
+use JaxkDev\DiscordBot\Models\Role;
+use JaxkDev\DiscordBot\Models\User;
+use JaxkDev\DiscordBot\Models\VoiceState;
+use JaxkDev\DiscordBot\Models\Webhook;
 
 class NetworkApi{
 
@@ -189,9 +200,21 @@ class NetworkApi{
         //100 Next ID
     ];
 
-    /** @var array<int, class-string>  */
+    /** @var array<int, class-string<BinarySerializable<mixed>>>  */
     public const MODELS_MAP = [
-        //TODO
+        //1-11
+        Guild::SERIALIZE_ID => Guild::class,
+        Activity::SERIALIZE_ID => Activity::class,
+        Presence::SERIALIZE_ID => Presence::class,
+        Ban::SERIALIZE_ID => Ban::class,
+        Emoji::SERIALIZE_ID => Emoji::class,
+        Invite::SERIALIZE_ID => Invite::class,
+        Member::SERIALIZE_ID => Member::class,
+        Role::SERIALIZE_ID => Role::class,
+        User::SERIALIZE_ID => User::class,
+        VoiceState::SERIALIZE_ID => VoiceState::class,
+        Webhook::SERIALIZE_ID => Webhook::class
+        //12 Next ID
     ];
 
     /**
@@ -201,7 +224,10 @@ class NetworkApi{
         return self::PACKETS_MAP[$id] ?? null;
     }
 
+    /**
+     * @return class-string<BinarySerializable<mixed>>|null
+     */
     public static function getModelClass(int $id): ?string{
-        return null;
+        return self::MODELS_MAP[$id] ?? null;
     }
 }

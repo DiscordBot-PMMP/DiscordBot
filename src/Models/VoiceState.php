@@ -23,6 +23,8 @@ use JaxkDev\DiscordBot\Plugin\Utils;
  */
 class VoiceState implements BinarySerializable{
 
+    public const SERIALIZE_ID = 10;
+
     /** The guild id this voice state is for, null for DMs. */
     private ?string $guild_id;
 
@@ -200,7 +202,7 @@ class VoiceState implements BinarySerializable{
         $stream->putNullableBool($this->self_stream);
         $stream->putBool($this->self_video);
         $stream->putBool($this->suppress);
-        $stream->putNullableInt($this->request_to_speak_timestamp);
+        $stream->putNullableLong($this->request_to_speak_timestamp);
         return $stream;
     }
 
@@ -217,7 +219,7 @@ class VoiceState implements BinarySerializable{
             $stream->getNullableBool(),     // self_stream
             $stream->getBool(),             // self_video
             $stream->getBool(),             // suppress
-            $stream->getNullableInt()       // request_to_speak_timestamp
+            $stream->getNullableLong()      // request_to_speak_timestamp
         );
     }
 }

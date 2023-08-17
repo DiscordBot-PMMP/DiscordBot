@@ -26,6 +26,6 @@ class RolePermissions extends Permissions{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        return new self((int)$stream->getString());
+        return new self($stream->getLong());
     }
 }

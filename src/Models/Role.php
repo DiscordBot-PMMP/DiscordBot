@@ -24,6 +24,8 @@ use JaxkDev\DiscordBot\Plugin\Utils;
  */
 class Role implements BinarySerializable{
 
+    public const SERIALIZE_ID = 8;
+
     /** Role ID, never null unless you are sending a new createRole via API. */
     private ?string $id;
 

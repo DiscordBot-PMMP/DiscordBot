@@ -24,6 +24,8 @@ use JaxkDev\DiscordBot\Plugin\Api;
  */
 class Presence implements BinarySerializable{
 
+    public const SERIALIZE_ID = 3;
+
     /** Current status */
     private Status $status;
 

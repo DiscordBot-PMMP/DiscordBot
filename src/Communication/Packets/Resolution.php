@@ -15,7 +15,9 @@ namespace JaxkDev\DiscordBot\Communication\Packets;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
+use JaxkDev\DiscordBot\Communication\NetworkApi;
 use function count;
+use function is_string;
 
 class Resolution extends Packet{
 
@@ -27,10 +29,10 @@ class Resolution extends Packet{
 
     private string $response;
 
-    /** @var BinarySerializable<mixed>[] */
+    /** @var BinarySerializable<mixed>[]|string[] */
     private array $data;
 
-    /** @param BinarySerializable<mixed>[] $data */
+    /** @param BinarySerializable<mixed>[]|string[] $data */
     public function __construct(int $pid, bool $successful, string $response, array $data = [], int $UID = null){
         parent::__construct($UID);
         $this->pid = $pid;
@@ -51,6 +53,7 @@ class Resolution extends Packet{
         return $this->response;
     }
 
+    /** @return BinarySerializable<mixed>[]|string[] */
     public function getData(): array{
         return $this->data;
     }
@@ -61,10 +64,16 @@ class Resolution extends Packet{
         $stream->putInt($this->pid);
         $stream->putBool($this->successful);
         $stream->putString($this->response);
-        $stream->putInt(0);//count($this->data));
-        foreach($this->data as $model){
-            //TODO Have a think about identifying model type, do we need IDs?
-            //$stream->put($model->binarySerialize()->getBuffer());
+        $stream->putInt(count($this->data));
+        foreach($this->data as $data){
+            if($data instanceof BinarySerializable && $this->successful === true){
+                $stream->putShort($data::SERIALIZE_ID);
+                $stream->putSerializable($data);
+            }elseif(is_string($data) && $this->successful === false){
+                $stream->putString($data);
+            }else{
+                throw new \AssertionError("Unknown data/success combo.");
+            }
         }
         return $stream;
     }
@@ -74,13 +83,19 @@ class Resolution extends Packet{
         $pid = $stream->getInt();
         $successful = $stream->getBool();
         $response = $stream->getString();
-        $modelCount = $stream->getInt();
-        $models = [];
-        for($i = 0; $i < $modelCount; $i++){
-            $modelID = $stream->getShort();
-            //TODO Wait for models binary implementation.
-            //Deserialize from class $modelID.
-            //$models[] = $model;
+        if($successful){
+            $modelCount = $stream->getInt();
+            $models = [];
+            for($i = 0; $i < $modelCount; $i++){
+                $modelID = $stream->getShort();
+                $modelClass = NetworkApi::getModelClass($modelID);
+                if($modelClass === null){
+                    throw new \AssertionError("Invalid model ID '{$modelID}'");
+                }
+                $models[] = $stream->getSerializable($modelClass);
+            }
+        }else{
+            $models = $stream->getStringArray();
         }
         return new self(
             $pid,

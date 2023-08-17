@@ -26,6 +26,8 @@ use function strlen;
  */
 class Webhook implements BinarySerializable{
 
+    public const SERIALIZE_ID = 11;
+
     /**
      * The type of the webhook
      * @see WebhookType

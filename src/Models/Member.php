@@ -28,6 +28,8 @@ use function sizeof;
  */
 class Member implements BinarySerializable{
 
+    public const SERIALIZE_ID = 7;
+
     /**
      * @link https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
      * @var array<string, int>
@@ -303,14 +305,14 @@ class Member implements BinarySerializable{
         $stream->putNullableString($this->nickname);
         $stream->putNullableString($this->avatar);
         $stream->putStringArray($this->roles);
-        $stream->putNullableInt($this->join_timestamp);
-        $stream->putNullableInt($this->premium_since);
+        $stream->putNullableLong($this->join_timestamp);
+        $stream->putNullableLong($this->premium_since);
         $stream->putBool($this->deaf);
         $stream->putBool($this->mute);
         $stream->putInt($this->flags_bitwise);
         $stream->putNullableBool($this->pending);
         $stream->putSerializable($this->permissions);
-        $stream->putNullableInt($this->communications_disabled_until);
+        $stream->putNullableLong($this->communications_disabled_until);
         $stream->putNullableSerializable($this->presence);
         return $stream;
     }
@@ -322,14 +324,14 @@ class Member implements BinarySerializable{
             $stream->getNullableString(),   // nickname
             $stream->getNullableString(),   // avatar
             $stream->getStringArray(),      // roles
-            $stream->getNullableInt(),      // join_timestamp
-            $stream->getNullableInt(),      // premium_since
+            $stream->getNullableLong(),     // join_timestamp
+            $stream->getNullableLong(),     // premium_since
             $stream->getBool(),             // deaf
             $stream->getBool(),             // mute
             $stream->getInt(),              // flags_bitwise
             $stream->getNullableBool(),     // pending
             $stream->getSerializable(RolePermissions::class),
-            $stream->getNullableInt(),      // communications_disabled_until
+            $stream->getNullableLong(),     // communications_disabled_until
             $stream->getNullableSerializable(Presence::class)
         );
     }

@@ -176,7 +176,7 @@ abstract class Permissions implements BinarySerializable{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putString((string)$this->bitwise); // String to allow 32bit programs to have a chance...
+        $stream->putLong($this->bitwise);
         return $stream;
     }
 }

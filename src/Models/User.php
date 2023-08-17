@@ -28,6 +28,8 @@ use function strlen;
  */
 class User implements BinarySerializable{
 
+    public const SERIALIZE_ID = 9;
+
     /**
      * @link https://discord.com/developers/docs/resources/user#user-object-user-flags
      * @var Array<string, int>
