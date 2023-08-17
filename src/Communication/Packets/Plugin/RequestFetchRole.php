@@ -1,4 +1,5 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *

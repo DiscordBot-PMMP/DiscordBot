@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
 
 /*
  * DiscordBot, PocketMine-MP Plugin.
