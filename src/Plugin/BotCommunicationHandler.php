@@ -128,9 +128,9 @@ class BotCommunicationHandler{
 
     private function handleReady(DiscordReadyPacket $packet): void{
         //Default activity, Feel free to change in event / later time
-        $ac = Activity::create(VersionInfo::NAME . " v" . VersionInfo::BASE_VERSION . " | DiscordBot " . \JaxkDev\DiscordBot\VERSION, ActivityType::GAME, "https://github.com/DiscordBotPMMP/DiscordBot");
+        $ac = Activity::create(VersionInfo::NAME . " v" . VersionInfo::BASE_VERSION . " | DiscordBot " . \JaxkDev\DiscordBot\VERSION, ActivityType::GAME);
 
-        $event = new DiscordReadyEvent($this->plugin, $packet->getBotUser(), $ac, Status::ONLINE);
+        $event = new DiscordReadyEvent($this->plugin, $packet->getBotUser(), $ac, Status::IDLE);
         $event->call();
 
         $this->plugin->getApi()->updateBotPresence($event->getStatus(), $event->getActivity())->otherwise(function(ApiRejection $a){
