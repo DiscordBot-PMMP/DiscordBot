@@ -10,11 +10,17 @@ on:
       - '.github/workflows/*'
       - 'test/github/*'
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 jobs:
   get-php:
     name: Download PHP
     runs-on: ubuntu-22.04
+    if: ${{ !github.event.pull_request.draft }}
 
     steps:
       - uses: actions/checkout@v3
