@@ -219,19 +219,23 @@ class BotCommunicationHandler{
     }
 
     private function handleMessageReactionAdd(MessageReactionAddPacket $packet): void{
-        (new MessageReactionAddEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $packet->getChannelId(), $packet->getGuildId(), $packet->getUserId()))->call();
+        (new MessageReactionAddEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId(),
+            $packet->getMessageId(), $packet->getEmoji(), $packet->getUserId()))->call();
     }
 
     private function handleMessageReactionRemove(MessageReactionRemovePacket $packet): void{
-        (new MessageReactionRemoveEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $packet->getChannelId(), $packet->getGuildId(), $packet->getUserId()))->call();
+        (new MessageReactionRemoveEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId(),
+            $packet->getMessageId(), $packet->getEmoji(), $packet->getUserId()))->call();
     }
 
     private function handleMessageReactionRemoveAll(MessageReactionRemoveAllPacket $packet): void{
-        (new MessageReactionRemoveAllEvent($this->plugin, $packet->getMessageId(), $packet->getChannelId()))->call();
+        (new MessageReactionRemoveAllEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId(),
+            $packet->getMessageId()))->call();
     }
 
     private function handleMessageReactionRemoveEmoji(MessageReactionRemoveEmojiPacket $packet): void{
-        (new MessageReactionRemoveEmojiEvent($this->plugin, $packet->getEmoji(), $packet->getMessageId(), $packet->getChannelId()))->call();
+        (new MessageReactionRemoveEmojiEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId(),
+            $packet->getMessageId(), $packet->getEmoji()))->call();
     }
 
     private function handleChannelCreate(ChannelCreatePacket $packet): void{
@@ -247,7 +251,7 @@ class BotCommunicationHandler{
     }
 
     private function handleChannelPinsUpdate(ChannelPinsUpdatePacket $packet): void{
-        (new ChannelPinsUpdatedEvent($this->plugin, $packet->getChannelId()))->call();
+        (new ChannelPinsUpdatedEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId()))->call();
     }
 
     private function handleRoleCreate(RoleCreatePacket $packet): void{

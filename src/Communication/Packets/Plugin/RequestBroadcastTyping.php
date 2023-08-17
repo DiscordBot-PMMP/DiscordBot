@@ -19,17 +19,18 @@ class RequestBroadcastTyping extends Packet{
 
     public const SERIALIZE_ID = 42;
 
-    private string $guild_id;
+    /** @var string|null Can be null for DMs */
+    private ?string $guild_id;
 
     private string $channel_id;
 
-    public function __construct(string $guild_id, string $channel_id, ?int $uid = null){
+    public function __construct(?string $guild_id, string $channel_id, ?int $uid = null){
         parent::__construct($uid);
         $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
     }
 
-    public function getGuildId(): string{
+    public function getGuildId(): ?string{
         return $this->guild_id;
     }
 
@@ -39,15 +40,15 @@ class RequestBroadcastTyping extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putString($this->guild_id);
+        $stream->putNullableString($this->guild_id);
         $stream->putString($this->channel_id);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getString(), // guild_id
-            $stream->getString()  // channel_id
+            $stream->getNullableString(), // guild_id
+            $stream->getString()          // channel_id
         );
     }
 }

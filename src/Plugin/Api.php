@@ -221,11 +221,11 @@ class Api{
      *
      * @return PromiseInterface Resolves with an array of Message models.
      */
-    public function fetchPinnedMessages(string $guild_id, string $channel_id): PromiseInterface{
+    public function fetchPinnedMessages(?string $guild_id, string $channel_id): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -241,11 +241,11 @@ class Api{
      *
      * @return PromiseInterface Resolves with a Message model.
      */
-    public function fetchMessage(string $guild_id, string $channel_id, string $message_id): PromiseInterface{
+    public function fetchMessage(?string $guild_id, string $channel_id, string $message_id): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -264,11 +264,11 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function pinMessage(string $guild_id, string $channel_id, string $message_id, ?string $reason = null): PromiseInterface{
+    public function pinMessage(?string $guild_id, string $channel_id, string $message_id, ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -287,11 +287,11 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function unpinMessage(string $guild_id, string $channel_id, string $message_id, ?string $reason = null): PromiseInterface{
+    public function unpinMessage(?string $guild_id, string $channel_id, string $message_id, ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -425,12 +425,12 @@ class Api{
      * @see Emoji::toApiString()
      * @return PromiseInterface Resolves with no data.
      */
-    public function removeReaction(string $guild_id, string $channel_id, string $message_id, string $user_id,
+    public function removeReaction(?string $guild_id, string $channel_id, string $message_id, string $user_id,
                                    string $emoji): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -458,11 +458,11 @@ class Api{
      * @see Emoji::toApiString()
      * @return PromiseInterface Resolves with no data.
      */
-    public function removeAllReactions(string $guild_id, string $channel_id, string $message_id, ?string $emoji = null): PromiseInterface{
+    public function removeAllReactions(?string $guild_id, string $channel_id, string $message_id, ?string $emoji = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -486,11 +486,11 @@ class Api{
      * @see Emoji::toApiString()
      * @return PromiseInterface Resolves with no data.
      */
-    public function addReaction(string $guild_id, string $channel_id, string $message_id, string $emoji): PromiseInterface{
+    public function addReaction(?string $guild_id, string $channel_id, string $message_id, string $emoji): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -513,11 +513,11 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function broadcastTyping(string $guild_id, string $channel_id): PromiseInterface{
+    public function broadcastTyping(?string $guild_id, string $channel_id): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -688,11 +688,11 @@ class Api{
      *
      * @return PromiseInterface Resolves with no data.
      */
-    public function deleteMessage(string $guild_id, string $channel_id, string $message_id, ?string $reason = null): PromiseInterface{
+    public function deleteMessage(?string $guild_id, string $channel_id, string $message_id, ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
