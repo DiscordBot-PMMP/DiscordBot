@@ -13,7 +13,7 @@ passthru("composer install --no-dev -o");
 echo "Building plugin...\n";
 
 /** @phpstan-ignore-next-line */
-$basePath = rtrim(realpath(__DIR__), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+$basePath = rtrim(realpath("./"), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 
 $includedPaths = array_map(function($path) : string{
     return rtrim(str_replace("/", DIRECTORY_SEPARATOR, $path), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
@@ -36,7 +36,7 @@ $name = ((!($opt = getopt("o:")) || $opt['o'] === false) ? str_replace(".","_",(
 
 if (!is_dir("dist")) mkdir("dist");
 
-foreach(buildPhar(__DIR__.DIRECTORY_SEPARATOR."dist".DIRECTORY_SEPARATOR.$name, $basePath, $includedPaths, $excludedPaths, $metadata, "<?php __HALT_COMPILER();") as $line){
+foreach(buildPhar($basePath."dist".DIRECTORY_SEPARATOR.$name, $basePath, $includedPaths, $excludedPaths, $metadata, "<?php __HALT_COMPILER();") as $line){
     echo $line.PHP_EOL;
 }
 
