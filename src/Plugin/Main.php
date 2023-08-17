@@ -32,10 +32,8 @@ use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use function array_map;
 use function bin2hex;
-use function count;
 use function define;
 use function defined;
-use function extension_loaded;
 use function file_exists;
 use function function_exists;
 use function intval;
@@ -46,7 +44,6 @@ use function rename;
 use function rtrim;
 use function sizeof;
 use function unlink;
-use function xdebug_info;
 use function yaml_emit_file;
 use function yaml_parse_file;
 
@@ -95,13 +92,7 @@ class Main extends PluginBase{
     }
 
     protected function onEnable(): void{
-        //return;
         if(!$this->loadConfig()) return;
-
-        /** @noinspection PhpUndefinedFunctionInspection xdebug_info */
-        if(extension_loaded("xdebug") && (!function_exists('xdebug_info') || count(xdebug_info('mode')) !== 0)){
-            $this->getLogger()->warning("xdebug is enabled, this will cause major performance issues with the discord thread.");
-        }
 
         $this->api = new Api($this);
         $this->communicationHandler = new BotCommunicationHandler($this);
