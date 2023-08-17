@@ -345,8 +345,9 @@ abstract class ModelConverter{
     }
 
     static public function genModelAttachment(DiscordAttachment $attachment): Attachment{
-        return new Attachment($attachment->id, $attachment->filename, $attachment->content_type ?? null,
-            $attachment->size, $attachment->url, $attachment->width ?? null, $attachment->height ?? null);
+        return new Attachment($attachment->id, $attachment->filename, $attachment->description ?? null,
+            $attachment->content_type ?? null, $attachment->size, $attachment->url, $attachment->proxy_url,
+            $attachment->height ?? null, $attachment->width ?? null, $attachment->ephemeral ?? null);
     }
 
     static public function genModelEmbed(DiscordEmbed $discordEmbed): Embed{
