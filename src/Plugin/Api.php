@@ -27,8 +27,20 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchBans;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchChannel;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchChannels;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchGuild;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchGuilds;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchInvites;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMembers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRoles;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
@@ -105,6 +117,276 @@ class Api{
     }
 
     /**
+     * Fetch all Bans in the specified guild.
+     *
+     * @return PromiseInterface Resolves with an array of Ban models.
+     */
+    public function fetchBans(string $guild_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        $pk = new RequestFetchBans($guild_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch a Channel by ID.
+     *
+     * @return PromiseInterface Resolves with an array of Channel models.
+     */
+    public function fetchChannel(?string $guild_id, string $channel_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+        }
+        $pk = new RequestFetchChannel($guild_id, $channel_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch all Channels in the specified Guild.
+     *
+     * @return PromiseInterface Resolves with an array of Channel models.
+     */
+    public function fetchChannels(string $guild_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        $pk = new RequestFetchChannels($guild_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch a Guild by ID.
+     *
+     * @return PromiseInterface Resolves with a Guild model.
+     */
+    public function fetchGuild(string $guild_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        $pk = new RequestFetchGuild($guild_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch all Guilds the bot is in.
+     *
+     * @return PromiseInterface Resolves with an array of Guild models.
+     */
+    public function fetchGuilds(): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        $pk = new RequestFetchGuilds();
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch all Invites in the specified Guild.
+     *
+     * @return PromiseInterface Resolves with an array of Invite models.
+     */
+    public function fetchInvites(string $guild_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        $pk = new RequestFetchInvites($guild_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch a Member from the specified Guild by User ID.
+     *
+     * @return PromiseInterface Resolves with an array of Member models.
+     */
+    public function fetchMember(string $guild_id, string $user_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
+        }
+        if(!Utils::validDiscordSnowflake($user_id)){
+            return rejectPromise(new ApiRejection("Invalid user ID '$user_id'"));
+        }
+        $pk = new RequestFetchMember($guild_id, $user_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch all Members in the specified Guild.
+     *
+     * @return PromiseInterface Resolves with an array of Member models.
+     */
+    public function fetchMembers(string $guild_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
+        }
+        $pk = new RequestFetchMembers($guild_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch a Message by ID.
+     *
+     * @return PromiseInterface Resolves with a Message model.
+     */
+    public function fetchMessage(?string $guild_id, string $channel_id, string $message_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
+        }
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'"));
+        }
+        if(!Utils::validDiscordSnowflake($message_id)){
+            return rejectPromise(new ApiRejection("Invalid message ID '$message_id'"));
+        }
+        $pk = new RequestFetchMessage($guild_id, $channel_id, $message_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch all Pinned Messages in the specified Channel.
+     *
+     * @return PromiseInterface Resolves with an array of Message models.
+     */
+    public function fetchPinnedMessages(?string $guild_id, string $channel_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
+        }
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'"));
+        }
+        $pk = new RequestFetchPinnedMessages($guild_id, $channel_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch a Role by ID.
+     *
+     * @return PromiseInterface Resolves with a Role model.
+     */
+    public function fetchRole(string $guild_id, string $role_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
+        }
+        if(!Utils::validDiscordSnowflake($role_id)){
+            return rejectPromise(new ApiRejection("Invalid role ID '$role_id'"));
+        }
+        $pk = new RequestFetchRole($guild_id, $role_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch all Roles in the specified Guild.
+     *
+     * @return PromiseInterface Resolves with an array of Role models.
+     */
+    public function fetchRoles(string $guild_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
+        }
+        $pk = new RequestFetchRoles($guild_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch a User by ID.
+     *
+     * @return PromiseInterface Resolves with a User model.
+     */
+    public function fetchUser(string $user_id): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($user_id)){
+            return rejectPromise(new ApiRejection("Invalid user ID '$user_id'"));
+        }
+        $pk = new RequestFetchUser($user_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch all Users (may not be a complete list).
+     *
+     * @return PromiseInterface Resolves with an array of User models.
+     */
+    public function fetchUsers(): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        $pk = new RequestFetchUsers();
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Fetch all Webhooks in the specified Guild (optionally channel specific webhooks).
+     *
+     * @return PromiseInterface Resolves with an array of Webhook models.
+     */
+    public function fetchWebhooks(string $guild_id, ?string $channel_id = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
+        }
+        if($channel_id !== null && !Utils::validDiscordSnowflake($channel_id)){
+            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'"));
+        }
+        $pk = new RequestFetchWebhooks($guild_id, $channel_id);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
      * Creates a normal webhook inside a channel.
      *
      * @param string  $name        max 80chars, 'clyde' and 'discord' not allowed in name.
@@ -178,26 +460,6 @@ class Api{
         return ApiResolver::create($pk->getUID());
     }
 
-    /**
-     * Fetch all webhooks that are linked to a guild (all channels) or more specifically just a single channel
-     *
-     * @return PromiseInterface Resolves with an array of Webhook models.
-     */
-    public function fetchWebhooks(string $guild_id, ?string $channel_id = null): PromiseInterface{
-        if(!$this->ready){
-            return rejectPromise(new ApiRejection("API is not ready for requests."));
-        }
-        if(!Utils::validDiscordSnowflake($guild_id)){
-            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
-        }
-        if($channel_id !== null && !Utils::validDiscordSnowflake($channel_id)){
-            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
-        }
-        $pk = new RequestFetchWebhooks($guild_id, $channel_id);
-        $this->plugin->writeOutboundData($pk);
-        return ApiResolver::create($pk->getUID());
-    }
-
     //createGuild will not be added due to security issues,
     //If you find a genuine use for createGuild please open an issue.
 
@@ -214,51 +476,6 @@ class Api{
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         $pk = new RequestLeaveGuild($guild_id);
-        $this->plugin->writeOutboundData($pk);
-        return ApiResolver::create($pk->getUID());
-    }
-
-    /**
-     * Fetch all the pinned messages in a channel.
-     *
-     * Note you could fetch individual messages by id using fetchMessage from channel::pins but this is easier.
-     *
-     * @return PromiseInterface Resolves with an array of Message models.
-     */
-    public function fetchPinnedMessages(?string $guild_id, string $channel_id): PromiseInterface{
-        if(!$this->ready){
-            return rejectPromise(new ApiRejection("API is not ready for requests."));
-        }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
-            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
-        }
-        if(!Utils::validDiscordSnowflake($channel_id)){
-            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
-        }
-        $pk = new RequestFetchPinnedMessages($guild_id, $channel_id);
-        $this->plugin->writeOutboundData($pk);
-        return ApiResolver::create($pk->getUID());
-    }
-
-    /**
-     * Fetch a message by ID.
-     *
-     * @return PromiseInterface Resolves with a Message model.
-     */
-    public function fetchMessage(?string $guild_id, string $channel_id, string $message_id): PromiseInterface{
-        if(!$this->ready){
-            return rejectPromise(new ApiRejection("API is not ready for requests."));
-        }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
-            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
-        }
-        if(!Utils::validDiscordSnowflake($channel_id)){
-            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
-        }
-        if(!Utils::validDiscordSnowflake($message_id)){
-            return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
-        }
-        $pk = new RequestFetchMessage($guild_id, $channel_id, $message_id);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
