@@ -123,9 +123,7 @@ class DiscordEventHandler{
     }
 
     public function onVoiceStateUpdate(DiscordVoiceStateUpdate $ds): void{
-        if($ds->guild_id === null) return; //DM's
-        $this->client->getThread()->writeOutboundData(new VoiceStateUpdatePacket($ds->guild_id, $ds->user_id,
-            ModelConverter::genModelVoiceState($ds)));
+        $this->client->getThread()->writeOutboundData(new VoiceStateUpdatePacket(ModelConverter::genModelVoiceState($ds)));
     }
 
     public function onPresenceUpdate(DiscordPresenceUpdate $presenceUpdate): void{
@@ -150,20 +148,23 @@ class DiscordEventHandler{
     }
 
     public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
-        if(!$this->checkMessage($message)) return;
-        if($message->author?->id === "305060807887159296") $message->react("❤️");
-        $packet = new MessageSentPacket(ModelConverter::genModelMessage($message));
-        $this->client->getThread()->writeOutboundData($packet);
+        //TODO
+        //if(!$this->checkMessage($message)) return;
+        //if($message->author?->id === "305060807887159296") $message->react("❤️");
+        //$packet = new MessageSentPacket(ModelConverter::genModelMessage($message));
+        //$this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
-        if(!$this->checkMessage($message)) return;
-        $packet = new MessageUpdatePacket(ModelConverter::genModelMessage($message));
-        $this->client->getThread()->writeOutboundData($packet);
+        //TODO
+        //if(!$this->checkMessage($message)) return;
+        //$packet = new MessageUpdatePacket(ModelConverter::genModelMessage($message));
+        //$this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onMessageDelete(DiscordMessage|\stdClass $data, Discord $discord): void{
-        if($data instanceof DiscordMessage){
+        //TODO
+        /*if($data instanceof DiscordMessage){
             if(!$this->checkMessage($data)){
                 //Unknown message type deleted (send basic details TODO decide for future).
                 $message = [
@@ -182,7 +183,7 @@ class DiscordEventHandler{
             ];
         }
         $packet = new MessageDeletePacket($message);
-        $this->client->getThread()->writeOutboundData($packet);
+        $this->client->getThread()->writeOutboundData($packet);*/
     }
 
     public function onMessageReactionAdd(DiscordMessageReaction $reaction): void{
@@ -251,17 +252,19 @@ class DiscordEventHandler{
     }
 
     public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
-        $c = ModelConverter::genModelChannel($channel);
+        //TODO
+        /*$c = ModelConverter::genModelChannel($channel);
         if($c === null) return;
         $packet = new ChannelCreatePacket($c);
-        $this->client->getThread()->writeOutboundData($packet);
+        $this->client->getThread()->writeOutboundData($packet);*/
     }
 
     public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
-        $c = ModelConverter::genModelChannel($channel);
+        //TODO
+        /*$c = ModelConverter::genModelChannel($channel);
         if($c === null) return;
         $packet = new ChannelUpdatePacket($c);
-        $this->client->getThread()->writeOutboundData($packet);
+        $this->client->getThread()->writeOutboundData($packet);*/
     }
 
     public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
@@ -308,37 +311,6 @@ class DiscordEventHandler{
         $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
         $this->client->getThread()->writeOutboundData($packet);
         return;
-        //todo
-        /*$g = $ban->guild;
-        /** @var DiscordMember|null $m *
-        $m = $g->members->get("id", $discord->user->id);
-        if($m !== null and $m->getPermissions()->ban_members){
-            //Get ban reason.
-            /** @noinspection PhpUnhandledExceptionInspection * //Impossible.
-            $g->bans->freshen()->done(function() use ($ban, $g){
-                //Got latest bans so we can fetch reason unless it was unbanned in like 0.01s
-                /** @var DiscordBan|null $b *
-                $b = $g->bans->get("user_id", $ban->user_id);
-                if($b !== null){
-                    $this->logger->debug("Successfully fetched bans, attached reason to new ban event.");
-                    $packet = new BanAddPacket(ModelConverter::genModelBan($b));
-                    $this->client->getThread()->writeOutboundData($packet);
-                }else{
-                    $this->logger->debug("No ban after freshen  ?? ? (IMPORTANT LOGIC ERROR)");
-                    $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
-                    $this->client->getThread()->writeOutboundData($packet);
-                }
-            }, function() use ($ban){
-                //Failed so just send ban with no reason.
-                $this->logger->debug("Failed to fetch bans even with ban_members permission, using old ban object.");
-                $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
-                $this->client->getThread()->writeOutboundData($packet);
-            });
-        }else{
-            $this->logger->debug("Bot does not have ban_members permission so no reason could be attached to this ban.");
-            $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
-            $this->client->getThread()->writeOutboundData($packet);
-        }*/
     }
 
     public function onBanRemove(DiscordBan $ban, Discord $discord): void{
@@ -353,6 +325,7 @@ class DiscordEventHandler{
     /**
      * Checks if we handle this type of message in this type of channel.
      */
+    /* TODO
     private function checkMessage(DiscordMessage $message): bool{
         // Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
         if($message->author === null) return false; //"Shouldn't" happen now...
@@ -364,5 +337,5 @@ class DiscordEventHandler{
         // ^ Spotify/Games etc
 
         return true;
-    }
+    }*/
 }

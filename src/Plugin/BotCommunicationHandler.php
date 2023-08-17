@@ -72,6 +72,7 @@ use JaxkDev\DiscordBot\Plugin\Events\PresenceUpdated as PresenceUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\VoiceStateUpdated as VoiceStateUpdatedEvent;
 use pocketmine\VersionInfo;
 use function floor;
 use function microtime;
@@ -135,65 +136,8 @@ class BotCommunicationHandler{
         });
     }
 
-    //Uses the storage (aka cache)
     private function handleVoiceStateUpdate(VoiceStateUpdatePacket $packet): void{
-        //TODO
-        $this->plugin->getLogger()->notice("Not handling voice state update.");
-        /*$member = Storage::getMember($packet->getMemberId());
-        if($member === null){
-            throw new \AssertionError("Member '{$packet->getMemberId()}' not found in storage.");
-        }
-        $state = $packet->getVoiceState();
-        if($state->getChannelId() === null){
-            $channel = Storage::getMembersVoiceChannel($packet->getMemberId());
-            if($channel === null){
-                throw new \AssertionError("Voice Channel for leaving member '{$packet->getMemberId()}' not found in storage.");
-            }
-            (new VoiceChannelMemberLeftEvent($this->plugin, $member, $channel))->call();
-            $member->setVoiceState(null);
-            $members = $channel->getMembers();
-            if(($key = array_search($packet->getMemberId(), $members, true)) !== false) {
-                unset($members[$key]);
-            }
-            $channel->setMembers($members);
-            Storage::updateMember($member);
-            Storage::updateChannel($channel);
-            Storage::unsetMembersVoiceChannel($packet->getMemberId());
-        }else{
-            $channel = Storage::getChannel($state->getChannelId());
-            if($channel === null){
-                throw new \AssertionError("Channel '{$state->getChannelId()}' not found in storage.");
-            }
-            if(!$channel instanceof VoiceChannel){
-                throw new \AssertionError("Channel '{$state->getChannelId()}' not a voice channel.");
-            }
-            if(in_array($packet->getMemberId(), $channel->getMembers(), true)){
-                //Member did not leave/join/transfer voice channel but muted/deaf/self_muted/self_deafen etc.
-                (new VoiceStateUpdatedEvent($this->plugin, $member, $state))->call();
-                $member->setVoiceState($packet->getVoiceState());
-                Storage::updateMember($member);
-            }else{
-                $previous = Storage::getMembersVoiceChannel($packet->getMemberId());
-                if($previous !== null and $previous->getId() !== $state->getChannelId()){
-                    (new VoiceChannelMemberMovedEvent($this->plugin, $member, $previous, $channel, $state))->call();
-                    $members = $previous->getMembers();
-                    if(($key = array_search($packet->getMemberId(), $members, true)) !== false) {
-                        unset($members[$key]);
-                    }
-                    $previous->setMembers($members);
-                    Storage::updateChannel($previous);
-                }else{
-                    (new VoiceChannelMemberJoinedEvent($this->plugin, $member, $channel, $state))->call();
-                }
-                $member->setVoiceState($packet->getVoiceState());
-                $members = $channel->getMembers();
-                $members[] = $packet->getMemberId();
-                $channel->setMembers($members);
-                Storage::updateMember($member);
-                Storage::updateChannel($channel);
-                Storage::setMembersVoiceChannel($packet->getMemberId(), $state->getChannelId());
-            }
-        }*/
+        (new VoiceStateUpdatedEvent($this->plugin, $packet->getVoiceState()))->call();
     }
 
     private function handlePresenceUpdate(PresenceUpdatePacket $packet): void{
