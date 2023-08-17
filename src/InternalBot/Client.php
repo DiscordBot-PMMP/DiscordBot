@@ -202,7 +202,7 @@ class Client{
     }
 
     public function tick(): void{
-        $data = $this->thread->readInboundData($this->getConfig()["protocol"]["packets_per_tick"]);
+        $data = $this->thread->readInboundData($this->getConfig()["protocol"]["general"]["packets_per_tick"]);
 
         foreach($data as $d){
             $this->communicationHandler->handle($d);
