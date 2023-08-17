@@ -57,14 +57,14 @@ class Resolution extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putInt($this->UID);
+        $stream->putInt($this->getUID());
         $stream->putInt($this->pid);
         $stream->putBool($this->successful);
         $stream->putString($this->response);
-        $stream->putInt(count($this->data));
+        $stream->putInt(0);//count($this->data));
         foreach($this->data as $model){
             //TODO Have a think about identifying model type, do we need IDs?
-            $stream->put($model->binarySerialize()->getBuffer());
+            //$stream->put($model->binarySerialize()->getBuffer());
         }
         return $stream;
     }

@@ -47,6 +47,7 @@ class RequestKickMember extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putString($this->guild_id);
         $stream->putString($this->user_id);
         $stream->putNullableString($this->reason);
@@ -54,10 +55,12 @@ class RequestKickMember extends Packet{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getString(),
-            $stream->getString(),
-            $stream->getNullableString()
+            $stream->getString(),         // guild_id
+            $stream->getString(),         // user_id
+            $stream->getNullableString(), // reason
+            $uid
         );
     }
 }

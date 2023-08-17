@@ -22,8 +22,8 @@ class Disconnect extends Packet{
 
     private string $message;
 
-    public function __construct(?string $message = null){
-        parent::__construct();
+    public function __construct(?string $message = null, ?int $uid = null){
+        parent::__construct($uid);
         $this->message = $message ?? "Unknown";
     }
 
@@ -33,13 +33,16 @@ class Disconnect extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putString($this->message);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getString()
+            $stream->getString(), // message
+            $uid
         );
     }
 }

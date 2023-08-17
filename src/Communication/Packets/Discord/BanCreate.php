@@ -34,13 +34,16 @@ class BanCreate extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putSerializable($this->ban);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Ban::class)
+            $stream->getSerializable(Ban::class), // ban
+            $uid
         );
     }
 }

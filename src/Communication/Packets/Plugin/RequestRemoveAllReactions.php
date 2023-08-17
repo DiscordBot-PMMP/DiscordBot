@@ -55,6 +55,7 @@ class RequestRemoveAllReactions extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putNullableString($this->guild_id);
         $stream->putString($this->channel_id);
         $stream->putString($this->message_id);
@@ -63,11 +64,13 @@ class RequestRemoveAllReactions extends Packet{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
             $stream->getNullableString(), // guild_id
             $stream->getString(),         // channel_id
             $stream->getString(),         // message_id
-            $stream->getNullableString()  // emoji
+            $stream->getNullableString(), // emoji
+            $uid
         );
     }
 }

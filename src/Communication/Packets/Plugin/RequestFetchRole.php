@@ -40,15 +40,18 @@ class RequestFetchRole extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putString($this->guild_id);
         $stream->putString($this->role_id);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
             $stream->getString(), // guild_id
-            $stream->getString()  // role_id
+            $stream->getString(), // role_id
+            $uid
         );
     }
 }

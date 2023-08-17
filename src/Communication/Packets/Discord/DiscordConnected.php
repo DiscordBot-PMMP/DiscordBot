@@ -34,13 +34,16 @@ class DiscordConnected extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putSerializable($this->bot_user);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(User::class)
+            $stream->getSerializable(User::class), // bot_user
+            $uid
         );
     }
 }

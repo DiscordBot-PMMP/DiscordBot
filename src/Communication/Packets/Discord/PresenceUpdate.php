@@ -48,6 +48,7 @@ class PresenceUpdate extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putString($this->guild_id);
         $stream->putString($this->user_id);
         $stream->putSerializable($this->presence);
@@ -55,10 +56,12 @@ class PresenceUpdate extends Packet{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getString(), // guild_id
-            $stream->getString(), // user_id
-            $stream->getSerializable(Presence::class) // presence
+            $stream->getString(),                      // guild_id
+            $stream->getString(),                      // user_id
+            $stream->getSerializable(Presence::class), // presence
+            $uid
         );
     }
 }

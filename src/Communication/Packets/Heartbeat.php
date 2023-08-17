@@ -32,16 +32,15 @@ class Heartbeat extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putInt($this->UID);
+        $stream->putInt($this->getUID());
         $stream->putInt($this->heartbeat);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         $uid = $stream->getInt();
-        $heartbeat = $stream->getInt();
         return new self(
-            $heartbeat,
+            $stream->getInt(), // heartbeat
             $uid
         );
     }

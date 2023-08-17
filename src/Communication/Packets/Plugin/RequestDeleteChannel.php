@@ -47,6 +47,7 @@ class RequestDeleteChannel extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putString($this->guild_id);
         $stream->putString($this->channel_id);
         $stream->putNullableString($this->reason);
@@ -54,10 +55,12 @@ class RequestDeleteChannel extends Packet{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getString(),        // guild_id
-            $stream->getString(),        // channel_id
-            $stream->getNullableString() // reason
+            $stream->getString(),         // guild_id
+            $stream->getString(),         // channel_id
+            $stream->getNullableString(), // reason
+            $uid
         );
     }
 }

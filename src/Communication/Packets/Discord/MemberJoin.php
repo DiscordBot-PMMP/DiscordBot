@@ -34,13 +34,16 @@ class MemberJoin extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putSerializable($this->member);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Member::class)
+            $stream->getSerializable(Member::class), // member
+            $uid
         );
     }
 }

@@ -43,6 +43,7 @@ class MessageDelete extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putBool($this->message instanceof Message);
         if($this->message instanceof Message){
             $stream->putSerializable($this->message);
@@ -55,9 +56,11 @@ class MessageDelete extends Packet{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         if($stream->getBool()){
             return new self(
-                $stream->getSerializable(Message::class)
+                $stream->getSerializable(Message::class),
+                $uid
             );
         }else{
             return new self(
@@ -65,7 +68,8 @@ class MessageDelete extends Packet{
                     "message_id" => $stream->getString(),
                     "guild_id" => $stream->getString(),
                     "channel_id" => $stream->getString()
-                ]
+                ],
+                $uid
             );
         }
     }

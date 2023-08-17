@@ -33,13 +33,16 @@ class RequestFetchInvites extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putString($this->guild_id);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getString()
+            $stream->getString(), // guild_id
+            $uid
         );
     }
 }

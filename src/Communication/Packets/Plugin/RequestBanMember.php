@@ -56,6 +56,7 @@ class RequestBanMember extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putString($this->guild_id);
         $stream->putString($this->user_id);
         $stream->putInt($this->delete_message_seconds);
@@ -64,11 +65,13 @@ class RequestBanMember extends Packet{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getString(),        // guild_id
-            $stream->getString(),        // user_id
-            $stream->getInt(),           // delete_message_seconds
-            $stream->getNullableString() // reason
+            $stream->getString(),         // guild_id
+            $stream->getString(),         // user_id
+            $stream->getInt(),            // delete_message_seconds
+            $stream->getNullableString(), // reason
+            $uid
         );
     }
 }

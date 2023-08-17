@@ -13,7 +13,6 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
-use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Messages\Message;
@@ -35,13 +34,16 @@ class RequestEditMessage extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putSerializable($this->message);
         return $stream;
     }
 
-    public static function fromBinary(BinaryStream $stream): BinarySerializable{
+    public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Message::class)
+            $stream->getSerializable(Message::class),
+            $uid
         );
     }
 }

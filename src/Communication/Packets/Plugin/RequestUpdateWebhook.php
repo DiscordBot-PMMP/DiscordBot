@@ -41,15 +41,18 @@ class RequestUpdateWebhook extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putSerializable($this->webhook);
         $stream->putNullableString($this->reason);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Webhook::class),
-            $stream->getNullableString()
+            $stream->getSerializable(Webhook::class), // webhook
+            $stream->getNullableString(),             // reason
+            $uid
         );
     }
 }

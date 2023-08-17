@@ -55,6 +55,7 @@ class RequestUpdateNickname extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putString($this->guild_id);
         $stream->putString($this->user_id);
         $stream->putNullableString($this->nickname);
@@ -63,11 +64,13 @@ class RequestUpdateNickname extends Packet{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getString(),        // guild_id
-            $stream->getString(),        // user_id
-            $stream->getNullableString(),// nickname
-            $stream->getNullableString() // reason
+            $stream->getString(),         // guild_id
+            $stream->getString(),         // user_id
+            $stream->getNullableString(), // nickname
+            $stream->getNullableString(), // reason
+            $uid
         );
     }
 }

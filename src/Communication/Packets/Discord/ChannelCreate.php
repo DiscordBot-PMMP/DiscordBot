@@ -34,13 +34,16 @@ class ChannelCreate extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         //TODO $stream->putSerializable($this->channel);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            //$stream->getSerializable(g)
+            $stream->getSerializable(GuildChannel::class), // channel
+            $uid
         );
     }
 }

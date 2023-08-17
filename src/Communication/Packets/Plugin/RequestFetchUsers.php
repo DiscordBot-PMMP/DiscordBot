@@ -21,10 +21,14 @@ class RequestFetchUsers extends Packet{
     public const SERIALIZE_ID = 64;
 
     public function binarySerialize(): BinaryStream{
-        return new BinaryStream();
+        $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
+        return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        return new self();
+        return new self(
+            $stream->getInt() // uid
+        );
     }
 }

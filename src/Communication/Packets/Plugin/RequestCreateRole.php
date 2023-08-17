@@ -92,6 +92,7 @@ class RequestCreateRole extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putString($this->guild_id);
         $stream->putString($this->name);
         $stream->putSerializable($this->permissions);
@@ -105,6 +106,7 @@ class RequestCreateRole extends Packet{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
             $stream->getString(),                             // guild_id
             $stream->getString(),                             // name
@@ -114,7 +116,8 @@ class RequestCreateRole extends Packet{
             $stream->getNullableString(),                     // icon_hash
             $stream->getNullableString(),                     // unicode_emoji
             $stream->getBool(),                               // mentionable
-            $stream->getNullableString()                      // reason
+            $stream->getNullableString(),                     // reason
+            $uid
         );
     }
 }

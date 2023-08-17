@@ -41,15 +41,18 @@ class RequestUpdateRole extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putSerializable($this->role);
         $stream->putNullableString($this->reason);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Role::class),
-            $stream->getNullableString()
+            $stream->getSerializable(Role::class), // role
+            $stream->getNullableString(),          // reason
+            $uid
         );
     }
 }

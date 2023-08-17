@@ -26,8 +26,8 @@ class Connect extends Packet{
     private int $version;
     private int $magic;
 
-    public function __construct(int $version, int $magic){
-        parent::__construct();
+    public function __construct(int $version, int $magic, ?int $uid = null){
+        parent::__construct($uid);
         $this->version = $version;
         $this->magic = $magic;
     }
@@ -42,15 +42,18 @@ class Connect extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putByte($this->version);
         $stream->putInt($this->magic);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getByte(),
-            $stream->getInt()
+            $stream->getByte(), // version
+            $stream->getInt(),  // magic
+            $uid
         );
     }
 }

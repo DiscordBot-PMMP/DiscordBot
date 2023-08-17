@@ -40,15 +40,18 @@ class RequestFetchWebhooks extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putString($this->guild_id);
         $stream->putNullableString($this->channel_id);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getString(),        // guild_id
-            $stream->getNullableString() // channel_id
+            $stream->getString(),         // guild_id
+            $stream->getNullableString(), // channel_id
+            $uid
         );
     }
 }

@@ -47,6 +47,7 @@ class InviteDelete extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putNullableString($this->guild_id);
         $stream->putNullableString($this->channel_id);
         $stream->putString($this->invite_code);
@@ -54,10 +55,12 @@ class InviteDelete extends Packet{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
             $stream->getNullableString(), // guild_id
             $stream->getNullableString(), // channel_id
-            $stream->getString()          // invite_code
+            $stream->getString(),         // invite_code
+            $uid
         );
     }
 }

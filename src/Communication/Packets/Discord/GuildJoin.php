@@ -34,13 +34,16 @@ class GuildJoin extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putSerializable($this->guild);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Guild::class)
+            $stream->getSerializable(Guild::class), // guild
+            $uid
         );
     }
 }

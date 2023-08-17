@@ -34,13 +34,16 @@ class InviteCreate extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putSerializable($this->invite);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Invite::class)
+            $stream->getSerializable(Invite::class), // invite
+            $uid
         );
     }
 }

@@ -34,13 +34,16 @@ class RequestUpdateBotPresence extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putSerializable($this->presence);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Presence::class)
+            $stream->getSerializable(Presence::class), // presence
+            $uid
         );
     }
 }

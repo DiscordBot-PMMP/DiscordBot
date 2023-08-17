@@ -34,13 +34,16 @@ class RoleUpdate extends Packet{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
         $stream->putSerializable($this->role);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Role::class)
+            $stream->getSerializable(Role::class), // role
+            $uid
         );
     }
 }
