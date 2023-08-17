@@ -26,7 +26,6 @@ use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
-use Discord\Repository\Channel\WebhookRepository as DiscordWebhookRepository;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
@@ -43,8 +42,20 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchBans;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchChannel;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchChannels;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchGuild;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchGuilds;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchInvites;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMember;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMembers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRoles;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
@@ -114,52 +125,206 @@ class CommunicationHandler{
         }
 
         //API Packets:
-        if($pk instanceof RequestUpdateNickname) $this->handleUpdateNickname($pk);
-        elseif($pk instanceof RequestUpdateBotPresence) $this->handleUpdateBotPresence($pk);
-        elseif($pk instanceof RequestBroadcastTyping) $this->handleBroadcastTyping($pk);
-        elseif($pk instanceof RequestSendMessage) $this->handleSendMessage($pk);
-        elseif($pk instanceof RequestSendFile) $this->handleSendFile($pk);
-        elseif($pk instanceof RequestEditMessage) $this->handleEditMessage($pk);
-        elseif($pk instanceof RequestAddReaction) $this->handleAddReaction($pk);
-        elseif($pk instanceof RequestRemoveReaction) $this->handleRemoveReaction($pk);
-        elseif($pk instanceof RequestRemoveAllReactions) $this->handleRemoveAllReactions($pk);
-        elseif($pk instanceof RequestDeleteMessage) $this->handleDeleteMessage($pk);
-        elseif($pk instanceof RequestFetchMessage) $this->handleFetchMessage($pk);
+        if($pk instanceof RequestUpdateBotPresence)       $this->handleUpdateBotPresence($pk);
+        elseif($pk instanceof RequestFetchBans)           $this->handleFetchBans($pk);
+        elseif($pk instanceof RequestFetchChannel)        $this->handleFetchChannel($pk);
+        elseif($pk instanceof RequestFetchChannels)       $this->handleFetchChannels($pk);
+        elseif($pk instanceof RequestFetchGuild)          $this->handleFetchGuild($pk);
+        elseif($pk instanceof RequestFetchGuilds)         $this->handleFetchGuilds($pk);
+        elseif($pk instanceof RequestFetchInvites)        $this->handleFetchInvites($pk);
+        elseif($pk instanceof RequestFetchMember)         $this->handleFetchMember($pk);
+        elseif($pk instanceof RequestFetchMembers)        $this->handleFetchMembers($pk);
+        elseif($pk instanceof RequestFetchMessage)        $this->handleFetchMessage($pk);
         elseif($pk instanceof RequestFetchPinnedMessages) $this->handleFetchPinnedMessages($pk);
-        elseif($pk instanceof RequestFetchWebhooks) $this->handleFetchWebhooks($pk);
-        elseif($pk instanceof RequestPinMessage) $this->handlePinMessage($pk);
-        elseif($pk instanceof RequestUnpinMessage) $this->handleUnpinMessage($pk);
-        elseif($pk instanceof RequestAddRole) $this->handleAddRole($pk);
-        elseif($pk instanceof RequestRemoveRole) $this->handleRemoveRole($pk);
-        elseif($pk instanceof RequestCreateRole) $this->handleCreateRole($pk);
-        elseif($pk instanceof RequestUpdateRole) $this->handleUpdateRole($pk);
-        elseif($pk instanceof RequestDeleteRole) $this->handleDeleteRole($pk);
-        elseif($pk instanceof RequestKickMember) $this->handleKickMember($pk);
-        elseif($pk instanceof RequestCreateInvite) $this->handleCreateInvite($pk);
-        elseif($pk instanceof RequestDeleteInvite) $this->handleDeleteInvite($pk);
-        elseif($pk instanceof RequestCreateChannel) $this->handleCreateChannel($pk);
-        elseif($pk instanceof RequestUpdateChannel) $this->handleUpdateChannel($pk);
-        elseif($pk instanceof RequestDeleteChannel) $this->handleDeleteChannel($pk);
-        elseif($pk instanceof RequestBanMember) $this->handleBanMember($pk);
-        elseif($pk instanceof RequestUnbanMember) $this->handleUnbanMember($pk);
-        elseif($pk instanceof RequestCreateWebhook) $this->handleCreateWebhook($pk);
-        elseif($pk instanceof RequestUpdateWebhook) $this->handleUpdateWebhook($pk);
-        elseif($pk instanceof RequestDeleteWebhook) $this->handleDeleteWebhook($pk);
-        elseif($pk instanceof RequestLeaveGuild) $this->handleLeaveGuild($pk);
+        elseif($pk instanceof RequestFetchRole)           $this->handleFetchRole($pk);
+        elseif($pk instanceof RequestFetchRoles)          $this->handleFetchRoles($pk);
+        elseif($pk instanceof RequestFetchUser)           $this->handleFetchUser($pk);
+        elseif($pk instanceof RequestFetchUsers)          $this->handleFetchUsers($pk);
+        elseif($pk instanceof RequestFetchWebhooks)       $this->handleFetchWebhooks($pk);
+        elseif($pk instanceof RequestUpdateNickname)      $this->handleUpdateNickname($pk);
+        elseif($pk instanceof RequestBroadcastTyping)     $this->handleBroadcastTyping($pk);
+        elseif($pk instanceof RequestSendMessage)         $this->handleSendMessage($pk);
+        elseif($pk instanceof RequestSendFile)            $this->handleSendFile($pk);
+        elseif($pk instanceof RequestEditMessage)         $this->handleEditMessage($pk);
+        elseif($pk instanceof RequestAddReaction)         $this->handleAddReaction($pk);
+        elseif($pk instanceof RequestRemoveReaction)      $this->handleRemoveReaction($pk);
+        elseif($pk instanceof RequestRemoveAllReactions)  $this->handleRemoveAllReactions($pk);
+        elseif($pk instanceof RequestDeleteMessage)       $this->handleDeleteMessage($pk);
+        elseif($pk instanceof RequestPinMessage)          $this->handlePinMessage($pk);
+        elseif($pk instanceof RequestUnpinMessage)        $this->handleUnpinMessage($pk);
+        elseif($pk instanceof RequestAddRole)             $this->handleAddRole($pk);
+        elseif($pk instanceof RequestRemoveRole)          $this->handleRemoveRole($pk);
+        elseif($pk instanceof RequestCreateRole)          $this->handleCreateRole($pk);
+        elseif($pk instanceof RequestUpdateRole)          $this->handleUpdateRole($pk);
+        elseif($pk instanceof RequestDeleteRole)          $this->handleDeleteRole($pk);
+        elseif($pk instanceof RequestKickMember)          $this->handleKickMember($pk);
+        elseif($pk instanceof RequestCreateInvite)        $this->handleCreateInvite($pk);
+        elseif($pk instanceof RequestDeleteInvite)        $this->handleDeleteInvite($pk);
+        elseif($pk instanceof RequestCreateChannel)       $this->handleCreateChannel($pk);
+        elseif($pk instanceof RequestUpdateChannel)       $this->handleUpdateChannel($pk);
+        elseif($pk instanceof RequestDeleteChannel)       $this->handleDeleteChannel($pk);
+        elseif($pk instanceof RequestBanMember)           $this->handleBanMember($pk);
+        elseif($pk instanceof RequestUnbanMember)         $this->handleUnbanMember($pk);
+        elseif($pk instanceof RequestCreateWebhook)       $this->handleCreateWebhook($pk);
+        elseif($pk instanceof RequestUpdateWebhook)       $this->handleUpdateWebhook($pk);
+        elseif($pk instanceof RequestDeleteWebhook)       $this->handleDeleteWebhook($pk);
+        elseif($pk instanceof RequestLeaveGuild)          $this->handleLeaveGuild($pk);
+    }
+
+    private function handleFetchBans(RequestFetchBans $pk): void{
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
+            $bans = [];
+            foreach($guild->bans->toArray() as $ban){
+                $bans[] = ModelConverter::genModelBan($ban);
+            }
+            $this->resolveRequest($pk->getUID(), true, "Fetched bans.", $bans);
+        });
+    }
+
+    private function handleFetchChannel(RequestFetchChannel $pk): void{
+        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+            $this->resolveRequest($pk->getUID(), true, "Fetched channel.", [ModelConverter::genModelChannel($channel)]);
+        });
+    }
+
+    private function handleFetchChannels(RequestFetchChannels $pk): void{
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
+            $channels = [];
+            foreach($guild->channels->toArray() as $channel){
+                $channels[] = ModelConverter::genModelChannel($channel);
+            }
+            $this->resolveRequest($pk->getUID(), true, "Fetched channels.", $channels);
+        });
+    }
+
+    private function handleFetchGuild(RequestFetchGuild $pk): void{
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
+            $this->resolveRequest($pk->getUID(), true, "Fetched guild.", [ModelConverter::genModelGuild($guild)]);
+        });
+    }
+
+    private function handleFetchGuilds(RequestFetchGuilds $pk): void{
+        $guilds = [];
+        foreach($this->client->getDiscordClient()->guilds->toArray() as $guild){
+            $guilds[] = ModelConverter::genModelGuild($guild);
+        }
+        $this->resolveRequest($pk->getUID(), true, "Fetched guilds.", $guilds);
+    }
+
+    private function handleFetchInvites(RequestFetchInvites $pk): void{
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
+            $invites = [];
+            foreach($guild->invites->toArray() as $invite){
+                $invites[] = ModelConverter::genModelInvite($invite);
+            }
+            $this->resolveRequest($pk->getUID(), true, "Fetched invites.", $invites);
+        });
+    }
+
+    private function handleFetchMember(RequestFetchMember $pk): void{
+        $this->getMember($pk, $pk->getGuildId(), $pk->getUserId(), function(DiscordMember $member) use($pk){
+            $this->resolveRequest($pk->getUID(), true, "Fetched member.", [ModelConverter::genModelMember($member)]);
+        });
+    }
+
+    private function handleFetchMembers(RequestFetchMembers $pk): void{
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
+            $members = [];
+            foreach($guild->members->toArray() as $member){
+                $members[] = ModelConverter::genModelMember($member);
+            }
+            $this->resolveRequest($pk->getUID(), true, "Fetched members.", $members);
+        });
+    }
+
+    private function handleFetchMessage(RequestFetchMessage $pk): void{
+        $this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $message) use($pk){
+            $this->resolveRequest($pk->getUID(), true, "Fetched message.", [ModelConverter::genModelMessage($message)]);
+        });
+    }
+
+    private function handleFetchPinnedMessages(RequestFetchPinnedMessages $pk): void{
+        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+            $channel->getPinnedMessages()->then(function(Collection $collection) use($pk){
+                $messages = [];
+                foreach($collection->toArray() as $message){
+                    $messages[] = ModelConverter::genModelMessage($message);
+                }
+                $this->resolveRequest($pk->getUID(), true, "Fetched pinned messages.", $messages);
+            }, function(\Throwable $e) use($pk){
+                $this->resolveRequest($pk->getUID(), false, "Failed to fetch pinned messages.", [$e->getMessage(), $e->getTraceAsString()]);
+                $this->logger->debug("Failed to fetch pinned messages ({$pk->getUID()}) - {$e->getMessage()}");
+            });
+        });
+    }
+
+    private function handleFetchRole(RequestFetchRole $pk): void{
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
+            $guild->roles->fetch($pk->getRoleId())->then(function(DiscordRole $role) use($pk){
+                $this->resolveRequest($pk->getUID(), true, "Fetched role.", [ModelConverter::genModelRole($role)]);
+            }, function(\Throwable $e) use($pk){
+                $this->resolveRequest($pk->getUID(), false, "Failed to fetch role.", [$e->getMessage(), $e->getTraceAsString()]);
+                $this->logger->debug("Failed to fetch role ({$pk->getUID()}) - {$e->getMessage()}");
+            });
+        });
+    }
+
+    private function handleFetchRoles(RequestFetchRoles $pk): void{
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
+            $roles = [];
+            foreach($guild->roles->toArray() as $role){
+                $roles[] = ModelConverter::genModelRole($role);
+            }
+            $this->resolveRequest($pk->getUID(), true, "Fetched roles.", $roles);
+        });
+    }
+
+    private function handleFetchUser(RequestFetchUser $pk): void{
+        $this->client->getDiscordClient()->users->fetch($pk->getUserId())->then(function(DiscordUser $user) use($pk){
+            $this->resolveRequest($pk->getUID(), true, "Fetched user.", [ModelConverter::genModelUser($user)]);
+        }, function(\Throwable $e) use($pk){
+            $this->resolveRequest($pk->getUID(), false, "Failed to fetch user.", [$e->getMessage(), $e->getTraceAsString()]);
+            $this->logger->debug("Failed to fetch user ({$pk->getUID()}) - {$e->getMessage()}");
+        });
+    }
+
+    private function handleFetchUsers(RequestFetchUsers $pk): void{
+        $users = [];
+        foreach($this->client->getDiscordClient()->users->toArray() as $user){
+            $users[] = ModelConverter::genModelUser($user);
+        }
+        $this->resolveRequest($pk->getUID(), true, "Fetched users.", $users);
+    }
+
+    private function handleFetchWebhooks(RequestFetchWebhooks $pk): void{
+        if($pk->getChannelId() !== null){
+            $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+                $webhooks = [];
+                foreach($channel->webhooks->toArray() as $webhook){
+                    $webhooks[] = ModelConverter::genModelWebhook($webhook);
+                }
+                $this->resolveRequest($pk->getUID(), true, "Fetched webhooks.", $webhooks);
+            });
+        }else{
+            $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use ($pk){
+                $webhooks = [];
+                foreach($guild->channels->toArray() as $channel){
+                    foreach($channel->webhooks->toArray() as $webhook){
+                        $webhooks[] = ModelConverter::genModelWebhook($webhook);
+                    }
+                }
+                $this->resolveRequest($pk->getUID(), true, "Fetched webhooks.", $webhooks);
+            });
+        }
     }
 
     private function handleDeleteWebhook(RequestDeleteWebhook $pk): void{
         $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
-            $channel->webhooks->fetch($pk->getWebhookId())->then(function(DiscordWebhook $webhook) use($channel, $pk){
-                $channel->webhooks->delete($webhook, $pk->getReason())->then(function() use($pk){
-                    $this->resolveRequest($pk->getUID());
-                }, function(\Throwable $e) use($pk){
-                    $this->resolveRequest($pk->getUID(), false, "Failed to delete webhook.", [$e->getMessage(), $e->getTraceAsString()]);
-                    $this->logger->debug("Failed to delete webhook ({$pk->getUID()}) - {$e->getMessage()}");
-                });
+            $channel->webhooks->delete($pk->getWebhookId(), $pk->getReason())->then(function(DiscordWebhook $webhook) use($pk){
+                $this->resolveRequest($pk->getUID());
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to delete webhook.", [$e->getMessage(), $e->getTraceAsString()]);
-                $this->logger->debug("Failed to delete webhook ({$pk->getUID()}) - fetch error: {$e->getMessage()}");
+                $this->logger->debug("Failed to delete webhook ({$pk->getUID()}) - {$e->getMessage()}");
             });
         });
     }
@@ -196,60 +361,6 @@ class CommunicationHandler{
                 $this->resolveRequest($pk->getUID(), false, "Failed to create webhook.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to create webhook ({$pk->getUID()}) - {$e->getMessage()}");
             });
-        });
-    }
-
-    private function handleFetchWebhooks(RequestFetchWebhooks $pk): void{
-        if($pk->getChannelId() !== null){
-            $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
-                $channel->webhooks->freshen()->then(function(DiscordWebhookRepository $repository) use($pk){
-                    $webhooks = [];
-                    /** @var DiscordWebhook $webhook */
-                    foreach($repository->toArray() as $webhook){
-                        $webhooks[] = ModelConverter::genModelWebhook($webhook);
-                    }
-                    $this->resolveRequest($pk->getUID(), true, "Fetched webhooks.", $webhooks);
-                }, function(\Throwable $e) use($pk){
-                    $this->resolveRequest($pk->getUID(), false, "Failed to fetch webhooks.", [$e->getMessage(), $e->getTraceAsString()]);
-                    $this->logger->debug("Failed to fetch webhooks ({$pk->getUID()}) - freshen error: {$e->getMessage()}");
-                });
-            });
-        }else{
-            $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use ($pk){
-                $webhooks = [];
-                foreach($guild->channels->toArray() as $channel){
-                    $channel->webhooks->freshen()->then(function(DiscordWebhookRepository $repository) use (&$webhooks){
-                        /** @var DiscordWebhook $webhook */
-                        foreach($repository->toArray() as $webhook){
-                            $webhooks[] = ModelConverter::genModelWebhook($webhook);
-                        }
-                    }, function(\Throwable $e) use ($pk){
-                        $this->logger->debug("[Non-fatal] Failed to fetch webhooks ({$pk->getUID()}) - freshen error: {$e->getMessage()}");
-                    });
-                }
-                $this->resolveRequest($pk->getUID(), true, "Fetched webhooks.", $webhooks);
-            });
-        }
-    }
-
-    private function handleFetchPinnedMessages(RequestFetchPinnedMessages $pk): void{
-        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
-            $channel->getPinnedMessages()->then(function(Collection $collection) use($pk){
-                $messages = [];
-                foreach($collection->toArray() as $message){
-                    $messages[] = ModelConverter::genModelMessage($message);
-                }
-                $this->resolveRequest($pk->getUID(), true, "Fetched pinned messages.", $messages);
-            }, function(\Throwable $e) use($pk){
-                $this->resolveRequest($pk->getUID(), false, "Failed to fetch pinned messages.", [$e->getMessage(), $e->getTraceAsString()]);
-                $this->logger->debug("Failed to fetch pinned messages ({$pk->getUID()}) - {$e->getMessage()}");
-            });
-        });
-    }
-
-    private function handleFetchMessage(RequestFetchMessage $pk): void{
-        $this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $message) use($pk){
-            $this->resolveRequest($pk->getUID(), true, "Fetched message.", [ModelConverter::genModelMessage($message)]);
         });
     }
 
