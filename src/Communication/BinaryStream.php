@@ -13,6 +13,9 @@
 
 namespace JaxkDev\DiscordBot\Communication;
 
+use function sizeof;
+use function strlen;
+
 class BinaryStream extends \pocketmine\utils\BinaryStream{
 
     public function putString(string $value): void{

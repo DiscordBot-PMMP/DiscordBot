@@ -18,7 +18,7 @@ use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a guild the bot is in has been deleted, or the bot left/was kicked.
- * 
+ *
  * @see GuildUpdated Emitted when a guild the bot is in has been updated.
  * @see GuildJoined Emitted when the bot joins a guild.
  */

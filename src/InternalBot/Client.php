@@ -21,13 +21,60 @@ use Error;
 use ErrorException;
 use JaxkDev\DiscordBot\Communication\Thread;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
-use JaxkDev\DiscordBot\InternalBot\Handlers\DiscordEventHandler;
 use JaxkDev\DiscordBot\InternalBot\Handlers\CommunicationHandler;
+use JaxkDev\DiscordBot\InternalBot\Handlers\DiscordEventHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level as LoggerLevel;
 use Monolog\Logger;
 use React\EventLoop\TimerInterface;
 use Throwable;
+use function array_map;
+use function count;
+use function error_reporting;
+use function gc_collect_cycles;
+use function gc_enable;
+use function gc_mem_caches;
+use function get_class;
+use function gettype;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_bool;
+use function is_dir;
+use function is_object;
+use function is_string;
+use function ltrim;
+use function microtime;
+use function preg_replace;
+use function register_shutdown_function;
+use function round;
+use function rtrim;
+use function set_error_handler;
+use function set_exception_handler;
+use function spl_object_id;
+use function str_replace;
+use function str_starts_with;
+use function strlen;
+use function strval;
+use function substr;
+use function time;
+use const DIRECTORY_SEPARATOR;
+use const E_ALL;
+use const E_COMPILE_ERROR;
+use const E_COMPILE_WARNING;
+use const E_CORE_ERROR;
+use const E_CORE_WARNING;
+use const E_DEPRECATED;
+use const E_ERROR;
+use const E_NOTICE;
+use const E_PARSE;
+use const E_RECOVERABLE_ERROR;
+use const E_STRICT;
+use const E_USER_DEPRECATED;
+use const E_USER_ERROR;
+use const E_USER_NOTICE;
+use const E_USER_WARNING;
+use const E_WARNING;
 
 class Client{
 
@@ -61,12 +108,12 @@ class Client{
 
         $this->logger = new Logger('InternalThread');
         $handler = new RotatingFileHandler(
-            \JaxkDev\DiscordBot\DATA_PATH.$config['logging']['directory'].DIRECTORY_SEPARATOR."DiscordBot.log",
+            \JaxkDev\DiscordBot\DATA_PATH . $config['logging']['directory'] . DIRECTORY_SEPARATOR . "DiscordBot.log",
             $config['logging']['max_files'],
             LoggerLevel::Debug
         );
         $handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
-        $this->logger->setHandlers(array($handler));
+        $this->logger->setHandlers([$handler]);
 
         /** @var string $ca IDE is stupid, this is always a string. */
         $ca = CaBundle::getSystemCaRootBundlePath($this->logger);
@@ -131,7 +178,7 @@ class Client{
             }
         });
 
-        $this->client->getLoop()->addPeriodicTimer(1/20, function(){
+        $this->client->getLoop()->addPeriodicTimer(1 / 20, function(){
             // Note this is not accurate/fixed dynamically to 1/20th of a second.
             $this->tick();
         });
@@ -168,9 +215,9 @@ class Client{
             }
 
             //GC Tests.
-            if(microtime(true)-$this->lastGCCollection >= 6000){
+            if(microtime(true) - $this->lastGCCollection >= 6000){
                 $cycles = gc_collect_cycles();
-                $mem = round(gc_mem_caches()/1024, 3);
+                $mem = round(gc_mem_caches() / 1024, 3);
                 $this->logger->debug("[GC] Claimed {$mem}kb and {$cycles} cycles.");
                 $this->lastGCCollection = time();
             }
@@ -207,17 +254,17 @@ class Client{
     public function websocketHandler(int $op, string $reason): void{
         switch($op){
             case Op::CLOSE_DISALLOWED_INTENTS:
-                $this->logger->emergency("Disallowed intents detected, Please follow the wiki provided ".
+                $this->logger->emergency("Disallowed intents detected, Please follow the wiki provided " .
                     "(https://github.com/DiscordBot-PMMP/DiscordBot/wiki/Creating-your-discord-bot) and ensure both privileged intents are enabled.");
                 break;
             case Op::CLOSE_INVALID_TOKEN:
-                $this->logger->emergency("Invalid token, rejected by discord , Please follow the wiki provided ".
+                $this->logger->emergency("Invalid token, rejected by discord , Please follow the wiki provided " .
                     "(https://github.com/DiscordBot-PMMP/DiscordBot/wiki/Creating-your-discord-bot).");
                 break;
             case Op::CLOSE_INVALID_INTENTS:
                 //Should never happen considering were set to a specific version of the gateway
-                $this->logger->emergency("Invalid intents specified, Please create a new issue on github ".
-                    "(https://github.com/DiscordBot-PMMP/DiscordBot/issues/new) quoting the text `op:".Op::CLOSE_INVALID_INTENTS." - {$reason}`.");
+                $this->logger->emergency("Invalid intents specified, Please create a new issue on github " .
+                    "(https://github.com/DiscordBot-PMMP/DiscordBot/issues/new) quoting the text `op:" . Op::CLOSE_INVALID_INTENTS . " - {$reason}`.");
                 break;
         }
         if(in_array($op, Op::getCriticalCloseCodes(), true)) {
@@ -253,7 +300,7 @@ class Client{
                 E_USER_DEPRECATED => "E_USER_DEPRECATED"
             ];
             $errno = $errorConversion[$error->getCode()] ?? $error->getCode();
-            $this->logger->critical(get_class($error) . ": \"{$error->getMessage()}\" (".strval($errno).") in \"{$error->getFile()}\" at line {$error->getLine()}");
+            $this->logger->critical(get_class($error) . ": \"{$error->getMessage()}\" (" . strval($errno) . ") in \"{$error->getFile()}\" at line {$error->getLine()}");
             foreach(self::printableTrace($error->getTrace()) as $line){
                 $this->logger->critical($line);
             }
@@ -287,7 +334,7 @@ class Client{
         $messages = [];
         for($i = 0; isset($trace[$i]); ++$i){
             $params = "";
-            if(isset($trace[$i]["args"]) or isset($trace[$i]["params"])){
+            if(isset($trace[$i]["args"]) || isset($trace[$i]["params"])){
                 if(isset($trace[$i]["args"])){
                     $args = $trace[$i]["args"];
                 }else{
@@ -326,7 +373,7 @@ class Client{
                     return gettype($value) . " " . (preg_replace('#([^\x20-\x7E])#', '.', strval($value)) ?? "");
                 }, $args));
             }
-            $messages[] = "#$i " . ((isset($trace[$i]["file"]) && is_string($trace[$i]["file"])) ? self::cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . (preg_replace('#([^\x20-\x7E])#', '.', $params) ?? "") . ")";
+            $messages[] = "#$i " . ((isset($trace[$i]["file"]) && is_string($trace[$i]["file"])) ? self::cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" || $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . (preg_replace('#([^\x20-\x7E])#', '.', $params) ?? "") . ")";
         }
         return $messages;
     }

@@ -13,6 +13,9 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
+use function strlen;
+use function strpos;
+
 // https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
 class Author{
 
@@ -35,7 +38,7 @@ class Author{
     }
 
     public function setName(?string $name): void{
-        if($name !== null and strlen($name) > 2048){
+        if($name !== null && strlen($name) > 2048){
             throw new \AssertionError("Embed author name can only have up to 2048 characters.");
         }
         $this->name = $name;
@@ -54,7 +57,7 @@ class Author{
     }
 
     public function setIconUrl(?string $icon_url): void{
-        if($icon_url !== null and strpos($icon_url , "https" ) !== 0){
+        if($icon_url !== null && strpos($icon_url , "https" ) !== 0){
             throw new \AssertionError("Embed author icon url '$icon_url' must start with https.");
         }
         $this->icon_url = $icon_url;

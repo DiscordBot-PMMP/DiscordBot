@@ -14,6 +14,7 @@
 namespace JaxkDev\DiscordBot\Models\Messages;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
+use function str_starts_with;
 
 class Attachment{
 
@@ -102,7 +103,7 @@ class Attachment{
     }
 
     public function setWidth(?int $width): void{
-        if($width !== null and $width < 0){
+        if($width !== null && $width < 0){
             throw new \AssertionError("Width '$width' is invalid.");
         }
         $this->width = $width;
@@ -113,7 +114,7 @@ class Attachment{
     }
 
     public function setHeight(?int $height): void{
-        if($height !== null and $height < 0){
+        if($height !== null && $height < 0){
             throw new \AssertionError("Height '$height' is invalid.");
         }
         $this->height = $height;

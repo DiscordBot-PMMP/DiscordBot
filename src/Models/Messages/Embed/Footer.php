@@ -13,6 +13,9 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
+use function strlen;
+use function strpos;
+
 class Footer{
 
     /** 2048 characters */
@@ -31,7 +34,7 @@ class Footer{
     }
 
     public function setText(?string $text): void{
-        if($text !== null and strlen($text) > 2048){
+        if($text !== null && strlen($text) > 2048){
             throw new \AssertionError("Embed footer text can only have up to 2048 characters.");
         }
         $this->text = $text;
@@ -42,7 +45,7 @@ class Footer{
     }
 
     public function setIconUrl(?string $icon_url): void{
-        if($icon_url !== null and strpos($icon_url , "https" ) !== 0){
+        if($icon_url !== null && strpos($icon_url , "https" ) !== 0){
             throw new \AssertionError("Embed footer icon URL '$icon_url' must start with https.");
         }
         $this->icon_url = $icon_url;

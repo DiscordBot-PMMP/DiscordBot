@@ -13,6 +13,8 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
+use function strpos;
+
 // https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
 class Image{
 
@@ -34,7 +36,7 @@ class Image{
     }
 
     public function setUrl(?string $url): void{
-        if($url !== null and strpos($url , "https" ) !== 0){
+        if($url !== null && strpos($url , "https" ) !== 0){
             throw new \AssertionError("URL '$url' must start with https.");
         }
         $this->url = $url;

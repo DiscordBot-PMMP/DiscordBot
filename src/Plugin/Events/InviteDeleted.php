@@ -17,7 +17,7 @@ use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a invite gets deleted/revoked/expires.
- * 
+ *
  * @see InviteCreated
  */
 class InviteDeleted extends DiscordBotEvent{

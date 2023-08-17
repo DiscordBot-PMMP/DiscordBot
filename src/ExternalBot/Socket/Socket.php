@@ -15,6 +15,21 @@ namespace JaxkDev\DiscordBot\ExternalBot\Socket;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use Monolog\Logger;
+use function socket_close;
+use function socket_connect;
+use function socket_create;
+use function socket_last_error;
+use function socket_read;
+use function socket_select;
+use function socket_set_nonblock;
+use function socket_strerror;
+use function socket_write;
+use function unpack;
+use const AF_INET;
+use const SOCK_STREAM;
+use const SOCKET_EINPROGRESS;
+use const SOCKET_EWOULDBLOCK;
+use const SOL_TCP;
 
 class Socket{
 
@@ -42,7 +57,7 @@ class Socket{
     }
 
     public function open(): void{
-        if(@socket_connect($this->socket, $this->address, $this->port) === false and ($e = socket_last_error()) !== SOCKET_EINPROGRESS){
+        if(@socket_connect($this->socket, $this->address, $this->port) === false && ($e = socket_last_error()) !== SOCKET_EINPROGRESS){
             throw new SocketException("Failed to connect to socket: " . socket_strerror($e));
         }
         $s = [$this->socket];
@@ -83,12 +98,12 @@ class Socket{
 
         $length = @socket_read($this->socket, 4);
 
-        if($length === false and ($e = socket_last_error()) !== SOCKET_EWOULDBLOCK){
+        if($length === false && ($e = socket_last_error()) !== SOCKET_EWOULDBLOCK){
             $this->close("Failed to read data from socket.");
             throw new SocketException("Failed to read data from socket: " . socket_strerror($e));
         }
 
-        if($length === "" or $length === false){
+        if($length === "" || $length === false){
             //No data to read.
             return null;
         }

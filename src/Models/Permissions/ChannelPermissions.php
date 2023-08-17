@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Models\Permissions;
 
 // Remember categories are classed as channels.
 use JaxkDev\DiscordBot\Communication\BinaryStream;
+use function array_merge;
 
 /** @extends Permissions<ChannelPermissions> */
 class ChannelPermissions extends Permissions{

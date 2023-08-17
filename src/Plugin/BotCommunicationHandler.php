@@ -72,6 +72,8 @@ use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
 use pocketmine\VersionInfo;
+use function floor;
+use function microtime;
 
 class BotCommunicationHandler{
 
@@ -125,7 +127,7 @@ class BotCommunicationHandler{
 
     private function handleReady(DiscordReadyPacket $packet): void{
         //Default activity, Feel free to change in event / later time
-        $ac = Activity::create(VersionInfo::NAME." v".VersionInfo::BASE_VERSION." | DiscordBot ".\JaxkDev\DiscordBot\VERSION, ActivityType::GAME, "https://github.com/DiscordBotPMMP/DiscordBot");
+        $ac = Activity::create(VersionInfo::NAME . " v" . VersionInfo::BASE_VERSION . " | DiscordBot " . \JaxkDev\DiscordBot\VERSION, ActivityType::GAME, "https://github.com/DiscordBotPMMP/DiscordBot");
 
         $event = new DiscordReadyEvent($this->plugin, $packet->getBotUser(), $ac, Status::ONLINE);
         $event->call();

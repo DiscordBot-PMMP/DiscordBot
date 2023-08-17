@@ -30,6 +30,25 @@ use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
+use function array_map;
+use function bin2hex;
+use function count;
+use function define;
+use function defined;
+use function extension_loaded;
+use function file_exists;
+use function function_exists;
+use function intval;
+use function is_dir;
+use function is_int;
+use function mkdir;
+use function rename;
+use function rtrim;
+use function sizeof;
+use function unlink;
+use function xdebug_info;
+use function yaml_emit_file;
+use function yaml_parse_file;
 
 class Main extends PluginBase{
 
@@ -53,21 +72,21 @@ class Main extends PluginBase{
 
         if(!defined("JaxkDev\DiscordBot\COMPOSER")){
             define("JaxkDev\DiscordBot\DATA_PATH", $this->getDataFolder());
-            define("JaxkDev\DiscordBot\VERSION", "v".$this->getDescription()->getVersion());
-            define("JaxkDev\DiscordBot\COMPOSER", $phar."/vendor/autoload.php");
+            define("JaxkDev\DiscordBot\VERSION", "v" . $this->getDescription()->getVersion());
+            define("JaxkDev\DiscordBot\COMPOSER", $phar . "/vendor/autoload.php");
         }
         if (!function_exists('JaxkDev\DiscordBot\Libs\React\Promise\resolve')) {
-            require $phar.'/src/Libs/React/Promise/functions.php';
+            require $phar . '/src/Libs/React/Promise/functions.php';
         }
 
-        if(!is_dir($this->getDataFolder()."logs")){
-            mkdir($this->getDataFolder()."logs");
+        if(!is_dir($this->getDataFolder() . "logs")){
+            mkdir($this->getDataFolder() . "logs");
         }
 
         $this->saveDefaultConfig();
         $this->saveResource("HELP_ENG.txt", true); //Always keep these up-to-date.
-        if(file_exists($this->getDataFolder()."cacert.pem")){
-            unlink($this->getDataFolder()."cacert.pem");
+        if(file_exists($this->getDataFolder() . "cacert.pem")){
+            unlink($this->getDataFolder() . "cacert.pem");
             $this->getLogger()->debug("Removed old cacert.pem file from plugin_data.");
         }
 
@@ -80,7 +99,7 @@ class Main extends PluginBase{
         if(!$this->loadConfig()) return;
 
         /** @noinspection PhpUndefinedFunctionInspection xdebug_info */
-        if(extension_loaded("xdebug") and (!function_exists('xdebug_info') || count(xdebug_info('mode')) !== 0)){
+        if(extension_loaded("xdebug") && (!function_exists('xdebug_info') || count(xdebug_info('mode')) !== 0)){
             $this->getLogger()->warning("xdebug is enabled, this will cause major performance issues with the discord thread.");
         }
 
@@ -133,7 +152,7 @@ class Main extends PluginBase{
         if($command->getName() !== "debugdiscord") return false;
         if(!$command->testPermission($sender)) return true;
 
-        $sender->sendMessage(TextFormat::YELLOW."Building debug file, please be patient this can take several seconds.");
+        $sender->sendMessage(TextFormat::YELLOW . "Building debug file, please be patient this can take several seconds.");
 
         $task = new DebugData($this, $sender);
         $this->getServer()->getAsyncPool()->submitTask($task);
@@ -145,8 +164,8 @@ class Main extends PluginBase{
         $this->getLogger()->debug("Loading configuration...");
 
         /** @var array<string, mixed>|false $config */
-        $config = yaml_parse_file($this->getDataFolder()."config.yml");
-        if($config === false or !is_int($config["version"] ?? "")){
+        $config = yaml_parse_file($this->getDataFolder() . "config.yml");
+        if($config === false || !is_int($config["version"] ?? "")){
             $this->getLogger()->critical("Failed to parse config.yml");
             $this->getServer()->getPluginManager()->disablePlugin($this);
             return false;
@@ -154,17 +173,17 @@ class Main extends PluginBase{
 
         if(intval($config["version"]) !== ConfigUtils::VERSION){
             $oldVersion = $config["version"];
-            $this->getLogger()->info("Updating your config from v".$oldVersion." to v".ConfigUtils::VERSION);
+            $this->getLogger()->info("Updating your config from v" . $oldVersion . " to v" . ConfigUtils::VERSION);
             ConfigUtils::update($config);
-            rename($this->getDataFolder()."config.yml", $this->getDataFolder()."config-v".$oldVersion.".yml.old");
-            yaml_emit_file($this->getDataFolder()."config.yml", $config);
+            rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config-v" . $oldVersion . ".yml.old");
+            yaml_emit_file($this->getDataFolder() . "config.yml", $config);
             $this->getLogger()->info("Config updated, old config was saved to '{$this->getDataFolder()}config-v{$oldVersion}.yml.old'");
         }
 
         $this->getLogger()->debug("Verifying config...");
         $result_raw = ConfigUtils::verify($config);
         if(sizeof($result_raw) !== 0){
-            $result = TextFormat::RED."There were some problems with your config.yml, see below:\n".TextFormat::RESET;
+            $result = TextFormat::RED . "There were some problems with your config.yml, see below:\n" . TextFormat::RESET;
             foreach($result_raw as $value){
                 $result .= "{$value}\n";
             }
@@ -211,7 +230,6 @@ class Main extends PluginBase{
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
     }
-
 
     /**
      * @internal

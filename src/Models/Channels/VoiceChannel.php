@@ -14,6 +14,7 @@
 namespace JaxkDev\DiscordBot\Models\Channels;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
+use function explode;
 
 class VoiceChannel extends GuildChannel{
 
@@ -26,7 +27,7 @@ class VoiceChannel extends GuildChannel{
     private array $members = [];
 
     /**
-     * @param string[]    $members Array of Member ID's
+     * @param string[] $members Array of Member ID's
      */
     public function __construct(int $bitrate, int $member_limit, string $name, int $position, string $guild_id,
                                    array $members, ?string $category_id = null, ?string $id = null){
@@ -61,7 +62,7 @@ class VoiceChannel extends GuildChannel{
     public function setMembers(array $members): void{
         foreach($members as $member){
             [$sid, $uid] = explode(".", $member);
-            if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
+            if(!Utils::validDiscordSnowflake($sid) || !Utils::validDiscordSnowflake($uid)){
                 throw new \AssertionError("Member ID '$member' is invalid.");
             }
         }

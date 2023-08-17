@@ -13,6 +13,8 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
+use function strlen;
+
 // https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
 class Field{
 

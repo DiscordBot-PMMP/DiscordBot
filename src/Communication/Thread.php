@@ -18,6 +18,9 @@ use JaxkDev\DiscordBot\ExternalBot\Client as ExternalClient;
 use JaxkDev\DiscordBot\InternalBot\Client as InternalClient;
 use pmmp\thread\Thread as PMMPThread;
 use pmmp\thread\ThreadSafeArray;
+use function array_map;
+use function bin2hex;
+use function ini_set;
 
 /**
  * This class is used to represent a thread that is used for network communication.

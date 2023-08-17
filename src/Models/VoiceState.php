@@ -83,7 +83,7 @@ class VoiceState implements BinarySerializable{
     }
 
     public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -94,7 +94,7 @@ class VoiceState implements BinarySerializable{
     }
 
     public function setChannelId(?string $channel_id): void{
-        if($channel_id !== null and !Utils::validDiscordSnowflake($channel_id)){
+        if($channel_id !== null && !Utils::validDiscordSnowflake($channel_id)){
             throw new \AssertionError("Channel ID '$channel_id' is invalid.");
         }
         $this->channel_id = $channel_id;

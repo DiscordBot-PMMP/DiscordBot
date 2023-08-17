@@ -18,7 +18,7 @@ use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a ban gets created (AKA Initialised).
- * 
+ *
  * @see BanDeleted (AKA Revoked)
  */
 class BanCreated extends DiscordBotEvent{

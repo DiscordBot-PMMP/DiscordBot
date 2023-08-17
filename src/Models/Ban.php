@@ -43,7 +43,7 @@ class Ban implements BinarySerializable{
     }
 
     public function getId(): string{
-        return $this->guild_id.".".$this->user_id;
+        return $this->guild_id . "." . $this->user_id;
     }
 
     public function getGuildId(): string{

@@ -28,7 +28,7 @@ abstract class Channel{
     }
 
     public function setId(?string $id): void{
-        if($id !== null and !Utils::validDiscordSnowflake($id)){
+        if($id !== null && !Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("Channel ID '$id' is invalid.");
         }
         $this->id = $id;

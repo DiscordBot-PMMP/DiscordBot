@@ -14,6 +14,7 @@
 namespace JaxkDev\DiscordBot\Models\Permissions;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
+use function array_merge;
 
 /** @extends Permissions<RolePermissions> */
 class RolePermissions extends Permissions{

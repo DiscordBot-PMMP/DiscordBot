@@ -35,7 +35,7 @@ class MessageReactionRemoveEmoji extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, ?string $guild_id, string $channel_id, string $message_id, string $emoji){
         parent::__construct($plugin);
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Invalid guild ID given.");
         }
         if(!Utils::validDiscordSnowflake($channel_id)){

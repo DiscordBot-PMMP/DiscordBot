@@ -28,7 +28,7 @@ class ChannelPinsUpdated extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, ?string $guild_id, string $channel_id){
         parent::__construct($plugin);
-        if($guild_id === null or Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id === null || Utils::validDiscordSnowflake($guild_id)){
             $this->guild_id = $guild_id;
         }else{
             throw new \AssertionError("Invalid guild ID given.");

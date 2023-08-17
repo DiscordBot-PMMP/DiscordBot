@@ -24,6 +24,9 @@ use JaxkDev\DiscordBot\ExternalBot\Socket\Socket;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level as LoggerLevel;
 use Monolog\Logger;
+use function microtime;
+use function usleep;
+use const DIRECTORY_SEPARATOR;
 
 class Client{
 
@@ -48,8 +51,7 @@ class Client{
             LoggerLevel::Debug
         );
         $handler->setFilenameFormat('{filename}-{date}', 'Y-m-d');
-        $this->logger->setHandlers(array($handler));
-
+        $this->logger->setHandlers([$handler]);
 
         //Socket options.
         $host = (string)$this->thread->getConfig()["protocol"]["external"]["host"];
@@ -59,7 +61,7 @@ class Client{
         try{
             $this->socket = new Socket($this->logger, $host, $port);
         }catch(\RuntimeException $e){
-            $this->logger->error("Failed to create socket: ".$e->getMessage());
+            $this->logger->error("Failed to create socket: " . $e->getMessage());
             $this->thread->setStatus(ThreadStatus::STOPPED);
             exit(1);
         }
@@ -98,7 +100,6 @@ class Client{
     }
 
     /**
-     * @param Packet $packet
      * @throws \AssertionError
      */
     public function writeDataPacket(Packet $packet): void{
@@ -119,7 +120,6 @@ class Client{
     }
 
     /**
-     * @return Packet|null
      * @throws \AssertionError
      */
     public function readDataPacket(): ?Packet{
@@ -230,7 +230,7 @@ class Client{
     private function loop(): void{
         $this->thread->setStatus(ThreadStatus::RUNNING);
         while($this->socket->isOpen()){
-            $this->lastTick = (int)(microtime(true)*1000000);
+            $this->lastTick = (int)(microtime(true) * 1000000);
             $this->checkStatus();
 
             $count = 0;
@@ -244,7 +244,7 @@ class Client{
                     $count += 1;
                     $this->thread->writeOutboundData($packet);
                 }
-            }while($packet !== null and $count < $this->thread->getConfig()["protocol"]["general"]["packets_per_tick"]);
+            }while($packet !== null && $count < $this->thread->getConfig()["protocol"]["general"]["packets_per_tick"]);
 
             $packets = $this->thread->readInboundData($this->thread->getConfig()["protocol"]["general"]["packets_per_tick"]);
             foreach($packets as $data){
@@ -256,7 +256,7 @@ class Client{
             }
 
             //sleep dynamically to keep up with the tick rate (1/20).
-            $time = (int)(microtime(true)*1000000);
+            $time = (int)(microtime(true) * 1000000);
             if($time - $this->lastTick < 49000){
                 usleep(50000 - ($time - $this->lastTick));
             }

@@ -14,6 +14,7 @@
 namespace JaxkDev\DiscordBot\Models\Messages;
 
 use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
+use function sizeof;
 
 class Webhook extends Message{
 

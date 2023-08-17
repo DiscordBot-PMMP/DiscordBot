@@ -1,4 +1,15 @@
-<?php /** @noinspection PhpUnusedPrivateMethodInspection */
+<?php
+
+/*
+ * DiscordBot, PocketMine-MP Plugin.
+ *
+ * Licensed under the Open Software License version 3.0 (OSL-3.0)
+ * Copyright (C) 2020-present JaxkDev
+ *
+ * Twitter :: @JaxkDev
+ * Discord :: JaxkDev
+ * Email   :: JaxkDev@gmail.com
+ */
 
 /*
  * DiscordBot, PocketMine-MP Plugin.
@@ -12,6 +23,16 @@
  */
 
 namespace JaxkDev\DiscordBot\Plugin;
+
+use function array_key_exists;
+use function filter_var;
+use function forward_static_call;
+use function in_array;
+use function is_int;
+use function is_string;
+use function strlen;
+use const FILTER_FLAG_IPV4;
+use const FILTER_VALIDATE_IP;
 
 abstract class ConfigUtils{
 
@@ -94,80 +115,80 @@ abstract class ConfigUtils{
     static public function verify(array $config): array{
         $result = [];
 
-        if(!array_key_exists("version", $config) or $config["version"] === null){
+        if(!array_key_exists("version", $config) || $config["version"] === null){
             $result[] = "No 'version' field found.";
         }else{
-            if(!is_int($config["version"]) or $config["version"] <= 0 or $config["version"] > self::VERSION){
+            if(!is_int($config["version"]) || $config["version"] <= 0 || $config["version"] > self::VERSION){
                 $result[] = "Invalid 'version' ({$config["version"]}), you were warned not to touch it...";
             }
         }
 
-        if(!array_key_exists("type", $config) or $config["type"] === null){
+        if(!array_key_exists("type", $config) || $config["type"] === null){
             $result[] = "No 'type' field found.";
         }else{
-            if(!is_string($config["type"]) or !in_array($config["type"], ["internal", "external"], true)){
+            if(!is_string($config["type"]) || !in_array($config["type"], ["internal", "external"], true)){
                 $result[] = "Invalid 'type' ({$config["type"]}), must be 'internal' or 'external'.";
             }
         }
 
-        if(!array_key_exists("logging", $config) or $config["logging"] === null){
+        if(!array_key_exists("logging", $config) || $config["logging"] === null){
             $result[] = "No 'logging' field found.";
         }else{
-            if(!array_key_exists("max_files", $config["logging"]) or $config["logging"]["max_files"] === null){
+            if(!array_key_exists("max_files", $config["logging"]) || $config["logging"]["max_files"] === null){
                 $result[] = "No 'logging.max_files' field found.";
             }else{
-                if(!is_int($config["logging"]["max_files"]) or $config["logging"]["max_files"] <= 0){
+                if(!is_int($config["logging"]["max_files"]) || $config["logging"]["max_files"] <= 0){
                     $result[] = "Invalid 'logging.max_files' ({$config["logging"]["max_files"]}), should be an int > 0.";
                 }
             }
 
-            if(!array_key_exists("directory", $config["logging"]) or $config["logging"]["directory"] === null){
+            if(!array_key_exists("directory", $config["logging"]) || $config["logging"]["directory"] === null){
                 $result[] = "No 'logging.directory' field found.";
             }else{
-                if(!is_string($config["logging"]["directory"]) or strlen($config["logging"]["directory"]) === 0){
+                if(!is_string($config["logging"]["directory"]) || strlen($config["logging"]["directory"]) === 0){
                     $result[] = "Invalid 'logging.directory' ({$config["logging"]["directory"]}).";
                 }
             }
         }
 
-        if(!array_key_exists("protocol", $config) or $config["protocol"] === null){
+        if(!array_key_exists("protocol", $config) || $config["protocol"] === null){
             $result[] = "No 'protocol' field found.";
         }else{
-            if(!array_key_exists("general", $config["protocol"]) or $config["protocol"]["general"] === null){
+            if(!array_key_exists("general", $config["protocol"]) || $config["protocol"]["general"] === null){
                 $result[] = "No 'protocol.general' field found.";
             }else{
-                if(!array_key_exists("packets_per_tick", $config["protocol"]["general"]) or $config["protocol"]["general"]["packets_per_tick"] === null){
+                if(!array_key_exists("packets_per_tick", $config["protocol"]["general"]) || $config["protocol"]["general"]["packets_per_tick"] === null){
                     $result[] = "No 'protocol.general.packets_per_tick' field found.";
                 }else{
-                    if(!is_int($config["protocol"]["general"]["packets_per_tick"]) or $config["protocol"]["general"]["packets_per_tick"] < 5){
+                    if(!is_int($config["protocol"]["general"]["packets_per_tick"]) || $config["protocol"]["general"]["packets_per_tick"] < 5){
                         $result[] = "Invalid 'protocol.general.packets_per_tick' ({$config["protocol"]["general"]["packets_per_tick"]}), Do not touch this without being told to explicitly by JaxkDev";
                     }
                 }
-                if(!array_key_exists("heartbeat_allowance", $config["protocol"]["general"]) or $config["protocol"]["general"]["heartbeat_allowance"] === null){
+                if(!array_key_exists("heartbeat_allowance", $config["protocol"]["general"]) || $config["protocol"]["general"]["heartbeat_allowance"] === null){
                     $result[] = "No 'protocol.general.heartbeat_allowance' field found.";
                 }else{
-                    if(!is_int($config["protocol"]["general"]["heartbeat_allowance"]) or $config["protocol"]["general"]["heartbeat_allowance"] < 2){
+                    if(!is_int($config["protocol"]["general"]["heartbeat_allowance"]) || $config["protocol"]["general"]["heartbeat_allowance"] < 2){
                         $result[] = "Invalid 'protocol.general.heartbeat_allowance' ({$config["protocol"]["general"]["heartbeat_allowance"]}),  Do not touch this without being told to explicitly by JaxkDev";
                     }
                 }
             }
 
-            if(!array_key_exists("internal", $config["protocol"]) or $config["protocol"]["internal"] === null){
+            if(!array_key_exists("internal", $config["protocol"]) || $config["protocol"]["internal"] === null){
                 $result[] = "No 'protocol.internal' field found.";
             }else{
-                if(!array_key_exists("token", $config["protocol"]["internal"]) or $config["protocol"]["internal"]["token"] === null){
+                if(!array_key_exists("token", $config["protocol"]["internal"]) || $config["protocol"]["internal"]["token"] === null){
                     $result[] = "No 'protocol.internal.token' field found.";
                 }else{
-                    if(!is_string($config["protocol"]["internal"]["token"]) or strlen($config["protocol"]["internal"]["token"]) < 59){
+                    if(!is_string($config["protocol"]["internal"]["token"]) || strlen($config["protocol"]["internal"]["token"]) < 59){
                         $result[] = "Invalid 'protocol.internal.token' ({$config["protocol"]["internal"]["token"]}), did you follow the wiki ?";
                     }
                 }
             }
 
-            if(!array_key_exists("external", $config["protocol"]) or $config["protocol"]["external"] === null){
+            if(!array_key_exists("external", $config["protocol"]) || $config["protocol"]["external"] === null){
                 $result[] = "No 'protocol.external' field found.";
             }else{
-                if(!array_key_exists("host", $config["protocol"]["external"]) or $config["protocol"]["external"]["host"] === null){
+                if(!array_key_exists("host", $config["protocol"]["external"]) || $config["protocol"]["external"]["host"] === null){
                     $result[] = "No 'protocol.external.host' field found.";
                 }else{
                     if(filter_var($config["protocol"]["external"]["host"], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false){
@@ -175,10 +196,10 @@ abstract class ConfigUtils{
                     }
                 }
 
-                if(!array_key_exists("port", $config["protocol"]["external"]) or $config["protocol"]["external"]["port"] === null){
+                if(!array_key_exists("port", $config["protocol"]["external"]) || $config["protocol"]["external"]["port"] === null){
                     $result[] = "No 'protocol.external.port' field found.";
                 }else{
-                    if(!is_int($config["protocol"]["external"]["port"]) or $config["protocol"]["external"]["port"] < 1 or $config["protocol"]["external"]["port"] > 65535){
+                    if(!is_int($config["protocol"]["external"]["port"]) || $config["protocol"]["external"]["port"] < 1 || $config["protocol"]["external"]["port"] > 65535){
                         $result[] = "Invalid 'protocol.external.port' ({$config["protocol"]["external"]["port"]}) must be a valid port (1-65535).";
                     }
                 }

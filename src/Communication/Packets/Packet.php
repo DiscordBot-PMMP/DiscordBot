@@ -14,7 +14,6 @@
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
-use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 /**
  * @implements BinarySerializable<self>

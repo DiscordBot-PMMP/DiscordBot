@@ -27,44 +27,44 @@ use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use Discord\Repository\Channel\WebhookRepository as DiscordWebhookRepository;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateBotPresence;
-use JaxkDev\DiscordBot\InternalBot\Client;
-use JaxkDev\DiscordBot\InternalBot\ModelConverter;
+use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateBotPresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
-use JaxkDev\DiscordBot\Communication\Packets\Heartbeat;
-use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
+use JaxkDev\DiscordBot\InternalBot\Client;
+use JaxkDev\DiscordBot\InternalBot\ModelConverter;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
@@ -75,7 +75,15 @@ use JaxkDev\DiscordBot\Plugin\ApiRejection;
 use Monolog\Logger;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
+use function array_combine;
+use function array_keys;
+use function array_map;
+use function array_values;
+use function floor;
+use function get_class;
+use function microtime;
 use function React\Promise\reject;
+use function strval;
 
 class CommunicationHandler{
 
@@ -321,7 +329,7 @@ class CommunicationHandler{
             try{
                 $data = array_combine($keys, $val); //Throws valueError on >= PHP8, returns false on < PHP8.
             }catch(\ValueError $e){
-                $promise->reject(new ApiRejection("Internal error occurred while updating role positions. (".$e->getMessage().")"));
+                $promise->reject(new ApiRejection("Internal error occurred while updating role positions. (" . $e->getMessage() . ")"));
                 return;
             }
             /** @var DiscordRole|null $k */
@@ -331,7 +339,7 @@ class CommunicationHandler{
                 return;
             }
             //shift
-            $diff = $role->getPosition()-$k->position; //How much are we shifting.
+            $diff = $role->getPosition() - $k->position; //How much are we shifting.
             if($diff === 0){
                 $this->logger->debug("Not updating role position ({$k->id}), no difference found.");
                 $promise->resolve();
@@ -340,15 +348,15 @@ class CommunicationHandler{
             $v = $k->id;
             $k = $k->position;
             if($diff > 0){
-                for($i = $k+1; $i <= $k+$diff; $i++){
-                    $data[$i-1] = $data[$i];
+                for($i = $k + 1; $i <= $k + $diff; $i++){
+                    $data[$i - 1] = $data[$i];
                 }
-                $data[$k+$diff] = $v;
+                $data[$k + $diff] = $v;
             }else{
-                for($i = $k-1; $i >= $k+$diff; $i--){
-                    $data[$i+1] = $data[$i];
+                for($i = $k - 1; $i >= $k + $diff; $i--){
+                    $data[$i + 1] = $data[$i];
                 }
-                $data[$k+$diff] = $v;
+                $data[$k + $diff] = $v;
             }
             //save
             $guild->updateRolePositions($data)->then(function(DiscordGuild $guild) use($promise){
@@ -385,7 +393,7 @@ class CommunicationHandler{
                         $this->handleUpdateRolePosition($pk->getRole())->then(function() use ($role, $pk){
                             $this->resolveRequest($pk->getUID(), true, "Updated role & position.", [ModelConverter::genModelRole($role)]);
                         }, function(ApiRejection $rejection) use ($pk){
-                            $this->resolveRequest($pk->getUID(), false, "Updated role however failed to update position: ".$rejection->getMessage(), [$rejection->getMessage(), $rejection->getTraceAsString()]);
+                            $this->resolveRequest($pk->getUID(), false, "Updated role however failed to update position: " . $rejection->getMessage(), [$rejection->getMessage(), $rejection->getTraceAsString()]);
                         });
                     }else{
                         $this->resolveRequest($pk->getUID(), true, "Updated role.", [ModelConverter::genModelRole($role)]);
@@ -453,7 +461,7 @@ class CommunicationHandler{
     private function handleRemoveAllReactions(RequestRemoveAllReactions $pk): void{
         $this->getMessage($pk, $pk->getChannelId(), $pk->getMessageId(), function(DiscordMessage $msg) use($pk){
             $msg->deleteReaction(($e = $pk->getEmoji()) === null ? DiscordMessage::REACT_DELETE_ALL : DiscordMessage::REACT_DELETE_EMOJI, $e)->then(function() use($pk, $e){
-                $this->resolveRequest($pk->getUID(), true, "Successfully bulk removed all ".($e === null ? "" : "'$e' ")."reactions");
+                $this->resolveRequest($pk->getUID(), true, "Successfully bulk removed all " . ($e === null ? "" : "'$e' ") . "reactions");
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to bulk remove reactions.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to bulk remove reactions ({$pk->getUID()}) - {$e->getMessage()}");
@@ -581,7 +589,7 @@ class CommunicationHandler{
                     $dc->rate_limit_per_user = $channel->getRateLimit() ?? 0;
                 }else{
                     $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type is unknown."]);
-                    throw new \AssertionError("What channel type is this ?? '".get_class($channel)."'");
+                    throw new \AssertionError("What channel type is this ?? '" . get_class($channel) . "'");
                 }
                 $guild->channels->save($dc)->then(function(DiscordChannel $channel) use($pk){
                     $this->resolveRequest($pk->getUID(), true, "Updated channel.", [ModelConverter::genModelChannel($channel)]);
@@ -845,7 +853,7 @@ class CommunicationHandler{
             $cb($guild);
         }, function(\Throwable $e) use($pk){
             $this->resolveRequest($pk->getUID(), false, "Failed to fetch guild.", [$e->getMessage(), $e->getTraceAsString()]);
-            $this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - guild error: {$e->getMessage()}");
+            $this->logger->debug("Failed to process request (" . get_class($pk) . "|{$pk->getUID()}) - guild error: {$e->getMessage()}");
         });
     }
 
@@ -860,13 +868,13 @@ class CommunicationHandler{
             $u = $this->client->getDiscordClient()->users->get("id", $channel_id);
             if($u === null){
                 $this->resolveRequest($pk->getUID(), false, "Failed to find channel/user.", ["Failed to find channel from local storage."]);
-                $this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - channel error: Failed to find channel from local storage.");
+                $this->logger->debug("Failed to process request (" . get_class($pk) . "|{$pk->getUID()}) - channel error: Failed to find channel from local storage.");
             }else{
                 $u->getPrivateChannel()->then(function(DiscordChannel $channel) use($cb){
                     $cb($channel);
                 }, function(\Throwable $e) use($pk){
                     $this->resolveRequest($pk->getUID(), false, "Failed to fetch private channel..", [$e->getMessage(), $e->getTraceAsString()]);
-                    $this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - private channel error: {$e->getMessage()}");
+                    $this->logger->debug("Failed to process request (" . get_class($pk) . "|{$pk->getUID()}) - private channel error: {$e->getMessage()}");
                 });
             }
         }else{
@@ -884,7 +892,7 @@ class CommunicationHandler{
                 $cb($dMessage);
             }, function(\Throwable $e) use ($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to fetch message.", [$e->getMessage(), $e->getTraceAsString()]);
-                $this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - message error: {$e->getMessage()}");
+                $this->logger->debug("Failed to process request (" . get_class($pk) . "|{$pk->getUID()}) - message error: {$e->getMessage()}");
             });
         });
     }
@@ -898,7 +906,7 @@ class CommunicationHandler{
                 $cb($member, $guild);
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to fetch member.", [$e->getMessage(), $e->getTraceAsString()]);
-                $this->logger->debug("Failed to process request (".get_class($pk)."|{$pk->getUID()}) - member error: {$e->getMessage()}");
+                $this->logger->debug("Failed to process request (" . get_class($pk) . "|{$pk->getUID()}) - member error: {$e->getMessage()}");
             });
         });
     }

@@ -13,6 +13,10 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
+use function in_array;
+use function sizeof;
+use function strlen;
+
 //Yes quite a lot of nullables... (https://discord.com/developers/docs/resources/channel#embed-object)
 class Embed{
 
@@ -79,7 +83,7 @@ class Embed{
     }
 
     public function setTitle(?string $title): void{
-        if($title !== null and strlen($title) > 2048){
+        if($title !== null && strlen($title) > 2048){
             throw new \AssertionError("Embed title can only have up to 2048 characters.");
         }
         $this->title = $title;
@@ -90,7 +94,7 @@ class Embed{
     }
 
     public function setType(?string $type): void{
-        if($type !== null and (!in_array($type, [self::TYPE_LINK, self::TYPE_ARTICLE, self::TYPE_GIFV, self::TYPE_VIDEO, self::TYPE_IMAGE, self::TYPE_RICH], true))){
+        if($type !== null && (!in_array($type, [self::TYPE_LINK, self::TYPE_ARTICLE, self::TYPE_GIFV, self::TYPE_VIDEO, self::TYPE_IMAGE, self::TYPE_RICH], true))){
             throw new \AssertionError("Invalid embed type '{$type}' provided.");
         }
         $this->type = $type;
@@ -101,7 +105,7 @@ class Embed{
     }
 
     public function setDescription(?string $description): void{
-        if($description !== null and strlen($description) > 4096){
+        if($description !== null && strlen($description) > 4096){
             throw new \AssertionError("Embed description can only have up to 4096 characters.");
         }
         $this->description = $description;

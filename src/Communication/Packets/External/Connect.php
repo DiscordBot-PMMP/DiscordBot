@@ -13,8 +13,8 @@
 
 namespace JaxkDev\DiscordBot\Communication\Packets\External;
 
-use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
+use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 /**
  * Packet for external bot to verify its connection with the correct Version and MAGIC.

@@ -18,6 +18,9 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Plugin\Utils;
+use function array_keys;
+use function in_array;
+use function sizeof;
 
 /**
  * @implements BinarySerializable<Member>

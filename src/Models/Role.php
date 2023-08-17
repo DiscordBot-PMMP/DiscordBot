@@ -86,7 +86,7 @@ class Role implements BinarySerializable{
     }
 
     public function setId(?string $id): void{
-        if($id !== null and !Utils::validDiscordSnowflake($id)){
+        if($id !== null && !Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("Role ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -117,7 +117,7 @@ class Role implements BinarySerializable{
 
     /** @param int $colour Hex [0x000000 - 0xFFFFFF] */
     public function setColour(int $colour): void{
-        if($colour < 0 or $colour > 0xFFFFFF){
+        if($colour < 0 || $colour > 0xFFFFFF){
             throw new \AssertionError("Colour '$colour' is outside the bounds 0x000000-0xFFFFFF.");
         }
         $this->colour = $colour;

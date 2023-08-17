@@ -59,7 +59,7 @@ class TextChannel extends GuildChannel{
      * @param int|null $rate_limit 0-21600 seconds.
      */
     public function setRateLimit(?int $rate_limit): void{
-        if($rate_limit !== null and ($rate_limit < 0 or $rate_limit > 21600)){
+        if($rate_limit !== null && ($rate_limit < 0 || $rate_limit > 21600)){
             throw new \AssertionError("Rate limit '$rate_limit' is outside the bounds 0-21600.");
         }
         $this->rate_limit = $rate_limit;

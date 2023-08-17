@@ -78,7 +78,7 @@ class Emoji implements BinarySerializable{
         if($this->id === null){
             return null;
         }
-        return "https://cdn.discordapp.com/emojis/{$this->id}." . ($this->animated??false ? "gif" : "png");
+        return "https://cdn.discordapp.com/emojis/{$this->id}." . ($this->animated ?? false ? "gif" : "png");
     }
 
     public function getId(): ?string{
@@ -162,15 +162,15 @@ class Emoji implements BinarySerializable{
 
     public function toApiString(): string{
         if($this->id === null){
-            return $this->name??"";
+            return $this->name ?? "";
         }
-        return (($this->animated??false) ? "a" : "") . ":{$this->name}:{$this->id}";
+        return (($this->animated ?? false) ? "a" : "") . ":{$this->name}:{$this->id}";
     }
     public function __toString(): string{
         if($this->id === null){
-            return $this->name??"";
+            return $this->name ?? "";
         }
-        return "<" . (($this->animated??false) ? "a" : "") . ":{$this->name}:{$this->id}>";
+        return "<" . (($this->animated ?? false) ? "a" : "") . ":{$this->name}:{$this->id}>";
     }
 
     //----- Serialization -----//

@@ -15,6 +15,11 @@ namespace JaxkDev\DiscordBot\Models\Permissions;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
+use function array_keys;
+use function get_parent_class;
+use function in_array;
+use function sizeof;
+use function strtolower;
 
 /**
  * Note, this goes above 32bit integer limit.
@@ -143,7 +148,7 @@ abstract class Permissions implements BinarySerializable{
         $posPermissions = $this::getPossiblePermissions();
 
         if(!in_array($permission, array_keys($posPermissions), true)){
-            throw new \AssertionError("Invalid permission '{$permission}' for a '".get_parent_class($this)."'");
+            throw new \AssertionError("Invalid permission '{$permission}' for a '" . get_parent_class($this) . "'");
         }
 
         if($this->permissions[$permission] === $state) return;

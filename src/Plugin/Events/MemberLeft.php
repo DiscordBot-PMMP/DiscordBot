@@ -18,7 +18,7 @@ use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a member leaves a discord guild.
- * 
+ *
  * @see MemberJoined
  * @see MemberUpdated
  */

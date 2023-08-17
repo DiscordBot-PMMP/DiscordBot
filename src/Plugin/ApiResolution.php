@@ -13,12 +13,16 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
+use function array_slice;
+use function is_string;
+use function sizeof;
+
 class ApiResolution{
 
     private array $data;
 
     public function __construct(array $data = []){
-        if(sizeof($data) === 0 or !is_string($data[0])){
+        if(sizeof($data) === 0 || !is_string($data[0])){
             throw new \AssertionError("Expected data for ApiResolution to contain at least a message.");
         }
         $this->data = $data;
@@ -30,8 +34,6 @@ class ApiResolution{
 
     /**
      * See API Docs for potential data to be returned per API request.
-     *
-     * @return array
      */
     public function getData(): array{
         return array_slice($this->data, 1);

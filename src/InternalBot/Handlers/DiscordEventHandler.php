@@ -24,14 +24,16 @@ use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
 use Discord\Parts\WebSockets\PresenceUpdate as DiscordPresenceUpdate;
 use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
-use JaxkDev\DiscordBot\InternalBot\Client;
-use JaxkDev\DiscordBot\InternalBot\ModelConverter;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate as ChannelPinsUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanCreate as BanAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanDelete as BanRemovePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate as ChannelCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelDelete as ChannelDeletePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate as ChannelPinsUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelUpdate as ChannelUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordConnected as DiscordConnectedPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteCreate as InviteCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteDelete as InviteDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberJoin as MemberJoinPacket;
@@ -48,16 +50,15 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate as PresenceU
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordConnected as DiscordConnectedPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
+use JaxkDev\DiscordBot\InternalBot\Client;
+use JaxkDev\DiscordBot\InternalBot\ModelConverter;
 use JaxkDev\DiscordBot\Models\Presence\ClientStatus;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use Monolog\Logger;
+use function sizeof;
 
 class DiscordEventHandler{
 
@@ -103,7 +104,7 @@ class DiscordEventHandler{
         $discord->on("MESSAGE_REACTION_REMOVE", [$this, "onMessageReactionRemove"]);
         $discord->on("MESSAGE_REACTION_REMOVE_ALL", [$this, "onMessageReactionRemoveAll"]);
         $discord->on("MESSAGE_REACTION_REMOVE_EMOJI", [$this, "onMessageReactionRemoveEmoji"]);
-    
+
         $discord->on("PRESENCE_UPDATE", [$this, "onPresenceUpdate"]);
         $discord->on("VOICE_STATE_UPDATE", [$this, "onVoiceStateUpdate"]);
     }
@@ -115,7 +116,7 @@ class DiscordEventHandler{
         $client = $this->client->getDiscordClient();
 
         $this->client->getThread()->setStatus(ThreadStatus::RUNNING);
-        $this->logger->info("Client '".$client->username."#".$client->discriminator."' ready.");
+        $this->logger->info("Client '" . $client->username . "#" . $client->discriminator . "' ready.");
 
         $this->client->getThread()->writeOutboundData(new DiscordConnectedPacket(ModelConverter::genModelUser($client->user)));
         $this->client->getCommunicationHandler()->sendHeartbeat();
@@ -296,7 +297,6 @@ class DiscordEventHandler{
 
     /**
      * @param DiscordInvite|\stdClass $invite {channel_id: str, guild_id: str, code: str}
-     * @param Discord   $discord
      */
     public function onInviteDelete(DiscordInvite|\stdClass $invite, Discord $discord): void{
         $packet = new InviteDeletePacket($invite->guild_id, $invite->channel_id, $invite->code);
@@ -352,8 +352,6 @@ class DiscordEventHandler{
 
     /**
      * Checks if we handle this type of message in this type of channel.
-     * @param DiscordMessage $message
-     * @return bool
      */
     private function checkMessage(DiscordMessage $message): bool{
         // Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
@@ -361,8 +359,8 @@ class DiscordEventHandler{
         if($message->author->id === $this->client->getDiscordClient()->id) return false;
 
         // Other types of messages not used right now.
-        if($message->type !== DiscordMessage::TYPE_DEFAULT and $message->type !== DiscordMessage::TYPE_REPLY) return false;
-        if(($message->content ?? "") === "" and $message->embeds->count() === 0 and sizeof($message->attachments) === 0) return false;
+        if($message->type !== DiscordMessage::TYPE_DEFAULT && $message->type !== DiscordMessage::TYPE_REPLY) return false;
+        if(($message->content ?? "") === "" && $message->embeds->count() === 0 && sizeof($message->attachments) === 0) return false;
         // ^ Spotify/Games etc
 
         return true;

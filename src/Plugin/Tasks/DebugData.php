@@ -18,6 +18,15 @@ use pocketmine\command\CommandSender;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\TextFormat;
 use ZipArchive;
+use function is_dir;
+use function microtime;
+use function mkdir;
+use function php_uname;
+use function round;
+use function scandir;
+use function time;
+use function yaml_emit;
+use const PHP_VERSION;
 
 class DebugData extends AsyncTask{
 
@@ -41,13 +50,13 @@ class DebugData extends AsyncTask{
     public function onRun(): void{
         $startTime = microtime(true);
 
-        if(!is_dir($this->pluginFolder."debug")){
-            if(!mkdir($this->pluginFolder."debug")){
+        if(!is_dir($this->pluginFolder . "debug")){
+            if(!mkdir($this->pluginFolder . "debug")){
                 throw new \RuntimeException("Failed to create debug folder.");
             }
         }
 
-        $path = $this->pluginFolder."debug/"."discordbot_".time().".zip";
+        $path = $this->pluginFolder . "debug/" . "discordbot_" . time() . ".zip";
         $z = new ZipArchive();
         $z->open($path, ZIPARCHIVE::CREATE);
 
@@ -55,14 +64,14 @@ class DebugData extends AsyncTask{
         $z->addFromString("config.yml", $this->config);
 
         //Server log.
-        $z->addFile($this->serverFolder."server.log", "server.log");
+        $z->addFile($this->serverFolder . "server.log", "server.log");
 
         //Add Discord thread logs.
-        $dir = scandir($this->pluginFolder."logs");
+        $dir = scandir($this->pluginFolder . "logs");
         if($dir !== false){
             foreach($dir as $file){
-                if($file !== "." and $file !== ".."){
-                    $z->addFile($this->pluginFolder."logs/".$file, "thread_logs/".$file);
+                if($file !== "." && $file !== ".."){
+                    $z->addFile($this->pluginFolder . "logs/" . $file, "thread_logs/" . $file);
                 }
             }
         }
@@ -70,7 +79,7 @@ class DebugData extends AsyncTask{
         //Some metadata, instead of users having no clue of anything I ask, therefore generate this information beforehand.
         $time = time();
         $ver = $this->version;
-        $pmmp = $this->pocketmineVersion." | ".$this->serverVersion;
+        $pmmp = $this->pocketmineVersion . " | " . $this->serverVersion;
         $os = php_uname();
         $php = PHP_VERSION;
         $z->addFromString("metadata.txt", <<<META
@@ -93,21 +102,21 @@ PHP        | {$php}
 OS         | {$os}
 META);
         $z->close();
-        $time = round(microtime(true)-$startTime, 3);
-        $this->setResult(TextFormat::GREEN."Successfully generated debug data in {$time} seconds, saved file to '$path'");
+        $time = round(microtime(true) - $startTime, 3);
+        $this->setResult(TextFormat::GREEN . "Successfully generated debug data in {$time} seconds, saved file to '$path'");
     }
 
     public function onError(): void{
         /** @var CommandSender $sender */
         $sender = $this->fetchLocal("sender");
-        $sender->sendMessage(TextFormat::RED."Unable to generate debug data, internal error occurred.");
+        $sender->sendMessage(TextFormat::RED . "Unable to generate debug data, internal error occurred.");
     }
 
     public function onCompletion(): void{
         /** @var CommandSender $sender */
         $sender = $this->fetchLocal("sender");
         /** @var string $res */
-        $res = $this->getResult() ?? (TextFormat::RED."Internal error occurred");
+        $res = $this->getResult() ?? (TextFormat::RED . "Internal error occurred");
         $sender->sendMessage($res);
     }
 }

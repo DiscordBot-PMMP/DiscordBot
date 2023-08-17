@@ -18,7 +18,7 @@ use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a guild the bot is in has been updated, eg Changed icon, name, region etc.
- * 
+ *
  * @see GuildDeleted Emitted when the bot leaves a guild
  * @see GuildJoined Emitted when the bot joins a guild.
  */

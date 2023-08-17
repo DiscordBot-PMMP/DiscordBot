@@ -18,7 +18,7 @@ use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a role gets Deleted.
- * 
+ *
  * @see RoleCreated
  * @see RoleUpdated
  */

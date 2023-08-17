@@ -18,7 +18,7 @@ use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a channel gets created.
- * 
+ *
  * @see ChannelDeleted
  * @see ChannelUpdated
  */

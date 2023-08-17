@@ -77,6 +77,9 @@ use JaxkDev\DiscordBot\Models\UserPremiumType;
 use JaxkDev\DiscordBot\Models\VoiceState;
 use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\WebhookType;
+use function array_keys;
+use function array_map;
+use function array_values;
 
 abstract class ModelConverter{
 
@@ -122,7 +125,6 @@ abstract class ModelConverter{
     /**
      * @link https://discord.com/developers/docs/topics/gateway-events#client-status-object
      * @param object{desktop?: string, mobile?: string, web?: string} $clientStatus
-     * @return ClientStatus
      */
     static public function genModelClientStatus(object $clientStatus): ClientStatus{
         return new ClientStatus(($clientStatus->desktop ?? null) === null ? Status::OFFLINE : Status::from($clientStatus->desktop),
@@ -132,13 +134,13 @@ abstract class ModelConverter{
 
     static public function genModelMember(DiscordMember $discordMember): Member{
         if($discordMember->guild_id === null){
-            throw new AssertionError("Guild id is null for member. (".$discordMember->serialize().")");
+            throw new AssertionError("Guild id is null for member. (" . $discordMember->serialize() . ")");
         }
 
         /** @var DiscordRole|null $r */
         $r = $discordMember->guild?->roles?->get("id", $discordMember->guild_id);
         if($r === null){
-            throw new AssertionError("Everyone role not found for guild '".$discordMember->guild_id."'.");
+            throw new AssertionError("Everyone role not found for guild '" . $discordMember->guild_id . "'.");
         }
         $bitwise = (int)$r->permissions->bitwise; //Everyone perms.
         $roles = [];
@@ -213,7 +215,6 @@ abstract class ModelConverter{
 
     /**
      * @template T of GuildChannel
-     * @param DiscordChannel $dc
      * @param T $c
      * @return T
      * @noinspection PhpMissingParamTypeInspection
@@ -238,7 +239,6 @@ abstract class ModelConverter{
 
     /**
      * Generates a model based on whatever type $channel is. (Excludes game store/group type)
-     * @param DiscordChannel $channel
      * @return ?GuildChannel Null if type is invalid/unused.
      */
     static public function genModelChannel(DiscordChannel $channel): ?GuildChannel{
@@ -259,7 +259,7 @@ abstract class ModelConverter{
         if($discordChannel->type !== DiscordChannel::TYPE_GUILD_CATEGORY){
             throw new AssertionError("Discord channel type must be `category` to generate model category channel.");
         }
-        if($discordChannel->guild_id === null or ($discordChannel->name ?? null) === null or ($discordChannel->position ?? null) === null){
+        if($discordChannel->guild_id === null || ($discordChannel->name ?? null) === null || ($discordChannel->position ?? null) === null){
             throw new AssertionError("Guild ID, name and position must be present.");
         }
         return self::applyPermissionOverwrites($discordChannel, new CategoryChannel($discordChannel->name ?? "", $discordChannel->position,
@@ -283,7 +283,7 @@ abstract class ModelConverter{
     }
 
     static public function genModelTextChannel(DiscordChannel $discordChannel): TextChannel{
-        if($discordChannel->type !== DiscordChannel::TYPE_GUILD_TEXT and $discordChannel->type !== DiscordChannel::TYPE_GUILD_ANNOUNCEMENT){
+        if($discordChannel->type !== DiscordChannel::TYPE_GUILD_TEXT && $discordChannel->type !== DiscordChannel::TYPE_GUILD_ANNOUNCEMENT){
             throw new AssertionError("Discord channel type must be `text|news` to generate model text channel.");
         }
         if($discordChannel->guild_id === null){
@@ -304,14 +304,14 @@ abstract class ModelConverter{
             $attachments[] = self::genModelAttachment($attachment);
         }
         $guild_id = $discordMessage->guild_id ?? ($discordMessage->author instanceof DiscordMember ? $discordMessage->author->guild_id : null);
-        if($discordMessage->type === DiscordMessage::TYPE_DEFAULT or $discordMessage->type === DiscordMessage::TYPE_CHAT_INPUT_COMMAND){ #TODO Decide on application commands.
+        if($discordMessage->type === DiscordMessage::TYPE_DEFAULT || $discordMessage->type === DiscordMessage::TYPE_CHAT_INPUT_COMMAND){ #TODO Decide on application commands.
             if($discordMessage->webhook_id === null){
                 /** @var DiscordEmbed|null $e */
                 $e = $discordMessage->embeds->first();
                 if($e !== null){
                     $e = self::genModelEmbed($e);
                 }
-                $author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
+                $author = $guild_id === null ? $discordMessage->author->id : $guild_id . "." . $discordMessage->author->id;
                 return new Message($discordMessage->channel_id, $discordMessage->id, $discordMessage->content, $e,
                     $author, $guild_id, $discordMessage->timestamp->getTimestamp(), $attachments, $discordMessage->mention_everyone,
                     array_keys($discordMessage->mentions->toArray()), array_keys($discordMessage->mention_roles->toArray()),
@@ -321,7 +321,7 @@ abstract class ModelConverter{
                 foreach($discordMessage->embeds as $embed){
                     $embeds[] = self::genModelEmbed($embed);
                 }
-                $author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
+                $author = $guild_id === null ? $discordMessage->author->id : $guild_id . "." . $discordMessage->author->id;
                 return new WebhookMessage($discordMessage->channel_id, $discordMessage->webhook_id, $embeds, $discordMessage->id,
                     $discordMessage->content, $author, $guild_id, $discordMessage->timestamp->getTimestamp(), $attachments,
                     $discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
@@ -333,7 +333,7 @@ abstract class ModelConverter{
             if($e !== null){
                 $e = self::genModelEmbed($e);
             }
-            $author = $guild_id === null ? $discordMessage->author->id : $guild_id.".".$discordMessage->author->id;
+            $author = $guild_id === null ? $discordMessage->author->id : $guild_id . "." . $discordMessage->author->id;
             return new ReplyMessage($discordMessage->channel_id, $discordMessage->referenced_message?->id, $discordMessage->id,
                 $discordMessage->content, $e, $author, $guild_id, $discordMessage->timestamp->getTimestamp(), $attachments,
                 $discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
@@ -401,7 +401,7 @@ abstract class ModelConverter{
 
     static public function genModelRole(DiscordRole $discordRole): Role{
         if($discordRole->guild_id === null){
-            throw new AssertionError("Guild ID is null, should never happen please report this issue. (".$discordRole->serialize().")");
+            throw new AssertionError("Guild ID is null, should never happen please report this issue. (" . $discordRole->serialize() . ")");
         }
         $tags = ($discordRole->tags === null) ? null : self::genModelRoleTags($discordRole->tags);
         return new Role($discordRole->id, $discordRole->guild_id, $discordRole->name, $discordRole->color,
@@ -412,7 +412,7 @@ abstract class ModelConverter{
 
     static public function genModelInvite(DiscordInvite $invite): Invite{
         if($invite->channel_id === null){
-            throw new AssertionError("Channel ID is null, should never happen please report this issue. (".$invite->serialize().")");
+            throw new AssertionError("Channel ID is null, should never happen please report this issue. (" . $invite->serialize() . ")");
         }
         return new Invite($invite->code, $invite->guild_id, $invite->channel_id, $invite->inviter?->id,
             $invite->target_type === null ? null : InviteTargetType::from($invite->target_type), $invite->target_user?->id,
@@ -421,7 +421,7 @@ abstract class ModelConverter{
 
     static public function genModelBan(DiscordBan $ban): Ban{
         if($ban->guild_id === null){
-            throw new AssertionError("Guild ID is null, should never happen please report this issue. (".$ban->serialize().")");
+            throw new AssertionError("Guild ID is null, should never happen please report this issue. (" . $ban->serialize() . ")");
         }
         return new Ban($ban->guild_id, $ban->user_id, $ban->reason);
     }

@@ -17,6 +17,11 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Plugin\Api;
+use function array_keys;
+use function in_array;
+use function sizeof;
+use function str_starts_with;
+use function time;
 
 /**
  * @implements BinarySerializable<Activity>
@@ -189,7 +194,7 @@ final class Activity implements BinarySerializable{
             }
         }
         */
-        if($url !== null and !str_starts_with($url, "https://") and !str_starts_with($url, "http://")){
+        if($url !== null && !str_starts_with($url, "https://") && !str_starts_with($url, "http://")){
             throw new \AssertionError("Invalid url '$url'.");
         }
         $this->url = $url;
@@ -211,7 +216,7 @@ final class Activity implements BinarySerializable{
     }
 
     public function setStartTimestamp(?int $timestamp): void{
-        if($timestamp !== null and $timestamp < 0){
+        if($timestamp !== null && $timestamp < 0){
             throw new \AssertionError("Invalid start timestamp '$timestamp'.");
         }
         $this->start_timestamp = $timestamp;
@@ -222,7 +227,7 @@ final class Activity implements BinarySerializable{
     }
 
     public function setEndTimestamp(?int $timestamp): void{
-        if($timestamp !== null and $timestamp < 0){
+        if($timestamp !== null && $timestamp < 0){
             throw new \AssertionError("Invalid end timestamp '$timestamp'.");
         }
         $this->end_timestamp = $timestamp;
@@ -273,7 +278,7 @@ final class Activity implements BinarySerializable{
     }
 
     public function setPartySize(?int $party_size): void{
-        if($party_size !== null and $party_size < 0){
+        if($party_size !== null && $party_size < 0){
             throw new \AssertionError("Invalid party size '$party_size'.");
         }
         $this->party_size = $party_size;
@@ -284,7 +289,7 @@ final class Activity implements BinarySerializable{
     }
 
     public function setPartyMaxSize(?int $party_max_size): void{
-        if($party_max_size !== null and $party_max_size < 0){
+        if($party_max_size !== null && $party_max_size < 0){
             throw new \AssertionError("Invalid party max size '$party_max_size'.");
         }
         $this->party_max_size = $party_max_size;
@@ -372,7 +377,7 @@ final class Activity implements BinarySerializable{
      * @return ?array<string, bool>
      */
     public function getFlags(): ?array{
-        if($this->flags === null and $this->flags_bitwise !== null){
+        if($this->flags === null && $this->flags_bitwise !== null){
             $this->recalculateFlags();
         }
         return $this->flags;
@@ -422,7 +427,7 @@ final class Activity implements BinarySerializable{
         }
         foreach($buttons as $button){
             if(!($button instanceof ActivityButton)){
-                throw new \AssertionError("Invalid button provided, must be of type ".ActivityButton::class);
+                throw new \AssertionError("Invalid button provided, must be of type " . ActivityButton::class);
             }
         }
         $this->buttons = $buttons;

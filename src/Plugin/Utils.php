@@ -13,16 +13,16 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-use function intval;
+use function base64_encode;
+use function file_exists;
+use function file_get_contents;
 use function floor;
+use function in_array;
+use function intval;
+use function mime_content_type;
+use function preg_match;
 use function strlen;
 use function time;
-use function preg_match;
-use function file_exists;
-use function mime_content_type;
-use function in_array;
-use function file_get_contents;
-use function base64_encode;
 
 abstract class Utils{
 
@@ -33,9 +33,9 @@ abstract class Utils{
     /** Checks a discord snowflake by verifying the timestamp at when it was created. */
     public static function validDiscordSnowflake(string $snowflake): bool{
         $len = strlen($snowflake);
-        if($len < 17 or $len > 19) return false;
+        if($len < 17 || $len > 19) return false;
         $timestamp = self::getDiscordSnowflakeTimestamp($snowflake);
-        if($timestamp > time()+86400 or $timestamp <= 1420070400) return false; //+86400 (24h for any timezone problems)
+        if($timestamp > time() + 86400 || $timestamp <= 1420070400) return false; //+86400 (24h for any timezone problems)
         return true;
     }
 

@@ -30,14 +30,11 @@ class VoiceChannelMemberMoved extends DiscordBotEvent{
     /** Note member contains old voice state. */
     private Member $member;
 
-    /** @var VoiceChannel */
     private VoiceChannel $previous_channel;
 
-    /** @var VoiceChannel */
-    private $new_channel;
+    private VoiceChannel $new_channel;
 
-    /** @var VoiceState */
-    private $voice_state;
+    private VoiceState $voice_state;
 
     public function __construct(Plugin $plugin, Member $member, VoiceChannel $previous_channel, VoiceChannel $new_channel,
                                 VoiceState $voice_state){

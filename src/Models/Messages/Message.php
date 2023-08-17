@@ -15,6 +15,9 @@ namespace JaxkDev\DiscordBot\Models\Messages;
 
 use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 use JaxkDev\DiscordBot\Plugin\Utils;
+use function explode;
+use function stripos;
+use function strlen;
 
 class Message{
 
@@ -108,9 +111,9 @@ class Message{
     }
 
     public function setAuthorId(?string $author_id): void{
-        if($author_id !== null and stripos($author_id, ".") !== false){
+        if($author_id !== null && stripos($author_id, ".") !== false){
             [$sid, $uid] = explode(".", $author_id);
-            if(!Utils::validDiscordSnowflake($sid) or !Utils::validDiscordSnowflake($uid)){
+            if(!Utils::validDiscordSnowflake($sid) || !Utils::validDiscordSnowflake($uid)){
                 throw new \AssertionError("Author ID '$author_id' is invalid.");
             }
         }elseif($author_id !== null){
@@ -138,7 +141,7 @@ class Message{
     }
 
     public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;

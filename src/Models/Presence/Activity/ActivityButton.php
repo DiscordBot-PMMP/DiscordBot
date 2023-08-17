@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Models\Presence\Activity;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
+use function strlen;
 
 /**
  * @implements BinarySerializable<ActivityButton>

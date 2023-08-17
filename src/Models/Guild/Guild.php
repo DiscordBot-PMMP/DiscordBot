@@ -17,6 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Plugin\Utils;
+use function in_array;
 
 /**
  * @implements BinarySerializable<Guild>
@@ -474,7 +475,7 @@ class Guild implements BinarySerializable{
     }
 
     public function setMaxMembers(?int $max_members): void{
-        if($max_members !== null and $max_members < 0){
+        if($max_members !== null && $max_members < 0){
             throw new \AssertionError("Max members '$max_members' is invalid.");
         }
         $this->max_members = $max_members;

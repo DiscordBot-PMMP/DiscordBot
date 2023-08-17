@@ -18,7 +18,7 @@ use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a invite gets created.
- * 
+ *
  * @see InviteDeleted
  */
 class InviteCreated extends DiscordBotEvent{

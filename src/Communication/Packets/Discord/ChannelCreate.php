@@ -16,7 +16,6 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
-use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 
 class ChannelCreate extends Packet{
 

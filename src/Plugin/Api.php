@@ -15,11 +15,14 @@ namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteWebhook;
@@ -27,18 +30,15 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestEditMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchPinnedMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateBotPresence;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateChannel;
@@ -60,7 +60,10 @@ use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\WebhookType;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
 use pocketmine\event\EventPriority;
+use function basename;
+use function is_file;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
+use function strlen;
 
 /**
  * For internal and developers use for interacting with the discord bot.
@@ -104,7 +107,7 @@ class Api{
     /**
      * Creates a normal webhook inside a channel.
      *
-     * @param string $name max 80chars, 'clyde' and 'discord' not allowed in name.
+     * @param string  $name        max 80chars, 'clyde' and 'discord' not allowed in name.
      * @param ?string $avatar_data If null, the default webhook avatar will be used. (see Utils::imageToDiscordData())
      * @see Utils::imageToDiscordData()
      *
@@ -121,7 +124,7 @@ class Api{
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Webhook channel ID is invalid."));
         }
-        if($avatar_data !== null and !Utils::validImageData($avatar_data)){
+        if($avatar_data !== null && !Utils::validImageData($avatar_data)){
             return rejectPromise(new ApiRejection("Webhook avatar data is invalid."));
         }
         $pk = new RequestCreateWebhook($guild_id, $channel_id, $name, $avatar_data, $reason);
@@ -187,7 +190,7 @@ class Api{
         if(!Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if($channel_id !== null and !Utils::validDiscordSnowflake($channel_id)){
+        if($channel_id !== null && !Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         $pk = new RequestFetchWebhooks($guild_id, $channel_id);
@@ -226,7 +229,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -246,7 +249,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -269,7 +272,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -292,7 +295,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -319,7 +322,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($icon_data !== null and !Utils::validImageData($icon_data)){
+        if($icon_data !== null && !Utils::validImageData($icon_data)){
             return rejectPromise(new ApiRejection("Invalid icon data '$icon_data'."));
         }
         if(!Utils::validDiscordSnowflake($guild_id)){
@@ -431,7 +434,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -463,7 +466,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -491,7 +494,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -518,7 +521,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -560,7 +563,7 @@ class Api{
         if(!Utils::validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
-        if($delete_message_seconds < 0 or $delete_message_seconds > 604800){
+        if($delete_message_seconds < 0 || $delete_message_seconds > 604800){
             return rejectPromise(new ApiRejection("Delete message seconds must be between 0 and 604800 (7days)."));
         }
         $pk = new RequestBanMember($guild_id, $user_id, $delete_message_seconds, $reason);
@@ -693,7 +696,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null and !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
@@ -776,10 +779,10 @@ class Api{
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        if($max_age < 0 or $max_age > 86400){
+        if($max_age < 0 || $max_age > 86400){
             return rejectPromise(new ApiRejection("Max age must be between 0(never) and 604800seconds (7 days)."));
         }
-        if($max_uses < 0 or $max_uses > 100){
+        if($max_uses < 0 || $max_uses > 100){
             return rejectPromise(new ApiRejection("Max uses must be between 0(unlimited) and 100."));
         }
         $pk = new RequestCreateInvite($guild_id, $channel_id, $max_age, $max_uses, $temporary, $unique, $reason);

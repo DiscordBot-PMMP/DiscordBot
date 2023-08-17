@@ -141,7 +141,7 @@ abstract class GuildChannel extends Channel{
     }
 
     public function setCategoryId(?string $category_id): void{
-        if($category_id !== null and !Utils::validDiscordSnowflake($category_id)){
+        if($category_id !== null && !Utils::validDiscordSnowflake($category_id)){
             throw new \AssertionError("Category ID '$category_id' is invalid.");
         }
         $this->category_id = $category_id;

@@ -18,7 +18,7 @@ use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a member is updated, eg roles, nickname, voice status.
- * 
+ *
  * @see MemberJoined
  * @see MemberLeft
  */

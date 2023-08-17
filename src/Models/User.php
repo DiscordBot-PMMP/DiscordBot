@@ -16,6 +16,12 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
+use function array_keys;
+use function ctype_digit;
+use function in_array;
+use function sizeof;
+use function str_contains;
+use function strlen;
 
 /**
  * @implements BinarySerializable<User>
@@ -228,7 +234,7 @@ class User implements BinarySerializable{
     }
 
     public function setAccentColour(?int $accent_colour): void{
-        if($accent_colour !== null and ($accent_colour < 0 or $accent_colour > 0xFFFFFF)){
+        if($accent_colour !== null && ($accent_colour < 0 || $accent_colour > 0xFFFFFF)){
             throw new \AssertionError("Accent colour '$accent_colour' is invalid, must be between 0 and 0xFFFFFF.");
         }
         $this->accent_colour = $accent_colour;
@@ -294,7 +300,6 @@ class User implements BinarySerializable{
     public function setPremiumType(?UserPremiumType $premium_type): void{
         $this->premium_type = $premium_type;
     }
-
 
     public function getPublicFlagsBitwise(): int{
         return $this->public_flags_bitwise;
