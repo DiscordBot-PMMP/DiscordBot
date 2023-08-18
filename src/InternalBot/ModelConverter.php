@@ -20,6 +20,7 @@ use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Channel\Overwrite as DiscordOverwrite;
+use Discord\Parts\Channel\Reaction as DiscordReaction;
 use Discord\Parts\Channel\Webhook as DiscordWebhook;
 use Discord\Parts\Embed\Author as DiscordAuthor;
 use Discord\Parts\Embed\Embed as DiscordEmbed;
@@ -31,6 +32,8 @@ use Discord\Parts\Guild\Ban as DiscordBan;
 use Discord\Parts\Guild\Emoji as DiscordEmoji;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Role as DiscordRole;
+use Discord\Parts\Guild\Sticker as DiscordSticker;
+use Discord\Parts\Interactions\Request\Component as DiscordComponent;
 use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
@@ -52,7 +55,17 @@ use JaxkDev\DiscordBot\Models\Guild\VerificationLevel;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\InviteTargetType;
 use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Messages\Activity as MessageActivity;
+use JaxkDev\DiscordBot\Models\Messages\ActivityType as MessageActivityType;
 use JaxkDev\DiscordBot\Models\Messages\Attachment;
+use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
+use JaxkDev\DiscordBot\Models\Messages\Component\Button;
+use JaxkDev\DiscordBot\Models\Messages\Component\ButtonStyle;
+use JaxkDev\DiscordBot\Models\Messages\Component\ComponentType;
+use JaxkDev\DiscordBot\Models\Messages\Component\SelectMenu;
+use JaxkDev\DiscordBot\Models\Messages\Component\SelectOption;
+use JaxkDev\DiscordBot\Models\Messages\Component\TextInput;
+use JaxkDev\DiscordBot\Models\Messages\Component\TextInputStyle;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Author;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Field;
@@ -61,8 +74,9 @@ use JaxkDev\DiscordBot\Models\Messages\Embed\Image;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Provider;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Video;
 use JaxkDev\DiscordBot\Models\Messages\Message;
-use JaxkDev\DiscordBot\Models\Messages\Reply as ReplyMessage;
-use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
+use JaxkDev\DiscordBot\Models\Messages\MessageType;
+use JaxkDev\DiscordBot\Models\Messages\Reaction;
+use JaxkDev\DiscordBot\Models\Messages\Reference;
 use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
@@ -73,6 +87,8 @@ use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\RoleTags;
+use JaxkDev\DiscordBot\Models\Sticker;
+use JaxkDev\DiscordBot\Models\StickerFormatType;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\UserPremiumType;
 use JaxkDev\DiscordBot\Models\VoiceState;
@@ -295,53 +311,131 @@ abstract class ModelConverter{
             $discordChannel->parent_id ?? null, $discordChannel->id));
     }
 
-    //TODO allow several embeds in a single normal message.
     static public function genModelMessage(DiscordMessage $discordMessage): Message{
-        if($discordMessage->author === null){
-            throw new AssertionError("Discord message does not have a author, cannot generate model message.");
-        }
         $attachments = [];
         foreach($discordMessage->attachments as $attachment){
             $attachments[] = self::genModelAttachment($attachment);
         }
-        $guild_id = $discordMessage->guild_id ?? ($discordMessage->author instanceof DiscordMember ? $discordMessage->author->guild_id : null);
-        if($discordMessage->type === DiscordMessage::TYPE_DEFAULT || $discordMessage->type === DiscordMessage::TYPE_CHAT_INPUT_COMMAND){ #TODO Decide on application commands.
-            if($discordMessage->webhook_id === null){
-                /** @var DiscordEmbed|null $e */
-                $e = $discordMessage->embeds->first();
-                if($e !== null){
-                    $e = self::genModelEmbed($e);
-                }
-                $author = $guild_id === null ? $discordMessage->author->id : $guild_id . "." . $discordMessage->author->id;
-                return new Message($discordMessage->channel_id, $discordMessage->id, $discordMessage->content, $e,
-                    $author, $guild_id, $discordMessage->timestamp->getTimestamp(), $attachments, $discordMessage->mention_everyone,
-                    array_keys($discordMessage->mentions->toArray()), array_keys($discordMessage->mention_roles->toArray()),
-                    array_keys($discordMessage->mention_channels->toArray()));
-            }else{
-                $embeds = [];
-                foreach($discordMessage->embeds as $embed){
-                    $embeds[] = self::genModelEmbed($embed);
-                }
-                $author = $guild_id === null ? $discordMessage->author->id : $guild_id . "." . $discordMessage->author->id;
-                return new WebhookMessage($discordMessage->channel_id, $discordMessage->webhook_id, $embeds, $discordMessage->id,
-                    $discordMessage->content, $author, $guild_id, $discordMessage->timestamp->getTimestamp(), $attachments,
-                    $discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
-                    array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));
-            }
-        }elseif($discordMessage->type === DiscordMessage::TYPE_REPLY){
-            /** @var DiscordEmbed|null $e */
-            $e = $discordMessage->embeds->first();
-            if($e !== null){
-                $e = self::genModelEmbed($e);
-            }
-            $author = $guild_id === null ? $discordMessage->author->id : $guild_id . "." . $discordMessage->author->id;
-            return new ReplyMessage($discordMessage->channel_id, $discordMessage->referenced_message?->id, $discordMessage->id,
-                $discordMessage->content, $e, $author, $guild_id, $discordMessage->timestamp->getTimestamp(), $attachments,
-                $discordMessage->mention_everyone, array_keys($discordMessage->mentions->toArray()),
-                array_keys($discordMessage->mention_roles->toArray()), array_keys($discordMessage->mention_channels->toArray()));
+        $embeds = [];
+        foreach($discordMessage->embeds as $embed){
+            $embeds[] = self::genModelEmbed($embed);
         }
-        # TODO Better handling of other/future message types.
-        throw new AssertionError("Discord message type (" . $discordMessage->type . ") not supported.");
+        $reactions = [];
+        foreach(($discordMessage->reactions ?? []) as $reaction){
+            $reactions[] = self::genModelMessageReaction($reaction);
+        }
+        $components = [];
+        foreach(($discordMessage->components ?? []) as $component){
+            $components[] = self::genModelComponentActionRow($component);
+        }
+        $stickers = [];
+        foreach(($discordMessage->sticker_items ?? []) as $sticker){
+            $stickers[] = self::genModelSticker($sticker);
+        }
+        $mentions = [];
+        foreach($discordMessage->mentions as $user){
+            $mentions[] = $user->id;
+        }
+        $mention_roles = [];
+        foreach($discordMessage->mention_roles as $role){
+           $mention_roles[] = $role->id;
+        }
+        /** @phpstan-ignore-next-line Poorly documented DiscordPHP objects */
+        $activity = ($discordMessage->activity ?? null) === null ? null : self::genModelMessageActivity($discordMessage->activity);
+        /** @phpstan-ignore-next-line Poorly documented DiscordPHP objects */
+        $reference = ($discordMessage->message_reference ?? null) === null ? null : self::genModelMessageReference($discordMessage->message_reference);
+        $referenced_message = ($discordMessage->referenced_message ?? null) === null ? null : self::genModelMessage($discordMessage->referenced_message);
+        return new Message(
+            MessageType::from($discordMessage->type), $discordMessage->id, $discordMessage->channel_id,
+            ($discordMessage->author ?? null)?->id, $discordMessage->content, $discordMessage->timestamp->getTimestamp(),
+            ($discordMessage->edited_timestamp ?? null)?->getTimestamp(), $discordMessage->tts,
+            $discordMessage->mention_everyone, $mentions, $mention_roles, $attachments, $embeds, $reactions,
+            $discordMessage->pinned, $discordMessage->webhook_id ?? null, $activity,
+                $discordMessage->application_id ?? null, $reference, $discordMessage->flags ?? null, $referenced_message,
+            ($discordMessage->thread ?? null)?->id, $components, $stickers
+        );
+    }
+
+    /** @param object{"guild_id": ?string, "channel_id": ?string, "message_id": ?string, "fail_if_not_exists": ?bool} $ref */
+    static public function genModelMessageReference(object $ref): Reference{
+        return new Reference($ref->guild_id ?? null, $ref->channel_id ?? null, $ref->message_id ?? null, $ref->fail_if_not_exists ?? null);
+    }
+
+    /** @param object{"type": int, "party_id": ?string} $activity */
+    static public function genModelMessageActivity(object $activity): MessageActivity{
+        return new MessageActivity(MessageActivityType::from($activity->type), $activity->party_id ?? null);
+    }
+
+    static public function genModelComponentActionRow(DiscordComponent $component): ActionRow{
+        if($component->type !== ComponentType::ACTION_ROW->value){
+            throw new AssertionError("Failed to generate action row component, different type provided - " . $component->type);
+        }
+        $sub = [];
+        foreach($component->components ?? [] as $sub_component){
+            $sub[] = self::genModelComponent($sub_component);
+        }
+        return new ActionRow($sub);
+    }
+
+    static public function genModelComponent(DiscordComponent $component): Button|TextInput|SelectMenu{
+        switch($component->type){
+            case ComponentType::BUTTON->value:
+                if($component->style === null){
+                    throw new AssertionError("Button style must be present.");
+                }
+                return new Button(ButtonStyle::from($component->style), $component->label ?? null,
+                    ($component->emoji ?? null) === null ? null : self::genModelEmoji($component->emoji),
+                    $component->custom_id ?? null, $component->url ?? null, $component->disabled ?? false);
+            case ComponentType::TEXT_INPUT->value:
+                if($component->style === null){
+                    throw new AssertionError("Text input style must be present.");
+                }
+                if($component->custom_id === null){
+                    throw new AssertionError("Text input custom_id must be present.");
+                }
+                if($component->label === null){
+                    throw new AssertionError("Text input label must be present.");
+                }
+                if($component->min_length === null){
+                    throw new AssertionError("Text input min_length must be present.");
+                }
+                if($component->max_length === null){
+                    throw new AssertionError("Text input max_length must be present.");
+                }
+                return new TextInput($component->custom_id, TextInputStyle::from($component->style),
+                    $component->label, $component->min_length, $component->max_length,
+                    $component->required ?? false, $component->value ?? null, $component->placeholder ?? null);
+            case ComponentType::STRING_SELECT->value:
+            case ComponentType::CHANNEL_SELECT->value:
+            case ComponentType::ROLE_SELECT->value:
+            case ComponentType::USER_SELECT->value:
+            case ComponentType::MENTIONABLE_SELECT->value:
+                if($component->custom_id === null){
+                    throw new AssertionError("Select menu custom_id must be present.");
+                }
+                $options = [];
+                /** @var object{"label": string, "value": string, "description": ?string, "emoji": ?object{"id": ?string, "name": ?string, "animated": ?bool}, "default": ?bool} $option */
+                foreach(($component->options ?? []) as $option){
+                    $options[] = new SelectOption($option->label, $option->value, $option->description ?? null,
+                        ($option->emoji ?? null) === null ? null : new Emoji($option->emoji->id ?? null, $option->emoji->name ?? null, null, null, null, null, $option->emoji->animated ?? null, null),
+                        $option->default ?? null);
+                }
+                //no channel_types on receive.
+                return new SelectMenu(ComponentType::from($component->type), $component->custom_id, $options, [],
+                    $component->placeholder ?? null, $component->min_values ?? 1, $component->max_values ?? 1,
+                    $component->disabled ?? false);
+            default:
+                //Unknown type.
+                throw new AssertionError("Unknown component type provided - " . $component->type);
+        }
+    }
+
+    static public function genModelSticker(DiscordSticker $sticker): Sticker{
+        return new Sticker($sticker->id, $sticker->name, StickerFormatType::from($sticker->format_type));
+    }
+
+    static public function genModelMessageReaction(DiscordReaction $reaction): Reaction{
+        return new Reaction($reaction->count, $reaction->me, self::genModelEmoji($reaction->emoji));
     }
 
     static public function genModelAttachment(DiscordAttachment $attachment): Attachment{

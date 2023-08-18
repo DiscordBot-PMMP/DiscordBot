@@ -22,12 +22,12 @@ class MessageDelete extends Packet{
     public const SERIALIZE_ID = 20;
 
     /**
-     * @var Message|array{"message_id": string, "channel_id": string, "guild_id": string}
+     * @var Message|array{"message_id": string, "channel_id": string, "guild_id": ?string}
      */
     private Message|array $message;
 
     /**
-     * @param Message|array{"message_id": string, "channel_id": string, "guild_id": string} $message
+     * @param Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} $message
      */
     public function __construct(Message|array $message, ?int $uid = null){
         parent::__construct($uid);
@@ -35,7 +35,7 @@ class MessageDelete extends Packet{
     }
 
     /**
-     * @return Message|array{"message_id": string, "channel_id": string, "guild_id": string}
+     * @return Message|array{"message_id": string, "channel_id": string, "guild_id": ?string}
      */
     public function getMessage(): Message|array{
         return $this->message;
@@ -44,31 +44,32 @@ class MessageDelete extends Packet{
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putInt($this->getUID());
-        $stream->putBool($this->message instanceof Message);
         if($this->message instanceof Message){
+            $stream->putBool(false); // not partial
             $stream->putSerializable($this->message);
         }else{
-            $stream->putString($this->message["message_id"]);
-            $stream->putString($this->message["guild_id"]);
+            $stream->putBool(true); // partial
+            $stream->putNullableString($this->message["guild_id"]);
             $stream->putString($this->message["channel_id"]);
+            $stream->putString($this->message["message_id"]);
         }
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         $uid = $stream->getInt();
-        if($stream->getBool()){
+        if($stream->getBool()){ //partial
             return new self(
-                $stream->getSerializable(Message::class),
+                [
+                    "guild_id" => $stream->getNullableString(),
+                    "channel_id" => $stream->getString(),
+                    "message_id" => $stream->getString()
+                ],
                 $uid
             );
         }else{
             return new self(
-                [
-                    "message_id" => $stream->getString(),
-                    "guild_id" => $stream->getString(),
-                    "channel_id" => $stream->getString()
-                ],
+                $stream->getSerializable(Message::class),
                 $uid
             );
         }

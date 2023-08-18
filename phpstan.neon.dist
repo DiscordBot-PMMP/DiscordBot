@@ -5,7 +5,6 @@ parameters:
     excludePaths:
         analyse:
             - vendor
-            - src/Communication/Packets/*/*Message*.php
             - src/Communication/Packets/*/*Channel*.php
             - src/Libs
     bootstrapFiles:

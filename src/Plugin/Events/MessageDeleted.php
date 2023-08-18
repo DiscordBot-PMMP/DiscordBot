@@ -28,12 +28,12 @@ use pocketmine\plugin\Plugin;
 class MessageDeleted extends DiscordBotEvent{
 
     /**
-     * @var Message|array{"message_id": string, "channel_id": string, "guild_id": string}
+     * @var Message|array{"message_id": string, "channel_id": string, "guild_id": ?string}
      */
     private Message|array $message;
 
     /**
-     * @param Message|array{"message_id": string, "channel_id": string, "guild_id": string} $message
+     * @param Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} $message
      */
     public function __construct(Plugin $plugin, Message|array $message){
         parent::__construct($plugin);
@@ -41,7 +41,7 @@ class MessageDeleted extends DiscordBotEvent{
     }
 
     /**
-     * @return Message|array{"message_id": string, "channel_id": string, "guild_id": string}
+     * @return Message|array{"message_id": string, "channel_id": string, "guild_id": ?string}
      */
     public function getMessage(): Message|array{
         return $this->message;

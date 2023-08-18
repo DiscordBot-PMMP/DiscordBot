@@ -79,7 +79,6 @@ use JaxkDev\DiscordBot\InternalBot\ModelConverter;
 use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
 use JaxkDev\DiscordBot\Models\Channels\TextChannel;
 use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
-use JaxkDev\DiscordBot\Models\Messages\Reply;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Plugin\ApiRejection;
@@ -789,7 +788,7 @@ class CommunicationHandler{
     }
 
     private function handleSendMessage(RequestSendMessage $pk): void{
-        $this->getChannel($pk, $pk->getMessage()->getChannelId(), function(DiscordChannel $channel) use($pk){
+        /*$this->getChannel($pk, $pk->getMessage()->getChannelId(), function(DiscordChannel $channel) use($pk){
             $m = $pk->getMessage();
             $e = $m->getEmbed();
             $de = null;
@@ -834,11 +833,11 @@ class CommunicationHandler{
                     $this->logger->debug("Failed to send message ({$pk->getUID()}) - {$e->getMessage()}");
                 });
             }
-        });
+        });*/
     }
 
     private function handleEditMessage(RequestEditMessage $pk): void{
-        $message = $pk->getMessage();
+        /*$message = $pk->getMessage();
         if($message->getId() === null){
             $this->resolveRequest($pk->getUID(), false, "No message ID provided.");
             return;
@@ -872,7 +871,7 @@ class CommunicationHandler{
                 $this->resolveRequest($pk->getUID(), false, "Failed to edit message.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to edit message ({$pk->getUID()}) - {$e->getMessage()}");
             });
-        });
+        });*/
     }
 
     private function handleDeleteMessage(RequestDeleteMessage $pk): void{

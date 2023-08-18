@@ -58,7 +58,6 @@ use JaxkDev\DiscordBot\Models\Presence\ClientStatus;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use Monolog\Logger;
-use function sizeof;
 
 class DiscordEventHandler{
 
@@ -148,18 +147,16 @@ class DiscordEventHandler{
     }
 
     public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
-        //TODO
-        //if(!$this->checkMessage($message)) return;
-        //if($message->author?->id === "305060807887159296") $message->react("❤️");
-        //$packet = new MessageSentPacket(ModelConverter::genModelMessage($message));
-        //$this->client->getThread()->writeOutboundData($packet);
+        if(!$this->checkMessage($message)) return;
+        if($message->author?->id === "305060807887159296") $message->react("❤️");
+        $packet = new MessageSentPacket(ModelConverter::genModelMessage($message));
+        $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
-        //TODO
-        //if(!$this->checkMessage($message)) return;
-        //$packet = new MessageUpdatePacket(ModelConverter::genModelMessage($message));
-        //$this->client->getThread()->writeOutboundData($packet);
+        if(!$this->checkMessage($message)) return;
+        $packet = new MessageUpdatePacket(ModelConverter::genModelMessage($message));
+        $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onMessageDelete(DiscordMessage|\stdClass $data, Discord $discord): void{
@@ -325,17 +322,9 @@ class DiscordEventHandler{
     /**
      * Checks if we handle this type of message in this type of channel.
      */
-    /* TODO
     private function checkMessage(DiscordMessage $message): bool{
-        // Can be user if bot doesnt have correct intents enabled on discord developer dashboard.
-        if($message->author === null) return false; //"Shouldn't" happen now...
-        if($message->author->id === $this->client->getDiscordClient()->id) return false;
-
-        // Other types of messages not used right now.
-        if($message->type !== DiscordMessage::TYPE_DEFAULT && $message->type !== DiscordMessage::TYPE_REPLY) return false;
-        if(($message->content ?? "") === "" && $message->embeds->count() === 0 && sizeof($message->attachments) === 0) return false;
-        // ^ Spotify/Games etc
+        if($message->author?->id === $this->client->getDiscordClient()->id) return false;
 
         return true;
-    }*/
+    }
 }

@@ -61,7 +61,6 @@ use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Messages\Message;
-use JaxkDev\DiscordBot\Models\Messages\Webhook as WebhookMessage;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
@@ -837,10 +836,6 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($message instanceof WebhookMessage){
-            //You can execute webhooks yourself using Api::fetchWebhooks() and use its token.
-            return rejectPromise(new ApiRejection("Webhook messages cannot be sent, only received."));
-        }
         if(strlen($message->getContent()) > 2000){
             return rejectPromise(new ApiRejection("Message content cannot be larger than 2000 characters for bots."));
         }
@@ -892,9 +887,6 @@ class Api{
     public function editMessage(Message $message): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
-        }
-        if($message->getId() === null){
-            return rejectPromise(new ApiRejection("Message must have a valid ID to be able to edit it."));
         }
         if(strlen($message->getContent()) > 2000){
             return rejectPromise(new ApiRejection("Message content cannot be larger than 2000 characters for bots."));
