@@ -262,11 +262,13 @@ abstract class ModelConverter{
         return new ForumTag($tag->id, $tag->name, $tag->moderated, $tag->emoji_id ?? null, $tag->emoji_name ?? null);
     }
 
-    /** @param object{"archived": bool, "auto_archive_duration": int, "archive_timestamp": int, "locked": bool,
-     *     "invitable": ?bool, "create_timestamp": ?int} $metadata */
+    /** @param object{"archived": bool, "auto_archive_duration": int, "archive_timestamp": string, "locked": bool,
+     *     "invitable": ?bool, "create_timestamp": ?string} $metadata */
     static public function genModelThreadMetadata(object $metadata): ThreadMetadata{
-        return new ThreadMetadata($metadata->archived, $metadata->auto_archive_duration, $metadata->archive_timestamp,
-            $metadata->locked, $metadata->invitable ?? null, $metadata->create_timestamp ?? null);
+        return new ThreadMetadata($metadata->archived,
+            $metadata->auto_archive_duration, Carbon::createFromTimeString($metadata->archive_timestamp)->getTimestamp(),
+            $metadata->locked, $metadata->invitable ?? null,
+            ($metadata->create_timestamp ?? null) === null ? null : Carbon::createFromTimeString($metadata->create_timestamp)->getTimestamp());
     }
 
     static public function genModelOverwrite(DiscordOverwrite $overwrite): Overwrite{

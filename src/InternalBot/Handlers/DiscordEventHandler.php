@@ -20,6 +20,7 @@ use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Guild\Ban as DiscordBan;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Role as DiscordRole;
+use Discord\Parts\Thread\Thread as DiscordThread;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
 use Discord\Parts\WebSockets\PresenceUpdate as DiscordPresenceUpdate;
@@ -73,8 +74,13 @@ class DiscordEventHandler{
     public function registerEvents(): void{
         $discord = $this->client->getDiscordClient();
         $discord->on("MESSAGE_CREATE", [$this, "onMessageCreate"]);
-        $discord->on("MESSAGE_DELETE", [$this, "onMessageDelete"]);
         $discord->on("MESSAGE_UPDATE", [$this, "onMessageUpdate"]);  //AKA Edit
+        $discord->on("MESSAGE_DELETE", [$this, "onMessageDelete"]);
+        //$discord->on("MESSAGE_DELETE_BULK", [$this, "onMessageDeleteBulk"]); //todo
+
+        $discord->on("THREAD_CREATE", [$this, "onChannelCreate"]);
+        $discord->on("THREAD_UPDATE", [$this, "onChannelUpdate"]);
+        $discord->on("THREAD_DELETE", [$this, "onChannelDelete"]);
 
         $discord->on("GUILD_MEMBER_ADD", [$this, "onMemberJoin"]);
         $discord->on("GUILD_MEMBER_REMOVE", [$this, "onMemberLeave"]);
@@ -96,6 +102,8 @@ class DiscordEventHandler{
         $discord->on("INVITE_CREATE", [$this, "onInviteCreate"]);
         $discord->on("INVITE_DELETE", [$this, "onInviteDelete"]);
 
+        //$discord->on("GUILD_AUDIT_LOG_ENTRY_CREATE", [$this, "onAuditLogEntryCreate"]); //todo
+
         $discord->on("GUILD_BAN_ADD", [$this, "onBanAdd"]);
         $discord->on("GUILD_BAN_REMOVE", [$this, "onBanRemove"]);
 
@@ -106,6 +114,10 @@ class DiscordEventHandler{
 
         $discord->on("PRESENCE_UPDATE", [$this, "onPresenceUpdate"]);
         $discord->on("VOICE_STATE_UPDATE", [$this, "onVoiceStateUpdate"]);
+
+        //$discord->on("WEBHOOKS_UPDATE", [$this, "onWebhooksUpdate"]); //todo
+
+        //$discord->on("USER_UPDATE", [$this, "onUserUpdate"]); //todo //Bot User details has changed, eg username updated from dashboard panel.
     }
 
     public function onReady(): void{
@@ -153,9 +165,18 @@ class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onMessageUpdate(DiscordMessage $message, Discord $discord): void{
-        if(!$this->checkMessage($message)) return;
-        $packet = new MessageUpdatePacket(ModelConverter::genModelMessage($message));
+    public function onMessageUpdate(DiscordMessage|\stdClass $data, Discord $discord): void{
+        if(!$data instanceof DiscordMessage || !$this->checkMessage($data)){
+            //Unknown message updated (send partial data).
+            $message = [
+                "guild_id" => $data->guild_id ?? null,
+                "channel_id" => $data->channel_id,
+                "message_id" => $data->id
+            ];
+        }else{
+            $message = ModelConverter::genModelMessage($data);
+        }
+        $packet = new MessageUpdatePacket($message);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
@@ -239,17 +260,17 @@ class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
+    public function onChannelCreate(DiscordChannel|DiscordThread $channel, Discord $discord): void{
         $packet = new ChannelCreatePacket(ModelConverter::genModelChannel($channel));
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
+    public function onChannelUpdate(DiscordChannel|DiscordThread $channel, Discord $discord): void{
         $packet = new ChannelUpdatePacket(ModelConverter::genModelChannel($channel));
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
+    public function onChannelDelete(DiscordChannel|DiscordThread|\stdClass $channel, Discord $discord): void{
         $packet = new ChannelDeletePacket($channel->guild_id, $channel->id);
         $this->client->getThread()->writeOutboundData($packet);
     }

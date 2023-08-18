@@ -230,8 +230,8 @@ class Channel implements BinarySerializable{
     }
 
     public function setTopic(?string $topic): void{
-        if($topic !== null && (strlen($topic) < 1 || strlen($topic) > 4096)){
-            throw new \AssertionError("Channel topic must be between 1 and 4096 characters.");
+        if($topic !== null && strlen($topic) > 4096){
+            throw new \AssertionError("Channel topic must be under 4096 characters.");
         }
         $this->topic = $topic;
     }

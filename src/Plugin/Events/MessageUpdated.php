@@ -19,19 +19,25 @@ use pocketmine\plugin\Plugin;
 /**
  * Emitted when a message has been updated.
  *
+ *  If message was made before bot started it will only have message id, channel id and guild id.
+ *  If it was made after bot started it may have the full message model (if cached).
+ *
  * @see MessageDeleted
  * @see MessageSent
  */
 class MessageUpdated extends DiscordBotEvent{
 
-    private Message $message;
+    /** @var Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} */
+    private Message|array $message;
 
-    public function __construct(Plugin $plugin, Message $message){
+    /** @param Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} $message */
+    public function __construct(Plugin $plugin, Message|array $message){
         parent::__construct($plugin);
         $this->message = $message;
     }
 
-    public function getMessage(): Message{
+    /* @return Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} */
+    public function getMessage(): Message|array{
         return $this->message;
     }
 }

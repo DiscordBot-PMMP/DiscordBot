@@ -21,29 +21,57 @@ class MessageUpdate extends Packet{
 
     public const SERIALIZE_ID = 26;
 
-    private Message $message;
+    /**
+     * @var Message|array{"message_id": string, "channel_id": string, "guild_id": ?string}
+     */
+    private Message|array $message;
 
-    public function __construct(Message $message, ?int $uid = null){
+    /**
+     * @param Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} $message
+     */
+    public function __construct(Message|array $message, ?int $uid = null){
         parent::__construct($uid);
         $this->message = $message;
     }
 
-    public function getMessage(): Message{
+    /**
+     * @return Message|array{"message_id": string, "channel_id": string, "guild_id": ?string}
+     */
+    public function getMessage(): Message|array{
         return $this->message;
     }
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putInt($this->getUID());
-        $stream->putSerializable($this->message);
+        if($this->message instanceof Message){
+            $stream->putBool(false); // not partial
+            $stream->putSerializable($this->message);
+        }else{
+            $stream->putBool(true); // partial
+            $stream->putNullableString($this->message["guild_id"]);
+            $stream->putString($this->message["channel_id"]);
+            $stream->putString($this->message["message_id"]);
+        }
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         $uid = $stream->getInt();
-        return new self(
-            $stream->getSerializable(Message::class), // message
-            $uid
-        );
+        if($stream->getBool()){ //partial
+            return new self(
+                [
+                    "guild_id" => $stream->getNullableString(),
+                    "channel_id" => $stream->getString(),
+                    "message_id" => $stream->getString()
+                ],
+                $uid
+            );
+        }else{
+            return new self(
+                $stream->getSerializable(Message::class),
+                $uid
+            );
+        }
     }
 }
