@@ -17,6 +17,7 @@ use AssertionError;
 use Carbon\Carbon;
 use Discord\Parts\Channel\Attachment as DiscordAttachment;
 use Discord\Parts\Channel\Channel as DiscordChannel;
+use Discord\Parts\Channel\Forum\Tag as DiscordTag;
 use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Channel\Overwrite as DiscordOverwrite;
@@ -35,15 +36,19 @@ use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\Guild\Sticker as DiscordSticker;
 use Discord\Parts\Interactions\Request\Component as DiscordComponent;
 use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
+use Discord\Parts\Thread\Thread as DiscordThread;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
 use JaxkDev\DiscordBot\Models\Ban;
-use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
-use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
-use JaxkDev\DiscordBot\Models\Channels\TextChannel;
-use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\ChannelType;
+use JaxkDev\DiscordBot\Models\Channels\ForumTag;
+use JaxkDev\DiscordBot\Models\Channels\Overwrite;
+use JaxkDev\DiscordBot\Models\Channels\OverwriteType;
+use JaxkDev\DiscordBot\Models\Channels\ThreadMetadata;
+use JaxkDev\DiscordBot\Models\Channels\VideoQualityMode;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Guild\DefaultMessageNotificationLevel;
 use JaxkDev\DiscordBot\Models\Guild\ExplicitContentFilterLevel;
@@ -87,14 +92,13 @@ use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\RoleTags;
-use JaxkDev\DiscordBot\Models\Sticker;
 use JaxkDev\DiscordBot\Models\StickerFormatType;
+use JaxkDev\DiscordBot\Models\StickerPartial;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\UserPremiumType;
 use JaxkDev\DiscordBot\Models\VoiceState;
 use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\WebhookType;
-use function array_keys;
 use function array_map;
 use function array_values;
 
@@ -230,85 +234,49 @@ abstract class ModelConverter{
             $discordGuild->premium_progress_bar_enabled, $discordGuild->safety_alerts_channel_id);
     }
 
-    /**
-     * @template T of GuildChannel
-     * @param T $c
-     * @return T
-     * @noinspection PhpMissingParamTypeInspection
-     */
-    static private function applyPermissionOverwrites(DiscordChannel $dc, $c){
-        /** @var DiscordOverwrite $overwrite */
-        foreach($dc->overwrites as $overwrite){
-            $allowed = new ChannelPermissions((int)$overwrite->allow->bitwise);
-            $denied = new ChannelPermissions((int)$overwrite->deny->bitwise);
-            if($overwrite->type === DiscordOverwrite::TYPE_MEMBER){
-                $c->setAllowedMemberPermissions($overwrite->id, $allowed);
-                $c->setDeniedMemberPermissions($overwrite->id, $denied);
-            }elseif($overwrite->type === DiscordOverwrite::TYPE_ROLE){
-                $c->setAllowedRolePermissions($overwrite->id, $allowed);
-                $c->setDeniedRolePermissions($overwrite->id, $denied);
-            }else{
-                throw new AssertionError("Overwrite type unknown ? ({$overwrite->type})");
-            }
+    static public function genModelChannel(DiscordChannel|DiscordThread $channel): Channel{
+        $overwrites = [];
+        foreach((($channel->overwrites ?? null)?->toArray() ?? []) as $overwrite){
+            $overwrites[] = self::genModelOverwrite($overwrite);
         }
-        return $c;
+        $recipients = [];
+        foreach(($channel->recipients ?? []) as $user){
+            $recipients[] = $user->id;
+        }
+        $tags = [];
+        foreach(($channel->available_tags ?? []) as $tag){
+            $tags[] = self::genModelForumTag($tag);
+        }
+        return new Channel($channel->id, ChannelType::from($channel->type), $channel->guild_id ?? null, $channel->position ?? null,
+            $overwrites, $channel->name ?? null, $channel->topic ?? null, $channel->nsfw ?? null, $channel->last_message_id ?? null,
+            $channel->bitrate ?? null, $channel->user_limit ?? null, $channel->rate_limit_per_user ?? null, $recipients,
+            $channel->icon ?? null, $channel->owner_id ?? null, $channel->application_id ?? null, $channel->managed ?? null,
+            $channel->parent_id ?? null, ($channel->last_pin_timestamp ?? null)?->getTimestamp(), $channel->rtc_region ?? null,
+            ($channel->video_quality_mode ?? null) === null ? null : VideoQualityMode::from($channel->video_quality_mode),
+            /** @phpstan-ignore-next-line Poorly documented thread_metadata from DiscordPHP. */
+            ($channel->thread_metadata ?? null) === null ? null : self::genModelThreadMetadata($channel->thread_metadata),
+            $channel->flags ?? null, $tags, $channel->applied_tags ?? null);
     }
 
-    /**
-     * Generates a model based on whatever type $channel is. (Excludes game store/group type)
-     * @return ?GuildChannel Null if type is invalid/unused.
-     */
-    static public function genModelChannel(DiscordChannel $channel): ?GuildChannel{
-        switch($channel->type){
-            case DiscordChannel::TYPE_GUILD_TEXT:
-            case DiscordChannel::TYPE_GUILD_ANNOUNCEMENT:
-                return self::genModelTextChannel($channel);
-            case DiscordChannel::TYPE_GUILD_VOICE:
-                return self::genModelVoiceChannel($channel);
-            case DiscordChannel::TYPE_GUILD_CATEGORY:
-                return self::genModelCategoryChannel($channel);
-            default:
-                return null;
-        }
+    static public function genModelForumTag(DiscordTag $tag): ForumTag{
+        return new ForumTag($tag->id, $tag->name, $tag->moderated, $tag->emoji_id ?? null, $tag->emoji_name ?? null);
     }
 
-    static public function genModelCategoryChannel(DiscordChannel $discordChannel): CategoryChannel{
-        if($discordChannel->type !== DiscordChannel::TYPE_GUILD_CATEGORY){
-            throw new AssertionError("Discord channel type must be `category` to generate model category channel.");
-        }
-        if($discordChannel->guild_id === null || ($discordChannel->name ?? null) === null || ($discordChannel->position ?? null) === null){
-            throw new AssertionError("Guild ID, name and position must be present.");
-        }
-        return self::applyPermissionOverwrites($discordChannel, new CategoryChannel($discordChannel->name ?? "", $discordChannel->position,
-            $discordChannel->guild_id, $discordChannel->id));
+    /** @param object{"archived": bool, "auto_archive_duration": int, "archive_timestamp": int, "locked": bool,
+     *     "invitable": ?bool, "create_timestamp": ?int} $metadata */
+    static public function genModelThreadMetadata(object $metadata): ThreadMetadata{
+        return new ThreadMetadata($metadata->archived, $metadata->auto_archive_duration, $metadata->archive_timestamp,
+            $metadata->locked, $metadata->invitable ?? null, $metadata->create_timestamp ?? null);
     }
 
-    static public function genModelVoiceChannel(DiscordChannel $discordChannel): VoiceChannel{
-        if($discordChannel->type !== DiscordChannel::TYPE_GUILD_VOICE){
-            throw new AssertionError("Discord channel type must be `voice` to generate model voice channel.");
+    static public function genModelOverwrite(DiscordOverwrite $overwrite): Overwrite{
+        $type = OverwriteType::from($overwrite->type);
+        if($type === OverwriteType::ROLE){
+            return new Overwrite($overwrite->id, $type, new RolePermissions((int)$overwrite->allow->bitwise),
+                new RolePermissions((int)$overwrite->deny->bitwise));
         }
-        $gid = $discordChannel->guild_id ?? "";
-        if($gid === ""){
-            throw new AssertionError("Guild ID must be present.");
-        }
-        $ids = array_map(function($id) use($gid){
-            return $gid . ".$id";
-        }, array_keys($discordChannel->members->toArray()));
-        return self::applyPermissionOverwrites($discordChannel, new VoiceChannel($discordChannel->bitrate ?? 0, $discordChannel->user_limit ?? 20,
-            $discordChannel->name ?? "", $discordChannel->position ?? 0, $gid, $ids,
-            $discordChannel->parent_id ?? null, $discordChannel->id));
-    }
-
-    static public function genModelTextChannel(DiscordChannel $discordChannel): TextChannel{
-        if($discordChannel->type !== DiscordChannel::TYPE_GUILD_TEXT && $discordChannel->type !== DiscordChannel::TYPE_GUILD_ANNOUNCEMENT){
-            throw new AssertionError("Discord channel type must be `text|news` to generate model text channel.");
-        }
-        if($discordChannel->guild_id === null){
-            throw new AssertionError("Guild ID must be present.");
-        }
-        return self::applyPermissionOverwrites($discordChannel, new TextChannel($discordChannel->topic ?? "", $discordChannel->name ?? "",
-            $discordChannel->position ?? 0, $discordChannel->guild_id, $discordChannel->nsfw ?? false, $discordChannel->rate_limit_per_user,
-            $discordChannel->parent_id ?? null, $discordChannel->id));
+        return new Overwrite($overwrite->id, $type, new ChannelPermissions((int)$overwrite->allow->bitwise),
+            new ChannelPermissions((int)$overwrite->deny->bitwise));
     }
 
     static public function genModelMessage(DiscordMessage $discordMessage): Message{
@@ -430,8 +398,8 @@ abstract class ModelConverter{
         }
     }
 
-    static public function genModelSticker(DiscordSticker $sticker): Sticker{
-        return new Sticker($sticker->id, $sticker->name, StickerFormatType::from($sticker->format_type));
+    static public function genModelSticker(DiscordSticker $sticker): StickerPartial{
+        return new StickerPartial($sticker->id, $sticker->name, StickerFormatType::from($sticker->format_type));
     }
 
     static public function genModelMessageReaction(DiscordReaction $reaction): Reaction{

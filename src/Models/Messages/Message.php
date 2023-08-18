@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
-use JaxkDev\DiscordBot\Models\Sticker;
+use JaxkDev\DiscordBot\Models\StickerPartial;
 use JaxkDev\DiscordBot\Plugin\Utils;
 use function count;
 
@@ -113,17 +113,17 @@ class Message implements BinarySerializable{
     /** @var ActionRow[] Max 5 */
     private array $components;
 
-    /** @var Sticker[] */
+    /** @var StickerPartial[] */
     private array $sticker_items;
 
     /**
-     * @param string[]     $mentions
-     * @param string[]     $mention_roles
-     * @param Attachment[] $attachments
-     * @param Embed[]      $embeds
-     * @param Reaction[]   $reactions
-     * @param ActionRow[]  $components    Max 5
-     * @param Sticker[]    $sticker_items
+     * @param string[]         $mentions
+     * @param string[]         $mention_roles
+     * @param Attachment[]     $attachments
+     * @param Embed[]          $embeds
+     * @param Reaction[]       $reactions
+     * @param ActionRow[]      $components    Max 5
+     * @param StickerPartial[] $sticker_items
      */
     public function __construct(MessageType $type, string $id, string $channel_id, ?string $author_id, string $content,
                                 int $timestamp, ?int $edited_timestamp, bool $tts, bool $mention_everyone,
@@ -401,16 +401,16 @@ class Message implements BinarySerializable{
         $this->components = $components;
     }
 
-    /** @return Sticker[] */
+    /** @return StickerPartial[] */
     public function getStickerItems(): array{
         return $this->sticker_items;
     }
 
-    /** @param Sticker[] $sticker_items */
+    /** @param StickerPartial[] $sticker_items */
     public function setStickerItems(array $sticker_items): void{
         foreach($sticker_items as $sticker_item){
-            if(!$sticker_item instanceof Sticker){
-                throw new \AssertionError("Sticker items must be an array of Sticker.");
+            if(!$sticker_item instanceof StickerPartial){
+                throw new \AssertionError("StickerPartial items must be an array of StickerPartial.");
             }
         }
         $this->sticker_items = $sticker_items;
@@ -470,7 +470,7 @@ class Message implements BinarySerializable{
             $stream->getNullableSerializable(Message::class),   // referenced_message
             $stream->getNullableString(),                       // thread_id
             $stream->getSerializableArray(ActionRow::class),    // components
-            $stream->getSerializableArray(Sticker::class)       // sticker_items
+            $stream->getSerializableArray(StickerPartial::class)       // sticker_items
         );
     }
 }

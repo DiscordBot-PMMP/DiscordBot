@@ -173,15 +173,6 @@ class Guild implements BinarySerializable{
     /** The maximum amount of users in a stage video channel */
     private ?int $max_stage_video_channel_users;
 
-    /** Approximate number of members in this guild, returned from the GET /guild/<id> endpoint when with_counts is true */
-    //private ?int $approximate_member_count;
-
-    /** Approximate number of non-offline members in this guild, returned from the GET /guild/<id> endpoint when with_counts is true */
-    //private ?int $approximate_presence_count;
-
-    /** The welcome screen of a Community guild, shown to new members, returned in an Invite's guild object */
-    //private $welcome_screen;
-
     /** The NSFW level of the guild */
     private NsfwLevel $nsfw_level;
 
@@ -189,7 +180,7 @@ class Guild implements BinarySerializable{
      * Custom guild stickers
      * @var Sticker[]
      */
-    //private array $stickers; TODO Sticker class
+    //private array $stickers; TODO Sticker packs etc
 
     /** Whether the guild has the boost progress bar enabled */
     private bool $premium_progress_bar_enabled;

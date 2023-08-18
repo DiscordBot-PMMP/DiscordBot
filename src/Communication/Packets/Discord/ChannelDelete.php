@@ -20,11 +20,18 @@ class ChannelDelete extends Packet{
 
     public const SERIALIZE_ID = 9;
 
+    private ?string $guild_id;
+
     private string $channel_id;
 
-    public function __construct(string $channel_id, ?int $uid = null){
+    public function __construct(?string $guild_id, string $channel_id, ?int $uid = null){
         parent::__construct($uid);
+        $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
+    }
+
+    public function getGuildId(): ?string{
+        return $this->guild_id;
     }
 
     public function getChannelId(): string{
@@ -34,6 +41,7 @@ class ChannelDelete extends Packet{
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putInt($this->getUID());
+        $stream->putNullableString($this->guild_id);
         $stream->putString($this->channel_id);
         return $stream;
     }
@@ -41,7 +49,8 @@ class ChannelDelete extends Packet{
     public static function fromBinary(BinaryStream $stream): self{
         $uid = $stream->getInt();
         return new self(
-            $stream->getString(), // channel_id
+            $stream->getNullableString(), // guild_id
+            $stream->getString(),         // channel_id
             $uid
         );
     }

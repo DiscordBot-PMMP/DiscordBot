@@ -240,23 +240,17 @@ class DiscordEventHandler{
     }
 
     public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
-        //TODO
-        /*$c = ModelConverter::genModelChannel($channel);
-        if($c === null) return;
-        $packet = new ChannelCreatePacket($c);
-        $this->client->getThread()->writeOutboundData($packet);*/
+        $packet = new ChannelCreatePacket(ModelConverter::genModelChannel($channel));
+        $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
-        //TODO
-        /*$c = ModelConverter::genModelChannel($channel);
-        if($c === null) return;
-        $packet = new ChannelUpdatePacket($c);
-        $this->client->getThread()->writeOutboundData($packet);*/
+        $packet = new ChannelUpdatePacket(ModelConverter::genModelChannel($channel));
+        $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
-        $packet = new ChannelDeletePacket($channel->id);
+        $packet = new ChannelDeletePacket($channel->guild_id, $channel->id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 

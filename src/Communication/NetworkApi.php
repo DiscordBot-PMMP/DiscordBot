@@ -90,6 +90,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Models\Ban;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Guild\Guild;
 use JaxkDev\DiscordBot\Models\Invite;
@@ -98,7 +99,6 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Role;
-use JaxkDev\DiscordBot\Models\Sticker;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\VoiceState;
 use JaxkDev\DiscordBot\Models\Webhook;
@@ -204,7 +204,7 @@ class NetworkApi{
 
     /** @var array<int, class-string<BinarySerializable<mixed>>>  */
     public const MODELS_MAP = [
-        //1-11
+        //1-13
         Guild::SERIALIZE_ID => Guild::class,
         Activity::SERIALIZE_ID => Activity::class,
         Presence::SERIALIZE_ID => Presence::class,
@@ -217,7 +217,8 @@ class NetworkApi{
         VoiceState::SERIALIZE_ID => VoiceState::class,
         Webhook::SERIALIZE_ID => Webhook::class,
         Message::SERIALIZE_ID => Message::class,
-        Sticker::SERIALIZE_ID => Sticker::class,
+        Channel::SERIALIZE_ID => Channel::class
+
         //14 Next ID
     ];
 

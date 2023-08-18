@@ -24,15 +24,26 @@ use pocketmine\plugin\Plugin;
  */
 class ChannelDeleted extends DiscordBotEvent{
 
+    private ?string $guild_id;
+
     private string $channel_id;
 
-    public function __construct(Plugin $plugin, string $channel_id){
+    public function __construct(Plugin $plugin, ?string $guild_id, string $channel_id){
         parent::__construct($plugin);
+        if($guild_id === null || Utils::validDiscordSnowflake($guild_id)){
+            $this->guild_id = $guild_id;
+        }else{
+            throw new \AssertionError("Invalid guild id given.");
+        }
         if(Utils::validDiscordSnowflake($channel_id)){
             $this->channel_id = $channel_id;
         }else{
             throw new \AssertionError("Invalid channel id given.");
         }
+    }
+
+    public function getGuildId(): ?string{
+        return $this->guild_id;
     }
 
     public function getChannelId(): string{

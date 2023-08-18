@@ -76,9 +76,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\InternalBot\Client;
 use JaxkDev\DiscordBot\InternalBot\ModelConverter;
-use JaxkDev\DiscordBot\Models\Channels\CategoryChannel;
-use JaxkDev\DiscordBot\Models\Channels\TextChannel;
-use JaxkDev\DiscordBot\Models\Channels\VoiceChannel;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Plugin\ApiRejection;
@@ -591,9 +589,9 @@ class CommunicationHandler{
     }
 
     private function handleCreateChannel(RequestCreateChannel $pk): void{
-        $this->getGuild($pk, $pk->getChannel()->getGuildId(), function(DiscordGuild $guild) use($pk){
+        /*$this->getGuild($pk, $pk->getChannel()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $c = $pk->getChannel();
-            /** @var DiscordChannel $dc */
+            /** @var DiscordChannel $dc *
             $dc = $guild->channels->create([
                 'name' => $c->getName(),
                 'position' => $c->getPosition(),
@@ -631,18 +629,18 @@ class CommunicationHandler{
                 $dc->rate_limit_per_user = $c->getRateLimit() ?? 0;
             }else{
                 throw new \AssertionError("What channel type is this ?? '".get_class($c)."'");
-            }*/
+            }*
             $guild->channels->save($dc)->then(function(DiscordChannel $channel) use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Created channel.", [ModelConverter::genModelChannel($channel)]);
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to create channel.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to create channel ({$pk->getUID()}) - {$e->getMessage()}");
             });
-        });
+        });*/
     }
 
     private function handleUpdateChannel(RequestUpdateChannel $pk): void{
-        if($pk->getChannel()->getId() === null){
+        /*if($pk->getChannel()->getId() === null){
             $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel ID must be present."]);
             return;
         }
@@ -711,7 +709,7 @@ class CommunicationHandler{
                 $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to update channel ({$pk->getUID()}) - channel error: {$e->getMessage()}");
             });
-        });
+        });*/
     }
 
     private function handleDeleteChannel(RequestDeleteChannel $pk): void{

@@ -66,6 +66,34 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
         return $array;
     }
 
+    /** @param BinarySerializable<mixed>[]|null $values */
+    public function putNullableSerializableArray(?array $values): void{
+        if($values === null){
+            $this->putBool(false);
+            return;
+        }
+        $this->putBool(true);
+        $this->putSerializableArray($values);
+    }
+
+    /**
+     * @template T of BinarySerializable<mixed>
+     * @param class-string<T> $class
+     * @return T[]|null
+     */
+    public function getNullableSerializableArray(string $class): ?array{
+        if(!$this->getBool()){
+            return null;
+        }
+        $array = [];
+        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
+            /** @var T $x */
+            $x = $class::fromBinary($this);
+            $array[] = $x;
+        }
+        return $array;
+    }
+
     /** @param string[] $values */
     public function putStringArray(array $values): void{
         $this->putInt(sizeof($values));
@@ -76,6 +104,31 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
 
     /** @return string[] */
     public function getStringArray(): array{
+        $array = [];
+        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
+            $array[] = $this->getString();
+        }
+        return $array;
+    }
+
+    /** @param string[]|null $values */
+    public function putNullableStringArray(?array $values): void{
+        if($values === null){
+            $this->putBool(false);
+            return;
+        }
+        $this->putBool(true);
+        $this->putInt(sizeof($values));
+        foreach($values as $value){
+            $this->putString($value);
+        }
+    }
+
+    /** @return string[]|null */
+    public function getNullableStringArray(): ?array{
+        if(!$this->getBool()){
+            return null;
+        }
         $array = [];
         for($i = 0, $size = $this->getInt(); $i < $size; $i++){
             $array[] = $this->getString();

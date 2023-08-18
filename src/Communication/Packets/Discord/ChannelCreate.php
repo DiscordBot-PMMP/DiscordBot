@@ -15,34 +15,34 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
-use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
 
 class ChannelCreate extends Packet{
 
     public const SERIALIZE_ID = 8;
 
-    private GuildChannel $channel;
+    private Channel $channel;
 
-    public function __construct(GuildChannel $channel, ?int $uid = null){
+    public function __construct(Channel $channel, ?int $uid = null){
         parent::__construct($uid);
         $this->channel = $channel;
     }
 
-    public function getChannel(): GuildChannel{
+    public function getChannel(): Channel{
         return $this->channel;
     }
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putInt($this->getUID());
-        //TODO $stream->putSerializable($this->channel);
+        $stream->putSerializable($this->channel);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(GuildChannel::class), // channel
+            $stream->getSerializable(Channel::class), // channel
             $uid
         );
     }

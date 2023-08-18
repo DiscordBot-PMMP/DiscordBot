@@ -58,7 +58,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateNickname;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
-use JaxkDev\DiscordBot\Models\Channels\GuildChannel;
+use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
@@ -919,19 +919,19 @@ class Api{
         return ApiResolver::create($pk->getUID());
     }
 
-    /**
+    /*
      * Create a guild channel.
      *
      * @return PromiseInterface Resolves with a Channel model of same type provided.
-     */
-    public function createChannel(GuildChannel $channel): PromiseInterface{ //TODO
+     *
+    public function createChannel(Channel $channel): PromiseInterface{ //TODO
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
         $pk = new RequestCreateChannel($channel);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
-    }
+    }*/
 
     /**
      * Update a guild channel, ID Must be present.
@@ -943,7 +943,7 @@ class Api{
      *
      * @return PromiseInterface Resolves with a Channel model of same type provided.
      */
-    public function updateChannel(GuildChannel $channel): PromiseInterface{
+    public function updateChannel(Channel $channel): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
