@@ -84,6 +84,23 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
     }
 
     /** @param int[] $values */
+    public function putByteArray(array $values): void{
+        $this->putInt(sizeof($values));
+        foreach($values as $value){
+            $this->putByte($value);
+        }
+    }
+
+    /** @return int[] */
+    public function getByteArray(): array{
+        $array = [];
+        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
+            $array[] = $this->getByte();
+        }
+        return $array;
+    }
+
+    /** @param int[] $values */
     public function putIntArray(array $values): void{
         $this->putInt(sizeof($values));
         foreach($values as $value){

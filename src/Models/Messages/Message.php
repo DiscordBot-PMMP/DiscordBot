@@ -13,116 +13,164 @@
 
 namespace JaxkDev\DiscordBot\Models\Messages;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
+use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
+use JaxkDev\DiscordBot\Models\Sticker;
 use JaxkDev\DiscordBot\Plugin\Utils;
-use function explode;
-use function stripos;
-use function strlen;
+use function count;
 
-class Message{
+/**
+ * @implements BinarySerializable<Message>
+ * @link https://discord.com/developers/docs/resources/channel#message-object-message-structure
+ */
+class Message implements BinarySerializable{
 
-    /** Null when sending message. */
-    protected ?string $id;
-
-    /** (<=2000 characters for bots/users. <=4000 for nitro users) Possibly empty with attachments/embeds. */
-    protected string $content = "";
-
-    /** Note gateway v9 / dphp7 supports several embeds and attachments in normal messages. (merge with webhook handling) */
-    protected ?Embed $embed;
-
-    /**  MemberID (guildID.userID), Null when sending or receiving webhook messages, just (UserID) if DM Channel. */
-    protected ?string $author_id;
-
-    protected string $channel_id;
-
-    /** Null if DM Channel. */
-    protected ?string $guild_id;
-
-    /** Null when sending message. */
-    protected ?float $timestamp;
-
-    /** @var Attachment[] Used for INBOUND messages only. */
-    protected array $attachments = [];
-
-    protected bool $everyone_mentioned = false;
-
-    /** @var string[] */
-    protected array $users_mentioned = [];
-
-    /** @var string[] */
-    protected array $roles_mentioned = [];
-
-    /** @var string[] */
-    protected array $channels_mentioned = [];
+    public const SERIALIZE_ID = 12;
 
     /**
-     * @param Attachment[] $attachments
-     * @param string[]     $users_mentioned
-     * @param string[]     $roles_mentioned
-     * @param string[]     $channels_mentioned
+     * @link https://discord.com/developers/docs/resources/channel#message-object-message-flags
+     * @var array<string, int>
      */
-    public function __construct(string $channel_id, ?string $id = null, string $content = "", ?Embed $embed = null,
-                                ?string $author_id = null, ?string $guild_id = null, ?float $timestamp = null,
-                                array $attachments = [], bool $everyone_mentioned = false, array $users_mentioned = [],
-                                array $roles_mentioned = [], array $channels_mentioned = []){
-        $this->setChannelId($channel_id);
+    public const FLAGS = [
+        "CROSSPOSTED" => 1 << 0,
+        "IS_CROSSPOST" => 1 << 1,
+        "SUPPRESS_EMBEDS" => 1 << 2,
+        "SOURCE_MESSAGE_DELETED" => 1 << 3,
+        "URGENT" => 1 << 4,
+        "HAS_THREAD" => 1 << 5,
+        "EPHEMERAL" => 1 << 6,
+        "LOADING" => 1 << 7,
+        "FAILED_TO_MENTION_SOME_ROLES_IN_THREAD" => 1 << 8,
+        "SUPPRESS_NOTIFICATIONS" => 1 << 12,
+        "IS_VOICE_MESSAGE" => 1 << 13
+    ];
+
+    private MessageType $type;
+
+    private string $id;
+
+    private string $channel_id;
+
+    private ?string $author_id;
+
+    /** Possibly empty with attachments/embeds. */
+    private string $content;
+
+    private int $timestamp;
+
+    /** Null if never edited. */
+    private ?int $edited_timestamp;
+
+    private bool $tts;
+
+    private bool $mention_everyone;
+
+    /** @var string[] User IDs */
+    private array $mentions;
+
+    /** @var string[] Role IDs */
+    private array $mention_roles;
+
+    /** @var Attachment[] */
+    private array $attachments;
+
+    /** @var Embed[] */
+    private array $embeds;
+
+    /** @var Reaction[] */
+    private array $reactions;
+
+    private bool $pinned;
+
+    private ?string $webhook_id;
+
+    private ?Activity $activity;
+
+    private ?string $application_id;
+
+    private ?Reference $message_reference;
+
+    /**
+     * @var int|null Flags bitmask.
+     * @see Message::FLAGS
+     */
+    private ?int $flags;
+
+    /**
+     * This field is only returned for messages with a type of 19 (REPLY) or 21 (THREAD_STARTER_MESSAGE).
+     * If the message is a reply but the referenced_message field is not present,
+     * the backend did not attempt to fetch the message that was being replied to, so its state is unknown.
+     * If the field exists but is null, the referenced message was deleted.
+     */
+    private ?Message $referenced_message;
+
+    //interaction?
+
+    private ?string $thread_id;
+
+    /** @var ActionRow[] Max 5 */
+    private array $components;
+
+    /** @var Sticker[] */
+    private array $sticker_items;
+
+    /**
+     * @param string[]     $mentions
+     * @param string[]     $mention_roles
+     * @param Attachment[] $attachments
+     * @param Embed[]      $embeds
+     * @param Reaction[]   $reactions
+     * @param ActionRow[]  $components    Max 5
+     * @param Sticker[]    $sticker_items
+     */
+    public function __construct(MessageType $type, string $id, string $channel_id, ?string $author_id, string $content,
+                                int $timestamp, ?int $edited_timestamp, bool $tts, bool $mention_everyone,
+                                array $mentions, array $mention_roles, array $attachments, array $embeds,
+                                array $reactions, bool $pinned, ?string $webhook_id, ?Activity $activity,
+                                ?string $application_id, ?Reference $message_reference, ?int $flags,
+                                ?Message $referenced_message, ?string $thread_id, array $components,
+                                array $sticker_items){
+        $this->type = $type;
         $this->setId($id);
-        $this->setContent($content);
-        $this->setEmbed($embed);
+        $this->setChannelId($channel_id);
         $this->setAuthorId($author_id);
-        $this->setGuildId($guild_id);
+        $this->setContent($content);
         $this->setTimestamp($timestamp);
+        $this->setEditedTimestamp($edited_timestamp);
+        $this->setTts($tts);
+        $this->setMentionEveryone($mention_everyone);
+        $this->setMentions($mentions);
+        $this->setMentionRoles($mention_roles);
         $this->setAttachments($attachments);
-        $this->setEveryoneMentioned($everyone_mentioned);
-        $this->setUsersMentioned($users_mentioned);
-        $this->setRolesMentioned($roles_mentioned);
-        $this->setChannelsMentioned($channels_mentioned);
+        $this->setEmbeds($embeds);
+        $this->setReactions($reactions);
+        $this->setPinned($pinned);
+        $this->setWebhookId($webhook_id);
+        $this->setActivity($activity);
+        $this->setApplicationId($application_id);
+        $this->setMessageReference($message_reference);
+        $this->setFlags($flags);
+        $this->setReferencedMessage($referenced_message);
+        $this->setThreadId($thread_id);
+        $this->setComponents($components);
+        $this->setStickerItems($sticker_items);
     }
 
-    public function getId(): ?string{
+    public function getType(): MessageType{
+        return $this->type;
+    }
+
+    public function getId(): string{
         return $this->id;
     }
 
-    public function setId(?string $id): void{
+    public function setId(string $id): void{
+        if(!Utils::validDiscordSnowflake($id)){
+            throw new \AssertionError("ID '$id' is invalid.");
+        }
         $this->id = $id;
-    }
-
-    public function getContent(): string{
-        return $this->content;
-    }
-
-    public function setContent(string $content): void{
-        if(strlen($content) > 4000){
-            throw new \AssertionError("Message content cannot exceed 4000 characters.");
-        }
-        $this->content = $content;
-    }
-
-    public function getEmbed(): ?Embed{
-        return $this->embed;
-    }
-
-    public function setEmbed(?Embed $embed): void{
-        $this->embed = $embed;
-    }
-
-    public function getAuthorId(): ?string{
-        return $this->author_id;
-    }
-
-    public function setAuthorId(?string $author_id): void{
-        if($author_id !== null && stripos($author_id, ".") !== false){
-            [$sid, $uid] = explode(".", $author_id);
-            if(!Utils::validDiscordSnowflake($sid) || !Utils::validDiscordSnowflake($uid)){
-                throw new \AssertionError("Author ID '$author_id' is invalid.");
-            }
-        }elseif($author_id !== null){
-            //Webhooks and DM's
-            if(!Utils::validDiscordSnowflake($author_id)){
-                throw new \AssertionError("Author ID '$author_id' is invalid.");
-            }
-        }
-        $this->author_id = $author_id;
     }
 
     public function getChannelId(): string{
@@ -136,144 +184,293 @@ class Message{
         $this->channel_id = $channel_id;
     }
 
-    public function getGuildId(): ?string{
-        return $this->guild_id;
+    public function getAuthorId(): ?string{
+        return $this->author_id;
     }
 
-    public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
-            throw new \AssertionError("Guild ID '$guild_id' is invalid.");
+    public function setAuthorId(?string $author_id): void{
+        if($author_id !== null && !Utils::validDiscordSnowflake($author_id)){
+            throw new \AssertionError("Author ID '$author_id' is invalid.");
         }
-        $this->guild_id = $guild_id;
+        $this->author_id = $author_id;
     }
 
-    public function getTimestamp(): ?float{
+    public function getContent(): string{
+        return $this->content;
+    }
+
+    public function setContent(string $content): void{
+        $this->content = $content;
+    }
+
+    public function getTimestamp(): int{
         return $this->timestamp;
     }
 
-    public function setTimestamp(?float $timestamp): void{
+    public function setTimestamp(int $timestamp): void{
         $this->timestamp = $timestamp;
     }
 
-    /**
-     * @return Attachment[]
-     */
+    public function getEditedTimestamp(): ?int{
+        return $this->edited_timestamp;
+    }
+
+    public function setEditedTimestamp(?int $edited_timestamp): void{
+        $this->edited_timestamp = $edited_timestamp;
+    }
+
+    public function getTts(): bool{
+        return $this->tts;
+    }
+
+    public function setTts(bool $tts): void{
+        $this->tts = $tts;
+    }
+
+    public function getMentionEveryone(): bool{
+        return $this->mention_everyone;
+    }
+
+    public function setMentionEveryone(bool $mention_everyone): void{
+        $this->mention_everyone = $mention_everyone;
+    }
+
+    /** @return string[] User IDs */
+    public function getMentions(): array{
+        return $this->mentions;
+    }
+
+    /** @param string[] $mentions User IDs */
+    public function setMentions(array $mentions): void{
+        foreach($mentions as $mention){
+            if(!Utils::validDiscordSnowflake($mention)){
+                throw new \AssertionError("Mention ID '$mention' is invalid.");
+            }
+        }
+        $this->mentions = $mentions;
+    }
+
+    /** @return string[] Role IDs */
+    public function getMentionRoles(): array{
+        return $this->mention_roles;
+    }
+
+    /** @param string[] $mention_roles Role IDs */
+    public function setMentionRoles(array $mention_roles): void{
+        foreach($mention_roles as $mention_role){
+            if(!Utils::validDiscordSnowflake($mention_role)){
+                throw new \AssertionError("Mention role ID '$mention_role' is invalid.");
+            }
+        }
+        $this->mention_roles = $mention_roles;
+    }
+
+    /** @return Attachment[] */
     public function getAttachments(): array{
         return $this->attachments;
     }
 
-    /**
-     * Notice, these will not work when sending/updating messages, its for INBOUND ONLY.
-     *
-     * @param Attachment[] $attachments
-     */
+    /** @param Attachment[] $attachments */
     public function setAttachments(array $attachments): void{
         foreach($attachments as $attachment){
             if(!$attachment instanceof Attachment){
-                throw new \AssertionError("Attachments must be an Attachment instance.");
+                throw new \AssertionError("Attachments must be an array of Attachment.");
             }
         }
         $this->attachments = $attachments;
     }
 
-    public function isEveryoneMentioned(): bool{
-        return $this->everyone_mentioned;
+    /** @return Embed[] */
+    public function getEmbeds(): array{
+        return $this->embeds;
     }
 
-    public function setEveryoneMentioned(bool $everyone_mentioned): void{
-        $this->everyone_mentioned = $everyone_mentioned;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getUsersMentioned(): array{
-        return $this->users_mentioned;
-    }
-
-    /**
-     * @param string[] $users_mentioned
-     */
-    public function setUsersMentioned(array $users_mentioned): void{
-        foreach($users_mentioned as $id){
-            if(!Utils::validDiscordSnowflake($id)){
-                throw new \AssertionError("User ID '$id' is invalid.");
+    /** @param Embed[] $embeds */
+    public function setEmbeds(array $embeds): void{
+        foreach($embeds as $embed){
+            if(!$embed instanceof Embed){
+                throw new \AssertionError("Embeds must be an array of Embed.");
             }
         }
-        $this->users_mentioned = $users_mentioned;
+        $this->embeds = $embeds;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getRolesMentioned(): array{
-        return $this->roles_mentioned;
+    /** @return Reaction[] */
+    public function getReactions(): array{
+        return $this->reactions;
     }
 
-    /**
-     * @param string[] $roles_mentioned
-     */
-    public function setRolesMentioned(array $roles_mentioned): void{
-        foreach($roles_mentioned as $id){
-            if(!Utils::validDiscordSnowflake($id)){
-                throw new \AssertionError("Role ID '$id' is invalid.");
+    /** @param Reaction[] $reactions */
+    public function setReactions(array $reactions): void{
+        foreach($reactions as $reaction){
+            if(!$reaction instanceof Reaction){
+                throw new \AssertionError("Reactions must be an array of Reaction.");
             }
         }
-        $this->roles_mentioned = $roles_mentioned;
+        $this->reactions = $reactions;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getChannelsMentioned(): array{
-        return $this->channels_mentioned;
+    public function getPinned(): bool{
+        return $this->pinned;
     }
 
-    /**
-     * @param string[] $channels_mentioned
-     */
-    public function setChannelsMentioned(array $channels_mentioned): void{
-        foreach($channels_mentioned as $id){
-            if(!Utils::validDiscordSnowflake($id)){
-                throw new \AssertionError("Channel ID '$id' is invalid.");
+    public function setPinned(bool $pinned): void{
+        $this->pinned = $pinned;
+    }
+
+    public function getWebhookId(): ?string{
+        return $this->webhook_id;
+    }
+
+    public function setWebhookId(?string $webhook_id): void{
+        if($webhook_id !== null && !Utils::validDiscordSnowflake($webhook_id)){
+            throw new \AssertionError("Webhook ID '$webhook_id' is invalid.");
+        }
+        $this->webhook_id = $webhook_id;
+    }
+
+    public function getActivity(): ?Activity{
+        return $this->activity;
+    }
+
+    public function setActivity(?Activity $activity): void{
+        $this->activity = $activity;
+    }
+
+    public function getApplicationId(): ?string{
+        return $this->application_id;
+    }
+
+    public function setApplicationId(?string $application_id): void{
+        if($application_id !== null && !Utils::validDiscordSnowflake($application_id)){
+            throw new \AssertionError("Application ID '$application_id' is invalid.");
+        }
+        $this->application_id = $application_id;
+    }
+
+    public function getMessageReference(): ?Reference{
+        return $this->message_reference;
+    }
+
+    public function setMessageReference(?Reference $message_reference): void{
+        $this->message_reference = $message_reference;
+    }
+
+    public function getFlags(): ?int{
+        return $this->flags;
+    }
+
+    public function setFlags(?int $flags): void{
+        $this->flags = $flags;
+    }
+
+    public function getReferencedMessage(): ?Message{
+        return $this->referenced_message;
+    }
+
+    public function setReferencedMessage(?Message $referenced_message): void{
+        $this->referenced_message = $referenced_message;
+    }
+
+    public function getThreadId(): ?string{
+        return $this->thread_id;
+    }
+
+    public function setThreadId(?string $thread_id): void{
+        if($thread_id !== null && !Utils::validDiscordSnowflake($thread_id)){
+            throw new \AssertionError("Thread ID '$thread_id' is invalid.");
+        }
+        $this->thread_id = $thread_id;
+    }
+
+    /** @return ActionRow[] */
+    public function getComponents(): array{
+        return $this->components;
+    }
+
+    /** @param ActionRow[] $components Max 5 */
+    public function setComponents(array $components): void{
+        if(count($components) > 5){
+            throw new \AssertionError("Max 5 components per message.");
+        }
+        foreach($components as $component){
+            if(!$component instanceof ActionRow){
+                throw new \AssertionError("Components must be an array of ActionRow.");
             }
         }
-        $this->channels_mentioned = $channels_mentioned;
+        $this->components = $components;
     }
 
-    //----- Serialization -----//
-
-    public function __serialize(): array{
-        return [
-            $this->id,
-            $this->content,
-            $this->embed,
-            $this->author_id,
-            $this->channel_id,
-            $this->guild_id,
-            $this->timestamp,
-            $this->attachments,
-            $this->everyone_mentioned,
-            $this->users_mentioned,
-            $this->roles_mentioned,
-            $this->channels_mentioned
-        ];
+    /** @return Sticker[] */
+    public function getStickerItems(): array{
+        return $this->sticker_items;
     }
 
-    public function __unserialize(array $data): void{
-        [
-            $this->id,
-            $this->content,
-            $this->embed,
-            $this->author_id,
-            $this->channel_id,
-            $this->guild_id,
-            $this->timestamp,
-            $this->attachments,
-            $this->everyone_mentioned,
-            $this->users_mentioned,
-            $this->roles_mentioned,
-            $this->channels_mentioned
-        ] = $data;
+    /** @param Sticker[] $sticker_items */
+    public function setStickerItems(array $sticker_items): void{
+        foreach($sticker_items as $sticker_item){
+            if(!$sticker_item instanceof Sticker){
+                throw new \AssertionError("Sticker items must be an array of Sticker.");
+            }
+        }
+        $this->sticker_items = $sticker_items;
+    }
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putByte($this->type->value);
+        $stream->putString($this->id);
+        $stream->putString($this->channel_id);
+        $stream->putNullableString($this->author_id);
+        $stream->putString($this->content);
+        $stream->putLong($this->timestamp);
+        $stream->putNullableLong($this->edited_timestamp);
+        $stream->putBool($this->tts);
+        $stream->putBool($this->mention_everyone);
+        $stream->putStringArray($this->mentions);
+        $stream->putStringArray($this->mention_roles);
+        $stream->putSerializableArray($this->attachments);
+        $stream->putSerializableArray($this->embeds);
+        $stream->putSerializableArray($this->reactions);
+        $stream->putBool($this->pinned);
+        $stream->putNullableString($this->webhook_id);
+        $stream->putNullableSerializable($this->activity);
+        $stream->putNullableString($this->application_id);
+        $stream->putNullableSerializable($this->message_reference);
+        $stream->putNullableInt($this->flags);
+        $stream->putNullableSerializable($this->referenced_message);
+        $stream->putNullableString($this->thread_id);
+        $stream->putSerializableArray($this->components);
+        $stream->putSerializableArray($this->sticker_items);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            MessageType::from($stream->getByte()),              // type
+            $stream->getString(),                               // id
+            $stream->getString(),                               // channel_id
+            $stream->getNullableString(),                       // author_id
+            $stream->getString(),                               // content
+            $stream->getLong(),                                 // timestamp
+            $stream->getNullableLong(),                         // edited_timestamp
+            $stream->getBool(),                                 // tts
+            $stream->getBool(),                                 // mention_everyone
+            $stream->getStringArray(),                          // mentions
+            $stream->getStringArray(),                          // mention_roles
+            $stream->getSerializableArray(Attachment::class),   // attachments
+            $stream->getSerializableArray(Embed::class),        // embeds
+            $stream->getSerializableArray(Reaction::class),     // reactions
+            $stream->getBool(),                                 // pinned
+            $stream->getNullableString(),                       // webhook_id
+            $stream->getNullableSerializable(Activity::class),  // activity
+            $stream->getNullableString(),                       // application_id
+            $stream->getNullableSerializable(Reference::class), // message_reference
+            $stream->getNullableInt(),                          // flags
+            $stream->getNullableSerializable(Message::class),   // referenced_message
+            $stream->getNullableString(),                       // thread_id
+            $stream->getSerializableArray(ActionRow::class),    // components
+            $stream->getSerializableArray(Sticker::class)       // sticker_items
+        );
     }
 }

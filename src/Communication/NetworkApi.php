@@ -94,9 +94,11 @@ use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Guild\Guild;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Role;
+use JaxkDev\DiscordBot\Models\Sticker;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\VoiceState;
 use JaxkDev\DiscordBot\Models\Webhook;
@@ -213,8 +215,10 @@ class NetworkApi{
         Role::SERIALIZE_ID => Role::class,
         User::SERIALIZE_ID => User::class,
         VoiceState::SERIALIZE_ID => VoiceState::class,
-        Webhook::SERIALIZE_ID => Webhook::class
-        //12 Next ID
+        Webhook::SERIALIZE_ID => Webhook::class,
+        Message::SERIALIZE_ID => Message::class,
+        Sticker::SERIALIZE_ID => Sticker::class,
+        //14 Next ID
     ];
 
     /**
