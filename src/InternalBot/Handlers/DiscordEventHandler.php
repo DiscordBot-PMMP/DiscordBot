@@ -160,27 +160,18 @@ class DiscordEventHandler{
     }
 
     public function onMessageDelete(DiscordMessage|\stdClass $data, Discord $discord): void{
-        //TODO
-        /*if($data instanceof DiscordMessage){
-            if(!$this->checkMessage($data)){
-                //Unknown message type deleted (send basic details TODO decide for future).
-                $message = [
-                    "message_id" => $data->id,
-                    "channel_id" => $data->channel_id,
-                    "guild_id" => $data->guild_id
-                ];
-            }else{
-                $message = ModelConverter::genModelMessage($data);
-            }
-        }else{
+        if(!$data instanceof DiscordMessage || !$this->checkMessage($data)){
+            //Unknown message deleted (send partial data).
             $message = [
-                "message_id" => $data->id,
+                "guild_id" => $data->guild_id ?? null,
                 "channel_id" => $data->channel_id,
-                "guild_id" => $data->guild_id
+                "message_id" => $data->id
             ];
+        }else{
+            $message = ModelConverter::genModelMessage($data);
         }
         $packet = new MessageDeletePacket($message);
-        $this->client->getThread()->writeOutboundData($packet);*/
+        $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onMessageReactionAdd(DiscordMessageReaction $reaction): void{

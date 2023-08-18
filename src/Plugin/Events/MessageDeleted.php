@@ -20,7 +20,7 @@ use pocketmine\plugin\Plugin;
  * Emitted when a message has been deleted.
  *
  * If message was made/updated before bot started it will only have message id, channel id and guild id.
- * If it was made/updated after bot started it will have the full message model.
+ * If it was made/updated after bot started it may have the full message model (if cached).
  *
  * @see MessageUpdated
  * @see MessageSent
