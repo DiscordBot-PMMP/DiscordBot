@@ -1043,11 +1043,11 @@ class Api{
      *
      * @return PromiseInterface Resolves with an updated Channel model.
      */
-    public function updateChannel(Channel $channel): PromiseInterface{
+    public function updateChannel(Channel $channel, ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        $pk = new RequestUpdateChannel($channel);
+        $pk = new RequestUpdateChannel($channel, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

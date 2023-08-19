@@ -76,7 +76,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Resolution;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\InternalBot\Client;
 use JaxkDev\DiscordBot\InternalBot\ModelConverter;
-use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Channels\ForumTag;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
@@ -92,7 +91,6 @@ use function floor;
 use function get_class;
 use function microtime;
 use function React\Promise\reject;
-use function strval;
 
 class CommunicationHandler{
 
@@ -637,76 +635,62 @@ class CommunicationHandler{
     }
 
     private function handleUpdateChannel(RequestUpdateChannel $pk): void{
-        /*if($pk->getChannel()->getId() === null){
-            $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel ID must be present."]);
+        if($pk->getChannel()->getGuildId() === null){
+            $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Guild ID must be present."]);
             return;
         }
         $this->getGuild($pk, $pk->getChannel()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->channels->fetch($pk->getChannel()->getId())->then(function(DiscordChannel $dc) use($guild, $pk){
                 $channel = $pk->getChannel();
-                if(isset($dc->name)){
-                    $dc->name = $pk->getChannel()->getName();
-                }
-                $dc->position = $pk->getChannel()->getPosition();
-                if($pk->getChannel()->getCategoryId() !== null){
-                    if(isset($dc->parent_id)){
-                        $dc->parent_id = $pk->getChannel()->getCategoryId();
+                $dc->name = $channel->getName();
+                $dc->position = $channel->getPosition();
+                $dc->topic = $channel->getTopic();
+                $dc->nsfw = $channel->getNsfw();
+                $dc->rate_limit_per_user = $channel->getRateLimitPerUser();
+                $dc->bitrate = $channel->getBitrate();
+                $dc->user_limit = $channel->getUserLimit();
+                $dc->parent_id = $channel->getParentId();
+                $dc->rtc_region = $channel->getRtcRegion();
+                $dc->video_quality_mode = $channel->getVideoQualityMode()?->value;
+                $dc->flags = $channel->getFlags();
+                $dc->available_tags->clear();
+                if(($atags = $channel->getAvailableTags()) !== null){
+                    foreach($atags as $tag){
+                        $dc->available_tags->push(new Tag($this->client->getDiscordClient(), [
+                            "id" => $tag->getId(),
+                            "name" => $tag->getName(),
+                            "moderated" => $tag->getModerated(),
+                            "emoji_id" => $tag->getEmojiId(),
+                            "emoji_name" => $tag->getEmojiName()
+                        ]));
                     }
                 }
-                $dc->overwrites->cache->clear(); //todo promise.
-                foreach($channel->getAllMemberPermissions() as $id => [$allowed, $denied]){
-                    $dc->overwrites->push($dc->overwrites->create([
-                        'id' => $id,
-                        "type" => DiscordOverwrite::TYPE_MEMBER,
-                        "allow" => strval($allowed === null ? 0 : $allowed->getBitwise()),
-                        "deny" => strval($denied === null ? 0 : $denied->getBitwise())
-                    ]));
-                }
-                foreach($channel->getAllRolePermissions() as $id => [$allowed, $denied]){
-                    $dc->overwrites->push($dc->overwrites->create([
-                        'id' => $id,
-                        "type" => DiscordOverwrite::TYPE_ROLE,
-                        "allow" => strval($allowed === null ? 0 : $allowed->getBitwise()),
-                        "deny" => strval($denied === null ? 0 : $denied->getBitwise())
-                    ]));
-                }
-                if($channel instanceof CategoryChannel){
-                    if($dc->type !== DiscordChannel::TYPE_GUILD_CATEGORY){
-                        $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type change is not allowed."]);
-                        return;
+
+                $dc->overwrites->cache->clear()->then(function() use($guild, $pk, $channel, $dc){
+                    foreach(($channel->getPermissionOverwrites() ?? []) as $overwrite){
+                        $dc->overwrites->push($dc->overwrites->create([
+                            'id' => $overwrite->getId(),
+                            "type" => $overwrite->getType()->value,
+                            "allow" => $overwrite->getAllow()->getBitwise(),
+                            "deny" => $overwrite->getDeny()->getBitwise()
+                        ]));
                     }
-                }elseif($channel instanceof VoiceChannel){
-                    if($dc->type !== DiscordChannel::TYPE_GUILD_VOICE){
-                        $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type change is not allowed."]);
-                        return;
-                    }
-                    $dc->bitrate = $channel->getBitrate();
-                    $dc->user_limit = $channel->getMemberLimit();
-                }elseif($channel instanceof TextChannel){
-                    if($dc->type !== DiscordChannel::TYPE_GUILD_TEXT){
-                        $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type change is not allowed."]);
-                        return;
-                    }
-                    if(isset($dc->topic)){
-                        $dc->topic = $channel->getTopic();
-                    }
-                    $dc->nsfw = $channel->isNsfw();
-                    $dc->rate_limit_per_user = $channel->getRateLimit() ?? 0;
-                }else{
-                    $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel type is unknown."]);
-                    throw new \AssertionError("What channel type is this ?? '" . get_class($channel) . "'");
-                }
-                $guild->channels->save($dc)->then(function(DiscordChannel $channel) use($pk){
-                    $this->resolveRequest($pk->getUID(), true, "Updated channel.", [ModelConverter::genModelChannel($channel)]);
+                    $guild->channels->save($dc, $pk->getReason())->then(function(DiscordChannel $channel) use($pk){
+                        $this->resolveRequest($pk->getUID(), true, "Updated channel.", [ModelConverter::genModelChannel($channel)]);
+                    }, function(\Throwable $e) use($pk){
+                        $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", [$e->getMessage(), $e->getTraceAsString()]);
+                        $this->logger->debug("Failed to update channel ({$pk->getUID()}) - {$e->getMessage()}");
+                    });
                 }, function(\Throwable $e) use($pk){
-                    $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", [$e->getMessage(), $e->getTraceAsString()]);
-                    $this->logger->debug("Failed to update channel ({$pk->getUID()}) - {$e->getMessage()}");
+                    $this->logger->error("Failed to clear channel overwrite cache - {$e->getMessage()}");
+                    $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", ["Channel permission overwrites failed to update."]);
+                    return;
                 });
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to update channel.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to update channel ({$pk->getUID()}) - channel error: {$e->getMessage()}");
             });
-        });*/
+        });
     }
 
     private function handleDeleteChannel(RequestDeleteChannel $pk): void{

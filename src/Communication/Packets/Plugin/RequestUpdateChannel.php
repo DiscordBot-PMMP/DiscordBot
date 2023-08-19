@@ -23,26 +23,35 @@ class RequestUpdateChannel extends Packet{
 
     private Channel $channel;
 
-    public function __construct(Channel $channel, ?int $uid = null){
+    private ?string $reason;
+
+    public function __construct(Channel $channel, ?string $reason = null, ?int $uid = null){
         parent::__construct($uid);
         $this->channel = $channel;
+        $this->reason = $reason;
     }
 
     public function getChannel(): Channel{
         return $this->channel;
     }
 
+    public function getReason(): ?string{
+        return $this->reason;
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putInt($this->getUID());
-        $stream->putSerializable($this->channel); //todo
+        $stream->putSerializable($this->channel);
+        $stream->putNullableString($this->reason);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Channel::class), //todo
+            $stream->getSerializable(Channel::class),
+            $stream->getNullableString(),
             $uid
         );
     }
