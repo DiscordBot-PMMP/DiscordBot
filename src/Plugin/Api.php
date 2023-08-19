@@ -958,8 +958,8 @@ class Api{
         if(strlen($name) < 1 || strlen($name) > 100){
             return rejectPromise(new ApiRejection("Channel name must be between 1 and 100 characters."));
         }
-        if(!$type->creatable()){
-            return rejectPromise(new ApiRejection("Channel type '{$type->name}' is not creatable."));
+        if(!$type->isGuild()){
+            return rejectPromise(new ApiRejection("Channel type '{$type->name}' is not creatable, only guild channels can be created."));
         }
         if($topic !== null){
             if(!in_array($type, [ChannelType::GUILD_TEXT, ChannelType::GUILD_ANNOUNCEMENT, ChannelType::GUILD_FORUM, ChannelType::GUILD_MEDIA], true)){

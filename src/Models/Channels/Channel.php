@@ -94,7 +94,10 @@ class Channel implements BinarySerializable{
     /** For group DM channels: whether the channel is managed by an application via the gdm.join OAuth2 scope */
     private ?bool $managed;
 
-    /** ID of the parent category for a channel (each parent category can contain up to 50 channels). */
+    /**
+     * ID of the parent category for a channel (each parent category can contain up to 50 channels).
+     * ID of the parent channel for a thread.
+     */
     private ?string $parent_id;
 
     /** When the last pinned message was pinned. */
