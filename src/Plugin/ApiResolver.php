@@ -51,7 +51,7 @@ abstract class ApiResolver{
             }
             unset(self::$map[$packet->getPid()]);
         }else{
-            if(self::$logger === null){
+            if((self::$logger ?? null) === null){
                 $pl = null;
                 try{
                     $pl = Server::getInstance()->getPluginManager()->getPlugin("DiscordBot");
