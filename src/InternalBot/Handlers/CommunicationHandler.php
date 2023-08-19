@@ -16,9 +16,9 @@ namespace JaxkDev\DiscordBot\InternalBot\Handlers;
 use Discord\Builders\MessageBuilder;
 use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
+use Discord\Parts\Channel\Forum\Tag;
 use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
-use Discord\Parts\Channel\Overwrite as DiscordOverwrite;
 use Discord\Parts\Channel\Webhook as DiscordWebhook;
 use Discord\Parts\Embed\Embed as DiscordEmbed;
 use Discord\Parts\Guild\Guild as DiscordGuild;
@@ -77,6 +77,7 @@ use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\InternalBot\Client;
 use JaxkDev\DiscordBot\InternalBot\ModelConverter;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\ForumTag;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Plugin\ApiRejection;
@@ -589,54 +590,50 @@ class CommunicationHandler{
     }
 
     private function handleCreateChannel(RequestCreateChannel $pk): void{
-        /*$this->getGuild($pk, $pk->getChannel()->getGuildId(), function(DiscordGuild $guild) use($pk){
-            $c = $pk->getChannel();
-            /** @var DiscordChannel $dc *
+        $this->getGuild($pk, $pk->getGuildId(), function(DiscordGuild $guild) use($pk){
+            $tags = [];
+            if(($atags = $pk->getAvailableTags()) !== null){
+                $tags = array_map(function(ForumTag $tag){
+                    return new Tag($this->client->getDiscordClient(), [
+                        "id" => $tag->getId(),
+                        "name" => $tag->getName(),
+                        "moderated" => $tag->getModerated(),
+                        "emoji_id" => $tag->getEmojiId(),
+                        "emoji_name" => $tag->getEmojiName()
+                    ]);
+                }, $atags);
+            }
+            /** @var DiscordChannel $dc */
             $dc = $guild->channels->create([
-                'name' => $c->getName(),
-                'position' => $c->getPosition(),
-                'guild_id' => $guild->id
+                "guild_id" => $pk->getGuildId(),
+                "name" => $pk->getName(),
+                "type" => $pk->getType()->value,
+                "topic" => $pk->getTopic(),
+                "bitrate" => $pk->getBitrate(),
+                "user_limit" => $pk->getUserLimit(),
+                "rate_limit_per_user" => $pk->getRateLimitPerUser(),
+                "position" => $pk->getPosition(),
+                "parent_id" => $pk->getParentId(),
+                "nsfw" => $pk->getNsfw(),
+                "rtc_region" => $pk->getRtcRegion(),
+                "video_quality_mode" => $pk->getVideoQualityMode()?->value,
+                "available_tags" => $tags
             ]);
-            if($c->getCategoryId() !== null){
-                //$dc->parent_id = $c->getCategoryId(); TODO, move things to create()
-            }
-            foreach($c->getAllMemberPermissions() as $id => [$allowed, $denied]){
+            foreach($pk->getPermissionOverwrites() as $overwrite){
                 $dc->overwrites->push($dc->overwrites->create([
-                    'id' => $id,
-                    "type" => DiscordOverwrite::TYPE_MEMBER,
-                    "allow" => strval($allowed === null ? 0 : $allowed->getBitwise()),
-                    "deny" => strval($denied === null ? 0 : $denied->getBitwise())
+                    'id' => $overwrite->getId(),
+                    "type" => $overwrite->getType()->value,
+                    "allow" => $overwrite->getAllow()->getBitwise(),
+                    "deny" => $overwrite->getDeny()->getBitwise()
                 ]));
             }
-            foreach($c->getAllRolePermissions() as $id => [$allowed, $denied]){
-                $dc->overwrites->push($dc->overwrites->create([
-                    'id' => $id,
-                    "type" => DiscordOverwrite::TYPE_ROLE,
-                    "allow" => strval($allowed === null ? 0 : $allowed->getBitwise()),
-                    "deny" => strval($denied === null ? 0 : $denied->getBitwise())
-                ]));
-            }
-            /* TODO Move things to create()
-            if($c instanceof CategoryChannel){
-                $dc->type = DiscordChannel::TYPE_GUILD_CATEGORY;
-            }elseif($c instanceof VoiceChannel){
-                $dc->type = DiscordChannel::TYPE_GUILD_VOICE;
-                $dc->bitrate = $c->getBitrate();
-                $dc->user_limit = $c->getMemberLimit();
-            }elseif($c instanceof TextChannel){
-                $dc->topic = $c->getTopic();
-                $dc->nsfw = $c->isNsfw();
-                $dc->rate_limit_per_user = $c->getRateLimit() ?? 0;
-            }else{
-                throw new \AssertionError("What channel type is this ?? '".get_class($c)."'");
-            }*
             $guild->channels->save($dc)->then(function(DiscordChannel $channel) use($pk){
                 $this->resolveRequest($pk->getUID(), true, "Created channel.", [ModelConverter::genModelChannel($channel)]);
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to create channel.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to create channel ({$pk->getUID()}) - {$e->getMessage()}");
             });
-        });*/
+        });
     }
 
     private function handleUpdateChannel(RequestUpdateChannel $pk): void{

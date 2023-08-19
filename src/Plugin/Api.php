@@ -59,6 +59,10 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUpdateWebhook;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
+use JaxkDev\DiscordBot\Models\Channels\ChannelType;
+use JaxkDev\DiscordBot\Models\Channels\ForumTag;
+use JaxkDev\DiscordBot\Models\Channels\Overwrite;
+use JaxkDev\DiscordBot\Models\Channels\VideoQualityMode;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
@@ -72,6 +76,7 @@ use JaxkDev\DiscordBot\Models\WebhookType;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
 use pocketmine\event\EventPriority;
 use function basename;
+use function in_array;
 use function is_file;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 use function strlen;
@@ -919,29 +924,124 @@ class Api{
         return ApiResolver::create($pk->getUID());
     }
 
-    /*
+    //TODO createThreadFromMessage()
+    //TODO createThread()
+
+    /**
      * Create a guild channel.
      *
-     * @return PromiseInterface Resolves with a Channel model of same type provided.
-     *
-    public function createChannel(Channel $channel): PromiseInterface{ //TODO
+     * @param Overwrite[]     $permission_overwrites
+     * @param ForumTag[]|null $available_tags
+     * @return PromiseInterface Resolves with a Channel model.
+     */
+    public function createChannel(string $guild_id,
+                                  string $name,
+                                  ChannelType $type,
+                                  ?string $topic = null,
+                                  ?int $bitrate = null,
+                                  ?int $user_limit = null,
+                                  ?int $rate_limit_per_user = null,
+                                  ?int $position = null,
+                                  array $permission_overwrites = [],
+                                  ?string $parent_id = null,
+                                  ?bool $nsfw = null,
+                                  ?string $rtc_region = null,
+                                  ?VideoQualityMode $video_quality_mode = null,
+                                  ?array $available_tags = null,
+                                  ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        $pk = new RequestCreateChannel($channel);
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        if(strlen($name) < 1 || strlen($name) > 100){
+            return rejectPromise(new ApiRejection("Channel name must be between 1 and 100 characters."));
+        }
+        if(!$type->creatable()){
+            return rejectPromise(new ApiRejection("Channel type '{$type->name}' is not creatable."));
+        }
+        if($topic !== null){
+            if(!in_array($type, [ChannelType::GUILD_TEXT, ChannelType::GUILD_ANNOUNCEMENT, ChannelType::GUILD_FORUM, ChannelType::GUILD_MEDIA], true)){
+                return rejectPromise(new ApiRejection("Channel topic can only be set on Text, Announcement, Forum, Media channels."));
+            }
+            if(strlen($topic) > 1024){
+                return rejectPromise(new ApiRejection("Channel topic must be less than 1024 characters."));
+            }
+        }
+        if($bitrate !== null){
+            if(!in_array($type, [ChannelType::GUILD_VOICE, ChannelType::GUILD_STAGE_VOICE], true)){
+                return rejectPromise(new ApiRejection("Channel bitrate can only be set on Voice, Stage channels."));
+            }
+            if($bitrate < 8000){
+                return rejectPromise(new ApiRejection("Channel bitrate must be above 8000."));
+            }
+        }
+        if($user_limit !== null){
+            if(!in_array($type, [ChannelType::GUILD_VOICE, ChannelType::GUILD_STAGE_VOICE], true)){
+                return rejectPromise(new ApiRejection("Channel user limit can only be set on Voice, Stage channels."));
+            }
+            if($user_limit < 0){
+                return rejectPromise(new ApiRejection("Channel user limit must be positive."));
+            }
+        }
+        if($rate_limit_per_user !== null){
+            if(!in_array($type, [ChannelType::GUILD_TEXT, ChannelType::GUILD_VOICE, ChannelType::GUILD_STAGE_VOICE, ChannelType::GUILD_FORUM, ChannelType::GUILD_MEDIA], true)){
+                return rejectPromise(new ApiRejection("Channel rate limit can only be set on Text, Voice, Stage, Forum, Media channels."));
+            }
+            if($rate_limit_per_user < 0 || $rate_limit_per_user > 21600){
+                return rejectPromise(new ApiRejection("Channel rate limit must be between 0 and 21600."));
+            }
+        }
+        if($position !== null){
+            if($position < 0){
+                return rejectPromise(new ApiRejection("Channel position must be positive."));
+            }
+        }
+        foreach($permission_overwrites as $overwrite){
+            if(!($overwrite instanceof Overwrite)){
+                return rejectPromise(new ApiRejection("Permission overwrites must be an array of Overwrite models."));
+            }
+        }
+        if($parent_id !== null){
+            if(!in_array($type, [ChannelType::GUILD_TEXT, ChannelType::GUILD_VOICE, ChannelType::GUILD_ANNOUNCEMENT, ChannelType::GUILD_STAGE_VOICE, ChannelType::GUILD_FORUM, ChannelType::GUILD_MEDIA], true)){
+                return rejectPromise(new ApiRejection("Channel parent ID can only be set on Text, Voice, Announcement, Stage, Forum, Media channels."));
+            }
+            if(!Utils::validDiscordSnowflake($parent_id)){
+                return rejectPromise(new ApiRejection("Invalid parent ID '$parent_id'."));
+            }
+        }
+        if($nsfw !== null){
+            if(!in_array($type, [ChannelType::GUILD_TEXT, ChannelType::GUILD_VOICE, ChannelType::GUILD_ANNOUNCEMENT, ChannelType::GUILD_STAGE_VOICE, ChannelType::GUILD_FORUM], true)){
+                return rejectPromise(new ApiRejection("Channel NSFW can only be set on Text, Voice, Announcement, Stage, Forum channels."));
+            }
+        }
+        if($rtc_region !== null && !in_array($type, [ChannelType::GUILD_VOICE, ChannelType::GUILD_STAGE_VOICE], true)){
+            return rejectPromise(new ApiRejection("Channel RTC region can only be set on Voice, Stage channels."));
+        }
+        if($video_quality_mode !== null && !in_array($type, [ChannelType::GUILD_VOICE, ChannelType::GUILD_STAGE_VOICE], true)){
+            return rejectPromise(new ApiRejection("Channel video quality mode can only be set on Voice, Stage channels."));
+        }
+        if($available_tags !== null){
+            if(!in_array($type, [ChannelType::GUILD_FORUM, ChannelType::GUILD_MEDIA], true)){
+                return rejectPromise(new ApiRejection("Channel available tags can only be set on Forum, Media channels."));
+            }
+            foreach($available_tags as $tag){
+                if(!($tag instanceof ForumTag)){
+                    return rejectPromise(new ApiRejection("Available tags must be an array of ForumTag models."));
+                }
+            }
+        }
+        $pk = new RequestCreateChannel($guild_id, $name, $type, $topic, $bitrate, $user_limit, $rate_limit_per_user,
+            $position, $permission_overwrites, $parent_id, $nsfw, $rtc_region, $video_quality_mode, $available_tags, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
-    }*/
+    }
 
     /**
-     * Update a guild channel, ID Must be present.
+     * Update a channel.
      *
-     * Note, Pins can NOT be updated directly.
-     *
-     * @see Api::pinMessage()
-     * @see Api::unpinMessage()
-     *
-     * @return PromiseInterface Resolves with a Channel model of same type provided.
+     * @return PromiseInterface Resolves with an updated Channel model.
      */
     public function updateChannel(Channel $channel): PromiseInterface{
         if(!$this->ready){
