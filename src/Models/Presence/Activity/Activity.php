@@ -125,7 +125,7 @@ final class Activity implements BinarySerializable{
     private array $buttons;
 
     /**
-     * The only parameters required (and allowed) to be set on creation for bot activity. TODO Check custom
+     * The only parameters required (and allowed) to be set on creation for bot activity.
      *
      * @see Api::updateBotPresence()
      */

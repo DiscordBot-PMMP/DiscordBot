@@ -46,8 +46,6 @@ class Invite implements BinarySerializable{
     /** The expiration date of this invite. (UNIX Timestamp) */
     private ?int $expires_at;
 
-    //TODO decide on objects: target_application, stage_instance, guild_scheduled_event
-
     public function __construct(?string $code, ?string $guild_id, string $channel_id, ?string $inviter,
                                 ?InviteTargetType $target_type, ?string $target_user, ?int $expires_at){
         $this->setCode($code);
@@ -149,7 +147,7 @@ class Invite implements BinarySerializable{
             $stream->getNullableString(),                               // inviter
             InviteTargetType::tryFrom($stream->getNullableByte() ?? -1),// target_type
             $stream->getNullableString(),                               // target_user
-            $stream->getNullableLong(),                                  // expires_at
+            $stream->getNullableLong()                                  // expires_at
         );
     }
 }

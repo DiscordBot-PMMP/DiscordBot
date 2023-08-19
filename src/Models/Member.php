@@ -18,9 +18,6 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Plugin\Utils;
-use function array_keys;
-use function in_array;
-use function sizeof;
 
 /**
  * @implements BinarySerializable<Member>
@@ -75,13 +72,7 @@ class Member implements BinarySerializable{
      * guild member flags represented as a bit set, defaults to 0
      * @see Member::FLAGS
      */
-    private int $flags_bitwise;
-
-    /**
-     * All the flags possible and their current state.
-     * @var array<string, bool>
-     */
-    private array $flags = [];
+    private int $flags;
 
     /** Whether the user has not yet passed the guild's Membership Screening requirements */
     private ?bool $pending;
@@ -114,7 +105,7 @@ class Member implements BinarySerializable{
         $this->setPremiumSince($premium_since);
         $this->setDeaf($deaf);
         $this->setMute($mute);
-        $this->setFlagsBitwise($flags, false);
+        $this->setFlags($flags);
         $this->setPending($pending);
         $this->setPermissions($permissions);
         $this->setCommunicationsDisabledUntil($communications_disabled_until);
@@ -210,47 +201,12 @@ class Member implements BinarySerializable{
         $this->mute = $mute;
     }
 
-    public function getFlagsBitwise(): int{
-        return $this->flags_bitwise;
-    }
-
-    public function setFlagsBitwise(int $flags_bitwise, bool $recalculate = true): void{
-        $this->flags_bitwise = $flags_bitwise;
-        if($recalculate){
-            $this->recalculateFlags();
-        }
-    }
-
-    /**
-     * Returns all the flags possible and their current state.
-     * @return array<string, bool>
-     */
-    public function getFlags(): array{
-        if(sizeof($this->flags) === 0){
-            $this->recalculateFlags();
-        }
+    public function getFlags(): int{
         return $this->flags;
     }
 
-    /** Get the state of a specific flag, null if not set. */
-    public function getFlag(int $flags): ?bool{
-        if(sizeof($this->flags) === 0){
-            $this->recalculateFlags();
-        }
-        return $this->flags[$flags] ?? null;
-    }
-
-    /** Set the state of a specific flag */
-    public function setFlag(int $flag, bool $state): void{
-        if(sizeof($this->flags) === 0){
-            $this->recalculateFlags();
-        }
-        if(!in_array($flag, array_keys(self::FLAGS), true)){
-            throw new \AssertionError("Flag '$flag' is invalid.");
-        }
-        if($this->flags[$flag] === $state) return;
-        $this->flags[$flag] = $state;
-        $this->flags_bitwise ^= self::FLAGS[$flag];
+    public function setFlags(int $flags): void{
+        $this->flags = $flags;
     }
 
     public function getPending(): ?bool{
@@ -285,17 +241,6 @@ class Member implements BinarySerializable{
         $this->presence = $presence;
     }
 
-    /**
-     * Recalculate the flags from the bitwise value.
-     * @internal
-     */
-    private function recalculateFlags(): void{
-        $this->flags = [];
-        foreach(self::FLAGS as $flag => $bitwise){
-            $this->flags[$flag] = ($this->flags_bitwise & $bitwise) === $bitwise;
-        }
-    }
-
     //----- Serialization -----//
 
     public function binarySerialize(): BinaryStream{
@@ -309,7 +254,7 @@ class Member implements BinarySerializable{
         $stream->putNullableLong($this->premium_since);
         $stream->putBool($this->deaf);
         $stream->putBool($this->mute);
-        $stream->putInt($this->flags_bitwise);
+        $stream->putInt($this->flags);
         $stream->putNullableBool($this->pending);
         $stream->putSerializable($this->permissions);
         $stream->putNullableLong($this->communications_disabled_until);
@@ -328,7 +273,7 @@ class Member implements BinarySerializable{
             $stream->getNullableLong(),     // premium_since
             $stream->getBool(),             // deaf
             $stream->getBool(),             // mute
-            $stream->getInt(),              // flags_bitwise
+            $stream->getInt(),              // flags
             $stream->getNullableBool(),     // pending
             $stream->getSerializable(RolePermissions::class),
             $stream->getNullableLong(),     // communications_disabled_until

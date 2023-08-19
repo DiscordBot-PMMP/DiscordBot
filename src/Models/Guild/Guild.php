@@ -430,12 +430,10 @@ class Guild implements BinarySerializable{
     }
 
     public function getSystemChannelFlags(): int{
-        //TODO Decide on this
         return $this->system_channel_flags;
     }
 
     public function setSystemChannelFlags(int $system_channel_flags): void{
-        //TODO Decide on this
         $this->system_channel_flags = $system_channel_flags;
     }
 
