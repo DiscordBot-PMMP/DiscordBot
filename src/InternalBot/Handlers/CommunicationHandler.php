@@ -642,14 +642,18 @@ class CommunicationHandler{
         $this->getGuild($pk, $pk->getChannel()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->channels->fetch($pk->getChannel()->getId())->then(function(DiscordChannel $dc) use($guild, $pk){
                 $channel = $pk->getChannel();
+                /** @phpstan-ignore-next-line undefined property $dc->name */
                 $dc->name = $channel->getName();
                 $dc->position = $channel->getPosition();
+                /** @phpstan-ignore-next-line undefined property $dc->topic */
                 $dc->topic = $channel->getTopic();
                 $dc->nsfw = $channel->getNsfw();
                 $dc->rate_limit_per_user = $channel->getRateLimitPerUser();
                 $dc->bitrate = $channel->getBitrate();
                 $dc->user_limit = $channel->getUserLimit();
+                /** @phpstan-ignore-next-line undefined property $dc->parent_id */
                 $dc->parent_id = $channel->getParentId();
+                /** @phpstan-ignore-next-line undefined property $dc->rtc_region */
                 $dc->rtc_region = $channel->getRtcRegion();
                 $dc->video_quality_mode = $channel->getVideoQualityMode()?->value;
                 $dc->flags = $channel->getFlags();
