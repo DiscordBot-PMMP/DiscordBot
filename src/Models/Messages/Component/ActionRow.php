@@ -86,6 +86,7 @@ class ActionRow extends Component{
             case ComponentType::STRING_SELECT:
             case ComponentType::USER_SELECT:
             case ComponentType::ROLE_SELECT:
+            case ComponentType::CHANNEL_SELECT:
             case ComponentType::MENTIONABLE_SELECT:
                 $stream->setOffset($stream->getOffset() - 1);
                 return SelectMenu::fromBinary($stream);
