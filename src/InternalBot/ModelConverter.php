@@ -105,8 +105,10 @@ use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\RoleTags;
+use JaxkDev\DiscordBot\Models\Sticker;
 use JaxkDev\DiscordBot\Models\StickerFormatType;
 use JaxkDev\DiscordBot\Models\StickerPartial;
+use JaxkDev\DiscordBot\Models\StickerType;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\UserPremiumType;
 use JaxkDev\DiscordBot\Models\VoiceState;
@@ -114,6 +116,7 @@ use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\WebhookType;
 use function array_map;
 use function array_values;
+use function implode;
 
 abstract class ModelConverter{
 
@@ -323,25 +326,27 @@ abstract class ModelConverter{
         foreach($discordGuild->emojis as $emoji){
             $emojis[] = self::genModelEmoji($emoji);
         }
-
         $features = [];
         foreach($discordGuild->features as $feature){
             $features[] = $feature;
         }
-
+        $stickers = [];
+        foreach($discordGuild->stickers as $sticker){
+            $stickers[] = self::genModelSticker($sticker);
+        }
         return new Guild($discordGuild->id, $discordGuild->name, $discordGuild->icon_hash/** @phpstan-ignore-line */,
             $discordGuild->splash_hash/** @phpstan-ignore-line */, $discordGuild->discovery_splash, $discordGuild->owner_id,
             $discordGuild->afk_channel_id, $discordGuild->afk_timeout, $discordGuild->widget_enabled,
             $discordGuild->widget_channel_id ?? null, VerificationLevel::from($discordGuild->verification_level),
             DefaultMessageNotificationLevel::from($discordGuild->default_message_notifications),
-            ExplicitContentFilterLevel::from($discordGuild->explicit_content_filter),
-            $emojis, $features, MfaLevel::from($discordGuild->mfa_level), $discordGuild->application_id,
-            $discordGuild->system_channel_id, $discordGuild->system_channel_flags, $discordGuild->rules_channel_id,
-            $discordGuild->max_presences, $discordGuild->max_members, $discordGuild->vanity_url_code,
-            $discordGuild->description, $discordGuild->banner, PremiumTier::from($discordGuild->premium_tier),
+            ExplicitContentFilterLevel::from($discordGuild->explicit_content_filter), $emojis, $features,
+            MfaLevel::from($discordGuild->mfa_level), $discordGuild->application_id, $discordGuild->system_channel_id,
+            $discordGuild->system_channel_flags, $discordGuild->rules_channel_id, $discordGuild->max_presences,
+            $discordGuild->max_members, $discordGuild->vanity_url_code, $discordGuild->description,
+            $discordGuild->banner, PremiumTier::from($discordGuild->premium_tier),
             $discordGuild->premium_subscription_count, $discordGuild->preferred_locale,
             $discordGuild->public_updates_channel_id, $discordGuild->max_video_channel_users,
-            $discordGuild->max_stage_video_channel_users, NsfwLevel::from($discordGuild->nsfw_level),
+            $discordGuild->max_stage_video_channel_users, NsfwLevel::from($discordGuild->nsfw_level), $stickers,
             $discordGuild->premium_progress_bar_enabled, $discordGuild->safety_alerts_channel_id);
     }
 
@@ -411,7 +416,7 @@ abstract class ModelConverter{
         }
         $stickers = [];
         foreach(($discordMessage->sticker_items ?? []) as $sticker){
-            $stickers[] = self::genModelSticker($sticker);
+            $stickers[] = self::genModelStickerPartial($sticker);
         }
         $mentions = [];
         foreach($discordMessage->mentions as $user){
@@ -511,7 +516,13 @@ abstract class ModelConverter{
         }
     }
 
-    static public function genModelSticker(DiscordSticker $sticker): StickerPartial{
+    static public function genModelSticker(DiscordSticker $sticker): Sticker{
+        return new Sticker($sticker->id, $sticker->pack_id ?? null, $sticker->name, $sticker->description ?? null,
+            implode(", ", $sticker->tags), StickerType::from($sticker->type), StickerFormatType::from($sticker->format_type),
+            $sticker->available ?? null, $sticker->guild_id ?? null, $sticker->user?->id, $sticker->sort_value ?? null);
+    }
+
+    static public function genModelStickerPartial(DiscordSticker $sticker): StickerPartial{
         return new StickerPartial($sticker->id, $sticker->name, StickerFormatType::from($sticker->format_type));
     }
 

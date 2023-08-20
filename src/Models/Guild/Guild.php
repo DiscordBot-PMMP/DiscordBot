@@ -16,6 +16,7 @@ namespace JaxkDev\DiscordBot\Models\Guild;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Emoji;
+use JaxkDev\DiscordBot\Models\Sticker;
 use JaxkDev\DiscordBot\Plugin\Utils;
 use function in_array;
 
@@ -180,7 +181,7 @@ class Guild implements BinarySerializable{
      * Custom guild stickers
      * @var Sticker[]
      */
-    //private array $stickers; TODO Sticker packs etc
+    private ?array $stickers;
 
     /** Whether the guild has the boost progress bar enabled */
     private bool $premium_progress_bar_enabled;
@@ -190,7 +191,11 @@ class Guild implements BinarySerializable{
 
     //No create method. This is a read-update-only object, guilds cannot be created by my API.
 
-    //Only ModelConverter should create this object, so we don't need to pad it out with defaults and make it look nice.
+    /**
+     * @param Emoji[]        $emojis
+     * @param string[]       $features
+     * @param Sticker[]|null $stickers
+     */
     public function __construct(string $id, string $name, ?string $icon, ?string $splash, ?string $discovery_splash,
                                 ?string $owner_id, ?string $afk_channel_id, int $afk_timeout, ?bool $widget_enabled, ?string $widget_channel_id,
                                 VerificationLevel $verification_level, DefaultMessageNotificationLevel $default_message_notifications,
@@ -199,7 +204,7 @@ class Guild implements BinarySerializable{
                                 ?int $max_presences, ?int $max_members, ?string $vanity_url_code, ?string $description, ?string $banner,
                                 PremiumTier $premium_tier, ?int $premium_subscription_count, string $preferred_locale,
                                 ?string $public_updates_channel_id, ?int $max_video_channel_users, ?int $max_stage_video_channel_users,
-                                NsfwLevel $nsfw_level, /*array $stickers,*/ bool $premium_progress_bar_enabled, ?string $safety_alerts_channel_id
+                                NsfwLevel $nsfw_level, ?array $stickers, bool $premium_progress_bar_enabled, ?string $safety_alerts_channel_id
     ){
         $this->setId($id);
         $this->setName($name);
@@ -233,7 +238,7 @@ class Guild implements BinarySerializable{
         $this->setMaxVideoChannelUsers($max_video_channel_users);
         $this->setMaxStageVideoChannelUsers($max_stage_video_channel_users);
         $this->setNsfwLevel($nsfw_level);
-        //$this->setStickers($stickers);
+        $this->setStickers($stickers);
         $this->setPremiumProgressBarEnabled($premium_progress_bar_enabled);
         $this->setSafetyAlertsChannelId($safety_alerts_channel_id);
     }
@@ -566,6 +571,23 @@ class Guild implements BinarySerializable{
         $this->nsfw_level = $nsfw_level;
     }
 
+    /** @return Sticker[]|null */
+    public function getStickers(): ?array{
+        return $this->stickers;
+    }
+
+    /** @param Sticker[]|null $stickers */
+    public function setStickers(?array $stickers): void{
+        if($stickers !== null){
+            foreach($stickers as $sticker){
+                if(!($sticker instanceof Sticker)){
+                    throw new \TypeError("All stickers must be instances of Sticker.");
+                }
+            }
+        }
+        $this->stickers = $stickers;
+    }
+
     public function getPremiumProgressBarEnabled(): bool{
         return $this->premium_progress_bar_enabled;
     }
@@ -621,6 +643,7 @@ class Guild implements BinarySerializable{
         $stream->putNullableInt($this->max_video_channel_users);
         $stream->putNullableInt($this->max_stage_video_channel_users);
         $stream->putByte($this->nsfw_level->value);
+        $stream->putNullableSerializableArray($this->stickers);
         $stream->putBool($this->premium_progress_bar_enabled);
         $stream->putNullableString($this->safety_alerts_channel_id);
         return $stream;
@@ -660,6 +683,7 @@ class Guild implements BinarySerializable{
             $stream->getNullableInt(),      // max_video_channel_users
             $stream->getNullableInt(),      // max_stage_video_channel_users
             NsfwLevel::from($stream->getByte()),
+            $stream->getNullableSerializableArray(Sticker::class),
             $stream->getBool(),             // premium_progress_bar_enabled
             $stream->getNullableString()    // safety_alerts_channel_id
         );
