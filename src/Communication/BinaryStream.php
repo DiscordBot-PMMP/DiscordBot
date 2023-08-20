@@ -18,6 +18,14 @@ use function strlen;
 
 class BinaryStream extends \pocketmine\utils\BinaryStream{
 
+    /** @return null (PHP 8.2 can be :null)*/
+    public function getNull(){
+        if($this->getBool()){
+            throw new \AssertionError("Expected null, got non-null.");
+        }
+        return null;
+    }
+
     public function putString(string $value): void{
         $this->putInt(strlen($value));
         $this->put($value);
@@ -255,5 +263,55 @@ class BinaryStream extends \pocketmine\utils\BinaryStream{
         }else{
             return null;
         }
+    }
+
+    /** @param array<string, string>|null $locales */
+    public function putNullableLocalizationDictionary(?array $locales): void{
+        $this->putBool($locales !== null);
+        if($locales !== null){
+            $this->putInt(sizeof($locales));
+            foreach($locales as $locale => $value){
+                $this->putString($locale);
+                $this->putString($value);
+            }
+        }
+    }
+
+    /** @return array<string, string>|null */
+    public function getNullableLocalizationDictionary(): ?array{
+        if(!$this->getBool()){
+            return null;
+        }
+        $array = [];
+        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
+            $key = $this->getString();
+            $value = $this->getString();
+            $array[$key] = $value;
+        }
+        return $array;
+    }
+
+    public function putNullableDouble(?float $value): void{
+        $this->putBool($value !== null);
+        if($value !== null){
+            $this->putDouble($value);
+        }
+    }
+
+    public function getNullableDouble(): ?float{
+        return $this->getBool() ? $this->getDouble() : null;
+    }
+
+    /** @param int[]|null $values */
+    public function putNullableByteArray(?array $values): void{
+        $this->putBool($values !== null);
+        if($values !== null){
+            $this->putByteArray($values);
+        }
+    }
+
+    /** @return int[]|null */
+    public function getNullableByteArray(): ?array{
+        return $this->getBool() ? $this->getByteArray() : null;
     }
 }
