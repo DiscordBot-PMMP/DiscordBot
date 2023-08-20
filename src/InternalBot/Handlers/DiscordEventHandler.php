@@ -29,6 +29,7 @@ use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
 use Discord\Parts\WebSockets\PresenceUpdate as DiscordPresenceUpdate;
 use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
+use Discord\WebSockets\Event as DiscordEvent;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanCreate as BanAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanDelete as BanRemovePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate as ChannelCreatePacket;
@@ -77,51 +78,52 @@ class DiscordEventHandler{
 
     public function registerEvents(): void{
         $discord = $this->client->getDiscordClient();
-        $discord->on("MESSAGE_CREATE", [$this, "onMessageCreate"]);
-        $discord->on("MESSAGE_UPDATE", [$this, "onMessageUpdate"]);  //AKA Edit
-        $discord->on("MESSAGE_DELETE", [$this, "onMessageDelete"]);
-        //$discord->on("MESSAGE_DELETE_BULK", [$this, "onMessageDeleteBulk"]); //todo
+        $discord->on(DiscordEvent::MESSAGE_CREATE, [$this, "onMessageCreate"]);
+        $discord->on(DiscordEvent::MESSAGE_UPDATE, [$this, "onMessageUpdate"]);  //AKA Edit
+        $discord->on(DiscordEvent::MESSAGE_DELETE, [$this, "onMessageDelete"]);
+        //$discord->on(DiscordEvent::MESSAGE_DELETE_BULK, [$this, "onMessageDeleteBulk"]); //todo
 
-        $discord->on("THREAD_CREATE", [$this, "onChannelCreate"]);
-        $discord->on("THREAD_UPDATE", [$this, "onChannelUpdate"]);
-        $discord->on("THREAD_DELETE", [$this, "onChannelDelete"]);
+        $discord->on(DiscordEvent::GUILD_MEMBER_ADD, [$this, "onMemberJoin"]);
+        $discord->on(DiscordEvent::GUILD_MEMBER_REMOVE, [$this, "onMemberLeave"]);
+        $discord->on(DiscordEvent::GUILD_MEMBER_UPDATE, [$this, "onMemberUpdate"]);   //Includes Roles,nickname etc
 
-        $discord->on("GUILD_MEMBER_ADD", [$this, "onMemberJoin"]);
-        $discord->on("GUILD_MEMBER_REMOVE", [$this, "onMemberLeave"]);
-        $discord->on("GUILD_MEMBER_UPDATE", [$this, "onMemberUpdate"]);   //Includes Roles,nickname etc
+        $discord->on(DiscordEvent::GUILD_CREATE, [$this, "onGuildJoin"]);
+        $discord->on(DiscordEvent::GUILD_UPDATE, [$this, "onGuildUpdate"]);
+        $discord->on(DiscordEvent::GUILD_DELETE, [$this, "onGuildLeave"]);
 
-        $discord->on("GUILD_CREATE", [$this, "onGuildJoin"]);
-        $discord->on("GUILD_UPDATE", [$this, "onGuildUpdate"]);
-        $discord->on("GUILD_DELETE", [$this, "onGuildLeave"]);
+        $discord->on(DiscordEvent::CHANNEL_CREATE, [$this, "onChannelCreate"]);
+        $discord->on(DiscordEvent::CHANNEL_UPDATE, [$this, "onChannelUpdate"]);
+        $discord->on(DiscordEvent::CHANNEL_DELETE, [$this, "onChannelDelete"]);
+        $discord->on(DiscordEvent::CHANNEL_PINS_UPDATE, [$this, "onChannelPinsUpdate"]);
 
-        $discord->on("CHANNEL_CREATE", [$this, "onChannelCreate"]);
-        $discord->on("CHANNEL_UPDATE", [$this, "onChannelUpdate"]);
-        $discord->on("CHANNEL_DELETE", [$this, "onChannelDelete"]);
-        $discord->on("CHANNEL_PINS_UPDATE", [$this, "onChannelPinsUpdate"]);
+        $discord->on(DiscordEvent::THREAD_CREATE, [$this, "onChannelCreate"]); //todo
+        $discord->on(DiscordEvent::THREAD_UPDATE, [$this, "onChannelUpdate"]); //todo
+        $discord->on(DiscordEvent::THREAD_DELETE, [$this, "onChannelDelete"]); //todo
 
-        $discord->on("GUILD_ROLE_CREATE", [$this, "onRoleCreate"]);
-        $discord->on("GUILD_ROLE_UPDATE", [$this, "onRoleUpdate"]);
-        $discord->on("GUILD_ROLE_DELETE", [$this, "onRoleDelete"]);
+        $discord->on(DiscordEvent::GUILD_ROLE_CREATE, [$this, "onRoleCreate"]);
+        $discord->on(DiscordEvent::GUILD_ROLE_UPDATE, [$this, "onRoleUpdate"]);
+        $discord->on(DiscordEvent::GUILD_ROLE_DELETE, [$this, "onRoleDelete"]);
 
-        $discord->on("INVITE_CREATE", [$this, "onInviteCreate"]);
-        $discord->on("INVITE_DELETE", [$this, "onInviteDelete"]);
+        $discord->on(DiscordEvent::INVITE_CREATE, [$this, "onInviteCreate"]);
+        $discord->on(DiscordEvent::INVITE_DELETE, [$this, "onInviteDelete"]);
 
-        //$discord->on("GUILD_AUDIT_LOG_ENTRY_CREATE", [$this, "onAuditLogEntryCreate"]); //todo
+        //$discord->on(DiscordEvent::GUILD_AUDIT_LOG_ENTRY_CREATE, [$this, "onAuditLogEntryCreate"]); //todo
 
-        $discord->on("GUILD_BAN_ADD", [$this, "onBanAdd"]);
-        $discord->on("GUILD_BAN_REMOVE", [$this, "onBanRemove"]);
+        $discord->on(DiscordEvent::GUILD_BAN_ADD, [$this, "onBanAdd"]);
+        $discord->on(DiscordEvent::GUILD_BAN_REMOVE, [$this, "onBanRemove"]);
 
-        $discord->on("MESSAGE_REACTION_ADD", [$this, "onMessageReactionAdd"]);
-        $discord->on("MESSAGE_REACTION_REMOVE", [$this, "onMessageReactionRemove"]);
-        $discord->on("MESSAGE_REACTION_REMOVE_ALL", [$this, "onMessageReactionRemoveAll"]);
-        $discord->on("MESSAGE_REACTION_REMOVE_EMOJI", [$this, "onMessageReactionRemoveEmoji"]);
+        $discord->on(DiscordEvent::MESSAGE_REACTION_ADD, [$this, "onMessageReactionAdd"]);
+        $discord->on(DiscordEvent::MESSAGE_REACTION_REMOVE, [$this, "onMessageReactionRemove"]);
+        $discord->on(DiscordEvent::MESSAGE_REACTION_REMOVE_ALL, [$this, "onMessageReactionRemoveAll"]);
+        $discord->on(DiscordEvent::MESSAGE_REACTION_REMOVE_EMOJI, [$this, "onMessageReactionRemoveEmoji"]);
 
-        $discord->on("PRESENCE_UPDATE", [$this, "onPresenceUpdate"]);
-        $discord->on("VOICE_STATE_UPDATE", [$this, "onVoiceStateUpdate"]);
+        $discord->on(DiscordEvent::PRESENCE_UPDATE, [$this, "onPresenceUpdate"]);
+        $discord->on(DiscordEvent::VOICE_STATE_UPDATE, [$this, "onVoiceStateUpdate"]);
+        //$discord->on(DiscordEvent::WEBHOOKS_UPDATE, [$this, "onWebhooksUpdate"]); //todo
 
-        //$discord->on("WEBHOOKS_UPDATE", [$this, "onWebhooksUpdate"]); //todo
+        //$discord->on(DiscordEvent::INTERACTION_CREATE, [$this, "onInteractionCreate"]); //todo
 
-        //$discord->on("USER_UPDATE", [$this, "onUserUpdate"]); //todo //Bot User details has changed, eg username updated from dashboard panel.
+        //$discord->on(DiscordEvent::USER_UPDATE, [$this, "onUserUpdate"]); //todo //Bot User details has changed, eg username updated from dashboard panel.
     }
 
     public function onReady(): void{
