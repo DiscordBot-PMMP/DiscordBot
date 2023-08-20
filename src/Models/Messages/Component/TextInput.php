@@ -21,6 +21,8 @@ use function strlen;
  */
 class TextInput extends Component{
 
+    public const SERIALIZE_ID = 17;
+
     /** Max 100 characters. */
     private string $custom_id;
 

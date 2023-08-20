@@ -24,6 +24,8 @@ use function strlen;
  */
 class SelectMenu extends Component{
 
+    public const SERIALIZE_ID = 16;
+
     /** Max 100 characters. */
     private string $custom_id;
 

@@ -22,6 +22,8 @@ use function strlen;
  */
 class Button extends Component{
 
+    public const SERIALIZE_ID = 15;
+
     private ButtonStyle $style;
 
     /** Max 80 characters. */

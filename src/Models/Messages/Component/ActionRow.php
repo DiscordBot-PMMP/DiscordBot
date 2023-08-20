@@ -21,6 +21,8 @@ use function count;
  */
 class ActionRow extends Component{
 
+    public const SERIALIZE_ID = 14;
+
     /** @var Button[]|SelectMenu[]|TextInput[] Max 5 buttons or 1 select menu or 1 text input. */
     public array $components = [];
 

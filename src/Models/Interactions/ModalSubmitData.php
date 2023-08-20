@@ -15,7 +15,9 @@ namespace JaxkDev\DiscordBot\Models\Interactions;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
+use JaxkDev\DiscordBot\Communication\NetworkApi;
 use JaxkDev\DiscordBot\Models\Messages\Component\Component;
+use function sizeof;
 
 /**
  * @implements BinarySerializable<ModalSubmitData>
@@ -57,13 +59,29 @@ class ModalSubmitData implements BinarySerializable{
     }
 
     public function binarySerialize(): BinaryStream{
-        // TODO: Implement binarySerialize() method.
-        // We don't know the exact components coming/going, need to SERIALIZE_ID & map them :(
-        return new BinaryStream();
+        $stream = new BinaryStream();
+        $stream->putString($this->custom_id);
+        $stream->putInt(sizeof($this->components));
+        foreach($this->components as $component){
+            $stream->putShort($component::SERIALIZE_ID);
+            $stream->put($component->binarySerialize()->getBuffer());
+        }
+        return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        // TODO: Implement fromBinary() method.
-        return new self("", []);
+        $custom_id = $stream->getString();
+        $components = [];
+        for($i = 0, $count = $stream->getInt(); $i < $count; $i++){
+            $modelID = $stream->getShort();
+            $modelClass = NetworkApi::getModelClass($modelID);
+            if($modelClass === null){
+                throw new \AssertionError("Invalid model ID '{$modelID}'");
+            }
+            /** @var Component $t */
+            $t = $stream->getSerializable($modelClass);
+            $components[] = $t;
+        }
+        return new self($custom_id, $components);
     }
 }

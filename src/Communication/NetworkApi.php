@@ -96,6 +96,10 @@ use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Guild\Guild;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
+use JaxkDev\DiscordBot\Models\Messages\Component\Button;
+use JaxkDev\DiscordBot\Models\Messages\Component\SelectMenu;
+use JaxkDev\DiscordBot\Models\Messages\Component\TextInput;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
@@ -206,7 +210,7 @@ class NetworkApi{
 
     /** @var array<int, class-string<BinarySerializable<mixed>>>  */
     public const MODELS_MAP = [
-        //1-13
+        //1-17
         Guild::SERIALIZE_ID => Guild::class,
         Activity::SERIALIZE_ID => Activity::class,
         Presence::SERIALIZE_ID => Presence::class,
@@ -219,9 +223,13 @@ class NetworkApi{
         VoiceState::SERIALIZE_ID => VoiceState::class,
         Webhook::SERIALIZE_ID => Webhook::class,
         Message::SERIALIZE_ID => Message::class,
-        Channel::SERIALIZE_ID => Channel::class
+        Channel::SERIALIZE_ID => Channel::class,
+        ActionRow::SERIALIZE_ID => ActionRow::class,
+        Button::SERIALIZE_ID => Button::class,
+        SelectMenu::SERIALIZE_ID => SelectMenu::class,
+        TextInput::SERIALIZE_ID => TextInput::class,
 
-        //14 Next ID
+        //18 Next ID
     ];
 
     /**
