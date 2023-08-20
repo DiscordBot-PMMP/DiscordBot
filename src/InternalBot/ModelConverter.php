@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\InternalBot;
 
 use AssertionError;
 use Carbon\Carbon;
+use Discord\InteractionType as DiscordInteractionType;
 use Discord\Parts\Channel\Attachment as DiscordAttachment;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Forum\Tag as DiscordTag;
@@ -34,7 +35,9 @@ use Discord\Parts\Guild\Emoji as DiscordEmoji;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\Guild\Sticker as DiscordSticker;
+use Discord\Parts\Interactions\Interaction as DiscordInteraction;
 use Discord\Parts\Interactions\Request\Component as DiscordComponent;
+use Discord\Parts\Interactions\Request\InteractionData;
 use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
 use Discord\Parts\Thread\Thread as DiscordThread;
 use Discord\Parts\User\Activity as DiscordActivity;
@@ -57,6 +60,11 @@ use JaxkDev\DiscordBot\Models\Guild\MfaLevel;
 use JaxkDev\DiscordBot\Models\Guild\NsfwLevel;
 use JaxkDev\DiscordBot\Models\Guild\PremiumTier;
 use JaxkDev\DiscordBot\Models\Guild\VerificationLevel;
+use JaxkDev\DiscordBot\Models\Interactions\ApplicationCommandData;
+use JaxkDev\DiscordBot\Models\Interactions\Interaction;
+use JaxkDev\DiscordBot\Models\Interactions\InteractionType;
+use JaxkDev\DiscordBot\Models\Interactions\MessageComponentData;
+use JaxkDev\DiscordBot\Models\Interactions\ModalSubmitData;
 use JaxkDev\DiscordBot\Models\Invite;
 use JaxkDev\DiscordBot\Models\InviteTargetType;
 use JaxkDev\DiscordBot\Models\Member;
@@ -66,6 +74,7 @@ use JaxkDev\DiscordBot\Models\Messages\Attachment;
 use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
 use JaxkDev\DiscordBot\Models\Messages\Component\Button;
 use JaxkDev\DiscordBot\Models\Messages\Component\ButtonStyle;
+use JaxkDev\DiscordBot\Models\Messages\Component\Component;
 use JaxkDev\DiscordBot\Models\Messages\Component\ComponentType;
 use JaxkDev\DiscordBot\Models\Messages\Component\SelectMenu;
 use JaxkDev\DiscordBot\Models\Messages\Component\SelectOption;
@@ -103,6 +112,63 @@ use function array_map;
 use function array_values;
 
 abstract class ModelConverter{
+
+    static public function genModelInteraction(DiscordInteraction $interaction): Interaction{
+        if($interaction->data === null){
+            $data = null;
+        }elseif($interaction->type === DiscordInteractionType::APPLICATION_COMMAND || $interaction->type === DiscordInteractionType::APPLICATION_COMMAND_AUTOCOMPLETE){
+            $data = self::genModelApplicationCommandData($interaction->data);
+        }elseif($interaction->type === DiscordInteractionType::MESSAGE_COMPONENT){
+            $data = self::genModelMessageComponentData($interaction->data);
+        }elseif($interaction->type === DiscordInteractionType::MODAL_SUBMIT){
+            $data = self::genModelModalSubmitData($interaction->data);
+        }else{
+            throw new AssertionError("Unknown interaction type {$interaction->type} with data.");
+        }
+
+        return new Interaction($interaction->id, $interaction->application_id, InteractionType::from($interaction->type),
+            $data, $interaction->guild_id ?? null, $interaction->channel_id ?? null,
+            $interaction->user?->id ?? $interaction->member?->id, $interaction->token, $interaction->version,
+            ($interaction->message ?? null) === null ? null : self::genModelMessage($interaction->message),
+            ($interaction->app_permissions ?? null) === null ? null : new ChannelPermissions((int)$interaction->app_permissions->bitwise),
+            $interaction->locale ?? null, $interaction->guild_locale ?? null);
+    }
+
+    static public function genModelApplicationCommandData(InteractionData $data): ApplicationCommandData{
+        return new ApplicationCommandData();//todo $data->id, $data->name, convert options);
+    }
+
+    static public function genModelMessageComponentData(InteractionData $data): MessageComponentData{
+        if($data->custom_id === null){
+            throw new AssertionError("Custom id is null for message component data.");
+        }
+        if($data->component_type === null){
+            throw new AssertionError("Component type is null for message component data.");
+        }
+        return new MessageComponentData($data->custom_id, ComponentType::from($data->component_type), $data->values);
+    }
+
+    static public function genModelModalSubmitData(InteractionData $data): ModalSubmitData{
+        if($data->custom_id === null){
+            throw new AssertionError("Custom id is null for modal submit data.");
+        }
+        if($data->components === null){
+            throw new AssertionError("Components is null for modal submit data.");
+        }
+        return new ModalSubmitData($data->custom_id, self::genModelComponents($data->components->toArray()));
+    }
+
+    /**
+     * @param DiscordComponent[] $components
+     * @return Component[]
+     */
+    static public function genModelComponents(array $components): array{
+        $out = [];
+        foreach($components as $component){
+            $out[] = self::genModelComponent($component);
+        }
+        return $out;
+    }
 
     static public function genModelVoiceState(DiscordVoiceStateUpdate $stateUpdate): VoiceState{
         return new VoiceState($stateUpdate->guild_id, $stateUpdate->channel_id ?? null, $stateUpdate->user_id,

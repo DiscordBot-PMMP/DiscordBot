@@ -23,6 +23,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordConnected;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\InteractionReceived;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberJoin;
@@ -122,7 +123,7 @@ class NetworkApi{
         Connect::SERIALIZE_ID => Connect::class,
         Disconnect::SERIALIZE_ID => Disconnect::class,
 
-        //5-31 Discord->PMMP Packets
+        //5-32 Discord->PMMP Packets
         DiscordConnected::SERIALIZE_ID => DiscordConnected::class,
         BanCreate::SERIALIZE_ID => BanCreate::class,
         BanDelete::SERIALIZE_ID => BanDelete::class,
@@ -150,7 +151,8 @@ class NetworkApi{
         RoleDelete::SERIALIZE_ID => RoleDelete::class,
         RoleUpdate::SERIALIZE_ID => RoleUpdate::class,
         VoiceStateUpdate::SERIALIZE_ID => VoiceStateUpdate::class,
-        //Reserved 31-39
+        InteractionReceived::SERIALIZE_ID => InteractionReceived::class,
+        //Reserved 33-39
 
         //40-83 PMMP->Discord Packets
         RequestAddReaction::SERIALIZE_ID => RequestAddReaction::class,

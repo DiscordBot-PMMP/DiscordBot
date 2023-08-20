@@ -24,6 +24,7 @@ use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Guild\Ban as DiscordBan;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Role as DiscordRole;
+use Discord\Parts\Interactions\Interaction as DiscordInteraction;
 use Discord\Parts\Thread\Thread as DiscordThread;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
@@ -40,6 +41,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordConnected as Discord
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\InteractionReceived;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteCreate as InviteCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteDelete as InviteDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberJoin as MemberJoinPacket;
@@ -121,7 +123,7 @@ class DiscordEventHandler{
         $discord->on(DiscordEvent::VOICE_STATE_UPDATE, [$this, "onVoiceStateUpdate"]);
         //$discord->on(DiscordEvent::WEBHOOKS_UPDATE, [$this, "onWebhooksUpdate"]); //todo
 
-        //$discord->on(DiscordEvent::INTERACTION_CREATE, [$this, "onInteractionCreate"]); //todo
+        $discord->on(DiscordEvent::INTERACTION_CREATE, [$this, "onInteractionCreate"]); //todo
 
         //$discord->on(DiscordEvent::USER_UPDATE, [$this, "onUserUpdate"]); //todo //Bot User details has changed, eg username updated from dashboard panel.
     }
@@ -137,6 +139,10 @@ class DiscordEventHandler{
 
         $this->client->getThread()->writeOutboundData(new DiscordConnectedPacket(ModelConverter::genModelUser($client->user)));
         $this->client->getCommunicationHandler()->sendHeartbeat();
+    }
+
+    public function onInteractionCreate(DiscordInteraction $interaction): void{
+        $this->client->getThread()->writeOutboundData(new InteractionReceived(ModelConverter::genModelInteraction($interaction)));
     }
 
     public function onVoiceStateUpdate(DiscordVoiceStateUpdate $ds): void{

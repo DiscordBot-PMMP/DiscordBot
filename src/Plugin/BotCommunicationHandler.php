@@ -23,6 +23,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordConnected as Discord
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\InteractionReceived as InteractionReceivedPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteCreate as InviteCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteDelete as InviteDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberJoin as MemberJoinPacket;
@@ -56,6 +57,7 @@ use JaxkDev\DiscordBot\Plugin\Events\DiscordReady as DiscordReadyEvent;
 use JaxkDev\DiscordBot\Plugin\Events\GuildDeleted as GuildDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\GuildJoined as GuildJoinedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\GuildUpdated as GuildUpdatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\InteractionReceived as InteractionReceivedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteCreated as InviteCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\InviteDeleted as InviteDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MemberJoined as MemberJoinedEvent;
@@ -107,6 +109,7 @@ class BotCommunicationHandler{
         elseif($packet instanceof MessageReactionRemovePacket) $this->handleMessageReactionRemove($packet);
         elseif($packet instanceof MessageReactionRemoveAllPacket) $this->handleMessageReactionRemoveAll($packet);
         elseif($packet instanceof MessageReactionRemoveEmojiPacket) $this->handleMessageReactionRemoveEmoji($packet);
+        elseif($packet instanceof InteractionReceivedPacket) $this->handleInteractionReceived($packet);
         elseif($packet instanceof ChannelCreatePacket) $this->handleChannelCreate($packet);
         elseif($packet instanceof ChannelUpdatePacket) $this->handleChannelUpdate($packet);
         elseif($packet instanceof ChannelDeletePacket) $this->handleChannelDelete($packet);
@@ -134,6 +137,10 @@ class BotCommunicationHandler{
         $this->plugin->getApi()->updateBotPresence($event->getStatus(), $event->getActivity())->otherwise(function(ApiRejection $a){
             $this->plugin->getLogger()->logException($a);
         });
+    }
+
+    private function handleInteractionReceived(InteractionReceivedPacket $packet): void{
+        (new InteractionReceivedEvent($this->plugin, $packet->getInteraction()))->call();
     }
 
     private function handleVoiceStateUpdate(VoiceStateUpdatePacket $packet): void{
