@@ -37,7 +37,8 @@ use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\Guild\Sticker as DiscordSticker;
 use Discord\Parts\Interactions\Interaction as DiscordInteraction;
 use Discord\Parts\Interactions\Request\Component as DiscordComponent;
-use Discord\Parts\Interactions\Request\InteractionData;
+use Discord\Parts\Interactions\Request\InteractionData as DiscordInteractionData;
+use Discord\Parts\Interactions\Request\Option as DiscordOption;
 use Discord\Parts\Permissions\RolePermission as DiscordRolePermission;
 use Discord\Parts\Thread\Thread as DiscordThread;
 use Discord\Parts\User\Activity as DiscordActivity;
@@ -61,6 +62,9 @@ use JaxkDev\DiscordBot\Models\Guild\NsfwLevel;
 use JaxkDev\DiscordBot\Models\Guild\PremiumTier;
 use JaxkDev\DiscordBot\Models\Guild\VerificationLevel;
 use JaxkDev\DiscordBot\Models\Interactions\ApplicationCommandData;
+use JaxkDev\DiscordBot\Models\Interactions\ApplicationCommandDataOption;
+use JaxkDev\DiscordBot\Models\Interactions\Commands\CommandOptionType;
+use JaxkDev\DiscordBot\Models\Interactions\Commands\CommandType;
 use JaxkDev\DiscordBot\Models\Interactions\Interaction;
 use JaxkDev\DiscordBot\Models\Interactions\InteractionType;
 use JaxkDev\DiscordBot\Models\Interactions\MessageComponentData;
@@ -134,11 +138,52 @@ abstract class ModelConverter{
             $interaction->locale ?? null, $interaction->guild_locale ?? null);
     }
 
-    static public function genModelApplicationCommandData(InteractionData $data): ApplicationCommandData{
-        return new ApplicationCommandData();//todo $data->id, $data->name, convert options);
+    static public function genModelApplicationCommandData(DiscordInteractionData $data): ApplicationCommandData{
+        $users = [];
+        $members = [];
+        $roles = [];
+        $channels = [];
+        $messages = [];
+        $attachments = [];
+        if(($r = $data->resolved) !== null){
+            foreach(($r->users?->toArray() ?? []) as $id => $user){
+                $users[$id] = self::genModelUser($user);
+            }
+            foreach(($r->members?->toArray() ?? []) as $id => $member){
+                $members[$id] = self::genModelMember($member);
+            }
+            foreach(($r->roles?->toArray() ?? []) as $id => $role){
+                $roles[$id] = self::genModelRole($role);
+            }
+            foreach(($r->channels?->toArray() ?? []) as $id => $channel){
+                $channels[$id] = self::genModelChannel($channel);
+            }
+            foreach(($r->messages?->toArray() ?? []) as $id => $message){
+                $messages[$id] = self::genModelMessage($message);
+            }
+            foreach(($r->attachments?->toArray() ?? []) as $id => $attachment){
+                $attachments[$id] = self::genModelAttachment($attachment);
+            }
+        }
+
+        $options = [];
+        foreach(($data->options?->toArray() ?? []) as $option){
+            $options[] = self::genModelApplicationCommandDataOption($option);
+        }
+        return new ApplicationCommandData($data->id, $data->name, CommandType::from($data->type), $users, $members, $roles,
+            $channels, $messages, $attachments, $options, $data->guild_id ?? null, $data->target_id ?? null);
     }
 
-    static public function genModelMessageComponentData(InteractionData $data): MessageComponentData{
+    static public function genModelApplicationCommandDataOption(DiscordOption $option): ApplicationCommandDataOption{
+        $options = [];
+        foreach(($option->options?->toArray() ?? []) as $o){
+            $options[] = self::genModelApplicationCommandDataOption($o);
+        }
+        return new ApplicationCommandDataOption($option->name, CommandOptionType::from($option->type), $option->value,
+            $options, $option->focused ?? null);
+    }
+
+    static public function genModelMessageComponentData(DiscordInteractionData $data): MessageComponentData{
         if($data->custom_id === null){
             throw new AssertionError("Custom id is null for message component data.");
         }
@@ -148,7 +193,7 @@ abstract class ModelConverter{
         return new MessageComponentData($data->custom_id, ComponentType::from($data->component_type), $data->values);
     }
 
-    static public function genModelModalSubmitData(InteractionData $data): ModalSubmitData{
+    static public function genModelModalSubmitData(DiscordInteractionData $data): ModalSubmitData{
         if($data->custom_id === null){
             throw new AssertionError("Custom id is null for modal submit data.");
         }
