@@ -123,7 +123,7 @@ class DiscordEventHandler{
         $discord->on(DiscordEvent::VOICE_STATE_UPDATE, [$this, "onVoiceStateUpdate"]);
         //$discord->on(DiscordEvent::WEBHOOKS_UPDATE, [$this, "onWebhooksUpdate"]); //todo
 
-        $discord->on(DiscordEvent::INTERACTION_CREATE, [$this, "onInteractionCreate"]); //todo
+        $discord->on(DiscordEvent::INTERACTION_CREATE, [$this, "onInteractionCreate"]);
 
         //$discord->on(DiscordEvent::USER_UPDATE, [$this, "onUserUpdate"]); //todo //Bot User details has changed, eg username updated from dashboard panel.
     }
