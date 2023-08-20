@@ -77,15 +77,17 @@ class SelectMenu extends Component{
 
     /** @param SelectOption[] $options */
     public function setOptions(array $options): void{
-        if($this->getType() !== ComponentType::STRING_SELECT){
-            throw new \AssertionError("Options are only available for STRING_SELECT.");
-        }
-        if(count($options) > 25){
-            throw new \AssertionError("Max 25 options per select menu.");
-        }
-        foreach($options as $option){
-            if(!$option instanceof SelectOption){
-                throw new \AssertionError("Options must be an array of SelectOption.");
+        if(count($options) !== 0){
+            if($this->getType() !== ComponentType::STRING_SELECT){
+                throw new \AssertionError("Options are only available for STRING_SELECT.");
+            }
+            if(count($options) > 25){
+                throw new \AssertionError("Max 25 options per select menu.");
+            }
+            foreach($options as $option){
+                if(!$option instanceof SelectOption){
+                    throw new \AssertionError("Options must be an array of SelectOption.");
+                }
             }
         }
         $this->options = $options;
@@ -98,12 +100,14 @@ class SelectMenu extends Component{
 
     /** @param ChannelType[] $channel_types */
     public function setChannelTypes(array $channel_types): void{
-        if($this->getType() !== ComponentType::CHANNEL_SELECT){
-            throw new \AssertionError("Channel types are only available for CHANNEL_SELECT.");
-        }
-        foreach($channel_types as $channel_type){
-            if(!$channel_type instanceof ChannelType){
-                throw new \AssertionError("Channel types must be an array of ChannelType.");
+        if(count($channel_types) !== 0){
+            if($this->getType() !== ComponentType::CHANNEL_SELECT){
+                throw new \AssertionError("Channel types are only available for CHANNEL_SELECT.");
+            }
+            foreach($channel_types as $channel_type){
+                if(!$channel_type instanceof ChannelType){
+                    throw new \AssertionError("Channel types must be an array of ChannelType.");
+                }
             }
         }
         $this->channel_types = $channel_types;

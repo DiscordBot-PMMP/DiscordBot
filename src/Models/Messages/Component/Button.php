@@ -80,11 +80,13 @@ class Button extends Component{
     }
 
     public function setCustomId(?string $custom_id): void{
-        if($this->style === ButtonStyle::LINK){
-            throw new \AssertionError("Custom ID only allowed on non-link style.");
-        }
-        if($custom_id !== null && strlen($custom_id) > 100){
-            throw new \AssertionError("Max 100 characters for button custom_id.");
+        if($custom_id !== null){
+            if($this->style === ButtonStyle::LINK){
+                throw new \AssertionError("Custom ID only allowed on non-link style.");
+            }
+            if(strlen($custom_id) > 100){
+                throw new \AssertionError("Max 100 characters for button custom_id.");
+            }
         }
         $this->custom_id = $custom_id;
     }
@@ -94,7 +96,7 @@ class Button extends Component{
     }
 
     public function setUrl(?string $url): void{
-        if($this->style !== ButtonStyle::LINK){
+        if($url !== null && $this->style !== ButtonStyle::LINK){
             throw new \AssertionError("URL only allowed on link style.");
         }
         $this->url = $url;
