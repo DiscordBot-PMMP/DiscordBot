@@ -118,22 +118,22 @@ class Main extends PluginBase{
             $this->tickTask->cancel();
         }catch(\Error){} //Ignore if tickTask isn't set.
 
-        //TODO Check if thread closed before we disabled (indicating an error/crash occurred in thread TBD on this method)
-        //If so, we need to generate a crash dump (debug data but in a separate folder for 'crashes'/'errors')
-        //TODO Also generate dump if PLUGIN crashes or similar.
         try{
             if($this->discordBot->isTerminated()){
+                //Thread terminated first indicating error from thread not plugin resulting in plugin shutdown.
                 $this->getLogger()->error("Discord thread terminated, check logs for more information.");
+                return;
             }
         }catch(\Error){
-            //Ignore not initialised.
+            //Ignore not initialised, error on plugin startup.
             return;
         }
 
+        // Plugin/Server crashed, shutdown thread.
         if($this->discordBot->isRunning()){
             $this->discordBot->setStatus(ThreadStatus::STOPPING);
             $this->getLogger()->info("Stopping discord thread gracefully, waiting for discord thread to stop...");
-            //Never had a condition where it hangs more than 1s (only long period of wait should be during the data dump.)
+            //Never had a condition where it hangs more than 1s
             $this->discordBot->join();
             $this->getLogger()->info("Thread stopped.");
         }
