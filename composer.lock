@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2fb8a52df1ba9b180b6af48dc7798f68",
+    "content-hash": "a5fad9e453e0bd0a072e09fa005147da",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -2384,12 +2384,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/discord-php/DiscordPHP.git",
-                "reference": "545f373"
+                "reference": "aa3f3bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/545f373",
-                "reference": "545f373",
+                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/aa3f3bc",
+                "reference": "aa3f3bc",
                 "shasum": ""
             },
             "require": {
@@ -2454,7 +2454,7 @@
                 "source": "https://github.com/discord-php/DiscordPHP/tree/master",
                 "wiki": "https://github.com/discord-php/DiscordPHP/wiki"
             },
-            "time": "2023-08-21T13:59:38+00:00"
+            "time": "2023-08-21T14:55:40+00:00"
         },
         {
             "name": "trafficcophp/bytebuffer",
