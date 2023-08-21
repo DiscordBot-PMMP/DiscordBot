@@ -14,7 +14,7 @@ Config.yml Explained:
 version: x                        DO NOT EVER TOUCH THIS.
 
 type: "internal"                  What type of bot to use, internal or external.
-                                  external option requires a separate program to be running. (TODO Link)
+                                  external option requires a separate program to be running. (Not yet stable, use internal)
 
 logging:
   max_files: 28                   How many log files to keep on disk at any one time.

@@ -99,6 +99,10 @@ class Main extends PluginBase{
 
         $this->getLogger()->debug("Starting DiscordBot Thread...");
 
+        if($this->config["type"] === "external"){
+            $this->getLogger()->warning("External bot is not stable, use at your own risk.");
+        }
+
         $this->discordBot = new Thread(ThreadSafeArray::fromArray($this->config), $this->outboundData, $this->inboundData);
 
         $this->discordBot->start(Thread::INHERIT_CONSTANTS);
