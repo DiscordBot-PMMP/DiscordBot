@@ -546,13 +546,14 @@ abstract class ModelConverter{
             $discordEmbed->description,
             $discordEmbed->url,
             $discordEmbed->timestamp instanceof Carbon ? $discordEmbed->timestamp->getTimestamp() : (int)$discordEmbed->timestamp,
-            $discordEmbed->color, $discordEmbed->footer === null ? null : self::genModelEmbedFooter($discordEmbed->footer),
-            $discordEmbed->image === null ? null : self::genModelEmbedImage($discordEmbed->image),
-            $discordEmbed->thumbnail === null ? null : self::genModelEmbedImage($discordEmbed->thumbnail),
+            $discordEmbed->color,
+            ($discordEmbed->footer === null || $discordEmbed->footer->text === null) ? null : self::genModelEmbedFooter($discordEmbed->footer),
+            ($discordEmbed->image === null || $discordEmbed->image->url === null) ? null : self::genModelEmbedImage($discordEmbed->image),
+            ($discordEmbed->thumbnail === null || $discordEmbed->thumbnail->url === null) ? null : self::genModelEmbedImage($discordEmbed->thumbnail),
             $discordEmbed->video === null ? null : self::genModelEmbedVideo($discordEmbed->video),
             /** @phpstan-ignore-next-line Poorly documented provider object */
             $discordEmbed->provider === null ? null : new Provider($discordEmbed->provider?->name, $discordEmbed->provider?->url),
-            $discordEmbed->author === null ? null : self::genModelEmbedAuthor($discordEmbed->author),
+            ($discordEmbed->author === null || $discordEmbed->author->name === null) ? null : self::genModelEmbedAuthor($discordEmbed->author),
             $fields);
     }
 

@@ -22,7 +22,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
  */
 class Image implements BinarySerializable{
 
-    private ?string $url;
+    private string $url;
 
     private ?string $proxy_url;
 
@@ -30,18 +30,18 @@ class Image implements BinarySerializable{
 
     private ?int $height;
 
-    public function __construct(?string $url, ?string $proxy_url = null, ?int $width = null, ?int $height = null){
+    public function __construct(string $url, ?string $proxy_url = null, ?int $width = null, ?int $height = null){
         $this->setUrl($url);
         $this->setProxyUrl($proxy_url);
         $this->setWidth($width);
         $this->setHeight($height);
     }
 
-    public function getUrl(): ?string{
+    public function getUrl(): string{
         return $this->url;
     }
 
-    public function setUrl(?string $url): void{
+    public function setUrl(string $url): void{
         $this->url = $url;
     }
 
@@ -71,7 +71,7 @@ class Image implements BinarySerializable{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putNullableString($this->getUrl());
+        $stream->putString($this->getUrl());
         $stream->putNullableString($this->getProxyUrl());
         $stream->putNullableInt($this->getWidth());
         $stream->putNullableInt($this->getHeight());
@@ -80,7 +80,7 @@ class Image implements BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getNullableString(), // url
+            $stream->getString(),         // url
             $stream->getNullableString(), // proxy_url
             $stream->getNullableInt(),    // width
             $stream->getNullableInt()     // height
