@@ -30,6 +30,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberJoin as MemberJoinPac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberLeave as MemberLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberUpdate as MemberUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageDelete as MessageDeletePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageDeleteBulk as MessageDeleteBulkPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionAdd as MessageReactionAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemove as MessageReactionRemovePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveAll as MessageReactionRemoveAllPacket;
@@ -68,6 +69,7 @@ use JaxkDev\DiscordBot\Plugin\Events\MessageReactionAdd as MessageReactionAddEve
 use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemove as MessageReactionRemoveEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveAll as MessageReactionRemoveAllEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageReactionRemoveEmoji as MessageReactionRemoveEmojiEvent;
+use JaxkDev\DiscordBot\Plugin\Events\MessagesBulkDeleted as MessagesBulkDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageSent as MessageSentEvent;
 use JaxkDev\DiscordBot\Plugin\Events\MessageUpdated as MessageUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\PresenceUpdated as PresenceUpdatedEvent;
@@ -105,6 +107,7 @@ class BotCommunicationHandler{
         elseif($packet instanceof MessageSentPacket) $this->handleMessageSent($packet);
         elseif($packet instanceof MessageUpdatePacket) $this->handleMessageUpdate($packet);
         elseif($packet instanceof MessageDeletePacket) $this->handleMessageDelete($packet);
+        elseif($packet instanceof MessageDeleteBulkPacket) $this->handleMessageDeleteBulk($packet);
         elseif($packet instanceof MessageReactionAddPacket) $this->handleMessageReactionAdd($packet);
         elseif($packet instanceof MessageReactionRemovePacket) $this->handleMessageReactionRemove($packet);
         elseif($packet instanceof MessageReactionRemoveAllPacket) $this->handleMessageReactionRemoveAll($packet);
@@ -161,6 +164,11 @@ class BotCommunicationHandler{
 
     private function handleMessageDelete(MessageDeletePacket $packet): void{
         (new MessageDeletedEvent($this->plugin, $packet->getMessage()))->call();
+    }
+
+    private function handleMessageDeleteBulk(MessageDeleteBulkPacket $packet): void{
+        (new MessagesBulkDeletedEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId(),
+            $packet->getMessageIds(), $packet->getMessages()))->call();
     }
 
     private function handleMessageReactionAdd(MessageReactionAddPacket $packet): void{

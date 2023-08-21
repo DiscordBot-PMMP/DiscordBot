@@ -30,6 +30,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberJoin;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberLeave;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageDeleteBulk;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionAdd;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemove;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveAll;
@@ -156,7 +157,8 @@ class NetworkApi{
         RoleUpdate::SERIALIZE_ID => RoleUpdate::class,
         VoiceStateUpdate::SERIALIZE_ID => VoiceStateUpdate::class,
         InteractionReceived::SERIALIZE_ID => InteractionReceived::class,
-        //Reserved 33-39
+        MessageDeleteBulk::SERIALIZE_ID => MessageDeleteBulk::class,
+        //Reserved 34-39
 
         //40-83 PMMP->Discord Packets
         RequestAddReaction::SERIALIZE_ID => RequestAddReaction::class,

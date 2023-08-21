@@ -18,6 +18,7 @@ use Discord\Builders\Components\Button;
 use Discord\Builders\Components\MentionableSelect;
 use Discord\Builders\MessageBuilder;
 use Discord\Discord;
+use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
@@ -41,13 +42,14 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\DiscordConnected as Discord
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildJoin as GuildJoinPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildLeave as GuildLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\GuildUpdate as GuildUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\InteractionReceived;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\InteractionReceived as InteractionReceivedPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteCreate as InviteCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\InviteDelete as InviteDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberJoin as MemberJoinPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberLeave as MemberLeavePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MemberUpdate as MemberUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageDelete as MessageDeletePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageDeleteBulk as MessageDeleteBulkPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionAdd as MessageReactionAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemove as MessageReactionRemovePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\MessageReactionRemoveAll as MessageReactionRemoveAllPacket;
@@ -83,7 +85,7 @@ class DiscordEventHandler{
         $discord->on(DiscordEvent::MESSAGE_CREATE, [$this, "onMessageCreate"]);
         $discord->on(DiscordEvent::MESSAGE_UPDATE, [$this, "onMessageUpdate"]);  //AKA Edit
         $discord->on(DiscordEvent::MESSAGE_DELETE, [$this, "onMessageDelete"]);
-        //$discord->on(DiscordEvent::MESSAGE_DELETE_BULK, [$this, "onMessageDeleteBulk"]); //todo
+        $discord->on(DiscordEvent::MESSAGE_DELETE_BULK, [$this, "onMessageDeleteBulk"]);
 
         $discord->on(DiscordEvent::GUILD_MEMBER_ADD, [$this, "onMemberJoin"]);
         $discord->on(DiscordEvent::GUILD_MEMBER_REMOVE, [$this, "onMemberLeave"]);
@@ -142,7 +144,7 @@ class DiscordEventHandler{
     }
 
     public function onInteractionCreate(DiscordInteraction $interaction): void{
-        $this->client->getThread()->writeOutboundData(new InteractionReceived(ModelConverter::genModelInteraction($interaction)));
+        $this->client->getThread()->writeOutboundData(new InteractionReceivedPacket(ModelConverter::genModelInteraction($interaction)));
     }
 
     public function onVoiceStateUpdate(DiscordVoiceStateUpdate $ds): void{
@@ -230,6 +232,35 @@ class DiscordEventHandler{
             $message = ModelConverter::genModelMessage($data);
         }
         $packet = new MessageDeletePacket($message);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
+
+    /** @link https://github.com/discord-php/DiscordPHP/blob/v10.0.0-RC6/docs/src/pages/api/03_events/07_messages.md#message-delete-bulk */
+    public function onMessageDeleteBulk(Collection $collection): void{
+        $guild = null;
+        $channel = "";
+        $messages = [];
+        $ids = [];
+        foreach($collection as $message){
+            if($message instanceof DiscordMessage){
+                $messages[] = ModelConverter::genModelMessage($message);
+                if($guild === null){
+                    $guild = $message->guild_id;
+                }
+                if($channel === ""){
+                    $channel = $message->channel_id;
+                }
+            }else{
+                $ids[] = $message->id;
+                if($message->guild_id !== null && $guild === null){
+                    $guild = $message->guild_id;
+                }
+                if($message->channel_id !== null && $channel === ""){
+                    $channel = $message->channel_id;
+                }
+            }
+        }
+        $packet = new MessageDeleteBulkPacket($ids, $messages, $channel, $guild);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
