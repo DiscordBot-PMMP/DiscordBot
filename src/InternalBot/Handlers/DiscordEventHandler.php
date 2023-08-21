@@ -62,11 +62,15 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate as PresenceU
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\WebhooksUpdate as WebhooksUpdatePacket;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\InternalBot\Client;
 use JaxkDev\DiscordBot\InternalBot\ModelConverter;
+use JaxkDev\DiscordBot\Models\Channels\ChannelType;
 use JaxkDev\DiscordBot\Models\Presence\ClientStatus;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
@@ -103,9 +107,9 @@ class DiscordEventHandler{
         $discord->on(DiscordEvent::CHANNEL_DELETE, [$this, "onChannelDelete"]);
         $discord->on(DiscordEvent::CHANNEL_PINS_UPDATE, [$this, "onChannelPinsUpdate"]);
 
-        $discord->on(DiscordEvent::THREAD_CREATE, [$this, "onChannelCreate"]); //todo
-        $discord->on(DiscordEvent::THREAD_UPDATE, [$this, "onChannelUpdate"]); //todo
-        $discord->on(DiscordEvent::THREAD_DELETE, [$this, "onChannelDelete"]); //todo (note object)
+        $discord->on(DiscordEvent::THREAD_CREATE, [$this, "onThreadCreate"]);
+        $discord->on(DiscordEvent::THREAD_UPDATE, [$this, "onThreadUpdate"]);
+        $discord->on(DiscordEvent::THREAD_DELETE, [$this, "onThreadDelete"]);
 
         $discord->on(DiscordEvent::GUILD_ROLE_CREATE, [$this, "onRoleCreate"]);
         $discord->on(DiscordEvent::GUILD_ROLE_UPDATE, [$this, "onRoleUpdate"]);
@@ -114,7 +118,8 @@ class DiscordEventHandler{
         $discord->on(DiscordEvent::INVITE_CREATE, [$this, "onInviteCreate"]);
         $discord->on(DiscordEvent::INVITE_DELETE, [$this, "onInviteDelete"]);
 
-        //$discord->on(DiscordEvent::GUILD_AUDIT_LOG_ENTRY_CREATE, [$this, "onAuditLogEntryCreate"]); //todo
+        //$discord->on(DiscordEvent::GUILD_AUDIT_LOG_ENTRY_CREATE, [$this, "onAuditLogEntryCreate"]);
+        //TODO-Next-Minor Decide on the model structure of this bad boy.
 
         $discord->on(DiscordEvent::GUILD_BAN_ADD, [$this, "onBanAdd"]);
         $discord->on(DiscordEvent::GUILD_BAN_REMOVE, [$this, "onBanRemove"]);
@@ -353,17 +358,38 @@ class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onChannelCreate(DiscordChannel|DiscordThread $channel, Discord $discord): void{
+    public function onThreadCreate(DiscordThread $thread, Discord $discord): void{
+        $packet = new ThreadCreate(ModelConverter::genModelChannel($thread));
+        $this->client->getThread()->writeOutboundData($packet);
+    }
+
+    public function onThreadUpdate(DiscordThread $thread, Discord $discord): void{
+        $packet = new ThreadUpdate(ModelConverter::genModelChannel($thread));
+        $this->client->getThread()->writeOutboundData($packet);
+    }
+
+    /** @param DiscordThread|\stdClass $thread {"type": int, "id": string, "guild_id": string, "parent_id": string} */
+    public function onThreadDelete(DiscordThread|\stdClass $thread, Discord $discord): void{
+        $t = ChannelType::from($thread->type);
+        if(!$t->isThread()){
+            $this->logger->warning("Thread delete event with non-thread type, ignoring. ID: " . $thread->id . " Type: " . $t->name . " (" . $thread->type . ")");
+            return;
+        }
+        $packet = new ThreadDelete($t, $thread->id, $thread->guild_id, $thread->parent_id);
+        $this->client->getThread()->writeOutboundData($packet);
+    }
+
+    public function onChannelCreate(DiscordChannel $channel, Discord $discord): void{
         $packet = new ChannelCreatePacket(ModelConverter::genModelChannel($channel));
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onChannelUpdate(DiscordChannel|DiscordThread $channel, Discord $discord): void{
+    public function onChannelUpdate(DiscordChannel $channel, Discord $discord): void{
         $packet = new ChannelUpdatePacket(ModelConverter::genModelChannel($channel));
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onChannelDelete(DiscordChannel|DiscordThread|\stdClass $channel, Discord $discord): void{
+    public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
         $packet = new ChannelDeletePacket($channel->guild_id, $channel->id);
         $this->client->getThread()->writeOutboundData($packet);
     }

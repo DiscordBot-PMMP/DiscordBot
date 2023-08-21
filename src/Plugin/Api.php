@@ -837,11 +837,11 @@ class Api{
         return ApiResolver::create($pk->getUID());
     }
 
-    /**
+    /*
      * Sends the Message to discord.
      *
      * @return PromiseInterface Resolves with a Message model.
-     */
+     *
     public function sendMessage(Message $message): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
@@ -852,16 +852,16 @@ class Api{
         $pk = new RequestSendMessage($message);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
-    }
+    }*/
 
-    /**
+    /* TODO sendMessage
      * Send a local file to a text channel.
      *
      * @param string      $file_path Full file path on disk.
      * @param string      $message   Optional text/message to send with the file
      * @param string|null $file_name Optional file_name to show in discord, Prefix with 'SPOILER_' to make as spoiler.
      * @return PromiseInterface Resolves with a Message model.
-     */
+     *
     public function sendFile(string $guild_id, string $channel_id, string $file_path, string $message = "",
                              string $file_name = null): PromiseInterface{
         if(!$this->ready){
@@ -885,7 +885,7 @@ class Api{
         $pk = new RequestSendFile($guild_id, $channel_id, $file_name, $file_path, $message);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
-    }
+    }*/
 
     /**
      * Edit a sent message.

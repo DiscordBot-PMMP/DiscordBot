@@ -42,6 +42,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadCreate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\WebhooksUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\External\Connect;
@@ -162,7 +165,10 @@ class NetworkApi{
         MessageDeleteBulk::SERIALIZE_ID => MessageDeleteBulk::class,
         BotUserUpdate::SERIALIZE_ID => BotUserUpdate::class,
         WebhooksUpdate::SERIALIZE_ID => WebhooksUpdate::class,
-        //Reserved 36-39
+        ThreadCreate::SERIALIZE_ID => ThreadCreate::class,
+        ThreadDelete::SERIALIZE_ID => ThreadDelete::class,
+        ThreadUpdate::SERIALIZE_ID => ThreadUpdate::class,
+        //Reserved 39
 
         //40-83 PMMP->Discord Packets
         RequestAddReaction::SERIALIZE_ID => RequestAddReaction::class,

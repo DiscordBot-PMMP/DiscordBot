@@ -42,6 +42,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate as PresenceU
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadCreate as ThreadCreatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadDelete as ThreadDeletePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadUpdate as ThreadUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\WebhooksUpdate as WebhooksUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
@@ -80,6 +83,9 @@ use JaxkDev\DiscordBot\Plugin\Events\PresenceUpdated as PresenceUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\ThreadCreated as ThreadCreatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\ThreadDeleted as ThreadDeletedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\ThreadUpdated as ThreadUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceStateUpdated as VoiceStateUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\WebhooksUpdated as WebhooksUpdatedEvent;
 use pocketmine\VersionInfo;
@@ -123,6 +129,9 @@ class BotCommunicationHandler{
         elseif($packet instanceof ChannelUpdatePacket) $this->handleChannelUpdate($packet);
         elseif($packet instanceof ChannelDeletePacket) $this->handleChannelDelete($packet);
         elseif($packet instanceof ChannelPinsUpdatePacket) $this->handleChannelPinsUpdate($packet);
+        elseif($packet instanceof ThreadCreatePacket) $this->handleThreadCreate($packet);
+        elseif($packet instanceof ThreadUpdatePacket) $this->handleThreadUpdate($packet);
+        elseif($packet instanceof ThreadDeletePacket) $this->handleThreadDelete($packet);
         elseif($packet instanceof RoleCreatePacket) $this->handleRoleCreate($packet);
         elseif($packet instanceof RoleUpdatePacket) $this->handleRoleUpdate($packet);
         elseif($packet instanceof RoleDeletePacket) $this->handleRoleDelete($packet);
@@ -146,9 +155,25 @@ class BotCommunicationHandler{
         $event = new DiscordReadyEvent($this->plugin, $packet->getBotUser(), $ac, Status::IDLE);
         $event->call();
 
+        //TODO, Commands here.
+        //Use single event at ready event to register ALL commands.
+        //This will stop duplicates reaching discord side.
+
         $this->plugin->getApi()->updateBotPresence($event->getStatus(), $event->getActivity())->otherwise(function(ApiRejection $a){
             $this->plugin->getLogger()->logException($a);
         });
+    }
+
+    private function handleThreadCreate(ThreadCreatePacket $packet): void{
+        (new ThreadCreatedEvent($this->plugin, $packet->getThread()))->call();
+    }
+
+    private function handleThreadUpdate(ThreadUpdatePacket $packet): void{
+        (new ThreadUpdatedEvent($this->plugin, $packet->getThread()))->call();
+    }
+
+    private function handleThreadDelete(ThreadDeletePacket $packet): void{
+        (new ThreadDeletedEvent($this->plugin, $packet->getType(), $packet->getId(), $packet->getGuildId(), $packet->getParentId()))->call();
     }
 
     private function handleWebhooksUpdate(WebhooksUpdatePacket $packet): void{
