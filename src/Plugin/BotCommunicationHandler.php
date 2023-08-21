@@ -54,6 +54,7 @@ use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Plugin\Events\BanCreated as BanCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\BanDeleted as BanDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\BotUserUpdated as BotUserUpdatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\ChannelCreated as ChannelCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelDeleted as ChannelDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelPinsUpdated as ChannelPinsUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelUpdated as ChannelUpdatedEvent;
@@ -208,7 +209,7 @@ class BotCommunicationHandler{
     }
 
     private function handleChannelCreate(ChannelCreatePacket $packet): void{
-        (new ChannelUpdatedEvent($this->plugin, $packet->getChannel()))->call();
+        (new ChannelCreatedEvent($this->plugin, $packet->getChannel()))->call();
     }
 
     private function handleChannelUpdate(ChannelUpdatePacket $packet): void{
