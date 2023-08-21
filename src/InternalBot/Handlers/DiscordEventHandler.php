@@ -360,8 +360,12 @@ class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onRoleDelete(DiscordRole $role, Discord $discord): void{
-        $packet = new RoleDeletePacket($role->id);
+    /** @phpstan-param DiscordRole|\stdClass $role {"role_id": string, "guild_id": string} */
+    public function onRoleDelete(DiscordRole|\stdClass $role, Discord $discord): void{
+        if($role->guild_id === null){
+            throw new \AssertionError("Role delete event with null guild_id.");
+        }
+        $packet = new RoleDeletePacket($role->guild_id, ($role instanceof DiscordRole) ? $role->id : $role->role_id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
@@ -379,7 +383,7 @@ class DiscordEventHandler{
     }
 
     public function onBanAdd(DiscordBan $ban, Discord $discord): void{
-        //No reason unless you freshen bans which is only possible with ban_members permission.
+        //No reason unless you freshen bans, or listen to audit log.
         $packet = new BanAddPacket(ModelConverter::genModelBan($ban));
         $this->client->getThread()->writeOutboundData($packet);
         return;
@@ -395,11 +399,10 @@ class DiscordEventHandler{
     }
 
     /**
-     * Checks if we handle this type of message in this type of channel.
+     * Checks if we should handle this message.
      */
     private function checkMessage(DiscordMessage $message): bool{
         if($message->author?->id === $this->client->getDiscordClient()->id) return false;
-
         return true;
     }
 }

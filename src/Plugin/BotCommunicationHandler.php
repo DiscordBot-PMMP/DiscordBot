@@ -216,7 +216,7 @@ class BotCommunicationHandler{
     }
 
     private function handleRoleDelete(RoleDeletePacket $packet): void{
-        (new RoleDeletedEvent($this->plugin, $packet->getRoleId()))->call();
+        (new RoleDeletedEvent($this->plugin, $packet->getGuildId(), $packet->getRoleId()))->call();
     }
 
     private function handleInviteCreate(InviteCreatePacket $packet): void{

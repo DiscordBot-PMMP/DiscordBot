@@ -24,15 +24,26 @@ use pocketmine\plugin\Plugin;
  */
 class RoleDeleted extends DiscordBotEvent{
 
+    private string $guild_id;
+
     private string $role_id;
 
-    public function __construct(Plugin $plugin, string $role_id){
+    public function __construct(Plugin $plugin, string $guild_id, string $role_id){
         parent::__construct($plugin);
+        if(Utils::validDiscordSnowflake($guild_id)){
+            $this->guild_id = $guild_id;
+        }else{
+            throw new \AssertionError("Invalid guild_id given.");
+        }
         if(Utils::validDiscordSnowflake($role_id)){
             $this->role_id = $role_id;
         }else{
             throw new \AssertionError("Invalid role_id given.");
         }
+    }
+
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
     public function getRoleId(): string{
