@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Plugin;
 
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanCreate as BanAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanDelete as BanRemovePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\BotUserUpdate as BotUserUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate as ChannelCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelDelete as ChannelDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate as ChannelPinsUpdatePacket;
@@ -51,6 +52,7 @@ use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityType;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Plugin\Events\BanCreated as BanCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\BanDeleted as BanDeletedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\BotUserUpdated as BotUserUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelDeleted as ChannelDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelPinsUpdated as ChannelPinsUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\ChannelUpdated as ChannelUpdatedEvent;
@@ -79,6 +81,7 @@ use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceStateUpdated as VoiceStateUpdatedEvent;
 use pocketmine\VersionInfo;
 use function floor;
+use function get_class;
 use function microtime;
 
 class BotCommunicationHandler{
@@ -128,6 +131,8 @@ class BotCommunicationHandler{
         elseif($packet instanceof GuildLeavePacket) $this->handleGuildLeave($packet);
         elseif($packet instanceof GuildUpdatePacket) $this->handleGuildUpdate($packet);
         elseif($packet instanceof DiscordReadyPacket) $this->handleReady($packet);
+        elseif($packet instanceof BotUserUpdatePacket) $this->handleBotUserUpdate($packet);
+        else $this->plugin->getLogger()->warning("Unhandled packet: " . get_class($packet));
     }
 
     private function handleReady(DiscordReadyPacket $packet): void{
@@ -140,6 +145,10 @@ class BotCommunicationHandler{
         $this->plugin->getApi()->updateBotPresence($event->getStatus(), $event->getActivity())->otherwise(function(ApiRejection $a){
             $this->plugin->getLogger()->logException($a);
         });
+    }
+
+    private function handleBotUserUpdate(BotUserUpdatePacket $packet): void{
+        (new BotUserUpdatedEvent($this->plugin, $packet->getBot()))->call();
     }
 
     private function handleInteractionReceived(InteractionReceivedPacket $packet): void{

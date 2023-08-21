@@ -15,6 +15,7 @@ namespace JaxkDev\DiscordBot\Communication;
 
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanDelete;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\BotUserUpdate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelDelete;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate;
@@ -158,7 +159,8 @@ class NetworkApi{
         VoiceStateUpdate::SERIALIZE_ID => VoiceStateUpdate::class,
         InteractionReceived::SERIALIZE_ID => InteractionReceived::class,
         MessageDeleteBulk::SERIALIZE_ID => MessageDeleteBulk::class,
-        //Reserved 34-39
+        BotUserUpdate::SERIALIZE_ID => BotUserUpdate::class,
+        //Reserved 35-39
 
         //40-83 PMMP->Discord Packets
         RequestAddReaction::SERIALIZE_ID => RequestAddReaction::class,

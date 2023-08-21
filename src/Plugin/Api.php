@@ -73,6 +73,7 @@ use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\WebhookType;
+use JaxkDev\DiscordBot\Plugin\Events\BotUserUpdated;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
 use pocketmine\event\EventPriority;
 use function basename;
@@ -103,6 +104,10 @@ class Api{
                 $this->bot_user = $event->getBotUser();
                 $this->ready = true;
                 $this->plugin->getLogger()->notice("DiscordBot Connected and ready.");
+            }, EventPriority::LOWEST, $this->plugin, true);
+            $this->plugin->getServer()->getPluginManager()->registerEvent(BotUserUpdated::class, function(BotUserUpdated $event){
+                $this->bot_user = $event->getBot();
+                $this->plugin->getLogger()->debug("Updated API Bot user.");
             }, EventPriority::LOWEST, $this->plugin, true);
         }catch(\Throwable $e){
             $this->plugin->getLogger()->logException($e);

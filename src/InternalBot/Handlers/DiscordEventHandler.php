@@ -28,12 +28,14 @@ use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\Interactions\Interaction as DiscordInteraction;
 use Discord\Parts\Thread\Thread as DiscordThread;
 use Discord\Parts\User\Member as DiscordMember;
+use Discord\Parts\User\User as DiscordUser;
 use Discord\Parts\WebSockets\MessageReaction as DiscordMessageReaction;
 use Discord\Parts\WebSockets\PresenceUpdate as DiscordPresenceUpdate;
 use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
 use Discord\WebSockets\Event as DiscordEvent;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanCreate as BanAddPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\BanDelete as BanRemovePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\BotUserUpdate as BotUserUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelCreate as ChannelCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelDelete as ChannelDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\ChannelPinsUpdate as ChannelPinsUpdatePacket;
@@ -102,7 +104,7 @@ class DiscordEventHandler{
 
         $discord->on(DiscordEvent::THREAD_CREATE, [$this, "onChannelCreate"]); //todo
         $discord->on(DiscordEvent::THREAD_UPDATE, [$this, "onChannelUpdate"]); //todo
-        $discord->on(DiscordEvent::THREAD_DELETE, [$this, "onChannelDelete"]); //todo
+        $discord->on(DiscordEvent::THREAD_DELETE, [$this, "onChannelDelete"]); //todo (note object)
 
         $discord->on(DiscordEvent::GUILD_ROLE_CREATE, [$this, "onRoleCreate"]);
         $discord->on(DiscordEvent::GUILD_ROLE_UPDATE, [$this, "onRoleUpdate"]);
@@ -127,7 +129,7 @@ class DiscordEventHandler{
 
         $discord->on(DiscordEvent::INTERACTION_CREATE, [$this, "onInteractionCreate"]);
 
-        //$discord->on(DiscordEvent::USER_UPDATE, [$this, "onUserUpdate"]); //todo //Bot User details has changed, eg username updated from dashboard panel.
+        $discord->on(DiscordEvent::USER_UPDATE, [$this, "onUserUpdate"]);
     }
 
     public function onReady(): void{
@@ -141,6 +143,10 @@ class DiscordEventHandler{
 
         $this->client->getThread()->writeOutboundData(new DiscordConnectedPacket(ModelConverter::genModelUser($client->user)));
         $this->client->getCommunicationHandler()->sendHeartbeat();
+    }
+
+    public function onUserUpdate(DiscordUser $bot): void{
+        $this->client->getThread()->writeOutboundData(new BotUserUpdatePacket(ModelConverter::genModelUser($bot)));
     }
 
     public function onInteractionCreate(DiscordInteraction $interaction): void{
@@ -314,7 +320,11 @@ class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onGuildJoin(DiscordGuild $guild, Discord $discord): void{
+    public function onGuildJoin(DiscordGuild|\stdClass $guild, Discord $discord): void{
+        if(!($guild instanceof DiscordGuild)){
+            $this->logger->warning("Guild join event with stdClass, ignoring (unavailable guild). ID: " . $guild->id);
+            return;
+        }
         $packet = new GuildJoinPacket(ModelConverter::genModelGuild($guild));
         $this->client->getThread()->writeOutboundData($packet);
     }
@@ -325,6 +335,10 @@ class DiscordEventHandler{
     }
 
     public function onGuildLeave(DiscordGuild|\stdClass $guild, Discord $discord, bool $unavailable): void{
+        if($unavailable){
+            $this->logger->warning("Guild unavailable: " . $guild->id . " ignoring event.");
+            return;
+        }
         $packet = new GuildLeavePacket($guild->id);
         $this->client->getThread()->writeOutboundData($packet);
     }
