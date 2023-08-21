@@ -63,6 +63,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\WebhooksUpdate as WebhooksUpdatePacket;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\InternalBot\Client;
 use JaxkDev\DiscordBot\InternalBot\ModelConverter;
@@ -125,7 +126,7 @@ class DiscordEventHandler{
 
         $discord->on(DiscordEvent::PRESENCE_UPDATE, [$this, "onPresenceUpdate"]);
         $discord->on(DiscordEvent::VOICE_STATE_UPDATE, [$this, "onVoiceStateUpdate"]);
-        //$discord->on(DiscordEvent::WEBHOOKS_UPDATE, [$this, "onWebhooksUpdate"]); //todo
+        $discord->on(DiscordEvent::WEBHOOKS_UPDATE, [$this, "onWebhooksUpdate"]);
 
         $discord->on(DiscordEvent::INTERACTION_CREATE, [$this, "onInteractionCreate"]);
 
@@ -143,6 +144,15 @@ class DiscordEventHandler{
 
         $this->client->getThread()->writeOutboundData(new DiscordConnectedPacket(ModelConverter::genModelUser($client->user)));
         $this->client->getCommunicationHandler()->sendHeartbeat();
+    }
+
+    /**
+     * @param DiscordGuild|\stdClass   $guild   \stdClass{"id": string}
+     * @param DiscordChannel|\stdClass $channel \stdClass{"id": string}
+     */
+    public function onWebhooksUpdate(DiscordGuild|\stdClass $guild, Discord $discord, DiscordChannel|\stdClass $channel): void{
+        $packet = new WebhooksUpdatePacket($guild->id, $channel->id);
+        $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onUserUpdate(DiscordUser $bot): void{

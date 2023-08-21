@@ -43,6 +43,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePac
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\WebhooksUpdate as WebhooksUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution as ResolutionPacket;
@@ -79,6 +80,7 @@ use JaxkDev\DiscordBot\Plugin\Events\RoleCreated as RoleCreatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleDeleted as RoleDeletedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\RoleUpdated as RoleUpdatedEvent;
 use JaxkDev\DiscordBot\Plugin\Events\VoiceStateUpdated as VoiceStateUpdatedEvent;
+use JaxkDev\DiscordBot\Plugin\Events\WebhooksUpdated as WebhooksUpdatedEvent;
 use pocketmine\VersionInfo;
 use function floor;
 use function get_class;
@@ -130,6 +132,7 @@ class BotCommunicationHandler{
         elseif($packet instanceof GuildJoinPacket) $this->handleGuildJoin($packet);
         elseif($packet instanceof GuildLeavePacket) $this->handleGuildLeave($packet);
         elseif($packet instanceof GuildUpdatePacket) $this->handleGuildUpdate($packet);
+        elseif($packet instanceof WebhooksUpdatePacket) $this->handleWebhooksUpdate($packet);
         elseif($packet instanceof DiscordReadyPacket) $this->handleReady($packet);
         elseif($packet instanceof BotUserUpdatePacket) $this->handleBotUserUpdate($packet);
         else $this->plugin->getLogger()->warning("Unhandled packet: " . get_class($packet));
@@ -145,6 +148,10 @@ class BotCommunicationHandler{
         $this->plugin->getApi()->updateBotPresence($event->getStatus(), $event->getActivity())->otherwise(function(ApiRejection $a){
             $this->plugin->getLogger()->logException($a);
         });
+    }
+
+    private function handleWebhooksUpdate(WebhooksUpdatePacket $packet): void{
+        (new WebhooksUpdatedEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId()))->call();
     }
 
     private function handleBotUserUpdate(BotUserUpdatePacket $packet): void{
