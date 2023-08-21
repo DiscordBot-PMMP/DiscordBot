@@ -13,8 +13,8 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * Emitted when a channel gets deleted.
@@ -30,12 +30,12 @@ class ChannelDeleted extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, ?string $guild_id, string $channel_id){
         parent::__construct($plugin);
-        if($guild_id === null || Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id === null || validDiscordSnowflake($guild_id)){
             $this->guild_id = $guild_id;
         }else{
             throw new \AssertionError("Invalid guild id given.");
         }
-        if(Utils::validDiscordSnowflake($channel_id)){
+        if(validDiscordSnowflake($channel_id)){
             $this->channel_id = $channel_id;
         }else{
             throw new \AssertionError("Invalid channel id given.");

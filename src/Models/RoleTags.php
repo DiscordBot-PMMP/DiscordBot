@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use JaxkDev\DiscordBot\Plugin\Utils;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * @implements BinarySerializable<RoleTags>
@@ -59,7 +59,7 @@ class RoleTags implements BinarySerializable{
     }
 
     public function setBotId(?string $bot_id): void{
-        if($bot_id !== null && !Utils::validDiscordSnowflake($bot_id)){
+        if($bot_id !== null && !validDiscordSnowflake($bot_id)){
             throw new \InvalidArgumentException("Bot ID '$bot_id' is invalid.");
         }
         $this->bot_id = $bot_id;
@@ -70,7 +70,7 @@ class RoleTags implements BinarySerializable{
     }
 
     public function setIntegrationId(?string $integration_id): void{
-        if($integration_id !== null && !Utils::validDiscordSnowflake($integration_id)){
+        if($integration_id !== null && !validDiscordSnowflake($integration_id)){
             throw new \InvalidArgumentException("Integration ID '$integration_id' is invalid.");
         }
         $this->integration_id = $integration_id;
@@ -89,7 +89,7 @@ class RoleTags implements BinarySerializable{
     }
 
     public function setSubscriptionListingId(?string $subscription_listing_id): void{
-        if($subscription_listing_id !== null && !Utils::validDiscordSnowflake($subscription_listing_id)){
+        if($subscription_listing_id !== null && !validDiscordSnowflake($subscription_listing_id)){
             throw new \InvalidArgumentException("Subscription listing ID '$subscription_listing_id' is invalid.");
         }
         $this->subscription_listing_id = $subscription_listing_id;

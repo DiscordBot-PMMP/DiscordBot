@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Api;
-use JaxkDev\DiscordBot\Plugin\Utils;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 use function stripos;
 use function strlen;
 
@@ -100,7 +100,7 @@ class Webhook implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!Utils::validDiscordSnowflake($id)){
+        if(!validDiscordSnowflake($id)){
             throw new \AssertionError("ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -111,7 +111,7 @@ class Webhook implements BinarySerializable{
     }
 
     public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -122,7 +122,7 @@ class Webhook implements BinarySerializable{
     }
 
     public function setChannelId(?string $channel_id): void{
-        if($channel_id !== null && !Utils::validDiscordSnowflake($channel_id)){
+        if($channel_id !== null && !validDiscordSnowflake($channel_id)){
             throw new \AssertionError("Channel ID '$channel_id' is invalid.");
         }
         $this->channel_id = $channel_id;
@@ -133,7 +133,7 @@ class Webhook implements BinarySerializable{
     }
 
     public function setUserId(?string $user_id): void{
-        if($user_id !== null && !Utils::validDiscordSnowflake($user_id)){
+        if($user_id !== null && !validDiscordSnowflake($user_id)){
             throw new \AssertionError("User ID '$user_id' is invalid.");
         }
         $this->user_id = $user_id;
@@ -185,7 +185,7 @@ class Webhook implements BinarySerializable{
     }
 
     public function setApplicationId(?string $application_id): void{
-        if($application_id !== null && !Utils::validDiscordSnowflake($application_id)){
+        if($application_id !== null && !validDiscordSnowflake($application_id)){
             throw new \AssertionError("Application ID '$application_id' is invalid.");
         }
         $this->application_id = $application_id;
@@ -196,7 +196,7 @@ class Webhook implements BinarySerializable{
     }
 
     public function setSourceGuildId(?string $source_guild_id): void{
-        if($source_guild_id !== null && !Utils::validDiscordSnowflake($source_guild_id)){
+        if($source_guild_id !== null && !validDiscordSnowflake($source_guild_id)){
             throw new \AssertionError("Source Guild ID '$source_guild_id' is invalid.");
         }
         $this->source_guild_id = $source_guild_id;
@@ -207,7 +207,7 @@ class Webhook implements BinarySerializable{
     }
 
     public function setSourceChannelId(?string $source_channel_id): void{
-        if($source_channel_id !== null && !Utils::validDiscordSnowflake($source_channel_id)){
+        if($source_channel_id !== null && !validDiscordSnowflake($source_channel_id)){
             throw new \AssertionError("Source Channel ID '$source_channel_id' is invalid.");
         }
         $this->source_channel_id = $source_channel_id;

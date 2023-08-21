@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Models\Interactions\Commands;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
-use JaxkDev\DiscordBot\Plugin\Utils;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 use function strlen;
 
 /**
@@ -107,7 +107,7 @@ class Command implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!Utils::validDiscordSnowflake($id)){
+        if(!validDiscordSnowflake($id)){
             throw new \AssertionError("Command ID '{$id}' is invalid.");
         }
         $this->id = $id;
@@ -126,7 +126,7 @@ class Command implements BinarySerializable{
     }
 
     public function setApplicationId(string $application_id): void{
-        if(!Utils::validDiscordSnowflake($application_id)){
+        if(!validDiscordSnowflake($application_id)){
             throw new \AssertionError("Application ID '{$application_id}' is invalid.");
         }
         $this->application_id = $application_id;
@@ -137,7 +137,7 @@ class Command implements BinarySerializable{
     }
 
     public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '{$guild_id}' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -224,7 +224,7 @@ class Command implements BinarySerializable{
     }
 
     public function setVersion(string $version): void{
-        if(!Utils::validDiscordSnowflake($version)){
+        if(!validDiscordSnowflake($version)){
             //Yes version is a snowflake...
             throw new \AssertionError("Version '{$version}' is invalid.");
         }

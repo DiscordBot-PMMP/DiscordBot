@@ -410,7 +410,7 @@ class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    /** @phpstan-param DiscordRole|\stdClass $role {"role_id": string, "guild_id": string} */
+    /** @param DiscordRole|\stdClass $role {"role_id": string, "guild_id": string} */
     public function onRoleDelete(DiscordRole|\stdClass $role, Discord $discord): void{
         if($role->guild_id === null){
             throw new \AssertionError("Role delete event with null guild_id.");

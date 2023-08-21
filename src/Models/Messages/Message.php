@@ -18,8 +18,8 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 use JaxkDev\DiscordBot\Models\StickerPartial;
-use JaxkDev\DiscordBot\Plugin\Utils;
 use function count;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * @implements BinarySerializable<Message>
@@ -167,7 +167,7 @@ class Message implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!Utils::validDiscordSnowflake($id)){
+        if(!validDiscordSnowflake($id)){
             throw new \AssertionError("ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -178,7 +178,7 @@ class Message implements BinarySerializable{
     }
 
     public function setChannelId(string $channel_id): void{
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             throw new \AssertionError("Channel ID '$channel_id' is invalid.");
         }
         $this->channel_id = $channel_id;
@@ -189,7 +189,7 @@ class Message implements BinarySerializable{
     }
 
     public function setAuthorId(?string $author_id): void{
-        if($author_id !== null && !Utils::validDiscordSnowflake($author_id)){
+        if($author_id !== null && !validDiscordSnowflake($author_id)){
             throw new \AssertionError("Author ID '$author_id' is invalid.");
         }
         $this->author_id = $author_id;
@@ -243,7 +243,7 @@ class Message implements BinarySerializable{
     /** @param string[] $mentions User IDs */
     public function setMentions(array $mentions): void{
         foreach($mentions as $mention){
-            if(!Utils::validDiscordSnowflake($mention)){
+            if(!validDiscordSnowflake($mention)){
                 throw new \AssertionError("Mention ID '$mention' is invalid.");
             }
         }
@@ -258,7 +258,7 @@ class Message implements BinarySerializable{
     /** @param string[] $mention_roles Role IDs */
     public function setMentionRoles(array $mention_roles): void{
         foreach($mention_roles as $mention_role){
-            if(!Utils::validDiscordSnowflake($mention_role)){
+            if(!validDiscordSnowflake($mention_role)){
                 throw new \AssertionError("Mention role ID '$mention_role' is invalid.");
             }
         }
@@ -323,7 +323,7 @@ class Message implements BinarySerializable{
     }
 
     public function setWebhookId(?string $webhook_id): void{
-        if($webhook_id !== null && !Utils::validDiscordSnowflake($webhook_id)){
+        if($webhook_id !== null && !validDiscordSnowflake($webhook_id)){
             throw new \AssertionError("Webhook ID '$webhook_id' is invalid.");
         }
         $this->webhook_id = $webhook_id;
@@ -342,7 +342,7 @@ class Message implements BinarySerializable{
     }
 
     public function setApplicationId(?string $application_id): void{
-        if($application_id !== null && !Utils::validDiscordSnowflake($application_id)){
+        if($application_id !== null && !validDiscordSnowflake($application_id)){
             throw new \AssertionError("Application ID '$application_id' is invalid.");
         }
         $this->application_id = $application_id;
@@ -377,7 +377,7 @@ class Message implements BinarySerializable{
     }
 
     public function setThreadId(?string $thread_id): void{
-        if($thread_id !== null && !Utils::validDiscordSnowflake($thread_id)){
+        if($thread_id !== null && !validDiscordSnowflake($thread_id)){
             throw new \AssertionError("Thread ID '$thread_id' is invalid.");
         }
         $this->thread_id = $thread_id;

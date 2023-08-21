@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use JaxkDev\DiscordBot\Plugin\Utils;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * @implements BinarySerializable<Emoji>
@@ -88,7 +88,7 @@ class Emoji implements BinarySerializable{
     }
 
     public function setId(?string $id): void{
-        if($id !== null && !Utils::validDiscordSnowflake($id)){
+        if($id !== null && !validDiscordSnowflake($id)){
             throw new \AssertionError("Emoji ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -111,7 +111,7 @@ class Emoji implements BinarySerializable{
     public function setRoleIds(?array $role_ids): void{
         if($role_ids !== null){
             foreach($role_ids as $role_id){
-                if(!Utils::validDiscordSnowflake($role_id)){
+                if(!validDiscordSnowflake($role_id)){
                     throw new \AssertionError("Emoji role ID '$role_id' is invalid.");
                 }
             }
@@ -124,7 +124,7 @@ class Emoji implements BinarySerializable{
     }
 
     public function setUserId(?string $user_id): void{
-        if($user_id !== null && !Utils::validDiscordSnowflake($user_id)){
+        if($user_id !== null && !validDiscordSnowflake($user_id)){
             throw new \AssertionError("Emoji user ID '$user_id' is invalid.");
         }
         $this->user_id = $user_id;

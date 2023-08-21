@@ -22,7 +22,7 @@ use JaxkDev\DiscordBot\Models\Messages\Attachment;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\User;
-use JaxkDev\DiscordBot\Plugin\Utils;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 use function sizeof;
 use function strlen;
 
@@ -121,7 +121,7 @@ class ApplicationCommandData implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!Utils::validDiscordSnowflake($id)){
+        if(!validDiscordSnowflake($id)){
             throw new \AssertionError("Command ID '{$id}' is invalid.");
         }
         $this->id = $id;
@@ -154,7 +154,7 @@ class ApplicationCommandData implements BinarySerializable{
     /** @param array<string, User>|null $resolved_users */
     public function setResolvedUsers(?array $resolved_users): void{
         foreach(($resolved_users ?? []) as $id => $user){
-            if(!Utils::validDiscordSnowflake($id)){
+            if(!validDiscordSnowflake($id)){
                 throw new \AssertionError("User ID '{$id}' is invalid.");
             }
             if(!($user instanceof User)){
@@ -172,7 +172,7 @@ class ApplicationCommandData implements BinarySerializable{
     /** @param array<string, Member>|null $resolved_members */
     public function setResolvedMembers(?array $resolved_members): void{
         foreach(($resolved_members ?? []) as $id => $member){
-            if(!Utils::validDiscordSnowflake($id)){
+            if(!validDiscordSnowflake($id)){
                 throw new \AssertionError("Member ID '{$id}' is invalid.");
             }
             if(!($member instanceof Member)){
@@ -190,7 +190,7 @@ class ApplicationCommandData implements BinarySerializable{
     /** @param array<string, Role>|null $resolved_roles */
     public function setResolvedRoles(?array $resolved_roles): void{
         foreach(($resolved_roles ?? []) as $id => $role){
-            if(!Utils::validDiscordSnowflake($id)){
+            if(!validDiscordSnowflake($id)){
                 throw new \AssertionError("Role ID '{$id}' is invalid.");
             }
             if(!($role instanceof Role)){
@@ -208,7 +208,7 @@ class ApplicationCommandData implements BinarySerializable{
     /** @param array<string, Channel>|null $resolved_channels */
     public function setResolvedChannels(?array $resolved_channels): void{
         foreach(($resolved_channels ?? []) as $id => $channel){
-            if(!Utils::validDiscordSnowflake($id)){
+            if(!validDiscordSnowflake($id)){
                 throw new \AssertionError("Channel ID '{$id}' is invalid.");
             }
             if(!($channel instanceof Channel)){
@@ -226,7 +226,7 @@ class ApplicationCommandData implements BinarySerializable{
     /** @param array<string, Message>|null $resolved_messages */
     public function setResolvedMessages(?array $resolved_messages): void{
         foreach(($resolved_messages ?? []) as $id => $message){
-            if(!Utils::validDiscordSnowflake($id)){
+            if(!validDiscordSnowflake($id)){
                 throw new \AssertionError("Message ID '{$id}' is invalid.");
             }
             if(!($message instanceof Message)){
@@ -244,7 +244,7 @@ class ApplicationCommandData implements BinarySerializable{
     /** @param array<string, Attachment>|null $resolved_attachments */
     public function setResolvedAttachments(?array $resolved_attachments): void{
         foreach(($resolved_attachments ?? []) as $id => $attachment){
-            if(!Utils::validDiscordSnowflake($id)){
+            if(!validDiscordSnowflake($id)){
                 throw new \AssertionError("Attachment ID '{$id}' is invalid.");
             }
             if(!($attachment instanceof Attachment)){
@@ -274,7 +274,7 @@ class ApplicationCommandData implements BinarySerializable{
     }
 
     public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '{$guild_id}' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -285,7 +285,7 @@ class ApplicationCommandData implements BinarySerializable{
     }
 
     public function setTargetId(?string $target_id): void{
-        if($target_id !== null && !Utils::validDiscordSnowflake($target_id)){
+        if($target_id !== null && !validDiscordSnowflake($target_id)){
             throw new \AssertionError("Target ID '{$target_id}' is invalid.");
         }
         $this->target_id = $target_id;

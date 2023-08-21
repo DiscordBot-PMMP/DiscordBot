@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use JaxkDev\DiscordBot\Plugin\Utils;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * Partial sticker object.
@@ -82,7 +82,7 @@ class Sticker implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!Utils::validDiscordSnowflake($id)){
+        if(!validDiscordSnowflake($id)){
             throw new \AssertionError("Sticker ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -93,7 +93,7 @@ class Sticker implements BinarySerializable{
     }
 
     public function setPackId(?string $pack_id): void{
-        if($pack_id !== null && !Utils::validDiscordSnowflake($pack_id)){
+        if($pack_id !== null && !validDiscordSnowflake($pack_id)){
             throw new \AssertionError("Sticker pack ID '$pack_id' is invalid.");
         }
         $this->pack_id = $pack_id;
@@ -152,7 +152,7 @@ class Sticker implements BinarySerializable{
     }
 
     public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Sticker guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -163,7 +163,7 @@ class Sticker implements BinarySerializable{
     }
 
     public function setUserId(?string $user_id): void{
-        if($user_id !== null && !Utils::validDiscordSnowflake($user_id)){
+        if($user_id !== null && !validDiscordSnowflake($user_id)){
             throw new \AssertionError("Sticker user ID '$user_id' is invalid.");
         }
         $this->user_id = $user_id;

@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use JaxkDev\DiscordBot\Plugin\Utils;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * @implements BinarySerializable<VoiceState>
@@ -85,7 +85,7 @@ class VoiceState implements BinarySerializable{
     }
 
     public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -96,7 +96,7 @@ class VoiceState implements BinarySerializable{
     }
 
     public function setChannelId(?string $channel_id): void{
-        if($channel_id !== null && !Utils::validDiscordSnowflake($channel_id)){
+        if($channel_id !== null && !validDiscordSnowflake($channel_id)){
             throw new \AssertionError("Channel ID '$channel_id' is invalid.");
         }
         $this->channel_id = $channel_id;
@@ -107,7 +107,7 @@ class VoiceState implements BinarySerializable{
     }
 
     public function setUserId(string $user_id): void{
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             throw new \AssertionError("User ID '$user_id' is invalid.");
         }
         $this->user_id = $user_id;

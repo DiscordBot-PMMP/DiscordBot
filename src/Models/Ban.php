@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use JaxkDev\DiscordBot\Plugin\Utils;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * @implements BinarySerializable<Ban>
@@ -53,7 +53,7 @@ class Ban implements BinarySerializable{
     }
 
     public function setGuildId(string $guild_id): void{
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -64,7 +64,7 @@ class Ban implements BinarySerializable{
     }
 
     public function setUserId(string $user_id): void{
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             throw new \AssertionError("User ID '$user_id' is invalid.");
         }
         $this->user_id = $user_id;

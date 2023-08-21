@@ -80,6 +80,8 @@ use function basename;
 use function in_array;
 use function is_file;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
+use function JaxkDev\DiscordBot\Plugin\Utils\validImageData;
 use function strlen;
 
 /**
@@ -134,7 +136,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         $pk = new RequestFetchBans($guild_id);
@@ -151,10 +153,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         $pk = new RequestFetchChannel($guild_id, $channel_id);
@@ -171,7 +173,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         $pk = new RequestFetchChannels($guild_id);
@@ -188,7 +190,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         $pk = new RequestFetchGuild($guild_id);
@@ -219,7 +221,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         $pk = new RequestFetchInvites($guild_id);
@@ -236,10 +238,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
         }
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'"));
         }
         $pk = new RequestFetchMember($guild_id, $user_id);
@@ -256,7 +258,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
         }
         $pk = new RequestFetchMembers($guild_id);
@@ -273,13 +275,13 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'"));
         }
-        if(!Utils::validDiscordSnowflake($message_id)){
+        if(!validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'"));
         }
         $pk = new RequestFetchMessage($guild_id, $channel_id, $message_id);
@@ -296,10 +298,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'"));
         }
         $pk = new RequestFetchPinnedMessages($guild_id, $channel_id);
@@ -316,10 +318,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
         }
-        if(!Utils::validDiscordSnowflake($role_id)){
+        if(!validDiscordSnowflake($role_id)){
             return rejectPromise(new ApiRejection("Invalid role ID '$role_id'"));
         }
         $pk = new RequestFetchRole($guild_id, $role_id);
@@ -336,7 +338,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
         }
         $pk = new RequestFetchRoles($guild_id);
@@ -353,7 +355,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'"));
         }
         $pk = new RequestFetchUser($user_id);
@@ -384,10 +386,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'"));
         }
-        if($channel_id !== null && !Utils::validDiscordSnowflake($channel_id)){
+        if($channel_id !== null && !validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'"));
         }
         $pk = new RequestFetchWebhooks($guild_id, $channel_id);
@@ -409,13 +411,13 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Webhook guild ID is invalid."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Webhook channel ID is invalid."));
         }
-        if($avatar_data !== null && !Utils::validImageData($avatar_data)){
+        if($avatar_data !== null && !validImageData($avatar_data)){
             return rejectPromise(new ApiRejection("Webhook avatar data is invalid."));
         }
         $pk = new RequestCreateWebhook($guild_id, $channel_id, $name, $avatar_data, $reason);
@@ -438,7 +440,7 @@ class Api{
         if($webhook->getToken() === null){
             return rejectPromise(new ApiRejection("Webhook does not have a token, it cannot be edited before being created."));
         }
-        if(!Utils::validDiscordSnowflake($webhook->getId())){
+        if(!validDiscordSnowflake($webhook->getId())){
             return rejectPromise(new ApiRejection("Invalid webhook ID '{$webhook->getId()}'."));
         }
         $pk = new RequestUpdateWebhook($webhook, $reason);
@@ -455,13 +457,13 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Webhook guild ID is invalid."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        if(!Utils::validDiscordSnowflake($webhook_id)){
+        if(!validDiscordSnowflake($webhook_id)){
             return rejectPromise(new ApiRejection("Invalid webhook ID '$webhook_id'."));
         }
         $pk = new RequestDeleteWebhook($guild_id, $channel_id, $webhook_id, $reason);
@@ -481,7 +483,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         $pk = new RequestLeaveGuild($guild_id);
@@ -498,13 +500,13 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        if(!Utils::validDiscordSnowflake($message_id)){
+        if(!validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
         $pk = new RequestPinMessage($guild_id, $channel_id, $message_id, $reason);
@@ -521,13 +523,13 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        if(!Utils::validDiscordSnowflake($message_id)){
+        if(!validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
         $pk = new RequestUnpinMessage($guild_id, $channel_id, $message_id, $reason);
@@ -548,10 +550,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($icon_data !== null && !Utils::validImageData($icon_data)){
+        if($icon_data !== null && !validImageData($icon_data)){
             return rejectPromise(new ApiRejection("Invalid icon data '$icon_data'."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         $pk = new RequestCreateRole($guild_id, $name, $permissions ?? new RolePermissions(), $colour, $hoist, $icon_data,
@@ -590,10 +592,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($role_id)){
+        if(!validDiscordSnowflake($role_id)){
             return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
         }
         $pk = new RequestDeleteRole($guild_id, $role_id, $reason);
@@ -610,13 +612,13 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
-        if(!Utils::validDiscordSnowflake($role_id)){
+        if(!validDiscordSnowflake($role_id)){
             return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
         }
         $pk = new RequestRemoveRole($guild_id, $user_id, $role_id, $reason);
@@ -633,13 +635,13 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
-        if(!Utils::validDiscordSnowflake($role_id)){
+        if(!validDiscordSnowflake($role_id)){
             return rejectPromise(new ApiRejection("Invalid role ID '$role_id'."));
         }
         $pk = new RequestAddRole($guild_id, $user_id, $role_id);
@@ -660,16 +662,16 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        if(!Utils::validDiscordSnowflake($message_id)){
+        if(!validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
         $pk = new RequestRemoveReaction($guild_id, $channel_id, $message_id, $user_id, $emoji);
@@ -692,13 +694,13 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        if(!Utils::validDiscordSnowflake($message_id)){
+        if(!validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
         $pk = new RequestRemoveAllReactions($guild_id, $channel_id, $message_id, $emoji);
@@ -720,13 +722,13 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        if(!Utils::validDiscordSnowflake($message_id)){
+        if(!validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
         $pk = new RequestAddReaction($guild_id, $channel_id, $message_id, $emoji);
@@ -747,10 +749,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         $pk = new RequestBroadcastTyping($guild_id, $channel_id);
@@ -783,10 +785,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
         if($delete_message_seconds < 0 || $delete_message_seconds > 604800){
@@ -806,10 +808,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
         $pk = new RequestUnbanMember($guild_id, $user_id, $reason);
@@ -826,10 +828,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
         $pk = new RequestKickMember($guild_id, $user_id, $reason);
@@ -867,10 +869,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         if(!is_file($file_path)){
@@ -915,13 +917,13 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        if(!Utils::validDiscordSnowflake($message_id)){
+        if(!validDiscordSnowflake($message_id)){
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
         $pk = new RequestDeleteMessage($guild_id, $channel_id, $message_id, $reason);
@@ -957,7 +959,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(strlen($name) < 1 || strlen($name) > 100){
@@ -1012,7 +1014,7 @@ class Api{
             if(!in_array($type, [ChannelType::GUILD_TEXT, ChannelType::GUILD_VOICE, ChannelType::GUILD_ANNOUNCEMENT, ChannelType::GUILD_STAGE_VOICE, ChannelType::GUILD_FORUM, ChannelType::GUILD_MEDIA], true)){
                 return rejectPromise(new ApiRejection("Channel parent ID can only be set on Text, Voice, Announcement, Stage, Forum, Media channels."));
             }
-            if(!Utils::validDiscordSnowflake($parent_id)){
+            if(!validDiscordSnowflake($parent_id)){
                 return rejectPromise(new ApiRejection("Invalid parent ID '$parent_id'."));
             }
         }
@@ -1066,10 +1068,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         $pk = new RequestDeleteChannel($guild_id, $channel_id, $reason);
@@ -1087,10 +1089,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($channel_id)){
+        if(!validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
         if($max_age < 0 || $max_age > 86400){
@@ -1113,7 +1115,7 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         $pk = new RequestDeleteInvite($guild_id, $invite_code, $reason);
@@ -1130,10 +1132,10 @@ class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if(!validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
-        if(!Utils::validDiscordSnowflake($user_id)){
+        if(!validDiscordSnowflake($user_id)){
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
         $pk = new RequestUpdateNickname($guild_id, $user_id, $nickname, $reason);

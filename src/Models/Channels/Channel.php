@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models\Channels;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use JaxkDev\DiscordBot\Plugin\Utils;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 use function strlen;
 
 /**
@@ -174,7 +174,7 @@ class Channel implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!Utils::validDiscordSnowflake($id)){
+        if(!validDiscordSnowflake($id)){
             throw new \AssertionError("Channel ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -193,7 +193,7 @@ class Channel implements BinarySerializable{
     }
 
     public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -252,7 +252,7 @@ class Channel implements BinarySerializable{
     }
 
     public function setLastMessageId(?string $last_message_id): void{
-        if($last_message_id !== null && !Utils::validDiscordSnowflake($last_message_id)){
+        if($last_message_id !== null && !validDiscordSnowflake($last_message_id)){
             throw new \AssertionError("Last message ID '$last_message_id' is invalid.");
         }
         $this->last_message_id = $last_message_id;
@@ -290,7 +290,7 @@ class Channel implements BinarySerializable{
     /** @param string[]|null $recipients User IDs */
     public function setRecipients(?array $recipients): void{
         foreach(($recipients ?? []) as $recipient){
-            if(!Utils::validDiscordSnowflake($recipient)){
+            if(!validDiscordSnowflake($recipient)){
                 throw new \AssertionError("Recipient ID '$recipient' is invalid.");
             }
         }
@@ -310,7 +310,7 @@ class Channel implements BinarySerializable{
     }
 
     public function setOwnerId(?string $owner_id): void{
-        if($owner_id !== null && !Utils::validDiscordSnowflake($owner_id)){
+        if($owner_id !== null && !validDiscordSnowflake($owner_id)){
             throw new \AssertionError("Owner ID '$owner_id' is invalid.");
         }
         $this->owner_id = $owner_id;
@@ -321,7 +321,7 @@ class Channel implements BinarySerializable{
     }
 
     public function setApplicationId(?string $application_id): void{
-        if($application_id !== null && !Utils::validDiscordSnowflake($application_id)){
+        if($application_id !== null && !validDiscordSnowflake($application_id)){
             throw new \AssertionError("Application ID '$application_id' is invalid.");
         }
         $this->application_id = $application_id;
@@ -340,7 +340,7 @@ class Channel implements BinarySerializable{
     }
 
     public function setParentId(?string $parent_id): void{
-        if($parent_id !== null && !Utils::validDiscordSnowflake($parent_id)){
+        if($parent_id !== null && !validDiscordSnowflake($parent_id)){
             throw new \AssertionError("Parent ID '$parent_id' is invalid.");
         }
         $this->parent_id = $parent_id;
@@ -409,7 +409,7 @@ class Channel implements BinarySerializable{
     /** @param string[]|null $applied_tags Tag IDs */
     public function setAppliedTags(?array $applied_tags): void{
         foreach(($applied_tags ?? []) as $tag){
-            if(!Utils::validDiscordSnowflake($tag)){
+            if(!validDiscordSnowflake($tag)){
                 throw new \AssertionError("Applied tag ID '$tag' is invalid.");
             }
         }

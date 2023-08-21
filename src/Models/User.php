@@ -15,10 +15,10 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use JaxkDev\DiscordBot\Plugin\Utils;
 use function array_keys;
 use function ctype_digit;
 use function in_array;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 use function sizeof;
 use function str_contains;
 use function strlen;
@@ -137,7 +137,7 @@ class User implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!Utils::validDiscordSnowflake($id)){
+        if(!validDiscordSnowflake($id)){
             throw new \AssertionError("User ID '$id' is invalid.");
         }
         $this->id = $id;

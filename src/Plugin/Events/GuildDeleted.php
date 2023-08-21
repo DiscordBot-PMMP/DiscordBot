@@ -13,8 +13,8 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
+use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * Emitted when a guild the bot is in has been deleted, or the bot left/was kicked.
@@ -28,7 +28,7 @@ class GuildDeleted extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, string $guild_id){
         parent::__construct($plugin);
-        if(Utils::validDiscordSnowflake($guild_id)){
+        if(validDiscordSnowflake($guild_id)){
             $this->guild_id = $guild_id;
         }else{
             throw new \AssertionError("Invalid guild_id given.");
