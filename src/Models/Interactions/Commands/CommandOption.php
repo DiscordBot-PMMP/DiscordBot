@@ -17,9 +17,9 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Channels\ChannelType;
 use function array_map;
+use function count;
 use function is_double;
 use function is_int;
-use function sizeof;
 use function strlen;
 
 /**
@@ -186,7 +186,7 @@ final class CommandOption implements BinarySerializable{
     /** @param CommandOptionChoice[]|null $choices */
     public function setChoices(?array $choices): void{
         if($choices !== null){
-            if(sizeof($choices) > 25){
+            if(count($choices) > 25){
                 throw new \AssertionError("Choices array cannot exceed 25 elements.");
             }
             foreach($choices as $choice){

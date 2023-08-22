@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use function sizeof;
+use function count;
 use function strlen;
 
 /**
@@ -173,7 +173,7 @@ final class Embed implements BinarySerializable{
 
     /** @param Field[] $fields */
     public function setFields(array $fields): void{
-        if(sizeof($fields) > 25){
+        if(count($fields) > 25){
             throw new \AssertionError("Embed can only have up to 25 fields.");
         }
         foreach($fields as $field){

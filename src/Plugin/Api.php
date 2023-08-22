@@ -81,9 +81,9 @@ use JaxkDev\DiscordBot\Models\WebhookType;
 use JaxkDev\DiscordBot\Plugin\Events\BotUserUpdated;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
 use pocketmine\event\EventPriority;
+use function count;
 use function in_array;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
-use function sizeof;
 use function strlen;
 
 /**
@@ -876,7 +876,7 @@ final class Api{
         if($reply_message_id !== null && !Utils::validDiscordSnowflake($reply_message_id)){
             return rejectPromise(new ApiRejection("Invalid reply message ID '$reply_message_id'."));
         }
-        if(sizeof($embeds ?? []) > 10){
+        if(count($embeds ?? []) > 10){
             return rejectPromise(new ApiRejection("Embed array cannot contain more than 10 embeds."));
         }
         foreach(($embeds ?? []) as $embed){
@@ -884,7 +884,7 @@ final class Api{
                 return rejectPromise(new ApiRejection("Embed array must all be of type '" . Embed::class . "'."));
             }
         }
-        if(sizeof($components ?? []) > 5){
+        if(count($components ?? []) > 5){
             return rejectPromise(new ApiRejection("Components array cannot contain more than 5 ActionRow components."));
         }
         foreach(($components ?? []) as $comp){
@@ -898,7 +898,7 @@ final class Api{
                 }
             }
         }
-        if(sizeof($sticker_ids ?? []) > 3){
+        if(count($sticker_ids ?? []) > 3){
             return rejectPromise(new ApiRejection("Sticker array cannot contain more than 3 stickers."));
         }
         foreach(($sticker_ids ?? []) as $id){
@@ -962,7 +962,7 @@ final class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(sizeof($message_ids) > 100 || sizeof($message_ids) < 2){
+        if(count($message_ids) > 100 || count($message_ids) < 2){
             return rejectPromise(new ApiRejection("Cannot delete more than 100 or less than 2 messages at once."));
         }
         foreach($message_ids as $message_id){

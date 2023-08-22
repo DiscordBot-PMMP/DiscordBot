@@ -14,15 +14,15 @@
 namespace JaxkDev\DiscordBot\Plugin;
 
 use function array_slice;
+use function count;
 use function is_string;
-use function sizeof;
 
 final class ApiResolution{
 
     private array $data;
 
     public function __construct(array $data = []){
-        if(sizeof($data) === 0 || !is_string($data[0])){
+        if(count($data) === 0 || !is_string($data[0])){
             throw new \AssertionError("Expected data for ApiResolution to contain at least a message.");
         }
         $this->data = $data;

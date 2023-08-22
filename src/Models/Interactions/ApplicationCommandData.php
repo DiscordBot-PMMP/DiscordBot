@@ -24,7 +24,7 @@ use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\User;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
-use function sizeof;
+use function count;
 use function strlen;
 
 /**
@@ -301,7 +301,7 @@ final class ApplicationCommandData implements BinarySerializable{
         //Manually serialize arrays due to ID keys. (same as putSerializableArray but includes string keys pointed out below)
         $stream->putBool($this->resolved_users !== null);
         if($this->resolved_users !== null){
-            $stream->putInt(sizeof($this->resolved_users));
+            $stream->putInt(count($this->resolved_users));
             foreach($this->resolved_users as $id => $user){
                 $stream->putString($id); //<- string ID key.
                 $stream->putSerializable($user);
@@ -310,7 +310,7 @@ final class ApplicationCommandData implements BinarySerializable{
 
         $stream->putBool($this->resolved_members !== null);
         if($this->resolved_members !== null){
-            $stream->putInt(sizeof($this->resolved_members));
+            $stream->putInt(count($this->resolved_members));
             foreach($this->resolved_members as $id => $member){
                 $stream->putString($id);
                 $stream->putSerializable($member);
@@ -319,7 +319,7 @@ final class ApplicationCommandData implements BinarySerializable{
 
         $stream->putBool($this->resolved_roles !== null);
         if($this->resolved_roles !== null){
-            $stream->putInt(sizeof($this->resolved_roles));
+            $stream->putInt(count($this->resolved_roles));
             foreach($this->resolved_roles as $id => $role){
                 $stream->putString($id);
                 $stream->putSerializable($role);
@@ -328,7 +328,7 @@ final class ApplicationCommandData implements BinarySerializable{
 
         $stream->putBool($this->resolved_channels !== null);
         if($this->resolved_channels !== null){
-            $stream->putInt(sizeof($this->resolved_channels));
+            $stream->putInt(count($this->resolved_channels));
             foreach($this->resolved_channels as $id => $channel){
                 $stream->putString($id);
                 $stream->putSerializable($channel);
@@ -337,7 +337,7 @@ final class ApplicationCommandData implements BinarySerializable{
 
         $stream->putBool($this->resolved_messages !== null);
         if($this->resolved_messages !== null){
-            $stream->putInt(sizeof($this->resolved_messages));
+            $stream->putInt(count($this->resolved_messages));
             foreach($this->resolved_messages as $id => $message){
                 $stream->putString($id);
                 $stream->putSerializable($message);
@@ -346,7 +346,7 @@ final class ApplicationCommandData implements BinarySerializable{
 
         $stream->putBool($this->resolved_attachments !== null);
         if($this->resolved_attachments !== null){
-            $stream->putInt(sizeof($this->resolved_attachments));
+            $stream->putInt(count($this->resolved_attachments));
             foreach($this->resolved_attachments as $id => $attachment){
                 $stream->putString($id);
                 $stream->putSerializable($attachment);

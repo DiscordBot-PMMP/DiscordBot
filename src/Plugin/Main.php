@@ -32,6 +32,7 @@ use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use function array_map;
 use function bin2hex;
+use function count;
 use function define;
 use function file_exists;
 use function intval;
@@ -40,7 +41,6 @@ use function is_int;
 use function mkdir;
 use function rename;
 use function rtrim;
-use function sizeof;
 use function unlink;
 use function yaml_emit_file;
 use function yaml_parse_file;
@@ -171,7 +171,7 @@ final class Main extends PluginBase{
 
         $this->getLogger()->debug("Verifying config...");
         $result_raw = ConfigUtils::verify($config);
-        if(sizeof($result_raw) !== 0){
+        if(count($result_raw) !== 0){
             $result = TextFormat::RED . "There were some problems with your config.yml, see below:\n" . TextFormat::RESET;
             foreach($result_raw as $value){
                 $result .= "{$value}\n";

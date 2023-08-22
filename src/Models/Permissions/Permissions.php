@@ -16,9 +16,9 @@ namespace JaxkDev\DiscordBot\Models\Permissions;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use function array_keys;
+use function count;
 use function get_parent_class;
 use function in_array;
-use function sizeof;
 use function strtolower;
 
 /**
@@ -127,21 +127,21 @@ abstract class Permissions implements BinarySerializable{
      * @return array<string, bool>
      */
     public function getPermissions(): array{
-        if(sizeof($this->permissions) === 0){
+        if(count($this->permissions) === 0){
             $this->recalculatePermissions();
         }
         return $this->permissions;
     }
 
     public function getPermission(string $permission): ?bool{
-        if(sizeof($this->permissions) === 0){
+        if(count($this->permissions) === 0){
             $this->recalculatePermissions();
         }
         return $this->permissions[$permission] ?? null;
     }
 
     public function setPermission(string $permission, bool $state = true): void{
-        if(sizeof($this->permissions) === 0){
+        if(count($this->permissions) === 0){
             $this->recalculatePermissions();
         }
         $permission = strtolower($permission);

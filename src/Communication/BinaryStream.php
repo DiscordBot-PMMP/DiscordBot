@@ -13,7 +13,7 @@
 
 namespace JaxkDev\DiscordBot\Communication;
 
-use function sizeof;
+use function count;
 use function strlen;
 
 final class BinaryStream extends \pocketmine\utils\BinaryStream{
@@ -53,7 +53,7 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
 
     /** @param BinarySerializable<mixed>[] $values */
     public function putSerializableArray(array $values): void{
-        $this->putInt(sizeof($values));
+        $this->putInt(count($values));
         foreach($values as $value){
             $this->put($value->binarySerialize()->getBuffer());
         }
@@ -104,7 +104,7 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
 
     /** @param string[] $values */
     public function putStringArray(array $values): void{
-        $this->putInt(sizeof($values));
+        $this->putInt(count($values));
         foreach($values as $value){
             $this->putString($value);
         }
@@ -126,7 +126,7 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
             return;
         }
         $this->putBool(true);
-        $this->putInt(sizeof($values));
+        $this->putInt(count($values));
         foreach($values as $value){
             $this->putString($value);
         }
@@ -146,7 +146,7 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
 
     /** @param int[] $values */
     public function putByteArray(array $values): void{
-        $this->putInt(sizeof($values));
+        $this->putInt(count($values));
         foreach($values as $value){
             $this->putByte($value);
         }
@@ -163,7 +163,7 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
 
     /** @param int[] $values */
     public function putIntArray(array $values): void{
-        $this->putInt(sizeof($values));
+        $this->putInt(count($values));
         foreach($values as $value){
             $this->putInt($value);
         }
@@ -269,7 +269,7 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
     public function putNullableLocalizationDictionary(?array $locales): void{
         $this->putBool($locales !== null);
         if($locales !== null){
-            $this->putInt(sizeof($locales));
+            $this->putInt(count($locales));
             foreach($locales as $locale => $value){
                 $this->putString($locale);
                 $this->putString($value);

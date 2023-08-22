@@ -18,8 +18,8 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Plugin\Api;
 use function array_keys;
+use function count;
 use function in_array;
-use function sizeof;
 use function str_starts_with;
 use function time;
 
@@ -424,7 +424,7 @@ final class Activity implements BinarySerializable{
 
     /** @param ActivityButton[] $buttons */
     public function setButtons(array $buttons): void{
-        if(sizeof($buttons) > 2){
+        if(count($buttons) > 2){
             throw new \AssertionError("Too many buttons (max 2).");
         }
         foreach($buttons as $button){

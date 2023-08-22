@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
-use function sizeof;
+use function count;
 
 final class RequestSendMessage extends Packet{
 
@@ -131,7 +131,7 @@ final class RequestSendMessage extends Packet{
         $stream->putNullableStringArray($this->sticker_ids);
         if($this->files !== null){
             $stream->putBool(true); //not-null
-            $stream->putInt(sizeof($this->files)); //size of array.
+            $stream->putInt(count($this->files)); //size of array.
             foreach($this->files as $name => $data){
                 $stream->putString($name); //key
                 $stream->putString($data); //value

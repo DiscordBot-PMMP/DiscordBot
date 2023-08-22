@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\NetworkApi;
 use JaxkDev\DiscordBot\Models\Messages\Component\Component;
-use function sizeof;
+use function count;
 
 /**
  * @implements BinarySerializable<ModalSubmitData>
@@ -61,7 +61,7 @@ final class ModalSubmitData implements BinarySerializable{
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->custom_id);
-        $stream->putInt(sizeof($this->components));
+        $stream->putInt(count($this->components));
         foreach($this->components as $component){
             $stream->putShort($component::SERIALIZE_ID);
             $stream->put($component->binarySerialize()->getBuffer());

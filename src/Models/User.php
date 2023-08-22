@@ -17,10 +17,10 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Plugin\Utils;
 use function array_keys;
+use function count;
 use function ctype_digit;
-use function in_array;
 
-use function sizeof;
+use function in_array;
 use function str_contains;
 use function strlen;
 
@@ -269,21 +269,21 @@ final class User implements BinarySerializable{
      * @return Array<string, bool>
      */
     public function getFlags(): array{
-        if(sizeof($this->flags) === 0){
+        if(count($this->flags) === 0){
             $this->recalculateFlags();
         }
         return $this->flags;
     }
 
     public function getFlag(string $flag): ?bool{
-        if(sizeof($this->flags) === 0){
+        if(count($this->flags) === 0){
             $this->recalculateFlags();
         }
         return $this->flags[$flag] ?? null;
     }
 
     public function setFlag(string $flag, bool $state = true): void{
-        if(sizeof($this->flags) === 0){
+        if(count($this->flags) === 0){
             $this->recalculateFlags();
         }
         if(!in_array($flag, array_keys(self::FLAGS), true)){
@@ -320,21 +320,21 @@ final class User implements BinarySerializable{
      * @return Array<string, bool>
      */
     public function getPublicFlags(): array{
-        if(sizeof($this->public_flags) === 0){
+        if(count($this->public_flags) === 0){
             $this->recalculatePublicFlags();
         }
         return $this->public_flags;
     }
 
     public function getPublicFlag(string $public_flag): ?bool{
-        if(sizeof($this->public_flags) === 0){
+        if(count($this->public_flags) === 0){
             $this->recalculatePublicFlags();
         }
         return $this->public_flags[$public_flag] ?? null;
     }
 
     public function setPublicFlag(string $public_flag, bool $state = true): void{
-        if(sizeof($this->public_flags) === 0){
+        if(count($this->public_flags) === 0){
             $this->recalculatePublicFlags();
         }
         if(!in_array($public_flag, array_keys(self::FLAGS), true)){
