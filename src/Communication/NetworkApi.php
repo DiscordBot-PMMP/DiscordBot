@@ -89,7 +89,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
@@ -210,7 +209,7 @@ final class NetworkApi{
         RequestRemoveRole::SERIALIZE_ID => RequestRemoveRole::class,
         RequestUnbanMember::SERIALIZE_ID => RequestUnbanMember::class,
         RequestDeleteInvite::SERIALIZE_ID => RequestDeleteInvite::class,
-        RequestSendFile::SERIALIZE_ID => RequestSendFile::class,
+        //GAP @ 76
         RequestSendMessage::SERIALIZE_ID => RequestSendMessage::class,
         RequestUnpinMessage::SERIALIZE_ID => RequestUnpinMessage::class,
         RequestUpdateBotPresence::SERIALIZE_ID => RequestUpdateBotPresence::class,

@@ -51,7 +51,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
@@ -67,6 +66,9 @@ use JaxkDev\DiscordBot\Models\Channels\ForumTag;
 use JaxkDev\DiscordBot\Models\Channels\Overwrite;
 use JaxkDev\DiscordBot\Models\Channels\VideoQualityMode;
 use JaxkDev\DiscordBot\Models\Emoji;
+use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
+use JaxkDev\DiscordBot\Models\Messages\Component\ComponentType;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
@@ -79,9 +81,7 @@ use JaxkDev\DiscordBot\Models\WebhookType;
 use JaxkDev\DiscordBot\Plugin\Events\BotUserUpdated;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
 use pocketmine\event\EventPriority;
-use function basename;
 use function in_array;
-use function is_file;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
 use function sizeof;
 use function strlen;
@@ -841,55 +841,76 @@ final class Api{
         return ApiResolver::create($pk->getUID());
     }
 
-    /*
-     * Sends the Message to discord.
+    /**
+     * Sends a Message to discord.
+     *
+     * At least one of "content, embeds, sticker_ids, components, or files" is required.
+     *
+     * @param string|null                $content          Max 2000 characters. Read note above.
+     * @param string|null                $reply_message_id Message ID to reply to, null if not a reply message.
+     * @param Embed[]|null               $embeds           Array of embeds, max 10. Read note above.
+     * @param bool|null                  $tts              Text to speech message?
+     * @param ActionRow[]|null           $components       Array of ActionRow components, max 5. Read note above. (cannot contain TEXT_INPUT components)
+     * @param string[]|null              $sticker_ids      Array of sticker IDs, max 3. Read note above.
+     * @param array<string, string>|null $files            Array of file data to send, max 8MB total. Read note above.
+     *                                                     Key is the file name, value is the file data.
+     *                                                     e.g. ['file.png' => 'raw_file_data']
      *
      * @return PromiseInterface Resolves with a Message model.
-     *
-    public function sendMessage(Message $message): PromiseInterface{
+     */
+    public function sendMessage(?string $guild_id, string $channel_id, ?string $content = null, ?string $reply_message_id = null,
+                                ?array $embeds = null, ?bool $tts = null, ?array $components = null, ?array $sticker_ids = null,
+                                ?array $files = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(strlen($message->getContent()) > 2000){
-            return rejectPromise(new ApiRejection("Message content cannot be larger than 2000 characters for bots."));
-        }
-        $pk = new RequestSendMessage($message);
-        $this->plugin->writeOutboundData($pk);
-        return ApiResolver::create($pk->getUID());
-    }*/
-
-    /* TODO sendMessage
-     * Send a local file to a text channel.
-     *
-     * @param string      $file_path Full file path on disk.
-     * @param string      $message   Optional text/message to send with the file
-     * @param string|null $file_name Optional file_name to show in discord, Prefix with 'SPOILER_' to make as spoiler.
-     * @return PromiseInterface Resolves with a Message model.
-     *
-    public function sendFile(string $guild_id, string $channel_id, string $file_path, string $message = "",
-                             string $file_name = null): PromiseInterface{
-        if(!$this->ready){
-            return rejectPromise(new ApiRejection("API is not ready for requests."));
-        }
-        if(!Utils::validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
         }
         if(!Utils::validDiscordSnowflake($channel_id)){
             return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
         }
-        if(!is_file($file_path)){
-            return rejectPromise(new ApiRejection("Invalid file path '$file_path' no such file exists."));
+        if(strlen($content ?? "") > 2000){
+            return rejectPromise(new ApiRejection("Message content cannot be larger than 2000 characters for bots."));
         }
-        if(strlen($message) > 2000){
-            return rejectPromise(new ApiRejection("Message cannot be larger than 2000 characters for bots."));
+        if($reply_message_id !== null && !Utils::validDiscordSnowflake($reply_message_id)){
+            return rejectPromise(new ApiRejection("Invalid reply message ID '$reply_message_id'."));
         }
-        if($file_name === null){
-            $file_name = basename($file_path);
+        if(sizeof($embeds ?? []) > 10){
+            return rejectPromise(new ApiRejection("Embed array cannot contain more than 10 embeds."));
         }
-        $pk = new RequestSendFile($guild_id, $channel_id, $file_name, $file_path, $message);
+        foreach(($embeds ?? []) as $embed){
+            if(!$embed instanceof Embed){
+                return rejectPromise(new ApiRejection("Embed array must all be of type '" . Embed::class . "'."));
+            }
+        }
+        if(sizeof($components ?? []) > 5){
+            return rejectPromise(new ApiRejection("Components array cannot contain more than 5 ActionRow components."));
+        }
+        foreach(($components ?? []) as $comp){
+            if(!$comp instanceof ActionRow){
+                return rejectPromise(new ApiRejection("Components array must all be of type '" . ActionRow::class . "'."));
+            }
+            foreach($comp->getComponents() as $c){
+                if($c->getType() === ComponentType::TEXT_INPUT){
+                    //Text inputs are MODAL FORM only, cannot be sent via message only via interaction response.
+                    return rejectPromise(new ApiRejection("Components array cannot contain TEXT_INPUT type."));
+                }
+            }
+        }
+        if(sizeof($sticker_ids ?? []) > 3){
+            return rejectPromise(new ApiRejection("Sticker array cannot contain more than 3 stickers."));
+        }
+        foreach(($sticker_ids ?? []) as $id){
+            if(!Utils::validDiscordSnowflake($id)){
+                return rejectPromise(new ApiRejection("Invalid sticker ID '$id'."));
+            }
+        }
+        $pk = new RequestSendMessage($guild_id, $channel_id, $content, $reply_message_id, $embeds, $tts, $components,
+            $sticker_ids, $files);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
-    }*/
+    }
 
     /**
      * Edit a sent message.

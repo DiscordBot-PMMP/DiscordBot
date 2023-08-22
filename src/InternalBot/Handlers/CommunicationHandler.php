@@ -66,7 +66,6 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveAllReactions;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestRemoveRole;
-use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendFile;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestSendMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnbanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestUnpinMessage;
@@ -143,7 +142,6 @@ final class CommunicationHandler{
         elseif($pk instanceof RequestUpdateNickname)          $this->handleUpdateNickname($pk);
         elseif($pk instanceof RequestBroadcastTyping)         $this->handleBroadcastTyping($pk);
         elseif($pk instanceof RequestSendMessage)             $this->handleSendMessage($pk);
-        elseif($pk instanceof RequestSendFile)                $this->handleSendFile($pk);
         elseif($pk instanceof RequestEditMessage)             $this->handleEditMessage($pk);
         elseif($pk instanceof RequestAddReaction)             $this->handleAddReaction($pk);
         elseif($pk instanceof RequestRemoveReaction)          $this->handleRemoveReaction($pk);
@@ -791,70 +789,78 @@ final class CommunicationHandler{
         }
     }
 
-    private function handleSendFile(RequestSendFile $pk): void{
-        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
-            if(!$channel->isTextBased()){
-                $this->resolveRequest($pk->getUID(), false, "Failed to send file, Invalid channel - text is not allowed.");
-                $this->logger->debug("Failed to send file ({$pk->getUID()}) - Channel does not allow text.");
-                return;
-            }
-            $channel->sendMessage(MessageBuilder::new()->addFile($pk->getFilePath(), $pk->getFileName())->setContent($pk->getMessage()))
-                ->then(function(DiscordMessage $message) use($pk){
-                    $this->resolveRequest($pk->getUID(), true, "Successfully sent file.", [ModelConverter::genModelMessage($message)]);
-                }, function(\Throwable $e) use($pk){
-                    $this->resolveRequest($pk->getUID(), false, "Failed to send file.", [$e->getMessage(), $e->getTraceAsString()]);
-                    $this->logger->debug("Failed to send file ({$pk->getUID()}) - {$e->getMessage()}");
-                });
-        });
-    }
-
     private function handleSendMessage(RequestSendMessage $pk): void{
-        /*$this->getChannel($pk, $pk->getMessage()->getChannelId(), function(DiscordChannel $channel) use($pk){
-            $m = $pk->getMessage();
-            $e = $m->getEmbed();
-            $de = null;
-            if($e !== null){
-                $de = new DiscordEmbed($this->client->getDiscordClient());
-                if($e->getTitle() !== null) $de->setTitle($e->getTitle());
-                if($e->getUrl() !== null) $de->setURL($e->getUrl());
-                if($e->getColour() !== null) $de->setColor($e->getColour());
-                if($e->getAuthor()?->getName() !== null) $de->setAuthor($e->getAuthor()->getName(), $e->getAuthor()->getIconUrl() ?? "", $e->getAuthor()->getUrl() ?? "");
-                if($e->getThumbnail()?->getUrl() !== null) $de->setThumbnail($e->getThumbnail()->getUrl());
-                if($e->getImage()?->getUrl() !== null) $de->setImage($e->getImage()->getUrl());
-                if($e->getDescription() !== null) $de->setDescription($e->getDescription());
-                if($e->getFooter()?->getText() !== null) $de->setFooter($e->getFooter()->getText(), $e->getFooter()->getIconUrl() ?? "");
-                if($e->getTimestamp() !== null) $de->setTimestamp($e->getTimestamp());
-                foreach($e->getFields() as $f){
-                    $de->addFieldValues($f->getName(), $f->getValue(), $f->getInline());
-                }
+        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+            $message = MessageBuilder::new();
+            if(($content = $pk->getContent()) !== null){
+                $message->setContent($content);
             }
-            if($m instanceof Reply){
-                if($m->getReferencedMessageId() === null){
-                    $this->resolveRequest($pk->getUID(), false, "Failed to send.", ["Reply message has no referenced message ID."]);
-                    $this->logger->debug("Failed to send message ({$pk->getUID()}) - Reply message has no referenced message ID.");
-                    return;
+            if(($tts = $pk->getTts()) !== null){
+                $message->setTts($tts);
+            }
+            foreach(($pk->getEmbeds() ?? []) as $embed){
+                $e = new DiscordEmbed($this->client->getDiscordClient());
+                if(($title = $embed->getTitle()) !== null){
+                    $e->setTitle($title);
                 }
-                $this->getMessage($pk, $m->getChannelId(), $m->getReferencedMessageId(), function(DiscordMessage $msg) use($channel, $pk, $de){
-                    $msgB = MessageBuilder::new()->setContent($pk->getMessage()->getContent())->setEmbeds($de === null ? [] : [$de])->setReplyTo($msg);
-                    $channel->sendMessage($msgB)->done(function(DiscordMessage $msg) use($pk){
-                        $this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
-                        $this->logger->debug("Sent message ({$pk->getUID()})");
+                if(($colour = $embed->getColour()) !== null){
+                    $e->setColor($colour);
+                }
+                if(($desc = $embed->getDescription()) !== null){
+                    $e->setDescription($desc);
+                }
+                if(($url = $embed->getUrl()) !== null){
+                    $e->setURL($url);
+                }
+                if(($time = $embed->getTimestamp()) !== null){
+                    try{
+                        $e->setTimestamp($time);
+                    }catch(\Throwable){}
+                }
+                if(($author = $embed->getAuthor()) !== null){
+                    $e->setAuthor($author->getName(), $author->getIconUrl(), $author->getUrl());
+                }
+                if(($footer = $embed->getFooter()) !== null){
+                    $e->setFooter($footer->getText(), $footer->getIconUrl());
+                }
+                if(($image = $embed->getImage()) !== null){
+                    $e->setImage($image->getUrl());
+                }
+                if(($thumb = $embed->getThumbnail()) !== null){
+                    $e->setThumbnail($thumb->getUrl());
+                }
+                foreach($embed->getFields() as $field){
+                    $e->addFieldValues($field->getName(), $field->getValue(), $field->getInline());
+                }
+                $message->addEmbed($e);
+            }
+            foreach(($pk->getComponents() ?? []) as $component){
+                //TODO Component sendMessage
+            }
+            $message->setStickers($pk->getStickerIds() ?? []);
+            foreach(($pk->getFiles() ?? []) as $file_name => $file_data){
+                $message->addFileFromContent($file_name, $file_data);
+            }
+
+            if($pk->getReplyMessageId() !== null){
+                $this->getMessage($pk, $pk->getChannelId(), $pk->getReplyMessageId(), function(DiscordMessage $reply) use($channel, $message, $pk){
+                    $message->setReplyTo($reply);
+                    $channel->sendMessage($message)->then(function(DiscordMessage $message) use($pk){
+                        $this->resolveRequest($pk->getUID(), true, "Successfully sent message.", [ModelConverter::genModelMessage($message)]);
                     }, function(\Throwable $e) use($pk){
-                        $this->resolveRequest($pk->getUID(), false, "Failed to send.", [$e->getMessage(), $e->getTraceAsString()]);
+                        $this->resolveRequest($pk->getUID(), false, "Failed to send message.", [$e->getMessage(), $e->getTraceAsString()]);
                         $this->logger->debug("Failed to send message ({$pk->getUID()}) - {$e->getMessage()}");
                     });
                 });
             }else{
-                $msgB = MessageBuilder::new()->setContent($m->getContent())->setEmbeds($de === null ? [] : [$de]);
-                $channel->sendMessage($msgB)->done(function(DiscordMessage $msg) use ($pk){
-                    $this->resolveRequest($pk->getUID(), true, "Message sent.", [ModelConverter::genModelMessage($msg)]);
-                    $this->logger->debug("Sent message ({$pk->getUID()})");
-                }, function(\Throwable $e) use ($pk){
-                    $this->resolveRequest($pk->getUID(), false, "Failed to send.", [$e->getMessage(), $e->getTraceAsString()]);
+                $channel->sendMessage($message)->then(function(DiscordMessage $message) use($pk){
+                    $this->resolveRequest($pk->getUID(), true, "Successfully sent message.", [ModelConverter::genModelMessage($message)]);
+                }, function(\Throwable $e) use($pk){
+                    $this->resolveRequest($pk->getUID(), false, "Failed to send message.", [$e->getMessage(), $e->getTraceAsString()]);
                     $this->logger->debug("Failed to send message ({$pk->getUID()}) - {$e->getMessage()}");
                 });
             }
-        });*/
+        });
     }
 
     private function handleEditMessage(RequestEditMessage $pk): void{
