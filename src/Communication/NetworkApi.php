@@ -58,6 +58,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateThreadFromMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteInvite;
@@ -133,7 +134,7 @@ final class NetworkApi{
         Connect::SERIALIZE_ID => Connect::class,
         Disconnect::SERIALIZE_ID => Disconnect::class,
 
-        //5-32 Discord->PMMP Packets
+        //5-38 Discord->PMMP Packets
         DiscordConnected::SERIALIZE_ID => DiscordConnected::class,
         BanCreate::SERIALIZE_ID => BanCreate::class,
         BanDelete::SERIALIZE_ID => BanDelete::class,
@@ -170,7 +171,7 @@ final class NetworkApi{
         ThreadUpdate::SERIALIZE_ID => ThreadUpdate::class,
         //Reserved 39
 
-        //40-83 PMMP->Discord Packets
+        //40-84 PMMP->Discord Packets
         RequestAddReaction::SERIALIZE_ID => RequestAddReaction::class,
         RequestAddRole::SERIALIZE_ID => RequestAddRole::class,
         RequestBroadcastTyping::SERIALIZE_ID => RequestBroadcastTyping::class,
@@ -214,8 +215,9 @@ final class NetworkApi{
         RequestUpdateChannel::SERIALIZE_ID => RequestUpdateChannel::class,
         RequestUpdateNickname::SERIALIZE_ID => RequestUpdateNickname::class,
         RequestUpdateRole::SERIALIZE_ID => RequestUpdateRole::class,
-        RequestUpdateWebhook::SERIALIZE_ID => RequestUpdateWebhook::class
-        //Reserved 84-99
+        RequestUpdateWebhook::SERIALIZE_ID => RequestUpdateWebhook::class,
+        RequestCreateThreadFromMessage::SERIALIZE_ID => RequestCreateThreadFromMessage::class,
+        //Reserved 85-99
 
         //100 Next ID
     ];

@@ -20,6 +20,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateThreadFromMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteInvite;
@@ -929,7 +930,41 @@ final class Api{
         return ApiResolver::create($pk->getUID());
     }
 
-    //TODO createThreadFromMessage()
+    /**
+     * @param string   $name                  Name of the thread (1-100 characters)
+     * @param int|null $auto_archive_duration The thread will stop showing in the channel list after auto_archive_duration minutes of inactivity, can be set to: 60, 1440, 4320, 10080 (minutes)
+     * @param int|null $rate_limit_per_user   Amount of seconds a user has to wait before sending another message (0-21600)
+     */
+    public function createThreadFromMessage(string $guild_id, string $channel_id, string $message_id, string $name,
+                                            ?int $auto_archive_duration = null, ?int $rate_limit_per_user = null,
+                                            ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+        }
+        if(!Utils::validDiscordSnowflake($message_id)){
+            return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
+        }
+        if(strlen($name) < 1 || strlen($name) > 100){
+            return rejectPromise(new ApiRejection("Channel name must be between 1 and 100 characters."));
+        }
+        if($auto_archive_duration !== null && !in_array($auto_archive_duration, [60, 1440, 4320, 10080], true)){
+            return rejectPromise(new ApiRejection("Auto archive duration must be one of 60, 1440, 4320 or 10080 (minutes)."));
+        }
+        if($rate_limit_per_user !== null && ($rate_limit_per_user < 0 || $rate_limit_per_user > 21600)){
+            return rejectPromise(new ApiRejection("Channel rate limit must be between 0 and 21600 (seconds)."));
+        }
+        $pk = new RequestCreateThreadFromMessage($guild_id, $channel_id, $message_id, $name, $auto_archive_duration,
+            $rate_limit_per_user, $reason);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
     //TODO createThread()
 
     /**
