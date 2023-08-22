@@ -13,10 +13,6 @@
 
 namespace JaxkDev\DiscordBot\InternalBot\Handlers;
 
-use Discord\Builders\Components\ActionRow;
-use Discord\Builders\Components\Button;
-use Discord\Builders\Components\MentionableSelect;
-use Discord\Builders\MessageBuilder;
 use Discord\Discord;
 use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;

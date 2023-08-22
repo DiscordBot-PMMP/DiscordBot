@@ -28,6 +28,7 @@ use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Channel\Webhook as DiscordWebhook;
 use Discord\Parts\Embed\Embed as DiscordEmbed;
+use Discord\Parts\Guild\Emoji;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Activity as DiscordActivity;
@@ -864,7 +865,14 @@ final class CommunicationHandler{
                         foreach($raw_c->getOptions() as $option){
                             $opt = new Option($option->getLabel(), $option->getValue());
                             $opt->setDescription($option->getDescription());
-                            $opt->setEmoji($option->getEmoji());
+                            if(($emoji = $option->getEmoji()) !== null){
+                                $e = new Emoji($this->client->getDiscordClient(), [
+                                    "id" => $emoji->getId(),
+                                    "name" => $emoji->getName(),
+                                    "animated" => $emoji->getAnimated()
+                                ]);
+                                $opt->setEmoji($e);
+                            }
                             if(($def = $option->getDefault()) !== null){
                                 $opt->setDefault($def);
                             }
@@ -879,6 +887,7 @@ final class CommunicationHandler{
                     $c->setMaxValues($raw_c->getMaxValues());
                     $c->setDisabled($raw_c->getDisabled());
                     $message->addComponent($c);
+                    continue;
                 }elseif($raw_c !== null && !($raw_c instanceof Button)){
                     $this->logger->warning("Unknown component type: " . get_class($raw_c));
                     continue;
@@ -889,8 +898,17 @@ final class CommunicationHandler{
                     $button = new \Discord\Builders\Components\Button($raw->getStyle()->value, $raw->getCustomId());
                     $button->setDisabled($raw->getDisabled());
                     $button->setLabel($raw->getLabel());
-                    $button->setEmoji($raw->getEmoji());
-                    $button->setUrl($raw->getUrl());
+                    if(($emoji = $raw->getEmoji()) !== null){
+                        $e = new Emoji($this->client->getDiscordClient(), [
+                            "id" => $emoji->getId(),
+                            "name" => $emoji->getName(),
+                            "animated" => $emoji->getAnimated()
+                        ]);
+                        $button->setEmoji($e);
+                    }
+                    if($raw->getUrl() !== null){
+                        $button->setUrl($raw->getUrl());
+                    }
                     $c->addComponent($button);
                 }
                 $message->addComponent($c);

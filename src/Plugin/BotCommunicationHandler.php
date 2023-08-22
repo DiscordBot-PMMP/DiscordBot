@@ -160,6 +160,55 @@ final class BotCommunicationHandler{
         //Use single event at ready event to register ALL commands.
         //This will stop duplicates reaching discord side.
 
+        /*$this->plugin->getApi()->sendMessage(null, "869940118729940992", "Test Content", "1143629778306482297", [
+            new Embed("Title", "Description", "https://google.com/desc", 1691732135, 0x00ff00,
+                new Footer("Text Footer", "https://google.com/footer"),
+                new Image("https://www.startupsos.com/wp-content/uploads/2015/07/test.jpg"),
+                new Image("https://flowaccount.com/blog/wp-content/uploads/2020/09/test-thumbnail-400x262.jpg"), null, null,
+                new Author("Author Name", "https://google.com/author", "https://icon-library.com/images/author-icon/author-icon-7.jpg"),
+            [
+                new Field("Field 1", "Field 1 Value inline", true),
+                new Field("Field 2", "Field 2 Value inline", true),
+                new Field("Field 3", "Field 3 Value", false),
+                new Field("Field 4", "Field 4 Value", false),
+                new Field("Field 5", "Field 5 Value", false),
+            ]),
+            new Embed("Title2", "Description2", "https://google.com/desc", 1691732135, 0x00ff00,
+                new Footer("Text Footer2", "https://google.com/footer"),
+                new Image("https://www.startupsos.com/wp-content/uploads/2015/07/test.jpg"),
+                new Image("https://flowaccount.com/blog/wp-content/uploads/2020/09/test-thumbnail-400x262.jpg"), null, null,
+                new Author("Author Name2", "https://google.com/author", "https://icon-library.com/images/author-icon/author-icon-7.jpg"),
+                [
+                    new Field("Field 1-2", "Field 1 Value inline", true),
+                    new Field("Field 2-2", "Field 2 Value inline", true),
+                    new Field("Field 3-2", "Field 3 Value", false),
+                    new Field("Field 4-2", "Field 4 Value", false),
+                    new Field("Field 5-2", "Field 5 Value", false),
+                ]
+            )], false, [
+            new ActionRow([
+                new Button(ButtonStyle::PRIMARY, "Button 1", null, "button1"),
+                new Button(ButtonStyle::SECONDARY, "Button 2", null, "button2"),
+                new Button(ButtonStyle::SUCCESS, "Button 3", null, "button3"),
+                new Button(ButtonStyle::DANGER, "Button 4", null, "button4"),
+                new Button(ButtonStyle::LINK, "Button 5", null, null, "https://google.com/button")
+            ]),
+            new ActionRow([
+                new Button(ButtonStyle::PRIMARY, "Button 1", new Emoji(null, "😊", null, null, null, null, null, null), "button1-2", null, true),
+                new Button(ButtonStyle::SECONDARY, "Button 2", new Emoji(null, "😊", null, null, null, null, null, null), "button2-2", null, true),
+                new Button(ButtonStyle::SUCCESS, "Button 3", new Emoji(null, "😊", null, null, null, null, null, null), "button3-2", null, true),
+                new Button(ButtonStyle::DANGER, "Button 4", new Emoji(null, "😊", null, null, null, null, null, null), "button4-2", null, true),
+                new Button(ButtonStyle::LINK, "Button 5", new Emoji(null, "😊", null, null, null, null, null, null), null, "https://google.com/button", true)
+            ]),
+            new ActionRow([
+                new SelectMenu(ComponentType::STRING_SELECT, "select_1", [new SelectOption("Option 1", "option1", "description?"), new SelectOption("Option 2", "option2", "description?", null, true), new SelectOption("Option 3", "option3", "description?", new Emoji(null, "😊", null, null, null, null, null, null))], [], "Placeholder", 1, 2, false),
+            ])
+        ], [], ["test.txt" => "Hi there this is my test :) 🥶", "test2.png" => file_get_contents("/Users/jackhonour/Downloads/IMG_0628.JPG")])->then(function(ApiResolution $data){
+            var_dump($data);
+        }, function(\Throwable $e){
+            var_dump($e);
+        });*/
+
         $this->plugin->getApi()->updateBotPresence($event->getStatus(), $event->getActivity())->otherwise(function(ApiRejection $a){
             $this->plugin->getLogger()->logException($a);
         });
