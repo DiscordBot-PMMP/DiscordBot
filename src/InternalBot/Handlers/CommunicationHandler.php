@@ -32,6 +32,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBulkDeleteMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
@@ -148,6 +149,7 @@ final class CommunicationHandler{
         elseif($pk instanceof RequestRemoveReaction)          $this->handleRemoveReaction($pk);
         elseif($pk instanceof RequestRemoveAllReactions)      $this->handleRemoveAllReactions($pk);
         elseif($pk instanceof RequestDeleteMessage)           $this->handleDeleteMessage($pk);
+        elseif($pk instanceof RequestBulkDeleteMessages)      $this->handleBulkDeleteMessages($pk);
         elseif($pk instanceof RequestPinMessage)              $this->handlePinMessage($pk);
         elseif($pk instanceof RequestUnpinMessage)            $this->handleUnpinMessage($pk);
         elseif($pk instanceof RequestAddRole)                 $this->handleAddRole($pk);
@@ -900,6 +902,17 @@ final class CommunicationHandler{
             }, function(\Throwable $e) use ($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to delete message.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to delete message ({$pk->getUID()}) - {$e->getMessage()}");
+            });
+        });
+    }
+
+    private function handleBulkDeleteMessages(RequestBulkDeleteMessages $pk): void{
+        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+            $channel->deleteMessages($pk->getMessageIds(), $pk->getReason())->done(function() use($pk){
+                $this->resolveRequest($pk->getUID(), true, "Messages bulk deleted.");
+            }, function(\Throwable $e) use ($pk){
+                $this->resolveRequest($pk->getUID(), false, "Failed to bulk delete messages.", [$e->getMessage(), $e->getTraceAsString()]);
+                $this->logger->debug("Failed to delete messages ({$pk->getUID()}) - {$e->getMessage()}");
             });
         });
     }

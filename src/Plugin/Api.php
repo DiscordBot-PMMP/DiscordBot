@@ -17,6 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBulkDeleteMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
@@ -82,6 +83,7 @@ use function basename;
 use function in_array;
 use function is_file;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
+use function sizeof;
 use function strlen;
 
 /**
@@ -927,6 +929,33 @@ final class Api{
             return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
         }
         $pk = new RequestDeleteMessage($guild_id, $channel_id, $message_id, $reason);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * @param string|null $guild_id    Null for DMs
+     * @param string[]    $message_ids Unique array of message IDs (limit 100) to delete (messages cannot be older than 2 weeks)
+     */
+    public function bulkDeleteMessages(?string $guild_id, string $channel_id, array $message_ids, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(sizeof($message_ids) > 100 || sizeof($message_ids) < 2){
+            return rejectPromise(new ApiRejection("Cannot delete more than 100 or less than 2 messages at once."));
+        }
+        foreach($message_ids as $message_id){
+            if(!Utils::validDiscordSnowflake($message_id)){
+                return rejectPromise(new ApiRejection("Invalid message ID '$message_id'."));
+            }
+        }
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+        }
+        $pk = new RequestBulkDeleteMessages($guild_id, $channel_id, $message_ids, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

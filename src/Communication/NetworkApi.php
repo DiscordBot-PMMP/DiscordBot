@@ -55,6 +55,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddReaction;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestAddRole;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBanMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBulkDeleteMessages;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
@@ -219,7 +220,8 @@ final class NetworkApi{
         RequestUpdateWebhook::SERIALIZE_ID => RequestUpdateWebhook::class,
         RequestCreateThreadFromMessage::SERIALIZE_ID => RequestCreateThreadFromMessage::class,
         RequestCreateThread::SERIALIZE_ID => RequestCreateThread::class,
-        //Reserved 86-99
+        RequestBulkDeleteMessages::SERIALIZE_ID => RequestBulkDeleteMessages::class,
+        //Reserved 87-99
 
         //100 Next ID
     ];
