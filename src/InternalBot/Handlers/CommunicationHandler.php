@@ -13,6 +13,13 @@
 
 namespace JaxkDev\DiscordBot\InternalBot\Handlers;
 
+use Discord\Builders\Components\ActionRow;
+use Discord\Builders\Components\ChannelSelect;
+use Discord\Builders\Components\MentionableSelect;
+use Discord\Builders\Components\Option;
+use Discord\Builders\Components\RoleSelect;
+use Discord\Builders\Components\StringSelect;
+use Discord\Builders\Components\UserSelect;
 use Discord\Builders\MessageBuilder;
 use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
@@ -79,6 +86,9 @@ use JaxkDev\DiscordBot\Communication\ThreadStatus;
 use JaxkDev\DiscordBot\InternalBot\Client;
 use JaxkDev\DiscordBot\InternalBot\ModelConverter;
 use JaxkDev\DiscordBot\Models\Channels\ForumTag;
+use JaxkDev\DiscordBot\Models\Messages\Component\Button;
+use JaxkDev\DiscordBot\Models\Messages\Component\ComponentType;
+use JaxkDev\DiscordBot\Models\Messages\Component\SelectMenu;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Plugin\ApiRejection;
@@ -835,7 +845,55 @@ final class CommunicationHandler{
                 $message->addEmbed($e);
             }
             foreach(($pk->getComponents() ?? []) as $component){
-                //TODO Component sendMessage
+                $all = $component->getComponents();
+                //A bit annoying but DiscordPHP doesn't do it like discord does, they put SelectMenu into ActionRow for us...
+                //So we have to take it OUT of our ActionRow so DiscordPHP can put it back in...
+                if(($raw_c = $all[0] ?? null) instanceof SelectMenu){
+                    $c = null;
+                    if($raw_c->getType() === ComponentType::CHANNEL_SELECT){
+                        $c = new ChannelSelect($raw_c->getCustomId());
+                        $c->setChannelTypes(array_map(fn($v) => $v->value, $raw_c->getChannelTypes()));
+                    }elseif($raw_c->getType() === ComponentType::ROLE_SELECT){
+                        $c = new RoleSelect($raw_c->getCustomId());
+                    }elseif($raw_c->getType() === ComponentType::USER_SELECT){
+                        $c = new UserSelect($raw_c->getCustomId());
+                    }elseif($raw_c->getType() === ComponentType::MENTIONABLE_SELECT){
+                        $c = new MentionableSelect($raw_c->getCustomId());
+                    }elseif($raw_c->getType() === ComponentType::STRING_SELECT){
+                        $c = new StringSelect($raw_c->getCustomId());
+                        foreach($raw_c->getOptions() as $option){
+                            $opt = new Option($option->getLabel(), $option->getValue());
+                            $opt->setDescription($option->getDescription());
+                            $opt->setEmoji($option->getEmoji());
+                            if(($def = $option->getDefault()) !== null){
+                                $opt->setDefault($def);
+                            }
+                            $c->addOption($opt);
+                        }
+                    }else{
+                        $this->logger->warning("Unknown select menu type: {$raw_c->getType()->name}");
+                        continue;
+                    }
+                    $c->setPlaceholder($raw_c->getPlaceholder());
+                    $c->setMinValues($raw_c->getMinValues());
+                    $c->setMaxValues($raw_c->getMaxValues());
+                    $c->setDisabled($raw_c->getDisabled());
+                    $message->addComponent($c);
+                }elseif($raw_c !== null && !($raw_c instanceof Button)){
+                    $this->logger->warning("Unknown component type: " . get_class($raw_c));
+                    continue;
+                }
+                $c = new ActionRow();
+                /** @var Button $raw */
+                foreach($all as $raw){
+                    $button = new \Discord\Builders\Components\Button($raw->getStyle()->value, $raw->getCustomId());
+                    $button->setDisabled($raw->getDisabled());
+                    $button->setLabel($raw->getLabel());
+                    $button->setEmoji($raw->getEmoji());
+                    $button->setUrl($raw->getUrl());
+                    $c->addComponent($button);
+                }
+                $message->addComponent($c);
             }
             $message->setStickers($pk->getStickerIds() ?? []);
             foreach(($pk->getFiles() ?? []) as $file_name => $file_data){
