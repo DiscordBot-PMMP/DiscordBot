@@ -2666,16 +2666,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.29",
+            "version": "1.10.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "ee5d8f2d3977fb09e55603eee6fb53bdd76ee9c1"
+                "reference": "2910afdd3fe33e5afd71c09f3fb0d0845b48c410"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/ee5d8f2d3977fb09e55603eee6fb53bdd76ee9c1",
-                "reference": "ee5d8f2d3977fb09e55603eee6fb53bdd76ee9c1",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/2910afdd3fe33e5afd71c09f3fb0d0845b48c410",
+                "reference": "2910afdd3fe33e5afd71c09f3fb0d0845b48c410",
                 "shasum": ""
             },
             "require": {
@@ -2724,7 +2724,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-08-14T13:24:11+00:00"
+            "time": "2023-08-22T13:48:25+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -3278,16 +3278,16 @@
         },
         {
             "name": "pocketmine/pocketmine-mp",
-            "version": "5.4.2",
+            "version": "5.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "2d5c9e64ce6790bf323b1f2d607a25ce6fc35020"
+                "reference": "e852a4382116705d7558fd808f1b388666b0c0cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/2d5c9e64ce6790bf323b1f2d607a25ce6fc35020",
-                "reference": "2d5c9e64ce6790bf323b1f2d607a25ce6fc35020",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/e852a4382116705d7558fd808f1b388666b0c0cb",
+                "reference": "e852a4382116705d7558fd808f1b388666b0c0cb",
                 "shasum": ""
             },
             "require": {
@@ -3360,7 +3360,7 @@
             "homepage": "https://pmmp.io",
             "support": {
                 "issues": "https://github.com/pmmp/PocketMine-MP/issues",
-                "source": "https://github.com/pmmp/PocketMine-MP/tree/5.4.2"
+                "source": "https://github.com/pmmp/PocketMine-MP/tree/5.4.3"
             },
             "funding": [
                 {
@@ -3372,7 +3372,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2023-08-09T13:04:57+00:00"
+            "time": "2023-08-21T17:31:45+00:00"
         },
         {
             "name": "pocketmine/raklib",
