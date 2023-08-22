@@ -58,6 +58,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateThread;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateThreadFromMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
@@ -217,7 +218,8 @@ final class NetworkApi{
         RequestUpdateRole::SERIALIZE_ID => RequestUpdateRole::class,
         RequestUpdateWebhook::SERIALIZE_ID => RequestUpdateWebhook::class,
         RequestCreateThreadFromMessage::SERIALIZE_ID => RequestCreateThreadFromMessage::class,
-        //Reserved 85-99
+        RequestCreateThread::SERIALIZE_ID => RequestCreateThread::class,
+        //Reserved 86-99
 
         //100 Next ID
     ];

@@ -20,6 +20,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateThread;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateThreadFromMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
@@ -965,7 +966,45 @@ final class Api{
         return ApiResolver::create($pk->getUID());
     }
 
-    //TODO createThread()
+    /**
+     * @param string      $name                  Name of the thread (1-100 characters)
+     * @param ChannelType $type                  Type of thread to create (must be thread type, Announcement thread when channel_id is for announcement channel type)
+     * @param bool|null   $invitable             Whether non-moderators can add other non-moderators to a thread; only available when creating a private thread
+     * @param int|null    $auto_archive_duration The thread will stop showing in the channel list after auto_archive_duration minutes of inactivity, can be set to: 60, 1440, 4320, 10080 (minutes)
+     * @param int|null    $rate_limit_per_user   Amount of seconds a user has to wait before sending another message (0-21600)
+     */
+    public function createThread(string $guild_id, string $channel_id, string $name, ChannelType $type,
+                                 ?bool $invitable = null, ?int $auto_archive_duration = null,
+                                 ?int $rate_limit_per_user = null, ?string $reason = null): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            return rejectPromise(new ApiRejection("Invalid guild ID '$guild_id'."));
+        }
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            return rejectPromise(new ApiRejection("Invalid channel ID '$channel_id'."));
+        }
+        if(strlen($name) < 1 || strlen($name) > 100){
+            return rejectPromise(new ApiRejection("Channel name must be between 1 and 100 characters."));
+        }
+        if(!$type->isThread()){
+            return rejectPromise(new ApiRejection("Channel type '{$type->name}' is not creatable, only threads can be created via createThread()."));
+        }
+        if($invitable !== null && $type !== ChannelType::PRIVATE_THREAD){
+            return rejectPromise(new ApiRejection("Invitable can only be set on private threads."));
+        }
+        if($auto_archive_duration !== null && !in_array($auto_archive_duration, [60, 1440, 4320, 10080], true)){
+            return rejectPromise(new ApiRejection("Auto archive duration must be one of 60, 1440, 4320 or 10080 (minutes)."));
+        }
+        if($rate_limit_per_user !== null && ($rate_limit_per_user < 0 || $rate_limit_per_user > 21600)){
+            return rejectPromise(new ApiRejection("Channel rate limit must be between 0 and 21600 (seconds)."));
+        }
+        $pk = new RequestCreateThread($guild_id, $channel_id, $name, $type, $invitable, $auto_archive_duration,
+            $rate_limit_per_user, $reason);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
 
     /**
      * Create a guild channel.
@@ -999,7 +1038,7 @@ final class Api{
             return rejectPromise(new ApiRejection("Channel name must be between 1 and 100 characters."));
         }
         if(!$type->isGuild()){
-            return rejectPromise(new ApiRejection("Channel type '{$type->name}' is not creatable, only guild channels can be created."));
+            return rejectPromise(new ApiRejection("Channel type '{$type->name}' is not creatable, only guild channels can be created via createChannel()."));
         }
         if($topic !== null){
             if(!in_array($type, [ChannelType::GUILD_TEXT, ChannelType::GUILD_ANNOUNCEMENT, ChannelType::GUILD_FORUM, ChannelType::GUILD_MEDIA], true)){

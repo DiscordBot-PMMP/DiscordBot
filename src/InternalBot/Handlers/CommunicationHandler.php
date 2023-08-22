@@ -35,6 +35,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestBroadcastTyping;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateChannel;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateInvite;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateRole;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateThread;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateThreadFromMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestCreateWebhook;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestDeleteChannel;
@@ -160,6 +161,7 @@ final class CommunicationHandler{
         elseif($pk instanceof RequestCreateChannel)           $this->handleCreateChannel($pk);
         elseif($pk instanceof RequestUpdateChannel)           $this->handleUpdateChannel($pk);
         elseif($pk instanceof RequestDeleteChannel)           $this->handleDeleteChannel($pk);
+        elseif($pk instanceof RequestCreateThread)            $this->handleCreateThread($pk);
         elseif($pk instanceof RequestCreateThreadFromMessage) $this->handleCreateThreadFromMessage($pk);
         elseif($pk instanceof RequestBanMember)               $this->handleBanMember($pk);
         elseif($pk instanceof RequestUnbanMember)             $this->handleUnbanMember($pk);
@@ -585,6 +587,23 @@ final class CommunicationHandler{
             }, function(\Throwable $e) use($pk){
                 $this->resolveRequest($pk->getUID(), false, "Failed to react to message.", [$e->getMessage(), $e->getTraceAsString()]);
                 $this->logger->debug("Failed to react to message ({$pk->getUID()}) - {$e->getMessage()}");
+            });
+        });
+    }
+
+    private function handleCreateThread(RequestCreateThread $pk): void{
+        $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
+            $channel->startThread([
+                "name" => $pk->getName(),
+                "invitable" => $pk->getInvitable(),
+                "auto_archive_duration" => $pk->getAutoArchiveDuration(),
+                "rate_limit_per_user" => $pk->getRateLimitPerUser(),
+                "private" => ($pk->getType()->value === DiscordChannel::TYPE_PRIVATE_THREAD)
+            ], $pk->getReason())->then(function(DiscordChannel $channel) use($pk){
+                $this->resolveRequest($pk->getUID(), true, "Created thread.", [ModelConverter::genModelChannel($channel)]);
+            }, function(\Throwable $e) use($pk){
+                $this->resolveRequest($pk->getUID(), false, "Failed to create thread.", [$e->getMessage(), $e->getTraceAsString()]);
+                $this->logger->debug("Failed to create thread ({$pk->getUID()}) - {$e->getMessage()}");
             });
         });
     }
