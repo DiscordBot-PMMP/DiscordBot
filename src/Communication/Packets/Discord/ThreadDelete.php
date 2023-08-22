@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Channels\ChannelType;
 
-class ThreadDelete extends Packet{
+final class ThreadDelete extends Packet{
 
     public const SERIALIZE_ID = 37;
 

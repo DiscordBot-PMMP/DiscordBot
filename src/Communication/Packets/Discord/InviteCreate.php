@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Invite;
 
-class InviteCreate extends Packet{
+final class InviteCreate extends Packet{
 
     public const SERIALIZE_ID = 15;
 

@@ -21,7 +21,7 @@ use function strlen;
  * @implements BinarySerializable<ActivityButton>
  * @link https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons
  */
-class ActivityButton implements BinarySerializable{
+final class ActivityButton implements BinarySerializable{
 
     /** Text shown on the button (1-32 characters) */
     private string $label;

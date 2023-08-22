@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class ChannelDelete extends Packet{
+final class ChannelDelete extends Packet{
 
     public const SERIALIZE_ID = 9;
 

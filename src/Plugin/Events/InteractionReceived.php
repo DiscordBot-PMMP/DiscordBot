@@ -19,7 +19,7 @@ use pocketmine\plugin\Plugin;
 /**
  * Emitted when an interaction is received.
  */
-class InteractionReceived extends DiscordBotEvent{
+final class InteractionReceived extends DiscordBotEvent{
 
     private Interaction $interaction;
 

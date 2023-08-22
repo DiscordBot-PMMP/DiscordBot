@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
 
-class PresenceUpdate extends Packet{
+final class PresenceUpdate extends Packet{
 
     public const SERIALIZE_ID = 27;
 

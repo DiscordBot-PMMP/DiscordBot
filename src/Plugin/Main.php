@@ -33,9 +33,7 @@ use pocketmine\utils\TextFormat;
 use function array_map;
 use function bin2hex;
 use function define;
-use function defined;
 use function file_exists;
-use function function_exists;
 use function intval;
 use function is_dir;
 use function is_int;
@@ -47,7 +45,7 @@ use function unlink;
 use function yaml_emit_file;
 use function yaml_parse_file;
 
-class Main extends PluginBase{
+final class Main extends PluginBase{
 
     private Thread $discordBot;
 
@@ -67,14 +65,10 @@ class Main extends PluginBase{
             throw new PluginException("Cannot be run from source.");
         }
 
-        if(!defined("JaxkDev\DiscordBot\COMPOSER")){
-            define("JaxkDev\DiscordBot\DATA_PATH", $this->getDataFolder());
-            define("JaxkDev\DiscordBot\VERSION", "v" . $this->getDescription()->getVersion());
-            define("JaxkDev\DiscordBot\COMPOSER", $phar . "/vendor/autoload.php");
-        }
-        if (!function_exists('JaxkDev\DiscordBot\Libs\React\Promise\resolve')) {
-            require $phar . '/src/Libs/React/Promise/functions.php';
-        }
+        define("JaxkDev\DiscordBot\DATA_PATH", $this->getDataFolder());
+        define("JaxkDev\DiscordBot\VERSION", "v" . $this->getDescription()->getVersion());
+        define("JaxkDev\DiscordBot\COMPOSER", $phar . "/vendor/autoload.php");
+        require_once $phar . '/src/Libs/React/Promise/functions.php';
 
         if(!is_dir($this->getDataFolder() . "logs")){
             mkdir($this->getDataFolder() . "logs");

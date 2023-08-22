@@ -22,7 +22,7 @@ use pocketmine\plugin\Plugin;
  * @see ChannelDeleted
  * @see ChannelCreated
  */
-class ChannelUpdated extends DiscordBotEvent{
+final class ChannelUpdated extends DiscordBotEvent{
 
     private Channel $channel;
 

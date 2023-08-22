@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use function array_merge;
 
 /** @extends Permissions<RolePermissions> */
-class RolePermissions extends Permissions{
+final class RolePermissions extends Permissions{
 
     /** @return Array<string, int> */
     static function getPossiblePermissions(): array{

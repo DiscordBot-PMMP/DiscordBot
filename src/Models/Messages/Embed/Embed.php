@@ -22,7 +22,7 @@ use function strlen;
  * @implements BinarySerializable<Embed>
  * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-structure
  */
-class Embed implements BinarySerializable{
+final class Embed implements BinarySerializable{
 
     /** 256 characters */
     private ?string $title;

@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class MessageReactionRemoveAll extends Packet{
+final class MessageReactionRemoveAll extends Packet{
 
     public const SERIALIZE_ID = 23;
 

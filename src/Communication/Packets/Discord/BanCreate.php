@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Ban;
 
-class BanCreate extends Packet{
+final class BanCreate extends Packet{
 
     public const SERIALIZE_ID = 6;
 

@@ -93,7 +93,8 @@ use function floor;
 use function get_class;
 use function microtime;
 
-class BotCommunicationHandler{
+/** @internal */
+final class BotCommunicationHandler{
 
     private Main $plugin;
 

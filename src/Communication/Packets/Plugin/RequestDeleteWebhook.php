@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestDeleteWebhook extends Packet{
+final class RequestDeleteWebhook extends Packet{
 
     public const SERIALIZE_ID = 49;
 

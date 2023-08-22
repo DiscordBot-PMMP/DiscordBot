@@ -19,7 +19,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 /**
  * Packet for external bot to verify its connection with the correct Version and MAGIC.
  */
-class Connect extends Packet{
+final class Connect extends Packet{
 
     public const SERIALIZE_ID = 3;
 

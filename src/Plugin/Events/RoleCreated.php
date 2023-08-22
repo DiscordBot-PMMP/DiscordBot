@@ -22,7 +22,7 @@ use pocketmine\plugin\Plugin;
  * @see RoleDeleted
  * @see RoleUpdated
  */
-class RoleCreated extends DiscordBotEvent{
+final class RoleCreated extends DiscordBotEvent{
 
     private Role $role;
 

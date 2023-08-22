@@ -28,7 +28,7 @@ use function time;
 use function yaml_emit;
 use const PHP_VERSION;
 
-class DebugData extends AsyncTask{
+final class DebugData extends AsyncTask{
 
     private string $serverFolder;
     private string $pluginFolder;

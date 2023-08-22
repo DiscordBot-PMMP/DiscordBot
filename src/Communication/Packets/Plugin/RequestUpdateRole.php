@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Role;
 
-class RequestUpdateRole extends Packet{
+final class RequestUpdateRole extends Packet{
 
     public const SERIALIZE_ID = 82;
 

@@ -20,7 +20,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
  * @implements BinarySerializable<Video>
  * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
  */
-class Video implements BinarySerializable{
+final class Video implements BinarySerializable{
 
     private ?string $url;
 

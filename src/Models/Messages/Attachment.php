@@ -15,7 +15,8 @@ namespace JaxkDev\DiscordBot\Models\Messages;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
+
+use JaxkDev\DiscordBot\Plugin\Utils;
 use function str_starts_with;
 use function strlen;
 use function substr;
@@ -24,7 +25,7 @@ use function substr;
  * @implements BinarySerializable<Attachment>
  * @link https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
  */
-class Attachment implements BinarySerializable{
+final class Attachment implements BinarySerializable{
 
     private string $id;
 
@@ -74,7 +75,7 @@ class Attachment implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!validDiscordSnowflake($id)){
+        if(!Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("ID '$id' is invalid.");
         }
         $this->id = $id;

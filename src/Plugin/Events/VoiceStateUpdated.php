@@ -23,7 +23,7 @@ use pocketmine\plugin\Plugin;
  * - Suppressed/muted/deafened by server
  * - Camera enabled/disabled
  */
-class VoiceStateUpdated extends DiscordBotEvent{
+final class VoiceStateUpdated extends DiscordBotEvent{
 
     /** New voice state. */
     private VoiceState $voice_state;

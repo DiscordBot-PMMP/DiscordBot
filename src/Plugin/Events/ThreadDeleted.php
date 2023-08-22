@@ -22,7 +22,7 @@ use pocketmine\plugin\Plugin;
  * @see ThreadCreatedEvent
  * @see ThreadUpdated
  */
-class ThreadDeleted extends DiscordBotEvent{
+final class ThreadDeleted extends DiscordBotEvent{
 
     private ChannelType $type;
 

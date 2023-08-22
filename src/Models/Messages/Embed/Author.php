@@ -21,7 +21,7 @@ use function strlen;
  * @implements BinarySerializable<Author>
  * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
  */
-class Author implements BinarySerializable{
+final class Author implements BinarySerializable{
 
     /** 256 characters */
     private string $name;

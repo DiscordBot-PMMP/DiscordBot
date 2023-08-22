@@ -76,7 +76,7 @@ use const E_USER_NOTICE;
 use const E_USER_WARNING;
 use const E_WARNING;
 
-class Client{
+final class Client{
 
     private Thread $thread;
 

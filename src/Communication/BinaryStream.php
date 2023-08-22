@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication;
 use function sizeof;
 use function strlen;
 
-class BinaryStream extends \pocketmine\utils\BinaryStream{
+final class BinaryStream extends \pocketmine\utils\BinaryStream{
 
     /** @return null (PHP 8.2 can be :null)*/
     public function getNull(){

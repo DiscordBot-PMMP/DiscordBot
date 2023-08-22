@@ -17,14 +17,14 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Sticker;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use function in_array;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * @implements BinarySerializable<Guild>
  * @link https://discord.com/developers/docs/resources/guild#guild-resource
  */
-class Guild implements BinarySerializable{
+final class Guild implements BinarySerializable{
 
     public const SERIALIZE_ID = 1;
 
@@ -248,7 +248,7 @@ class Guild implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!validDiscordSnowflake($id)){
+        if(!Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -303,7 +303,7 @@ class Guild implements BinarySerializable{
     }
 
     public function setOwnerId(?string $owner_id): void{
-        if($owner_id !== null && !validDiscordSnowflake($owner_id)){
+        if($owner_id !== null && !Utils::validDiscordSnowflake($owner_id)){
             throw new \AssertionError("Owner ID '$owner_id' is invalid.");
         }
         $this->owner_id = $owner_id;
@@ -314,7 +314,7 @@ class Guild implements BinarySerializable{
     }
 
     public function setAfkChannelId(?string $afk_channel_id): void{
-        if($afk_channel_id !== null && !validDiscordSnowflake($afk_channel_id)){
+        if($afk_channel_id !== null && !Utils::validDiscordSnowflake($afk_channel_id)){
             throw new \AssertionError("AFK channel ID '$afk_channel_id' is invalid.");
         }
         $this->afk_channel_id = $afk_channel_id;
@@ -344,7 +344,7 @@ class Guild implements BinarySerializable{
     }
 
     public function setWidgetChannelId(?string $widget_channel_id): void{
-        if($widget_channel_id !== null && !validDiscordSnowflake($widget_channel_id)){
+        if($widget_channel_id !== null && !Utils::validDiscordSnowflake($widget_channel_id)){
             throw new \AssertionError("Widget channel ID '$widget_channel_id' is invalid.");
         }
         $this->widget_channel_id = $widget_channel_id;
@@ -417,7 +417,7 @@ class Guild implements BinarySerializable{
     }
 
     public function setApplicationId(?string $application_id): void{
-        if($application_id !== null && !validDiscordSnowflake($application_id)){
+        if($application_id !== null && !Utils::validDiscordSnowflake($application_id)){
             throw new \AssertionError("Application ID '$application_id' is invalid.");
         }
         $this->application_id = $application_id;
@@ -428,7 +428,7 @@ class Guild implements BinarySerializable{
     }
 
     public function setSystemChannelId(?string $system_channel_id): void{
-        if($system_channel_id !== null && !validDiscordSnowflake($system_channel_id)){
+        if($system_channel_id !== null && !Utils::validDiscordSnowflake($system_channel_id)){
             throw new \AssertionError("System channel ID '$system_channel_id' is invalid.");
         }
         $this->system_channel_id = $system_channel_id;
@@ -447,7 +447,7 @@ class Guild implements BinarySerializable{
     }
 
     public function setRulesChannelId(?string $rules_channel_id): void{
-        if($rules_channel_id !== null && !validDiscordSnowflake($rules_channel_id)){
+        if($rules_channel_id !== null && !Utils::validDiscordSnowflake($rules_channel_id)){
             throw new \AssertionError("Rules channel ID '$rules_channel_id' is invalid.");
         }
         $this->rules_channel_id = $rules_channel_id;
@@ -535,7 +535,7 @@ class Guild implements BinarySerializable{
     }
 
     public function setPublicUpdatesChannelId(?string $public_updates_channel_id): void{
-        if($public_updates_channel_id !== null && !validDiscordSnowflake($public_updates_channel_id)){
+        if($public_updates_channel_id !== null && !Utils::validDiscordSnowflake($public_updates_channel_id)){
             throw new \AssertionError("Public updates channel ID '$public_updates_channel_id' is invalid.");
         }
         $this->public_updates_channel_id = $public_updates_channel_id;
@@ -601,7 +601,7 @@ class Guild implements BinarySerializable{
     }
 
     public function setSafetyAlertsChannelId(?string $safety_alerts_channel_id): void{
-        if($safety_alerts_channel_id !== null && !validDiscordSnowflake($safety_alerts_channel_id)){
+        if($safety_alerts_channel_id !== null && !Utils::validDiscordSnowflake($safety_alerts_channel_id)){
             throw new \AssertionError("Safety alerts channel ID '$safety_alerts_channel_id' is invalid.");
         }
         $this->safety_alerts_channel_id = $safety_alerts_channel_id;

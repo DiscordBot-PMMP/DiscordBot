@@ -20,7 +20,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
  * @implements BinarySerializable<ThreadMetadata>
  * @link https://discord.com/developers/docs/resources/channel#thread-metadata-object-thread-metadata-structure
  */
-class ThreadMetadata implements BinarySerializable{
+final class ThreadMetadata implements BinarySerializable{
 
     /** Whether the thread is archived */
     private bool $archived;

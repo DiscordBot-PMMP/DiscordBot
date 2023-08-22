@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Member;
 
-class MemberJoin extends Packet{
+final class MemberJoin extends Packet{
 
     public const SERIALIZE_ID = 17;
 

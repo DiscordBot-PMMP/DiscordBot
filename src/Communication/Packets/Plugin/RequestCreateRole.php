@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 
-class RequestCreateRole extends Packet{
+final class RequestCreateRole extends Packet{
 
     public const SERIALIZE_ID = 44;
 

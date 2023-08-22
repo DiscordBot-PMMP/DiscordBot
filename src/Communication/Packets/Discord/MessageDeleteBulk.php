@@ -21,7 +21,7 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
  * Sent when messages are deleted in bulk.
  * The message deleted will either be an ID in message_ids or a model in messages. (exclusive properties, won't be in both.)
  */
-class MessageDeleteBulk extends Packet{
+final class MessageDeleteBulk extends Packet{
 
     public const SERIALIZE_ID = 33;
 

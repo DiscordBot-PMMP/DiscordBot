@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
 
-class RequestUpdateChannel extends Packet{
+final class RequestUpdateChannel extends Packet{
 
     public const SERIALIZE_ID = 80;
 

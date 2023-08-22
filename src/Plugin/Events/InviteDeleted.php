@@ -20,7 +20,7 @@ use pocketmine\plugin\Plugin;
  *
  * @see InviteCreated
  */
-class InviteDeleted extends DiscordBotEvent{
+final class InviteDeleted extends DiscordBotEvent{
 
     private ?string $guild_id;
 

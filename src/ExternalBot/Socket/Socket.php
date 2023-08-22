@@ -31,7 +31,7 @@ use const SOCKET_EINPROGRESS;
 use const SOCKET_EWOULDBLOCK;
 use const SOL_TCP;
 
-class Socket{
+final class Socket{
 
     private Logger $logger;
 

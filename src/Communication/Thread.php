@@ -26,7 +26,7 @@ use function ini_set;
  * This class is used to represent a thread that is used for network communication.
  * There are two options, internal (hosting the bot) and external (hosting the bot outside the server).
  */
- class Thread extends PMMPThread{
+ final class Thread extends PMMPThread{
 
     private ThreadStatus $status = ThreadStatus::STARTING;
 

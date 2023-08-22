@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Interactions\Interaction;
 
-class InteractionReceived extends Packet{
+final class InteractionReceived extends Packet{
 
     public const SERIALIZE_ID = 32;
 

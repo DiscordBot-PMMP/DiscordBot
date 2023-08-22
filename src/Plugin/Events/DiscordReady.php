@@ -24,7 +24,7 @@ use pocketmine\plugin\Plugin;
  *
  * @see DiscordClosed Emitted when DiscordBot disconnects.
  */
-class DiscordReady extends DiscordBotEvent{
+final class DiscordReady extends DiscordBotEvent{
 
     private User $bot_user;
 

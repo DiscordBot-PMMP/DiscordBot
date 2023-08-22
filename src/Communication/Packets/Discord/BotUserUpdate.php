@@ -21,7 +21,7 @@ use JaxkDev\DiscordBot\Models\User;
  * Sent when the bot connected has its user properties changed.
  * eg, owner changes its username via discord developer dashboard while bot is running.
  */
-class BotUserUpdate extends Packet{
+final class BotUserUpdate extends Packet{
 
     public const SERIALIZE_ID = 34;
 

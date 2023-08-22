@@ -22,7 +22,7 @@ use JaxkDev\DiscordBot\Plugin\Api;
  * A simple class to hold all presence data for members.
  * @implements BinarySerializable<Presence>
  */
-class Presence implements BinarySerializable{
+final class Presence implements BinarySerializable{
 
     public const SERIALIZE_ID = 3;
 

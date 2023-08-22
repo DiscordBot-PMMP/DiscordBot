@@ -21,7 +21,7 @@ use pocketmine\plugin\Plugin;
  *
  * @see BanDeleted (AKA Revoked)
  */
-class BanCreated extends DiscordBotEvent{
+final class BanCreated extends DiscordBotEvent{
 
     private Ban $ban;
 

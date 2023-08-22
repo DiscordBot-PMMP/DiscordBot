@@ -22,7 +22,7 @@ use function strlen;
 /**
  * @link https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
  */
-class SelectMenu extends Component{
+final class SelectMenu extends Component{
 
     public const SERIALIZE_ID = 16;
 

@@ -92,7 +92,7 @@ use function get_class;
 use function microtime;
 use function React\Promise\reject;
 
-class CommunicationHandler{
+final class CommunicationHandler{
 
     private Client $client;
 

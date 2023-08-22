@@ -17,13 +17,13 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Models\Presence\Presence;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
+use JaxkDev\DiscordBot\Plugin\Utils;
 
 /**
  * @implements BinarySerializable<Member>
  * @link https://discord.com/developers/docs/resources/guild#guild-member-object
  */
-class Member implements BinarySerializable{
+final class Member implements BinarySerializable{
 
     public const SERIALIZE_ID = 7;
 
@@ -117,7 +117,7 @@ class Member implements BinarySerializable{
     }
 
     public function setGuildId(string $guild_id): void{
-        if(!validDiscordSnowflake($guild_id)){
+        if(!Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -128,7 +128,7 @@ class Member implements BinarySerializable{
     }
 
     public function setUserId(string $id): void{
-        if(!validDiscordSnowflake($id)){
+        if(!Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("User ID '$id' is invalid.");
         }
         $this->user_id = $id;
@@ -162,7 +162,7 @@ class Member implements BinarySerializable{
     /** @param string[] $roles Role IDs */
     public function setRoles(array $roles): void{
         foreach($roles as $id){
-            if(!validDiscordSnowflake($id)){
+            if(!Utils::validDiscordSnowflake($id)){
                 throw new \AssertionError("Role ID '$id' is invalid.");
             }
         }

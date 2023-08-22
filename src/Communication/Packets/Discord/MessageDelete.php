@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 
-class MessageDelete extends Packet{
+final class MessageDelete extends Packet{
 
     public const SERIALIZE_ID = 20;
 

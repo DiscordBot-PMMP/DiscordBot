@@ -21,7 +21,7 @@ use function strlen;
  * @implements BinarySerializable<Field>
  * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
  */
-class Field implements BinarySerializable{
+final class Field implements BinarySerializable{
 
     /** 256 characters */
     private string $name;

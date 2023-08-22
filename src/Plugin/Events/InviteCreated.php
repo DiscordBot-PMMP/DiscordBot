@@ -21,7 +21,7 @@ use pocketmine\plugin\Plugin;
  *
  * @see InviteDeleted
  */
-class InviteCreated extends DiscordBotEvent{
+final class InviteCreated extends DiscordBotEvent{
 
     private Invite $invite;
 

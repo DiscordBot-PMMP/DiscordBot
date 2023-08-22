@@ -20,7 +20,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
  * @implements BinarySerializable<Provider>
  * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
  */
-class Provider implements BinarySerializable{
+final class Provider implements BinarySerializable{
 
     private ?string $name;
 

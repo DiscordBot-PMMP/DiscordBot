@@ -21,7 +21,7 @@ use function strlen;
  * @implements BinarySerializable<Footer>
  * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
  */
-class Footer implements BinarySerializable{
+final class Footer implements BinarySerializable{
 
     /** 2048 characters */
     private string $text;

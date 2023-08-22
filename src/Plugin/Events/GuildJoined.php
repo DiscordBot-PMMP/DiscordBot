@@ -22,7 +22,7 @@ use pocketmine\plugin\Plugin;
  * @see GuildDeleted Emitted when the bot leaves a guild
  * @see GuildUpdated Emitted when a guild the bot is in has been updated.
  */
-class GuildJoined extends DiscordBotEvent{
+final class GuildJoined extends DiscordBotEvent{
 
     private Guild $guild;
 

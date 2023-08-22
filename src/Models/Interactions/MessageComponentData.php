@@ -21,7 +21,7 @@ use JaxkDev\DiscordBot\Models\Messages\Component\ComponentType;
  * @implements BinarySerializable<MessageComponentData>
  * @link https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-message-component-data-structure
  */
-class MessageComponentData implements BinarySerializable{
+final class MessageComponentData implements BinarySerializable{
 
     /** The custom_id of the component */
     private string $custom_id;

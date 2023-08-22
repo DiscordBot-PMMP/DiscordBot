@@ -114,7 +114,7 @@ use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\VoiceState;
 use JaxkDev\DiscordBot\Models\Webhook;
 
-class NetworkApi{
+final class NetworkApi{
 
     //Version will change for any breaking changes to:
     //Models, Packets, Magic.

@@ -20,7 +20,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
  * @implements BinarySerializable<Activity>
  * @link https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure
  */
-class Activity implements BinarySerializable{
+final class Activity implements BinarySerializable{
 
     private ActivityType $type;
 

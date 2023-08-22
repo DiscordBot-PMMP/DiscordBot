@@ -17,13 +17,13 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
+use JaxkDev\DiscordBot\Plugin\Utils;
 
 /**
  * @implements BinarySerializable<Overwrite>
  * @link https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure
  */
-class Overwrite implements BinarySerializable{
+final class Overwrite implements BinarySerializable{
 
     /** Role or user id */
     private string $id;
@@ -46,7 +46,7 @@ class Overwrite implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!validDiscordSnowflake($id)){
+        if(!Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("Invalid ID provided.");
         }
         $this->id = $id;

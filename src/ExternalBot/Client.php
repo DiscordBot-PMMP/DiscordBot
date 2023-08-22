@@ -28,7 +28,7 @@ use function microtime;
 use function usleep;
 use const DIRECTORY_SEPARATOR;
 
-class Client{
+final class Client{
 
     private Thread $thread;
 

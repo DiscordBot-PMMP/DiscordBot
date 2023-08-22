@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RoleDelete extends Packet{
+final class RoleDelete extends Packet{
 
     public const SERIALIZE_ID = 29;
 

@@ -13,13 +13,13 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * Emitted when a webhook(s) in the specified guild/channel has been updated
  */
-class WebhooksUpdated extends DiscordBotEvent{
+final class WebhooksUpdated extends DiscordBotEvent{
 
     private string $guild_id;
 
@@ -27,12 +27,12 @@ class WebhooksUpdated extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, string $guild_id, string $channel_id){
         parent::__construct($plugin);
-        if(validDiscordSnowflake($guild_id)){
+        if(Utils::validDiscordSnowflake($guild_id)){
             $this->guild_id = $guild_id;
         }else{
             throw new \AssertionError("Invalid guild ID given.");
         }
-        if(validDiscordSnowflake($channel_id)){
+        if(Utils::validDiscordSnowflake($channel_id)){
             $this->channel_id = $channel_id;
         }else{
             throw new \AssertionError("Invalid channel ID given.");

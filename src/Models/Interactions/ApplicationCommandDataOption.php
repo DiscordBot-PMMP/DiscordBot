@@ -26,7 +26,7 @@ use function is_string;
  * @implements BinarySerializable<ApplicationCommandDataOption>
  * @link https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-interaction-data-option-structure
  */
-class ApplicationCommandDataOption implements BinarySerializable{
+final class ApplicationCommandDataOption implements BinarySerializable{
 
     //value and options are mutually exclusive.
 

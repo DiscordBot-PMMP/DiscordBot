@@ -26,7 +26,7 @@ use pocketmine\plugin\Plugin;
  * @see MessageSent
  * @see MessageDeletd
  */
-class MessagesBulkDeleted extends DiscordBotEvent{
+final class MessagesBulkDeleted extends DiscordBotEvent{
 
     private ?string $guild_id;
 

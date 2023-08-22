@@ -22,7 +22,7 @@ use pocketmine\plugin\Plugin;
  * @see MemberJoined
  * @see MemberLeft
  */
-class MemberUpdated extends DiscordBotEvent{
+final class MemberUpdated extends DiscordBotEvent{
 
     private Member $member;
 

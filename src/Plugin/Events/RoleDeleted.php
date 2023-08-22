@@ -13,8 +13,8 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * Emitted when a role gets Deleted.
@@ -22,7 +22,7 @@ use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
  * @see RoleCreated
  * @see RoleUpdated
  */
-class RoleDeleted extends DiscordBotEvent{
+final class RoleDeleted extends DiscordBotEvent{
 
     private string $guild_id;
 
@@ -30,12 +30,12 @@ class RoleDeleted extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, string $guild_id, string $role_id){
         parent::__construct($plugin);
-        if(validDiscordSnowflake($guild_id)){
+        if(Utils::validDiscordSnowflake($guild_id)){
             $this->guild_id = $guild_id;
         }else{
             throw new \AssertionError("Invalid guild_id given.");
         }
-        if(validDiscordSnowflake($role_id)){
+        if(Utils::validDiscordSnowflake($role_id)){
             $this->role_id = $role_id;
         }else{
             throw new \AssertionError("Invalid role_id given.");

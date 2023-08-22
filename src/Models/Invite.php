@@ -15,13 +15,13 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
+use JaxkDev\DiscordBot\Plugin\Utils;
 
 /**
  * @implements BinarySerializable<Invite>
  * @link https://discord.com/developers/docs/resources/invite#invite-object
  */
-class Invite implements BinarySerializable{
+final class Invite implements BinarySerializable{
 
     public const SERIALIZE_ID = 6;
 
@@ -70,7 +70,7 @@ class Invite implements BinarySerializable{
     }
 
     public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -81,7 +81,7 @@ class Invite implements BinarySerializable{
     }
 
     public function setChannelId(string $channel_id): void{
-        if(!validDiscordSnowflake($channel_id)){
+        if(!Utils::validDiscordSnowflake($channel_id)){
             throw new \AssertionError("Channel ID '$channel_id' is invalid.");
         }
         $this->channel_id = $channel_id;
@@ -92,7 +92,7 @@ class Invite implements BinarySerializable{
     }
 
     public function setInviter(?string $inviter): void{
-        if($inviter !== null && !validDiscordSnowflake($inviter)){
+        if($inviter !== null && !Utils::validDiscordSnowflake($inviter)){
             throw new \AssertionError("Inviter ID '$inviter' is invalid.");
         }
         $this->inviter = $inviter;
@@ -111,7 +111,7 @@ class Invite implements BinarySerializable{
     }
 
     public function setTargetUser(?string $target_user): void{
-        if($target_user !== null && !validDiscordSnowflake($target_user)){
+        if($target_user !== null && !Utils::validDiscordSnowflake($target_user)){
             throw new \AssertionError("Target user ID '$target_user' is invalid.");
         }
         $this->target_user = $target_user;

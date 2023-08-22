@@ -18,10 +18,8 @@ use JaxkDev\DiscordBot\Libs\React\Promise\Deferred;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use pocketmine\Server;
 
-/**
- * @internal
- */
-abstract class ApiResolver{
+/** @internal */
+final class ApiResolver{
 
     static private ?\AttachableLogger $logger;
 

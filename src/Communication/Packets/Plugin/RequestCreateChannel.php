@@ -23,7 +23,7 @@ use JaxkDev\DiscordBot\Models\Channels\VideoQualityMode;
 /**
  * @link https://discord.com/developers/docs/resources/guild#create-guild-channel-json-params
  */
-class RequestCreateChannel extends Packet{
+final class RequestCreateChannel extends Packet{
 
     public const SERIALIZE_ID = 43;
 

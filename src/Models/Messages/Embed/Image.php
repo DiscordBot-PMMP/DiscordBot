@@ -20,7 +20,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
  * @implements BinarySerializable<Image>
  * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
  */
-class Image implements BinarySerializable{
+final class Image implements BinarySerializable{
 
     private string $url;
 

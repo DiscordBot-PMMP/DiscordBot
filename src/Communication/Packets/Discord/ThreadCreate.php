@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
 
-class ThreadCreate extends Packet{
+final class ThreadCreate extends Packet{
 
     public const SERIALIZE_ID = 36;
 

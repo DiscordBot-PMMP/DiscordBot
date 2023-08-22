@@ -26,7 +26,7 @@ use function strlen;
  * @implements BinarySerializable<CommandOption>
  * @link https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
  */
-class CommandOption implements BinarySerializable{
+final class CommandOption implements BinarySerializable{
 
     /** Type of option */
     private CommandOptionType $type;

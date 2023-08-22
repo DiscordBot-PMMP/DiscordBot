@@ -19,7 +19,7 @@ use function strlen;
 /**
  * @link https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure
  */
-class TextInput extends Component{
+final class TextInput extends Component{
 
     public const SERIALIZE_ID = 17;
 

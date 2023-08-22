@@ -17,13 +17,13 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 use JaxkDev\DiscordBot\Models\Permissions\ChannelPermissions;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
+use JaxkDev\DiscordBot\Plugin\Utils;
 
 /**
  * @implements BinarySerializable<Interaction>
  * @link https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
  */
-class Interaction implements BinarySerializable{
+final class Interaction implements BinarySerializable{
 
     /** ID of the interaction */
     private string $id;
@@ -94,7 +94,7 @@ class Interaction implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!validDiscordSnowflake($id)){
+        if(!Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -105,7 +105,7 @@ class Interaction implements BinarySerializable{
     }
 
     public function setApplicationId(string $application_id): void{
-        if(!validDiscordSnowflake($application_id)){
+        if(!Utils::validDiscordSnowflake($application_id)){
             throw new \AssertionError("Application ID '$application_id' is invalid.");
         }
         $this->application_id = $application_id;
@@ -132,7 +132,7 @@ class Interaction implements BinarySerializable{
     }
 
     public function setGuildId(?string $guild_id): void{
-        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;
@@ -143,7 +143,7 @@ class Interaction implements BinarySerializable{
     }
 
     public function setChannelId(?string $channel_id): void{
-        if($channel_id !== null && !validDiscordSnowflake($channel_id)){
+        if($channel_id !== null && !Utils::validDiscordSnowflake($channel_id)){
             throw new \AssertionError("Channel ID '$channel_id' is invalid.");
         }
         $this->channel_id = $channel_id;
@@ -154,7 +154,7 @@ class Interaction implements BinarySerializable{
     }
 
     public function setUserId(?string $user_id): void{
-        if($user_id !== null && !validDiscordSnowflake($user_id)){
+        if($user_id !== null && !Utils::validDiscordSnowflake($user_id)){
             throw new \AssertionError("User ID '$user_id' is invalid.");
         }
         $this->user_id = $user_id;

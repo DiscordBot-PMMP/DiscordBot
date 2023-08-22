@@ -21,7 +21,7 @@ use JaxkDev\DiscordBot\Models\Emoji;
  * @implements BinarySerializable<Reaction>
  * @link https://discord.com/developers/docs/resources/channel#reaction-object-reaction-structure
  */
-class Reaction implements BinarySerializable{
+final class Reaction implements BinarySerializable{
 
     private int $count;
 

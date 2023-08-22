@@ -20,7 +20,7 @@ use function strlen;
 /**
  * @link https://discord.com/developers/docs/interactions/message-components#button-object-button-structure
  */
-class Button extends Component{
+final class Button extends Component{
 
     public const SERIALIZE_ID = 15;
 

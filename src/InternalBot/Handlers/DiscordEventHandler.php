@@ -76,7 +76,7 @@ use JaxkDev\DiscordBot\Models\Presence\Presence;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use Monolog\Logger;
 
-class DiscordEventHandler{
+final class DiscordEventHandler{
 
     private Client $client;
 
@@ -118,7 +118,7 @@ class DiscordEventHandler{
         $discord->on(DiscordEvent::INVITE_CREATE, [$this, "onInviteCreate"]);
         $discord->on(DiscordEvent::INVITE_DELETE, [$this, "onInviteDelete"]);
 
-        //$discord->on(DiscordEvent::GUILD_AUDIT_LOG_ENTRY_CREATE, [$this, "onAuditLogEntryCreate"]);
+        //$discord->on(DiscordEvent::GUILD_AUDIT_LOG_ENTRY_CREATE, [$this, "onAuditLoModelConverter::gentryCreate"]);
         //TODO-Next-Minor Decide on the model structure of this bad boy.
 
         $discord->on(DiscordEvent::GUILD_BAN_ADD, [$this, "onBanAdd"]);

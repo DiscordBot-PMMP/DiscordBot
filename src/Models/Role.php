@@ -16,13 +16,13 @@ namespace JaxkDev\DiscordBot\Models;
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
+use JaxkDev\DiscordBot\Plugin\Utils;
 
 /**
  * @implements BinarySerializable<Role>
  * @link https://discord.com/developers/docs/topics/permissions#role-object
  */
-class Role implements BinarySerializable{
+final class Role implements BinarySerializable{
 
     public const SERIALIZE_ID = 8;
 
@@ -88,7 +88,7 @@ class Role implements BinarySerializable{
     }
 
     public function setId(?string $id): void{
-        if($id !== null && !validDiscordSnowflake($id)){
+        if($id !== null && !Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("Role ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -99,7 +99,7 @@ class Role implements BinarySerializable{
     }
 
     public function setGuildId(string $guild_id): void{
-        if(!validDiscordSnowflake($guild_id)){
+        if(!Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Guild ID '$guild_id' is invalid.");
         }
         $this->guild_id = $guild_id;

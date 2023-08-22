@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestFetchRoles extends Packet{
+final class RequestFetchRoles extends Packet{
 
     public const SERIALIZE_ID = 62;
 

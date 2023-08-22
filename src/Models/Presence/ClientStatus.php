@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 
 /** @implements BinarySerializable<ClientStatus> */
-class ClientStatus implements BinarySerializable{
+final class ClientStatus implements BinarySerializable{
 
     private Status $desktop;
     private Status $mobile;

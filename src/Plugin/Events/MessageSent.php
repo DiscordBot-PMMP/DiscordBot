@@ -22,7 +22,7 @@ use pocketmine\plugin\Plugin;
  * @see MessageDeleted
  * @see MessageUpdated
  */
-class MessageSent extends DiscordBotEvent{
+final class MessageSent extends DiscordBotEvent{
 
     private Message $message;
 

@@ -19,7 +19,7 @@ use function count;
 /**
  * @link https://discord.com/developers/docs/interactions/message-components#action-rows
  */
-class ActionRow extends Component{
+final class ActionRow extends Component{
 
     public const SERIALIZE_ID = 14;
 

@@ -19,7 +19,7 @@ use pocketmine\plugin\Plugin;
 /**
  * Emitted when a members presence is updated.
  */
-class PresenceUpdated extends DiscordBotEvent{
+final class PresenceUpdated extends DiscordBotEvent{
 
     private string $guild_id;
 

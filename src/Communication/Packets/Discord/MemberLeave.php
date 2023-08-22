@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class MemberLeave extends Packet{
+final class MemberLeave extends Packet{
 
     public const SERIALIZE_ID = 18;
 

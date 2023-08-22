@@ -19,7 +19,7 @@ use pocketmine\plugin\Plugin;
 /**
  * Emitted when the bot user is updated, eg changes username etc.
  */
-class BotUserUpdated extends DiscordBotEvent{
+final class BotUserUpdated extends DiscordBotEvent{
 
     private User $bot;
 

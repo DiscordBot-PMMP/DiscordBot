@@ -13,7 +13,7 @@
 
 namespace JaxkDev\DiscordBot\InternalBot;
 
-class Discord extends \Discord\Discord{
+final class Discord extends \Discord\Discord{
     public function handleWsClose(int $op, string $reason): void{
         $this->emit("ws_closed", [$op, $reason]);
         parent::handleWsClose($op, $reason);

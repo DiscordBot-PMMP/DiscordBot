@@ -34,7 +34,11 @@ use function strlen;
 use const FILTER_FLAG_IPV4;
 use const FILTER_VALIDATE_IP;
 
-abstract class ConfigUtils{
+/**
+ * This class is used INTERNALLY to update the config.yml file to the latest version.
+ * @internal
+ */
+final class ConfigUtils{
 
     const VERSION = 4;
 

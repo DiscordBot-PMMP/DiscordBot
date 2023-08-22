@@ -13,8 +13,8 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
 
 /**
  * Emitted when ALL reactions are removed from a message.
@@ -23,7 +23,7 @@ use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
  * @see MessageReactionRemove
  * @see MessageReactionRemoveEmoji
  */
-class MessageReactionRemoveAll extends DiscordBotEvent{
+final class MessageReactionRemoveAll extends DiscordBotEvent{
 
     private ?string $guild_id;
 
@@ -33,13 +33,13 @@ class MessageReactionRemoveAll extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, ?string $guild_id, string $channel_id, string $message_id){
         parent::__construct($plugin);
-        if($guild_id !== null && !validDiscordSnowflake($guild_id)){
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Invalid guild ID given.");
         }
-        if(!validDiscordSnowflake($channel_id)){
+        if(!Utils::validDiscordSnowflake($channel_id)){
             throw new \AssertionError("Invalid channel ID given.");
         }
-        if(!validDiscordSnowflake($message_id)){
+        if(!Utils::validDiscordSnowflake($message_id)){
             throw new \AssertionError("Invalid message ID given.");
         }
         $this->guild_id = $guild_id;

@@ -15,14 +15,15 @@ namespace JaxkDev\DiscordBot\Models\Channels;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
+
+use JaxkDev\DiscordBot\Plugin\Utils;
 use function strlen;
 
 /**
  * @implements BinarySerializable<ForumTag>
  * @link https://discord.com/developers/docs/resources/channel#forum-tag-object-forum-tag-structure
  */
-class ForumTag implements BinarySerializable{
+final class ForumTag implements BinarySerializable{
 
     /** The ID of the tag. */
     private string $id;
@@ -52,7 +53,7 @@ class ForumTag implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!validDiscordSnowflake($id)){
+        if(!Utils::validDiscordSnowflake($id)){
             throw new \InvalidArgumentException("Invalid ID given.");
         }
         $this->id = $id;
@@ -82,7 +83,7 @@ class ForumTag implements BinarySerializable{
     }
 
     public function setEmojiId(?string $emoji_id): void{
-        if($emoji_id !== null && !validDiscordSnowflake($emoji_id)){
+        if($emoji_id !== null && !Utils::validDiscordSnowflake($emoji_id)){
             throw new \InvalidArgumentException("Invalid emoji ID given.");
         }
         $this->emoji_id = $emoji_id;

@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class BanDelete extends Packet{
+final class BanDelete extends Packet{
 
     public const SERIALIZE_ID = 7;
 

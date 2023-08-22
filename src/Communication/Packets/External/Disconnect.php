@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\External;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class Disconnect extends Packet{
+final class Disconnect extends Packet{
 
     public const SERIALIZE_ID = 4;
 

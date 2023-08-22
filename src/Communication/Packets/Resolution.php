@@ -19,7 +19,7 @@ use JaxkDev\DiscordBot\Communication\NetworkApi;
 use function count;
 use function is_string;
 
-class Resolution extends Packet{
+final class Resolution extends Packet{
 
     public const SERIALIZE_ID = 2;
 

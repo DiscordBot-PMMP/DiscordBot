@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestFetchChannels extends Packet{
+final class RequestFetchChannels extends Packet{
 
     public const SERIALIZE_ID = 53;
 

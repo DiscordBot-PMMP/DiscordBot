@@ -23,7 +23,7 @@ use function sizeof;
  * @implements BinarySerializable<ModalSubmitData>
  * @link https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-modal-submit-data-structure
  */
-class ModalSubmitData implements BinarySerializable{
+final class ModalSubmitData implements BinarySerializable{
 
     /** the custom_id of the modal. */
     private string $custom_id;

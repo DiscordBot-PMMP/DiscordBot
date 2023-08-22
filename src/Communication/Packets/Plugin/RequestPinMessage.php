@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestPinMessage extends Packet{
+final class RequestPinMessage extends Packet{
 
     public const SERIALIZE_ID = 70;
 

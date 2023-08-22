@@ -17,7 +17,7 @@ use function array_slice;
 use function is_string;
 use function sizeof;
 
-class ApiResolution{
+final class ApiResolution{
 
     private array $data;
 

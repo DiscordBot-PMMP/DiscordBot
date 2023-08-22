@@ -13,7 +13,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-class ApiRejection extends \Exception{
+final class ApiRejection extends \Exception{
 
     /** @var string[] */
     private array $data;

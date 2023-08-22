@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\VoiceState;
 
-class VoiceStateUpdate extends Packet{
+final class VoiceStateUpdate extends Packet{
 
     public const SERIALIZE_ID = 31;
 

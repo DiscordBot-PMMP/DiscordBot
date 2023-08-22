@@ -22,7 +22,7 @@ use function strlen;
  * @implements BinarySerializable<SelectOption>
  * @link https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure
  */
-class SelectOption implements BinarySerializable{
+final class SelectOption implements BinarySerializable{
 
     /** Max 100 characters */
     private string $label;

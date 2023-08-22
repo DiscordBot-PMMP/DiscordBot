@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Guild\Guild;
 
-class GuildJoin extends Packet{
+final class GuildJoin extends Packet{
 
     public const SERIALIZE_ID = 12;
 

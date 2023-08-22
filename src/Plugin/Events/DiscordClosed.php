@@ -17,4 +17,4 @@ namespace JaxkDev\DiscordBot\Plugin\Events;
  * DiscordBot has disconnected, and we are no longer in contact with discord.
  * @see DiscordConnected Emitted when DiscordBot connects.
  */
-class DiscordClosed extends DiscordBotEvent{}
+final class DiscordClosed extends DiscordBotEvent{}

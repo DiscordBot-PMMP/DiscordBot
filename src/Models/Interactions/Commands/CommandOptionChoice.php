@@ -24,7 +24,7 @@ use function strlen;
  * @implements BinarySerializable<CommandOptionChoice>
  * @link https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
  */
-class CommandOptionChoice implements BinarySerializable{
+final class CommandOptionChoice implements BinarySerializable{
 
     /** 1-100 character name */
     private string $name;

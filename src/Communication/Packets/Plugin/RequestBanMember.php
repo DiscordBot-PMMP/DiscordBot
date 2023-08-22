@@ -16,7 +16,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestBanMember extends Packet{
+final class RequestBanMember extends Packet{
 
     public const SERIALIZE_ID = 66;
 

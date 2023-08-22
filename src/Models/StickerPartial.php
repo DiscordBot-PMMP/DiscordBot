@@ -15,7 +15,7 @@ namespace JaxkDev\DiscordBot\Models;
 
 use JaxkDev\DiscordBot\Communication\BinarySerializable;
 use JaxkDev\DiscordBot\Communication\BinaryStream;
-use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
+use JaxkDev\DiscordBot\Plugin\Utils;
 
 /**
  * Partial sticker object.
@@ -23,7 +23,7 @@ use function JaxkDev\DiscordBot\Plugin\Utils\validDiscordSnowflake;
  * @implements BinarySerializable<StickerPartial>
  * @link https://discord.com/developers/docs/resources/sticker#sticker-item-object-sticker-item-structure
  */
-class StickerPartial implements BinarySerializable{
+final class StickerPartial implements BinarySerializable{
 
     private string $id;
 
@@ -42,7 +42,7 @@ class StickerPartial implements BinarySerializable{
     }
 
     public function setId(string $id): void{
-        if(!validDiscordSnowflake($id)){
+        if(!Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("StickerPartial ID '$id' is invalid.");
         }
         $this->id = $id;
