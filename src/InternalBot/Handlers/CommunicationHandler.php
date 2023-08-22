@@ -13,22 +13,23 @@
 
 namespace JaxkDev\DiscordBot\InternalBot\Handlers;
 
-use Discord\Builders\Components\ActionRow;
-use Discord\Builders\Components\ChannelSelect;
-use Discord\Builders\Components\MentionableSelect;
-use Discord\Builders\Components\Option;
-use Discord\Builders\Components\RoleSelect;
-use Discord\Builders\Components\StringSelect;
-use Discord\Builders\Components\UserSelect;
-use Discord\Builders\MessageBuilder;
-use Discord\Helpers\Collection;
+use Discord\Builders\Components\ActionRow as DiscordActionRow;
+use Discord\Builders\Components\Button as DiscordButton;
+use Discord\Builders\Components\ChannelSelect as DiscordChannelSelect;
+use Discord\Builders\Components\MentionableSelect as DiscordMentionableSelect;
+use Discord\Builders\Components\Option as DiscordOption;
+use Discord\Builders\Components\RoleSelect as DiscordRoleSelect;
+use Discord\Builders\Components\StringSelect as DiscordStringSelect;
+use Discord\Builders\Components\UserSelect as DiscordUserSelect;
+use Discord\Builders\MessageBuilder as DiscordMessageBuilder;
+use Discord\Helpers\Collection as DiscordCollection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Forum\Tag as DiscordForumTag;
 use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
 use Discord\Parts\Channel\Webhook as DiscordWebhook;
 use Discord\Parts\Embed\Embed as DiscordEmbed;
-use Discord\Parts\Guild\Emoji;
+use Discord\Parts\Guild\Emoji as DiscordEmoji;
 use Discord\Parts\Guild\Guild as DiscordGuild;
 use Discord\Parts\Guild\Role as DiscordRole;
 use Discord\Parts\User\Activity as DiscordActivity;
@@ -256,7 +257,7 @@ final class CommunicationHandler{
 
     private function handleFetchPinnedMessages(RequestFetchPinnedMessages $pk): void{
         $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
-            $channel->getPinnedMessages()->then(function(Collection $collection) use($pk){
+            $channel->getPinnedMessages()->then(function(DiscordCollection $collection) use($pk){
                 $messages = [];
                 foreach($collection->toArray() as $message){
                     $messages[] = ModelConverter::genModelMessage($message);
@@ -802,7 +803,7 @@ final class CommunicationHandler{
 
     private function handleSendMessage(RequestSendMessage $pk): void{
         $this->getChannel($pk, $pk->getChannelId(), function(DiscordChannel $channel) use($pk){
-            $message = MessageBuilder::new();
+            $message = DiscordMessageBuilder::new();
             if(($content = $pk->getContent()) !== null){
                 $message->setContent($content);
             }
@@ -852,21 +853,21 @@ final class CommunicationHandler{
                 if(($raw_c = $all[0] ?? null) instanceof SelectMenu){
                     $c = null;
                     if($raw_c->getType() === ComponentType::CHANNEL_SELECT){
-                        $c = new ChannelSelect($raw_c->getCustomId());
+                        $c = new DiscordChannelSelect($raw_c->getCustomId());
                         $c->setChannelTypes(array_map(fn($v) => $v->value, $raw_c->getChannelTypes()));
                     }elseif($raw_c->getType() === ComponentType::ROLE_SELECT){
-                        $c = new RoleSelect($raw_c->getCustomId());
+                        $c = new DiscordRoleSelect($raw_c->getCustomId());
                     }elseif($raw_c->getType() === ComponentType::USER_SELECT){
-                        $c = new UserSelect($raw_c->getCustomId());
+                        $c = new DiscordUserSelect($raw_c->getCustomId());
                     }elseif($raw_c->getType() === ComponentType::MENTIONABLE_SELECT){
-                        $c = new MentionableSelect($raw_c->getCustomId());
+                        $c = new DiscordMentionableSelect($raw_c->getCustomId());
                     }elseif($raw_c->getType() === ComponentType::STRING_SELECT){
-                        $c = new StringSelect($raw_c->getCustomId());
+                        $c = new DiscordStringSelect($raw_c->getCustomId());
                         foreach($raw_c->getOptions() as $option){
-                            $opt = new Option($option->getLabel(), $option->getValue());
+                            $opt = new DiscordOption($option->getLabel(), $option->getValue());
                             $opt->setDescription($option->getDescription());
                             if(($emoji = $option->getEmoji()) !== null){
-                                $e = new Emoji($this->client->getDiscordClient(), [
+                                $e = new DiscordEmoji($this->client->getDiscordClient(), [
                                     "id" => $emoji->getId(),
                                     "name" => $emoji->getName(),
                                     "animated" => $emoji->getAnimated()
@@ -892,14 +893,14 @@ final class CommunicationHandler{
                     $this->logger->warning("Unknown component type: " . get_class($raw_c));
                     continue;
                 }
-                $c = new ActionRow();
+                $c = new DiscordActionRow();
                 /** @var Button $raw */
                 foreach($all as $raw){
-                    $button = new \Discord\Builders\Components\Button($raw->getStyle()->value, $raw->getCustomId());
+                    $button = new DiscordButton($raw->getStyle()->value, $raw->getCustomId());
                     $button->setDisabled($raw->getDisabled());
                     $button->setLabel($raw->getLabel());
                     if(($emoji = $raw->getEmoji()) !== null){
-                        $e = new Emoji($this->client->getDiscordClient(), [
+                        $e = new DiscordEmoji($this->client->getDiscordClient(), [
                             "id" => $emoji->getId(),
                             "name" => $emoji->getName(),
                             "animated" => $emoji->getAnimated()
@@ -940,41 +941,138 @@ final class CommunicationHandler{
     }
 
     private function handleEditMessage(RequestEditMessage $pk): void{
-        /*$message = $pk->getMessage();
-        if($message->getId() === null){
-            $this->resolveRequest($pk->getUID(), false, "No message ID provided.");
-            return;
-        }
+        $message = $pk->getMessage();
         $this->getMessage($pk, $message->getChannelId(), $message->getId(), function(DiscordMessage $dMessage) use($pk, $message){
-            $e = $pk->getMessage()->getEmbed();
-            $de = null;
-            if($e !== null){
-                $de = new DiscordEmbed($this->client->getDiscordClient());
-                if($e->getTitle() !== null) $de->setTitle($e->getTitle());
-                if($e->getUrl() !== null) $de->setURL($e->getUrl());
-                if($e->getColour() !== null) $de->setColor($e->getColour());
-                if($e->getAuthor()?->getName() !== null) $de->setAuthor($e->getAuthor()->getName(), $e->getAuthor()->getIconUrl() ?? "", $e->getAuthor()->getUrl() ?? "");
-                if($e->getThumbnail()?->getUrl() !== null) $de->setThumbnail($e->getThumbnail()->getUrl());
-                if($e->getImage()?->getUrl() !== null) $de->setImage($e->getImage()->getUrl());
-                if($e->getDescription() !== null) $de->setDescription($e->getDescription());
-                if($e->getFooter()?->getText() !== null) $de->setFooter($e->getFooter()->getText(), $e->getFooter()->getIconUrl() ?? "");
-                if($e->getTimestamp() !== null) $de->setTimestamp($e->getTimestamp());
-                foreach($e->getFields() as $f){
-                    $de->addFieldValues($f->getName(), $f->getValue(), $f->getInline());
+            $builder = DiscordMessageBuilder::new();
+            if(($content = $message->getContent()) !== null){
+                $builder->setContent($content);
+            }
+            $builder->setTts($message->getTts());
+            foreach($message->getEmbeds() as $embed){
+                $e = new DiscordEmbed($this->client->getDiscordClient());
+                if(($title = $embed->getTitle()) !== null){
+                    $e->setTitle($title);
                 }
+                if(($colour = $embed->getColour()) !== null){
+                    $e->setColor($colour);
+                }
+                if(($desc = $embed->getDescription()) !== null){
+                    $e->setDescription($desc);
+                }
+                if(($url = $embed->getUrl()) !== null){
+                    $e->setURL($url);
+                }
+                if(($time = $embed->getTimestamp()) !== null){
+                    try{
+                        $e->setTimestamp($time);
+                    }catch(\Throwable){}
+                }
+                if(($author = $embed->getAuthor()) !== null){
+                    $e->setAuthor($author->getName(), $author->getIconUrl(), $author->getUrl());
+                }
+                if(($footer = $embed->getFooter()) !== null){
+                    $e->setFooter($footer->getText(), $footer->getIconUrl());
+                }
+                if(($image = $embed->getImage()) !== null){
+                    $e->setImage($image->getUrl());
+                }
+                if(($thumb = $embed->getThumbnail()) !== null){
+                    $e->setThumbnail($thumb->getUrl());
+                }
+                foreach($embed->getFields() as $field){
+                    $e->addFieldValues($field->getName(), $field->getValue(), $field->getInline());
+                }
+                $builder->addEmbed($e);
             }
-            $dMessage->content = $message->getContent();
-            if($de !== null){
-                $dMessage->embeds->clear();
-                $dMessage->addEmbed($de);
+            foreach($message->getComponents() as $component){
+                $all = $component->getComponents();
+                //A bit annoying but DiscordPHP doesn't do it like discord does, they put SelectMenu into ActionRow for us...
+                //So we have to take it OUT of our ActionRow so DiscordPHP can put it back in...
+                if(($raw_c = $all[0] ?? null) instanceof SelectMenu){
+                    $c = null;
+                    if($raw_c->getType() === ComponentType::CHANNEL_SELECT){
+                        $c = new DiscordChannelSelect($raw_c->getCustomId());
+                        $c->setChannelTypes(array_map(fn($v) => $v->value, $raw_c->getChannelTypes()));
+                    }elseif($raw_c->getType() === ComponentType::ROLE_SELECT){
+                        $c = new DiscordRoleSelect($raw_c->getCustomId());
+                    }elseif($raw_c->getType() === ComponentType::USER_SELECT){
+                        $c = new DiscordUserSelect($raw_c->getCustomId());
+                    }elseif($raw_c->getType() === ComponentType::MENTIONABLE_SELECT){
+                        $c = new DiscordMentionableSelect($raw_c->getCustomId());
+                    }elseif($raw_c->getType() === ComponentType::STRING_SELECT){
+                        $c = new DiscordStringSelect($raw_c->getCustomId());
+                        foreach($raw_c->getOptions() as $option){
+                            $opt = new DiscordOption($option->getLabel(), $option->getValue());
+                            $opt->setDescription($option->getDescription());
+                            if(($emoji = $option->getEmoji()) !== null){
+                                $e = new DiscordEmoji($this->client->getDiscordClient(), [
+                                    "id" => $emoji->getId(),
+                                    "name" => $emoji->getName(),
+                                    "animated" => $emoji->getAnimated()
+                                ]);
+                                $opt->setEmoji($e);
+                            }
+                            if(($def = $option->getDefault()) !== null){
+                                $opt->setDefault($def);
+                            }
+                            $c->addOption($opt);
+                        }
+                    }else{
+                        $this->logger->warning("Unknown select menu type: {$raw_c->getType()->name}");
+                        continue;
+                    }
+                    $c->setPlaceholder($raw_c->getPlaceholder());
+                    $c->setMinValues($raw_c->getMinValues());
+                    $c->setMaxValues($raw_c->getMaxValues());
+                    $c->setDisabled($raw_c->getDisabled());
+                    $builder->addComponent($c);
+                    continue;
+                }elseif($raw_c !== null && !($raw_c instanceof Button)){
+                    $this->logger->warning("Unknown component type: " . get_class($raw_c));
+                    continue;
+                }
+                $c = new DiscordActionRow();
+                /** @var Button $raw */
+                foreach($all as $raw){
+                    $button = new DiscordButton($raw->getStyle()->value, $raw->getCustomId());
+                    $button->setDisabled($raw->getDisabled());
+                    $button->setLabel($raw->getLabel());
+                    if(($emoji = $raw->getEmoji()) !== null){
+                        $e = new DiscordEmoji($this->client->getDiscordClient(), [
+                            "id" => $emoji->getId(),
+                            "name" => $emoji->getName(),
+                            "animated" => $emoji->getAnimated()
+                        ]);
+                        $button->setEmoji($e);
+                    }
+                    if($raw->getUrl() !== null){
+                        $button->setUrl($raw->getUrl());
+                    }
+                    $c->addComponent($button);
+                }
+                $builder->addComponent($c);
             }
-            $dMessage->channel->messages->save($dMessage)->done(function(DiscordMessage $dMessage) use($pk){
-                $this->resolveRequest($pk->getUID(), true, "Message edited.", [ModelConverter::genModelMessage($dMessage)]);
-            }, function(\Throwable $e) use ($pk){
-                $this->resolveRequest($pk->getUID(), false, "Failed to edit message.", [$e->getMessage(), $e->getTraceAsString()]);
-                $this->logger->debug("Failed to edit message ({$pk->getUID()}) - {$e->getMessage()}");
-            });
-        });*/
+            //TODO Stickers & Files.
+
+            if($message->getMessageReference()?->getChannelId() !== null && $message->getMessageReference()->getMessageId() !== null){
+                $this->getMessage($pk, $message->getMessageReference()->getChannelId(), $message->getMessageReference()->getMessageId(), function(DiscordMessage $reply) use($dMessage, $builder, $pk){
+                    $builder->setReplyTo($reply);
+                    $dMessage->edit($builder)->then(function(DiscordMessage $message) use($pk){
+                        $this->resolveRequest($pk->getUID(), true, "Successfully edited message.", [ModelConverter::genModelMessage($message)]);
+                    }, function(\Throwable $e) use($pk){
+                        $this->resolveRequest($pk->getUID(), false, "Failed to edit message.", [$e->getMessage(), $e->getTraceAsString()]);
+                        $this->logger->debug("Failed to edit message ({$pk->getUID()}) - {$e->getMessage()}");
+                    });
+                });
+            }else{
+                $dMessage->edit($builder)->then(function(DiscordMessage $message) use($pk){
+                    $this->resolveRequest($pk->getUID(), true, "Successfully edited message.", [ModelConverter::genModelMessage($message)]);
+                }, function(\Throwable $e) use($pk){
+                    $this->resolveRequest($pk->getUID(), false, "Failed to edit message.", [$e->getMessage(), $e->getTraceAsString()]);
+                    $this->logger->debug("Failed to edit message ({$pk->getUID()}) - {$e->getMessage()}");
+                });
+            }
+        });
     }
 
     private function handleDeleteMessage(RequestDeleteMessage $pk): void{

@@ -55,8 +55,8 @@ final class Message implements BinarySerializable{
 
     private ?string $author_id;
 
-    /** Possibly empty with attachments/embeds. */
-    private string $content;
+    /** Possibly null with attachments/embeds/stickers/components. */
+    private ?string $content;
 
     private int $timestamp;
 
@@ -125,7 +125,7 @@ final class Message implements BinarySerializable{
      * @param ActionRow[]      $components    Max 5
      * @param StickerPartial[] $sticker_items
      */
-    public function __construct(MessageType $type, string $id, string $channel_id, ?string $author_id, string $content,
+    public function __construct(MessageType $type, string $id, string $channel_id, ?string $author_id, ?string $content,
                                 int $timestamp, ?int $edited_timestamp, bool $tts, bool $mention_everyone,
                                 array $mentions, array $mention_roles, array $attachments, array $embeds,
                                 array $reactions, bool $pinned, ?string $webhook_id, ?Activity $activity,
@@ -195,11 +195,11 @@ final class Message implements BinarySerializable{
         $this->author_id = $author_id;
     }
 
-    public function getContent(): string{
+    public function getContent(): ?string{
         return $this->content;
     }
 
-    public function setContent(string $content): void{
+    public function setContent(?string $content): void{
         $this->content = $content;
     }
 
@@ -422,7 +422,7 @@ final class Message implements BinarySerializable{
         $stream->putString($this->id);
         $stream->putString($this->channel_id);
         $stream->putNullableString($this->author_id);
-        $stream->putString($this->content);
+        $stream->putNullableString($this->content);
         $stream->putLong($this->timestamp);
         $stream->putNullableLong($this->edited_timestamp);
         $stream->putBool($this->tts);
@@ -447,30 +447,30 @@ final class Message implements BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            MessageType::from($stream->getByte()),              // type
-            $stream->getString(),                               // id
-            $stream->getString(),                               // channel_id
-            $stream->getNullableString(),                       // author_id
-            $stream->getString(),                               // content
-            $stream->getLong(),                                 // timestamp
-            $stream->getNullableLong(),                         // edited_timestamp
-            $stream->getBool(),                                 // tts
-            $stream->getBool(),                                 // mention_everyone
-            $stream->getStringArray(),                          // mentions
-            $stream->getStringArray(),                          // mention_roles
-            $stream->getSerializableArray(Attachment::class),   // attachments
-            $stream->getSerializableArray(Embed::class),        // embeds
-            $stream->getSerializableArray(Reaction::class),     // reactions
-            $stream->getBool(),                                 // pinned
-            $stream->getNullableString(),                       // webhook_id
-            $stream->getNullableSerializable(Activity::class),  // activity
-            $stream->getNullableString(),                       // application_id
-            $stream->getNullableSerializable(Reference::class), // message_reference
-            $stream->getNullableInt(),                          // flags
-            $stream->getNullableSerializable(Message::class),   // referenced_message
-            $stream->getNullableString(),                       // thread_id
-            $stream->getSerializableArray(ActionRow::class),    // components
-            $stream->getSerializableArray(StickerPartial::class)       // sticker_items
+            MessageType::from($stream->getByte()),               // type
+            $stream->getString(),                                // id
+            $stream->getString(),                                // channel_id
+            $stream->getNullableString(),                        // author_id
+            $stream->getNullableString(),                        // content
+            $stream->getLong(),                                  // timestamp
+            $stream->getNullableLong(),                          // edited_timestamp
+            $stream->getBool(),                                  // tts
+            $stream->getBool(),                                  // mention_everyone
+            $stream->getStringArray(),                           // mentions
+            $stream->getStringArray(),                           // mention_roles
+            $stream->getSerializableArray(Attachment::class),    // attachments
+            $stream->getSerializableArray(Embed::class),         // embeds
+            $stream->getSerializableArray(Reaction::class),      // reactions
+            $stream->getBool(),                                  // pinned
+            $stream->getNullableString(),                        // webhook_id
+            $stream->getNullableSerializable(Activity::class),   // activity
+            $stream->getNullableString(),                        // application_id
+            $stream->getNullableSerializable(Reference::class),  // message_reference
+            $stream->getNullableInt(),                           // flags
+            $stream->getNullableSerializable(Message::class),    // referenced_message
+            $stream->getNullableString(),                        // thread_id
+            $stream->getSerializableArray(ActionRow::class),     // components
+            $stream->getSerializableArray(StickerPartial::class) // sticker_items
         );
     }
 }

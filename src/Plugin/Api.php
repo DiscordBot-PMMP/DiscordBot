@@ -89,6 +89,8 @@ use function strlen;
 /**
  * For internal and developers use for interacting with the discord bot.
  *
+ * TODO interactionResponse
+ *
  * @see Main::getApi() To get instance.
  */
 final class Api{
@@ -923,9 +925,10 @@ final class Api{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        if(strlen($message->getContent()) > 2000){
+        if(strlen($message->getContent() ?? "") > 2000){
             return rejectPromise(new ApiRejection("Message content cannot be larger than 2000 characters for bots."));
         }
+        //TODO Rest of validation.
         $pk = new RequestEditMessage($message);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
