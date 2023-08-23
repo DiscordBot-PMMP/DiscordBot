@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Models\Invite;
 use pocketmine\plugin\Plugin;
 
 /**
- * Emitted when a invite gets created.
+ * Emitted when an invite gets created.
  *
  * @see InviteDeleted
  */

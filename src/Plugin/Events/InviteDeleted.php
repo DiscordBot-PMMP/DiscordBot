@@ -13,6 +13,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -30,6 +31,12 @@ final class InviteDeleted extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, ?string $guild_id, ?string $channel_id, string $invite_code){
         parent::__construct($plugin);
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Invalid guild_id given.");
+        }
+        if($channel_id !== null && !Utils::validDiscordSnowflake($channel_id)){
+            throw new \AssertionError("Invalid channel_id given.");
+        }
         $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
         $this->invite_code = $invite_code;

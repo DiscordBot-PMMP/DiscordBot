@@ -28,6 +28,9 @@ final class ThreadUpdated extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, Channel $thread){
         parent::__construct($plugin);
+        if(!$thread->getType()->isThread()){
+            throw new \AssertionError("Channel must be a thread.");
+        }
         $this->thread = $thread;
     }
 

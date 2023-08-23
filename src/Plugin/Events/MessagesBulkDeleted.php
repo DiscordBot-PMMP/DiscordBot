@@ -14,6 +14,7 @@
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
 use JaxkDev\DiscordBot\Models\Messages\Message;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -44,6 +45,22 @@ final class MessagesBulkDeleted extends DiscordBotEvent{
      */
     public function __construct(Plugin $plugin, ?string $guild_id, string $channel_id, array $message_ids, array $messages){
         parent::__construct($plugin);
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Invalid guild ID given.");
+        }
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            throw new \AssertionError("Invalid channel ID given.");
+        }
+        foreach($message_ids as $message_id){
+            if(!Utils::validDiscordSnowflake($message_id)){
+                throw new \AssertionError("Invalid message ID given.");
+            }
+        }
+        foreach($messages as $message){
+            if(!$message instanceof Message){
+                throw new \AssertionError("Invalid message model given.");
+            }
+        }
         $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
         $this->message_ids = $message_ids;

@@ -27,16 +27,14 @@ final class WebhooksUpdated extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, string $guild_id, string $channel_id){
         parent::__construct($plugin);
-        if(Utils::validDiscordSnowflake($guild_id)){
-            $this->guild_id = $guild_id;
-        }else{
+        if(!Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Invalid guild ID given.");
         }
-        if(Utils::validDiscordSnowflake($channel_id)){
-            $this->channel_id = $channel_id;
-        }else{
+        if(!Utils::validDiscordSnowflake($channel_id)){
             throw new \AssertionError("Invalid channel ID given.");
         }
+        $this->guild_id = $guild_id;
+        $this->channel_id = $channel_id;
     }
 
     public function getGuildId(): string{

@@ -30,16 +30,14 @@ final class MemberLeft extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, string $guild_id, string $user_id){
         parent::__construct($plugin);
-        if(Utils::validDiscordSnowflake($guild_id)){
-            $this->guild_id = $guild_id;
-        }else{
+        if(!Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Invalid guild_id provided.");
         }
-        if(Utils::validDiscordSnowflake($user_id)){
-            $this->user_id = $user_id;
-        }else{
+        if(!Utils::validDiscordSnowflake($user_id)){
             throw new \AssertionError("Invalid user_id provided.");
         }
+        $this->guild_id = $guild_id;
+        $this->user_id = $user_id;
     }
 
     public function getGuildId(): string{

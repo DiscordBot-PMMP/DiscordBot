@@ -14,6 +14,7 @@
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
 use JaxkDev\DiscordBot\Models\Channels\ChannelType;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
@@ -34,6 +35,18 @@ final class ThreadDeleted extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, ChannelType $type, string $id, string $guild_id, string $parent_id){
         parent::__construct($plugin);
+        if(!$type->isThread()){
+            throw new \AssertionError("Channel must be a thread.");
+        }
+        if(!Utils::validDiscordSnowflake($id)){
+            throw new \AssertionError("Invalid id given.");
+        }
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Invalid guild_id given.");
+        }
+        if(!Utils::validDiscordSnowflake($parent_id)){
+            throw new \AssertionError("Invalid parent_id given.");
+        }
         $this->type = $type;
         $this->id = $id;
         $this->guild_id = $guild_id;

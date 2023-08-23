@@ -28,11 +28,10 @@ final class GuildDeleted extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, string $guild_id){
         parent::__construct($plugin);
-        if(Utils::validDiscordSnowflake($guild_id)){
-            $this->guild_id = $guild_id;
-        }else{
+        if(!Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Invalid guild_id given.");
         }
+        $this->guild_id = $guild_id;
     }
 
     public function getGuildId(): string{
