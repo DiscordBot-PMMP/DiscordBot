@@ -2,7 +2,7 @@
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__ . '/src')
-    ->notPath('Libs/React/');
+    ->notPath('Libs/');
 
 return (new PhpCsFixer\Config)
     ->setRiskyAllowed(true)
