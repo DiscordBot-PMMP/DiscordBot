@@ -6,6 +6,9 @@
 
 Protocol: `TCP(Stream) - IPV4`
 
+The plugin DiscordBot acts as a client,\
+The server is the program hosting the bot and providing a socket to connect to.
+
 Custom base data types are defined as follows:
 
 ```
@@ -45,13 +48,34 @@ binaryData = 8bit(1) + 32bitBE(5)
             //(Nullable 1 byte, 0 = null, 1 = value present. + 32bitBE(5)
 ```
 
+For more information see `src/Communication/BinaryStream.php` [here](src/Communication/BinaryStream.php)
+
 <hr />
 
 ## Network Protocol
 
-Before any data is sent, the client once connected to the socket
-must send a [Connect packet](TODO) to the server.
+### Writing/Reading Packets
+```
+[32-bit int-BE, packet size] [raw packet of length packet size]
+```
 
-If the `version` of the client is not compatible with the server, the server will send a [Disconnect packet](TODO) to the client and close the connection.
+### Packet Format
+```
+[16-bit int-BE, packet id] [raw packet data, see individual packet for format]
+```
 
-If the `magic` is not correct, the server will send a [Disconnect packet](TODO) to the client and close the connection.
+### Order of connect packets
+The order in packets sent before main loop.
+1. [Connect packet](src/Communication/Packets/External/Connect.php) (Plugin -> Server)
+2. [Connect packet](src/Communication/Packets/External/Connect.php) (Server -> Plugin) (This should not ping back the packet we sent, but the servers response with its own values)
+
+
+3. [Heartbeat packet](src/Communication/Packets/Heartbeat.php) - (Plugin -> Server, Server -> Plugin) Heartbeat every second for the duration of the connection now.
+
+
+4. [DiscordReady packet](src/Communication/Packets/Discord/DiscordConnected.php) (Server -> Plugin) (This is sent after the bot is ready, and the server/plugin should not send any packets before this is received, excluding heartbeat)
+
+
+5. Connection finished, now the server can send any packets it wants to the plugin, and the plugin can send any packets it wants to the server.
+
+At any point either the server or plugin can send a [Disconnect packet](src/Communication/Packets/External/Disconnect.php) to close the connection.
