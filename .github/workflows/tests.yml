@@ -60,25 +60,21 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/composer/files
-            ~/.cache/composer/vcs
-            ./vendor
+            ./tools/php-cs-fixer/vendor
           key: "composer-v3-cache-php-cs-fixer-${{ hashFiles('./tools/php-cs-fixer/composer.lock') }}"
           restore-keys: |
             composer-v3-cache-php-cs-fixer-
       - name: Install Composer dependencies
-        if: steps.composer-cache.outputs.cache-hit != 'true'
+        if: steps.composer-cache-php-cs-fixer.outputs.cache-hit != 'true'
         run: php composer.phar install -d tools/php-cs-fixer --no-interaction
 
       - name: Save Composer package cache
-        if: steps.composer-cache.outputs.cache-hit != 'true'
+        if: steps.composer-cache-php-cs-fixer.outputs.cache-hit != 'true'
         id: composer-cache-save
         uses: actions/cache/save@v3
         with:
           path: |
-            ~/.cache/composer/files
-            ~/.cache/composer/vcs
-            ./vendor
+            ./tools/php-cs-fixer/vendor
           key: "composer-v3-cache-php-cs-fixer-${{ hashFiles('./tools/php-cs-fixer/composer.lock') }}"
 
       - name: Run PHP-CS-Fixer
