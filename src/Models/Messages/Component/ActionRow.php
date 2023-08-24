@@ -90,7 +90,7 @@ final class ActionRow extends Component{
             case ComponentType::ROLE_SELECT:
             case ComponentType::CHANNEL_SELECT:
             case ComponentType::MENTIONABLE_SELECT:
-                $stream->setOffset($stream->getOffset() - 1);
+                $stream->setOffset($stream->getOffset() - 1); //unread first byte so SelectMenu knows what type to build.
                 return SelectMenu::fromBinary($stream);
             default:
                 throw new \InvalidArgumentException("Unknown component type {$type->name} ({$type->value})");

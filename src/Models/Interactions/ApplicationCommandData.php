@@ -24,7 +24,6 @@ use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Models\User;
 
 use JaxkDev\DiscordBot\Plugin\Utils;
-use function count;
 use function strlen;
 
 /**
@@ -297,98 +296,32 @@ final class ApplicationCommandData implements BinarySerializable{
         $stream->putString($this->id);
         $stream->putString($this->name);
         $stream->putByte($this->type->value);
-
-        //Manually serialize arrays due to ID keys. (same as putSerializableArray but includes string keys pointed out below)
-        $stream->putBool($this->resolved_users !== null);
-        if($this->resolved_users !== null){
-            $stream->putInt(count($this->resolved_users));
-            foreach($this->resolved_users as $id => $user){
-                $stream->putString($id); //<- string ID key.
-                $stream->putSerializable($user);
-            }
-        }
-
-        $stream->putBool($this->resolved_members !== null);
-        if($this->resolved_members !== null){
-            $stream->putInt(count($this->resolved_members));
-            foreach($this->resolved_members as $id => $member){
-                $stream->putString($id);
-                $stream->putSerializable($member);
-            }
-        }
-
-        $stream->putBool($this->resolved_roles !== null);
-        if($this->resolved_roles !== null){
-            $stream->putInt(count($this->resolved_roles));
-            foreach($this->resolved_roles as $id => $role){
-                $stream->putString($id);
-                $stream->putSerializable($role);
-            }
-        }
-
-        $stream->putBool($this->resolved_channels !== null);
-        if($this->resolved_channels !== null){
-            $stream->putInt(count($this->resolved_channels));
-            foreach($this->resolved_channels as $id => $channel){
-                $stream->putString($id);
-                $stream->putSerializable($channel);
-            }
-        }
-
-        $stream->putBool($this->resolved_messages !== null);
-        if($this->resolved_messages !== null){
-            $stream->putInt(count($this->resolved_messages));
-            foreach($this->resolved_messages as $id => $message){
-                $stream->putString($id);
-                $stream->putSerializable($message);
-            }
-        }
-
-        $stream->putBool($this->resolved_attachments !== null);
-        if($this->resolved_attachments !== null){
-            $stream->putInt(count($this->resolved_attachments));
-            foreach($this->resolved_attachments as $id => $attachment){
-                $stream->putString($id);
-                $stream->putSerializable($attachment);
-            }
-        }
-
+        $stream->putNullableStringSerializableArray($this->resolved_users);
+        $stream->putNullableStringSerializableArray($this->resolved_members);
+        $stream->putNullableStringSerializableArray($this->resolved_roles);
+        $stream->putNullableStringSerializableArray($this->resolved_channels);
+        $stream->putNullableStringSerializableArray($this->resolved_messages);
+        $stream->putNullableStringSerializableArray($this->resolved_attachments);
         $stream->putSerializableArray($this->options);
         $stream->putNullableString($this->guild_id);
         $stream->putNullableString($this->target_id);
         return $stream;
     }
 
-    /**
-     * @template T of BinarySerializable<mixed>
-     * @param class-string<T> $type
-     * @return array<string, T>
-     */
-    protected static function getSpecial(string $type, BinaryStream &$stream): array{
-        $array = [];
-        for($i = 0, $size = $stream->getInt(); $i < $size; $i++){
-            $key = $stream->getString();
-            /** @var T $x */
-            $x = $type::fromBinary($stream);
-            $array[$key] = $x;
-        }
-        return $array;
-    }
-
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getString(),                                                     // id
-            $stream->getString(),                                                     // name
-            CommandType::from($stream->getByte()),                                    // type
-            $stream->getBool() ? self::getSpecial(User::class, $stream) : null,       // resolved_users
-            $stream->getBool() ? self::getSpecial(Member::class, $stream) : null,     // resolved_members
-            $stream->getBool() ? self::getSpecial(Role::class, $stream) : null,       // resolved_roles
-            $stream->getBool() ? self::getSpecial(Channel::class, $stream) : null,    // resolved_channels
-            $stream->getBool() ? self::getSpecial(Message::class, $stream) : null,    // resolved_messages
-            $stream->getBool() ? self::getSpecial(Attachment::class, $stream) : null, // resolved_attachments
-            $stream->getSerializableArray(ApplicationCommandDataOption::class),       // options
-            $stream->getNullableString(),                                             // guild_id
-            $stream->getNullableString()                                              // target_id
+            $stream->getString(),                                               // id
+            $stream->getString(),                                               // name
+            CommandType::from($stream->getByte()),                              // type
+            $stream->getNullableStringSerializableArray(User::class),           // resolved_users
+            $stream->getNullableStringSerializableArray(Member::class),         // resolved_members
+            $stream->getNullableStringSerializableArray(Role::class),           // resolved_roles
+            $stream->getNullableStringSerializableArray(Channel::class),        // resolved_channels
+            $stream->getNullableStringSerializableArray(Message::class),        // resolved_messages
+            $stream->getNullableStringSerializableArray(Attachment::class),     // resolved_attachments
+            $stream->getSerializableArray(ApplicationCommandDataOption::class), // options
+            $stream->getNullableString(),                                       // guild_id
+            $stream->getNullableString()                                        // target_id
         );
     }
 }

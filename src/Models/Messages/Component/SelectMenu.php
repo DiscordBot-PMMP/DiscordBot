@@ -170,14 +170,15 @@ final class SelectMenu extends Component{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
-        $type = ComponentType::from($stream->getByte());
-        $custom_id = $stream->getString();
-        $options = $stream->getSerializableArray(SelectOption::class);
-        $channel_types = array_map(fn(int $type) => ChannelType::from($type), $stream->getByteArray());
-        $placeholder = $stream->getNullableString();
-        $min_values = $stream->getInt();
-        $max_values = $stream->getInt();
-        $disabled = $stream->getBool();
-        return new self($type, $custom_id, $options, $channel_types, $placeholder, $min_values, $max_values, $disabled);
+        return new self(
+            ComponentType::from($stream->getByte()),                                       // type
+            $stream->getString(),                                                          // custom_id
+            $stream->getSerializableArray(SelectOption::class),                            // options
+            array_map(fn(int $type) => ChannelType::from($type), $stream->getByteArray()), // channel_types
+            $stream->getNullableString(),                                                  // placeholder
+            $stream->getInt(),                                                             // min_values
+            $stream->getInt(),                                                             // max_values
+            $stream->getBool()                                                             // disabled
+        );
     }
 }

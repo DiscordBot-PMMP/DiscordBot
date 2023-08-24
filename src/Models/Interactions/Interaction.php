@@ -232,8 +232,8 @@ final class Interaction implements BinarySerializable{
             $stream->getString(),
             ($t = InteractionType::from($stream->getByte())),
             //Nullable serializable array (data type dependant on type^)
-            match($stream->getBool()) {
-                true => match ($t) {
+            match($stream->getBool()) { //null or not
+                true => match ($t) { //get correct data type
                     InteractionType::APPLICATION_COMMAND, InteractionType::APPLICATION_COMMAND_AUTOCOMPLETE => ApplicationCommandData::fromBinary($stream),
                     InteractionType::MESSAGE_COMPONENT => MessageComponentData::fromBinary($stream),
                     InteractionType::MODAL_SUBMIT => ModalSubmitData::fromBinary($stream),

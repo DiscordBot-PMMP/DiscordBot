@@ -239,9 +239,9 @@ final class Command implements BinarySerializable{
         $stream->putString($this->application_id);
         $stream->putNullableString($this->guild_id);
         $stream->putString($this->name);
-        $stream->putNullableLocalizationDictionary($this->name_localizations);
+        $stream->putNullableStringStringArray($this->name_localizations);
         $stream->putString($this->description);
-        $stream->putNullableLocalizationDictionary($this->description_localizations);
+        $stream->putNullableStringStringArray($this->description_localizations);
         $stream->putNullableSerializableArray($this->options);
         $stream->putNullableSerializable($this->default_member_permissions);
         $stream->putNullableBool($this->dm_permission);
@@ -257,9 +257,9 @@ final class Command implements BinarySerializable{
             $stream->getString(),
             $stream->getNullableString(),
             $stream->getString(),
-            $stream->getNullableLocalizationDictionary(),
+            $stream->getNullableStringStringArray(),
             $stream->getString(),
-            $stream->getNullableLocalizationDictionary(),
+            $stream->getNullableStringStringArray(),
             $stream->getNullableSerializableArray(CommandOption::class),
             $stream->getNullableSerializable(RolePermissions::class),
             $stream->getNullableBool(),

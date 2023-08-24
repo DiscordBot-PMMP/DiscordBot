@@ -85,23 +85,23 @@ final class Resolution extends Packet{
         $response = $stream->getString();
         if($successful){
             $modelCount = $stream->getInt();
-            $models = [];
+            $data = [];
             for($i = 0; $i < $modelCount; $i++){
                 $modelID = $stream->getShort();
                 $modelClass = NetworkApi::getModelClass($modelID);
                 if($modelClass === null){
                     throw new \AssertionError("Invalid model ID '{$modelID}'");
                 }
-                $models[] = $stream->getSerializable($modelClass);
+                $data[] = $stream->getSerializable($modelClass);
             }
         }else{
-            $models = $stream->getStringArray();
+            $data = $stream->getStringArray();
         }
         return new self(
             $pid,
             $successful,
             $response,
-            $models,
+            $data,
             $uid
         );
     }

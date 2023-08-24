@@ -17,7 +17,6 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
-use function count;
 
 final class RequestSendMessage extends Packet{
 
@@ -129,16 +128,7 @@ final class RequestSendMessage extends Packet{
         $stream->putNullableBool($this->tts);
         $stream->putNullableSerializableArray($this->components);
         $stream->putNullableStringArray($this->sticker_ids);
-        if($this->files !== null){
-            $stream->putBool(true); //not-null
-            $stream->putInt(count($this->files)); //size of array.
-            foreach($this->files as $name => $data){
-                $stream->putString($name); //key
-                $stream->putString($data); //value
-            }
-        }else{
-            $stream->putBool(false); //null
-        }
+        $stream->putNullableStringStringArray($this->files);
         return $stream;
     }
 
@@ -153,18 +143,8 @@ final class RequestSendMessage extends Packet{
             $stream->getNullableBool(),                                     // tts
             $stream->getNullableSerializableArray(ActionRow::class),        // components
             $stream->getNullableStringArray(),                              // sticker_ids
-            $stream->getBool() ? self::getFilesFromBinary($stream) : null,  // files
+            $stream->getNullableStringStringArray(),                        // files
             $uid
         );
-    }
-
-    /** @return array<string, string> */
-    protected static function getFilesFromBinary(BinaryStream $stream): array{
-        $files = [];
-        $count = $stream->getInt();
-        for($i = 0; $i < $count; $i++){
-            $files[$stream->getString()] = $stream->getString();
-        }
-        return $files;
     }
 }

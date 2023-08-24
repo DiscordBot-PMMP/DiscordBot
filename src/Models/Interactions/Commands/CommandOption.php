@@ -276,9 +276,9 @@ final class CommandOption implements BinarySerializable{
         $stream = new BinaryStream();
         $stream->putByte($this->type->value);
         $stream->putString($this->name);
-        $stream->putNullableLocalizationDictionary($this->name_localizations);
+        $stream->putNullableStringStringArray($this->name_localizations);
         $stream->putString($this->description);
-        $stream->putNullableLocalizationDictionary($this->description_localizations);
+        $stream->putNullableStringStringArray($this->description_localizations);
         $stream->putNullableBool($this->required);
         $stream->putNullableSerializableArray($this->choices);
         $stream->putNullableSerializableArray($this->options);
@@ -303,9 +303,9 @@ final class CommandOption implements BinarySerializable{
         return new self(
             ($t = CommandOptionType::from($stream->getByte())),
             $stream->getString(),
-            $stream->getNullableLocalizationDictionary(),
+            $stream->getNullableStringStringArray(),
             $stream->getString(),
-            $stream->getNullableLocalizationDictionary(),
+            $stream->getNullableStringStringArray(),
             $stream->getNullableBool(),
             $stream->getNullableSerializableArray(CommandOptionChoice::class),
             $stream->getNullableSerializableArray(self::class),

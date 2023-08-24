@@ -81,7 +81,7 @@ final class CommandOptionChoice implements BinarySerializable{
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->name);
-        $stream->putNullableLocalizationDictionary($this->name_localizations);
+        $stream->putNullableStringStringArray($this->name_localizations);
         if(is_string($this->value)){
             $stream->putByte(1); //1 = string
             $stream->putString($this->value);
@@ -100,7 +100,7 @@ final class CommandOptionChoice implements BinarySerializable{
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
             $stream->getString(),
-            $stream->getNullableLocalizationDictionary(),
+            $stream->getNullableStringStringArray(),
             match($stream->getByte()){
                 1 => $stream->getString(),
                 2 => $stream->getLong(),

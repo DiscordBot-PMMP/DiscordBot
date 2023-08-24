@@ -181,10 +181,7 @@ final class Emoji implements BinarySerializable{
         $stream = new BinaryStream();
         $stream->putNullableString($this->id);
         $stream->putNullableString($this->name);
-        $stream->putBool($this->role_ids !== null);
-        if($this->role_ids !== null){
-            $stream->putStringArray($this->role_ids);
-        }
+        $stream->putNullableStringArray($this->role_ids);
         $stream->putNullableString($this->user_id);
         $stream->putNullableBool($this->require_colons);
         $stream->putNullableBool($this->managed);
@@ -195,14 +192,14 @@ final class Emoji implements BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getNullableString(),                           // id
-            $stream->getNullableString(),                           // name
-            $stream->getBool() ? $stream->getStringArray() : null,  // role_ids
-            $stream->getNullableString(),                           // user_id
-            $stream->getNullableBool(),                             // require_colons
-            $stream->getNullableBool(),                             // managed
-            $stream->getNullableBool(),                             // animated
-            $stream->getNullableBool()                              // available
+            $stream->getNullableString(),      // id
+            $stream->getNullableString(),      // name
+            $stream->getNullableStringArray(), // role_ids
+            $stream->getNullableString(),      // user_id
+            $stream->getNullableBool(),        // require_colons
+            $stream->getNullableBool(),        // managed
+            $stream->getNullableBool(),        // animated
+            $stream->getNullableBool()         // available
         );
     }
 }

@@ -51,57 +51,6 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
         return $x;
     }
 
-    /** @param BinarySerializable<mixed>[] $values */
-    public function putSerializableArray(array $values): void{
-        $this->putInt(count($values));
-        foreach($values as $value){
-            $this->put($value->binarySerialize()->getBuffer());
-        }
-    }
-
-    /**
-     * @template T of BinarySerializable<mixed>
-     * @param class-string<T> $class
-     * @return T[]
-     */
-    public function getSerializableArray(string $class): array{
-        $array = [];
-        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
-            /** @var T $x */
-            $x = $class::fromBinary($this);
-            $array[] = $x;
-        }
-        return $array;
-    }
-
-    /** @param BinarySerializable<mixed>[]|null $values */
-    public function putNullableSerializableArray(?array $values): void{
-        if($values === null){
-            $this->putBool(false);
-            return;
-        }
-        $this->putBool(true);
-        $this->putSerializableArray($values);
-    }
-
-    /**
-     * @template T of BinarySerializable<mixed>
-     * @param class-string<T> $class
-     * @return T[]|null
-     */
-    public function getNullableSerializableArray(string $class): ?array{
-        if(!$this->getBool()){
-            return null;
-        }
-        $array = [];
-        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
-            /** @var T $x */
-            $x = $class::fromBinary($this);
-            $array[] = $x;
-        }
-        return $array;
-    }
-
     /** @param string[] $values */
     public function putStringArray(array $values): void{
         $this->putInt(count($values));
@@ -112,31 +61,6 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
 
     /** @return string[] */
     public function getStringArray(): array{
-        $array = [];
-        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
-            $array[] = $this->getString();
-        }
-        return $array;
-    }
-
-    /** @param string[]|null $values */
-    public function putNullableStringArray(?array $values): void{
-        if($values === null){
-            $this->putBool(false);
-            return;
-        }
-        $this->putBool(true);
-        $this->putInt(count($values));
-        foreach($values as $value){
-            $this->putString($value);
-        }
-    }
-
-    /** @return string[]|null */
-    public function getNullableStringArray(): ?array{
-        if(!$this->getBool()){
-            return null;
-        }
         $array = [];
         for($i = 0, $size = $this->getInt(); $i < $size; $i++){
             $array[] = $this->getString();
@@ -174,6 +98,69 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
         $array = [];
         for($i = 0, $size = $this->getInt(); $i < $size; $i++){
             $array[] = $this->getInt();
+        }
+        return $array;
+    }
+
+    /** @param BinarySerializable<mixed>[] $values */
+    public function putSerializableArray(array $values): void{
+        $this->putInt(count($values));
+        foreach($values as $value){
+            $this->put($value->binarySerialize()->getBuffer());
+        }
+    }
+
+    /**
+     * @template T of BinarySerializable<mixed>
+     * @param class-string<T> $class
+     * @return T[]
+     */
+    public function getSerializableArray(string $class): array{
+        $array = [];
+        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
+            /** @var T $x */
+            $x = $class::fromBinary($this);
+            $array[] = $x;
+        }
+        return $array;
+    }
+
+    /** @param array<string, string> $values */
+    public function putStringStringArray(array $values): void{
+        $this->putInt(count($values));
+        foreach($values as $key => $value){
+            $this->putString($key);
+            $this->putString($value);
+        }
+    }
+
+    /** @return array<string, string> */
+    public function getStringStringArray(): array{
+        $array = [];
+        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
+            $array[$this->getString()] = $this->getString();
+        }
+        return $array;
+    }
+
+    /** @param array<string, BinarySerializable<mixed>> $values */
+    public function putStringSerializableArray(array $values): void{
+        $this->putInt(count($values));
+        foreach($values as $key => $value){
+            $this->putString($key);
+            $this->putSerializable($value);
+        }
+    }
+
+    /**
+     * @template T of BinarySerializable<mixed>
+     * @param class-string<T> $type
+     * @return array<string, T>
+     */
+    public function getStringSerializableArray(string $type): array{
+        $array = [];
+        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
+            $array[$this->getString()] = $this->getSerializable($type);
         }
         return $array;
     }
@@ -246,7 +233,7 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
     public function putNullableSerializable(?BinarySerializable $value): void{
         $this->putBool($value !== null);
         if($value !== null){
-            $this->put($value->binarySerialize()->getBuffer());
+            $this->putSerializable($value);
         }
     }
 
@@ -257,38 +244,10 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
      */
     public function getNullableSerializable(string $class){
         if($this->getBool()){
-            /** @var T $x */
-            $x = $class::fromBinary($this);
-            return $x;
+            return $this->getSerializable($class);
         }else{
             return null;
         }
-    }
-
-    /** @param array<string, string>|null $locales */
-    public function putNullableLocalizationDictionary(?array $locales): void{
-        $this->putBool($locales !== null);
-        if($locales !== null){
-            $this->putInt(count($locales));
-            foreach($locales as $locale => $value){
-                $this->putString($locale);
-                $this->putString($value);
-            }
-        }
-    }
-
-    /** @return array<string, string>|null */
-    public function getNullableLocalizationDictionary(): ?array{
-        if(!$this->getBool()){
-            return null;
-        }
-        $array = [];
-        for($i = 0, $size = $this->getInt(); $i < $size; $i++){
-            $key = $this->getString();
-            $value = $this->getString();
-            $array[$key] = $value;
-        }
-        return $array;
     }
 
     public function putNullableDouble(?float $value): void{
@@ -302,6 +261,24 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
         return $this->getBool() ? $this->getDouble() : null;
     }
 
+    /** @param string[]|null $values */
+    public function putNullableStringArray(?array $values): void{
+        if($values === null){
+            $this->putBool(false);
+            return;
+        }
+        $this->putBool(true);
+        $this->putStringArray($values);
+    }
+
+    /** @return string[]|null */
+    public function getNullableStringArray(): ?array{
+        if(!$this->getBool()){
+            return null;
+        }
+        return $this->getStringArray();
+    }
+
     /** @param int[]|null $values */
     public function putNullableByteArray(?array $values): void{
         $this->putBool($values !== null);
@@ -313,5 +290,57 @@ final class BinaryStream extends \pocketmine\utils\BinaryStream{
     /** @return int[]|null */
     public function getNullableByteArray(): ?array{
         return $this->getBool() ? $this->getByteArray() : null;
+    }
+
+    /** @param BinarySerializable<mixed>[]|null $values */
+    public function putNullableSerializableArray(?array $values): void{
+        if($values === null){
+            $this->putBool(false);
+            return;
+        }
+        $this->putBool(true);
+        $this->putSerializableArray($values);
+    }
+
+    /**
+     * @template T of BinarySerializable<mixed>
+     * @param class-string<T> $class
+     * @return T[]|null
+     */
+    public function getNullableSerializableArray(string $class): ?array{
+        if(!$this->getBool()){
+            return null;
+        }
+        return $this->getSerializableArray($class);
+    }
+
+    /** @param array<string, string>|null $values */
+    public function putNullableStringStringArray(?array $values): void{
+        $this->putBool($values !== null);
+        if($values !== null){
+            $this->putStringStringArray($values);
+        }
+    }
+
+    /** @return array<string, string>|null */
+    public function getNullableStringStringArray(): ?array{
+        return $this->getBool() ? $this->getStringStringArray() : null;
+    }
+
+    /** @param array<string, BinarySerializable<mixed>>|null $values */
+    public function putNullableStringSerializableArray(?array $values): void{
+        $this->putBool($values !== null);
+        if($values !== null){
+            $this->putStringSerializableArray($values);
+        }
+    }
+
+    /**
+     * @template T of BinarySerializable<mixed>
+     * @param class-string<T> $type
+     * @return array<string, T>|null
+     */
+    public function getNullableStringSerializableArray(string $type): ?array{
+        return $this->getBool() ? $this->getStringSerializableArray($type) : null;
     }
 }
