@@ -6,7 +6,6 @@
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
  * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
@@ -918,6 +917,7 @@ final class Api{
      * Edit a sent message.
      *
      * Note you can't convert a 'REPLY' message to a normal 'MESSAGE'.
+     * Note at the moment we don't support editing/removing/adding stickers/files :(
      *
      * @return PromiseInterface Resolves with a Message model.
      */
@@ -1185,7 +1185,7 @@ final class Api{
     }
 
     /**
-     * Delete a channel in a guild, you cannot delete private channels (DM's)
+     * Delete a channel, you cannot delete private channels (DM's)
      *
      * @return PromiseInterface Resolves with no data.
      */
