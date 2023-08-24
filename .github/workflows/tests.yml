@@ -8,7 +8,7 @@ on:
     paths:
       - '**.php'
       - '.github/workflows/*'
-      - 'test/github/*'
+      - 'tools/github/*'
   pull_request:
     types:
       - opened
@@ -29,11 +29,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: "./bin"
-          key: "php-cache-${{ hashFiles('./test/github/get-php.sh') }}"
+          key: "php-cache-${{ hashFiles('./tools/github/get-php.sh') }}"
 
       - name: Download PHP
         if: steps.php-cache.outputs.cache-hit != 'true'
-        run: ./test/github/get-php.sh
+        run: ./tools/github/get-php.sh
 
   code-style:
     name: Code Style Checks
@@ -47,7 +47,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: "./bin"
-          key: "php-cache-${{ hashFiles('./test/github/get-php.sh') }}"
+          key: "php-cache-${{ hashFiles('./tools/github/get-php.sh') }}"
 
       - name: Prefix PHP to PATH
         run: echo "$(pwd)/bin/php7/bin" >> $GITHUB_PATH
@@ -93,7 +93,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: "./bin"
-          key: "php-cache-${{ hashFiles('./test/github/get-php.sh') }}"
+          key: "php-cache-${{ hashFiles('./tools/github/get-php.sh') }}"
 
       - name: Prefix PHP to PATH
         run: echo "$(pwd)/bin/php7/bin" >> $GITHUB_PATH
