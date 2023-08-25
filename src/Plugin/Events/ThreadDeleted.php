@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
+use JaxkDev\DiscordBot\Models\Channels\Channel;
 use JaxkDev\DiscordBot\Models\Channels\ChannelType;
 use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
@@ -32,7 +33,9 @@ final class ThreadDeleted extends DiscordBotEvent{
 
     private string $parent_id;
 
-    public function __construct(Plugin $plugin, ChannelType $type, string $id, string $guild_id, string $parent_id){
+    private ?Channel $cached_thread;
+
+    public function __construct(Plugin $plugin, ChannelType $type, string $id, string $guild_id, string $parent_id, ?Channel $cached_thread){
         parent::__construct($plugin);
         if(!$type->isThread()){
             throw new \AssertionError("Channel must be a thread.");
@@ -46,10 +49,14 @@ final class ThreadDeleted extends DiscordBotEvent{
         if(!Utils::validDiscordSnowflake($parent_id)){
             throw new \AssertionError("Invalid parent_id given.");
         }
+        if($cached_thread !== null && !$cached_thread->getType()->isThread()){
+            throw new \AssertionError("Cached thread must be a thread or null.");
+        }
         $this->type = $type;
         $this->id = $id;
         $this->guild_id = $guild_id;
         $this->parent_id = $parent_id;
+        $this->cached_thread = $cached_thread;
     }
 
     public function getType(): ChannelType{
@@ -66,5 +73,9 @@ final class ThreadDeleted extends DiscordBotEvent{
 
     public function getParentId(): string{
         return $this->parent_id;
+    }
+
+    public function getCachedThread(): ?Channel{
+        return $this->cached_thread;
     }
 }

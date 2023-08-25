@@ -222,7 +222,8 @@ final class BotCommunicationHandler{
     }
 
     private function handleThreadDelete(ThreadDeletePacket $packet): void{
-        (new ThreadDeletedEvent($this->plugin, $packet->getType(), $packet->getId(), $packet->getGuildId(), $packet->getParentId()))->call();
+        (new ThreadDeletedEvent($this->plugin, $packet->getType(), $packet->getId(), $packet->getGuildId(),
+            $packet->getParentId(), $packet->getCachedThread()))->call();
     }
 
     private function handleWebhooksUpdate(WebhooksUpdatePacket $packet): void{

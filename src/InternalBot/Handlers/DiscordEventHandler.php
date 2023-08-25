@@ -356,7 +356,8 @@ final class DiscordEventHandler{
             $this->logger->warning("Thread delete event with non-thread type, ignoring. ID: " . $thread->id . " Type: " . $t->name . " (" . $thread->type . ")");
             return;
         }
-        $packet = new ThreadDeletePacket($t, $thread->id, $thread->guild_id, $thread->parent_id);
+        $packet = new ThreadDeletePacket($t, $thread->id, $thread->guild_id, $thread->parent_id,
+            ($thread instanceof DiscordThread) ? ModelConverter::genModelChannel($thread) : null);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
