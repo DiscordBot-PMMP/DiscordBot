@@ -318,7 +318,7 @@ final class DiscordEventHandler{
             $this->logger->warning("Guild unavailable: " . $guild->id . " ignoring event.");
             return;
         }
-        $packet = new GuildLeavePacket($guild->id);
+        $packet = new GuildLeavePacket($guild->id, ($guild instanceof DiscordGuild) ? ModelConverter::genModelGuild($guild) : null);
         $this->client->getThread()->writeOutboundData($packet);
     }
 

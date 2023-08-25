@@ -353,7 +353,7 @@ final class BotCommunicationHandler{
     }
 
     private function handleGuildLeave(GuildLeavePacket $packet): void{
-        (new GuildDeletedEvent($this->plugin, $packet->getGuildId()))->call();
+        (new GuildDeletedEvent($this->plugin, $packet->getGuildId(), $packet->getCachedGuild()))->call();
     }
 
     public function resetHeartbeat(): void{
