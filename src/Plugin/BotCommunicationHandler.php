@@ -341,7 +341,7 @@ final class BotCommunicationHandler{
         //When leaving guild this is emitted.
         if($this->plugin->getApi()->getBotUser()->getId() === $packet->getUserId()) return;
 
-        (new MemberLeftEvent($this->plugin, $packet->getGuildId(), $packet->getUserId()))->call();
+        (new MemberLeftEvent($this->plugin, $packet->getGuildId(), $packet->getUserId(), $packet->getCachedMember()))->call();
     }
 
     private function handleGuildJoin(GuildJoinPacket $packet): void{

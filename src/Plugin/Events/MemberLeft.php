@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
+use JaxkDev\DiscordBot\Models\Member;
 use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
@@ -27,7 +28,10 @@ final class MemberLeft extends DiscordBotEvent{
 
     private string $user_id;
 
-    public function __construct(Plugin $plugin, string $guild_id, string $user_id){
+    /** Cached member if available. */
+    private ?Member $cached_member;
+
+    public function __construct(Plugin $plugin, string $guild_id, string $user_id, ?Member $cached_member){
         parent::__construct($plugin);
         if(!Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Invalid guild_id provided.");
@@ -37,6 +41,7 @@ final class MemberLeft extends DiscordBotEvent{
         }
         $this->guild_id = $guild_id;
         $this->user_id = $user_id;
+        $this->cached_member = $cached_member;
     }
 
     public function getGuildId(): string{
@@ -45,5 +50,9 @@ final class MemberLeft extends DiscordBotEvent{
 
     public function getUserId(): string{
         return $this->user_id;
+    }
+
+    public function getCachedMember(): ?Member{
+        return $this->cached_member;
     }
 }

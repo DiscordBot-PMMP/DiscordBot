@@ -295,7 +295,7 @@ final class DiscordEventHandler{
             $this->logger->warning("Member leave event with null guild_id, ignoring. ID: " . $member->id);
             return;
         }
-        $packet = new MemberLeavePacket($member->guild_id, $member->id);
+        $packet = new MemberLeavePacket($member->guild_id, $member->id, ModelConverter::genModelMember($member));
         $this->client->getThread()->writeOutboundData($packet);
     }
 
