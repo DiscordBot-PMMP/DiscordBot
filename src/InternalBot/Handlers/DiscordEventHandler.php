@@ -373,8 +373,9 @@ final class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onRoleUpdate(DiscordRole $role, Discord $discord): void{
-        $packet = new RoleUpdatePacket(ModelConverter::genModelRole($role));
+    public function onRoleUpdate(DiscordRole $role, Discord $discord, ?DiscordRole $old): void{
+        $packet = new RoleUpdatePacket(ModelConverter::genModelRole($role),
+            ($old instanceof DiscordRole) ? ModelConverter::genModelRole($old) : null);
         $this->client->getThread()->writeOutboundData($packet);
     }
 

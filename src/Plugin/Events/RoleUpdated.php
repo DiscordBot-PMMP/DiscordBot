@@ -25,12 +25,20 @@ final class RoleUpdated extends DiscordBotEvent{
 
     private Role $role;
 
-    public function __construct(Plugin $plugin, Role $role){
+    /** Old role if cached. */
+    private ?Role $old_role;
+
+    public function __construct(Plugin $plugin, Role $role, ?Role $old_role){
         parent::__construct($plugin);
         $this->role = $role;
+        $this->old_role = $old_role;
     }
 
     public function getRole(): Role{
         return $this->role;
+    }
+
+    public function getOldRole(): ?Role{
+        return $this->old_role;
     }
 }

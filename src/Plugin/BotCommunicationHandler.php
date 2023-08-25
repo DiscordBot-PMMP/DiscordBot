@@ -306,7 +306,7 @@ final class BotCommunicationHandler{
     }
 
     private function handleRoleUpdate(RoleUpdatePacket $packet): void{
-        (new RoleUpdatedEvent($this->plugin, $packet->getRole()))->call();
+        (new RoleUpdatedEvent($this->plugin, $packet->getRole(), $packet->getOldRole()))->call();
     }
 
     private function handleRoleDelete(RoleDeletePacket $packet): void{
