@@ -13,7 +13,7 @@
 namespace JaxkDev\DiscordBot\InternalBot\Handlers;
 
 use Discord\Discord;
-use Discord\Helpers\Collection;
+use Discord\Helpers\Collection as DiscordCollection;
 use Discord\Parts\Channel\Channel as DiscordChannel;
 use Discord\Parts\Channel\Invite as DiscordInvite;
 use Discord\Parts\Channel\Message as DiscordMessage;
@@ -57,9 +57,9 @@ use JaxkDev\DiscordBot\Communication\Packets\Discord\PresenceUpdate as PresenceU
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleCreate as RoleCreatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleDelete as RoleDeletePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\RoleUpdate as RoleUpdatePacket;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadCreate;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadDelete;
-use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadUpdate;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadCreate as ThreadCreatePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadDelete as ThreadDeletePacket;
+use JaxkDev\DiscordBot\Communication\Packets\Discord\ThreadUpdate as ThreadUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\VoiceStateUpdate as VoiceStateUpdatePacket;
 use JaxkDev\DiscordBot\Communication\Packets\Discord\WebhooksUpdate as WebhooksUpdatePacket;
 use JaxkDev\DiscordBot\Communication\ThreadStatus;
@@ -252,7 +252,7 @@ final class DiscordEventHandler{
     }
 
     /** @link https://github.com/discord-php/DiscordPHP/blob/v10.0.0-RC6/docs/src/pages/api/03_events/07_messages.md#message-delete-bulk */
-    public function onMessageDeleteBulk(Collection $collection): void{
+    public function onMessageDeleteBulk(DiscordCollection $collection): void{
         $guild = null;
         $channel = "";
         $messages = [];
@@ -354,12 +354,12 @@ final class DiscordEventHandler{
     }
 
     public function onThreadCreate(DiscordThread $thread, Discord $discord): void{
-        $packet = new ThreadCreate(ModelConverter::genModelChannel($thread));
+        $packet = new ThreadCreatePacket(ModelConverter::genModelChannel($thread));
         $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onThreadUpdate(DiscordThread $thread, Discord $discord): void{
-        $packet = new ThreadUpdate(ModelConverter::genModelChannel($thread));
+        $packet = new ThreadUpdatePacket(ModelConverter::genModelChannel($thread));
         $this->client->getThread()->writeOutboundData($packet);
     }
 
@@ -370,7 +370,7 @@ final class DiscordEventHandler{
             $this->logger->warning("Thread delete event with non-thread type, ignoring. ID: " . $thread->id . " Type: " . $t->name . " (" . $thread->type . ")");
             return;
         }
-        $packet = new ThreadDelete($t, $thread->id, $thread->guild_id, $thread->parent_id);
+        $packet = new ThreadDeletePacket($t, $thread->id, $thread->guild_id, $thread->parent_id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
