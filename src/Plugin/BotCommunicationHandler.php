@@ -251,7 +251,8 @@ final class BotCommunicationHandler{
     }
 
     private function handleMessageUpdate(MessageUpdatePacket $packet): void{
-        (new MessageUpdatedEvent($this->plugin, $packet->getMessage()))->call();
+        (new MessageUpdatedEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId(), $packet->getMessageId(),
+            $packet->getNewMessage(), $packet->getOldMessage()))->call();
     }
 
     private function handleMessageDelete(MessageDeletePacket $packet): void{

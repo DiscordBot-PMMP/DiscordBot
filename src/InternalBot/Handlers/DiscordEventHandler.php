@@ -195,18 +195,10 @@ final class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onMessageUpdate(DiscordMessage|\stdClass $data, Discord $discord): void{
-        if(!$data instanceof DiscordMessage || !$this->checkMessage($data)){
-            //Unknown message updated (send partial data).
-            $message = [
-                "guild_id" => $data->guild_id ?? null,
-                "channel_id" => $data->channel_id,
-                "message_id" => $data->id
-            ];
-        }else{
-            $message = ModelConverter::genModelMessage($data);
-        }
-        $packet = new MessageUpdatePacket($message);
+    public function onMessageUpdate(DiscordMessage|\stdClass $data, Discord $discord, ?DiscordMessage $old): void{
+        $packet = new MessageUpdatePacket($data->guild_id ?? null, $data->channel_id, $data->id,
+            ($data instanceof DiscordMessage) ? ModelConverter::genModelMessage($data) : null,
+            ($old instanceof DiscordMessage) ? ModelConverter::genModelMessage($old) : null);
         $this->client->getThread()->writeOutboundData($packet);
     }
 

@@ -20,38 +20,61 @@ use pocketmine\plugin\Plugin;
  * Emitted when a message has been updated.
  *
  *  If message was made before bot started it will only have message id, channel id and guild id.
- *  If it was made after bot started it may have the full message model (if cached).
+ *  If it was made after bot started it may have the full message models (if cached).
  *
  * @see MessageDeleted
  * @see MessageSent
  */
 final class MessageUpdated extends DiscordBotEvent{
 
-    /** @var Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} */
-    private Message|array $message;
+    private ?string $guild_id;
 
-    /** @param Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} $message */
-    public function __construct(Plugin $plugin, Message|array $message){
+    private string $channel_id;
+
+    private string $message_id;
+
+    /** Null if no new message was provided from discord. */
+    private ?Message $new_message;
+
+    /** Null if old message was not cached. */
+    private ?Message $old_message;
+
+    public function __construct(Plugin $plugin, ?string $guild_id, string $channel_id, string $message_id,
+                                ?Message $new_message, ?Message $old_message){
         parent::__construct($plugin);
-        if(!$message instanceof Message){
-            if(!isset($message["message_id"], $message["channel_id"])){
-                throw new \AssertionError("Invalid message given, missing message_id or channel_id.");
-            }
-            if(!Utils::validDiscordSnowflake($message["message_id"])){
-                throw new \AssertionError("Invalid message_id given.");
-            }
-            if(!Utils::validDiscordSnowflake($message["channel_id"])){
-                throw new \AssertionError("Invalid channel_id given.");
-            }
-            if(isset($message["guild_id"]) && !Utils::validDiscordSnowflake($message["guild_id"])){
-                throw new \AssertionError("Invalid guild_id given.");
-            }
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Invalid guild_id given.");
         }
-        $this->message = $message;
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            throw new \AssertionError("Invalid channel_id given.");
+        }
+        if(!Utils::validDiscordSnowflake($message_id)){
+            throw new \AssertionError("Invalid message_id given.");
+        }
+        $this->guild_id = $guild_id;
+        $this->channel_id = $channel_id;
+        $this->message_id = $message_id;
+        $this->new_message = $new_message;
+        $this->old_message = $old_message;
     }
 
-    /* @return Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} */
-    public function getMessage(): Message|array{
-        return $this->message;
+    public function getGuildId(): ?string{
+        return $this->guild_id;
+    }
+
+    public function getChannelId(): string{
+        return $this->channel_id;
+    }
+
+    public function getMessageId(): string{
+        return $this->message_id;
+    }
+
+    public function getNewMessage(): ?Message{
+        return $this->new_message;
+    }
+
+    public function getOldMessage(): ?Message{
+        return $this->old_message;
     }
 }
