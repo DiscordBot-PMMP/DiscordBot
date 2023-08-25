@@ -78,6 +78,7 @@ use JaxkDev\DiscordBot\Models\User;
 use JaxkDev\DiscordBot\Models\Webhook;
 use JaxkDev\DiscordBot\Models\WebhookType;
 use JaxkDev\DiscordBot\Plugin\Events\BotUserUpdated;
+use JaxkDev\DiscordBot\Plugin\Events\DiscordClosed;
 use JaxkDev\DiscordBot\Plugin\Events\DiscordReady;
 use pocketmine\event\EventPriority;
 use function count;
@@ -108,7 +109,11 @@ final class Api{
             $this->plugin->getServer()->getPluginManager()->registerEvent(DiscordReady::class, function(DiscordReady $event){
                 $this->bot_user = $event->getBotUser();
                 $this->ready = true;
-                $this->plugin->getLogger()->notice("DiscordBot Connected and ready.");
+                $this->plugin->getLogger()->notice("DiscordBot Connected, API is ready.");
+            }, EventPriority::LOWEST, $this->plugin, true);
+            $this->plugin->getServer()->getPluginManager()->registerEvent(DiscordClosed::class, function(DiscordClosed $event){
+                $this->ready = false;
+                $this->plugin->getLogger()->notice("DiscordBot Disconnected, API no longer ready.");
             }, EventPriority::LOWEST, $this->plugin, true);
             $this->plugin->getServer()->getPluginManager()->registerEvent(BotUserUpdated::class, function(BotUserUpdated $event){
                 $this->bot_user = $event->getBot();
