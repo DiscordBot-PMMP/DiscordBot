@@ -45,7 +45,8 @@ If you do become an active contributor to the plugin I will help you set up effi
 
 ---
 ### Contributors
-- [@JaxkDev](https://github.com/JaxkDev) - Lead Developer
+- [@JaxkDev](https://github.com/JaxkDev) - Lead developer
+- [@dktapps](https://github.com/dktapps) - ext-pmmpthread support
 
 ### Libraries
 - [Discord-PHP/DiscordPHP](https://github.com/DiscordPHP/DiscordPHP) - Used internally to communicate with discord.
