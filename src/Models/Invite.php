@@ -24,8 +24,8 @@ final class Invite implements BinarySerializable{
 
     public const SERIALIZE_ID = 6;
 
-    /** Also used as ID internally, ONLY null when creating model. */
-    private ?string $code;
+    /** Also used as ID internally. */
+    private string $code;
 
     /** The guild this invite is for (if any) */
     private ?string $guild_id;
@@ -45,7 +45,7 @@ final class Invite implements BinarySerializable{
     /** The expiration date of this invite. (UNIX Timestamp) */
     private ?int $expires_at;
 
-    public function __construct(?string $code, ?string $guild_id, string $channel_id, ?string $inviter,
+    public function __construct(string $code, ?string $guild_id, string $channel_id, ?string $inviter,
                                 ?InviteTargetType $target_type, ?string $target_user, ?int $expires_at){
         $this->setCode($code);
         $this->setGuildId($guild_id);
@@ -56,11 +56,11 @@ final class Invite implements BinarySerializable{
         $this->setExpiresAt($expires_at);
     }
 
-    public function getCode(): ?string{
+    public function getCode(): string{
         return $this->code;
     }
 
-    public function setCode(?string $code): void{
+    public function setCode(string $code): void{
         $this->code = $code;
     }
 
@@ -124,11 +124,15 @@ final class Invite implements BinarySerializable{
         $this->expires_at = $expires_at;
     }
 
+    public function getUrl(): string{
+        return "https://discord.gg/{$this->code}";
+    }
+
     //----- Serialization -----//
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putNullableString($this->code);
+        $stream->putString($this->code);
         $stream->putNullableString($this->guild_id);
         $stream->putString($this->channel_id);
         $stream->putNullableString($this->inviter);
@@ -140,7 +144,7 @@ final class Invite implements BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getNullableString(),                               // code
+            $stream->getString(),                                       // code
             $stream->getNullableString(),                               // guild_id
             $stream->getString(),                                       // channel_id
             $stream->getNullableString(),                               // inviter
