@@ -25,8 +25,7 @@ final class Role implements BinarySerializable{
 
     public const SERIALIZE_ID = 8;
 
-    /** Role ID, never null unless you are sending a new createRole via API. */
-    private ?string $id;
+    private string $id;
 
     /** The guild this role is part of, used for internal mapping. */
     private string $guild_id;
@@ -65,7 +64,7 @@ final class Role implements BinarySerializable{
      * @internal See API::createRole()
      * @see API::createRole()
      */
-    public function __construct(?string $id, string $guild_id, string $name, int $colour, bool $hoist, ?string $icon,
+    public function __construct(string $id, string $guild_id, string $name, int $colour, bool $hoist, ?string $icon,
                                 ?string $unicode_emoji, int $position, RolePermissions $permissions, bool $managed,
                                 bool $mentionable, ?RoleTags $tags){
         $this->setId($id);
@@ -82,12 +81,12 @@ final class Role implements BinarySerializable{
         $this->setTags($tags);
     }
 
-    public function getId(): ?string{
+    public function getId(): string{
         return $this->id;
     }
 
-    public function setId(?string $id): void{
-        if($id !== null && !Utils::validDiscordSnowflake($id)){
+    public function setId(string $id): void{
+        if(!Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("Role ID '$id' is invalid.");
         }
         $this->id = $id;
@@ -133,7 +132,7 @@ final class Role implements BinarySerializable{
     }
 
     public function getIconUrl(): ?string{
-        return ($this->id === null || $this->icon === null) ? null : "https://cdn.discordapp.com/role-icons/{$this->id}/{$this->icon}.png";
+        return ($this->icon === null) ? null : "https://cdn.discordapp.com/role-icons/{$this->id}/{$this->icon}.png";
     }
 
     public function getIcon(): ?string{
@@ -200,7 +199,7 @@ final class Role implements BinarySerializable{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
-        $stream->putNullableString($this->id);
+        $stream->putString($this->id);
         $stream->putString($this->guild_id);
         $stream->putString($this->name);
         $stream->putInt($this->colour);
@@ -217,7 +216,7 @@ final class Role implements BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            $stream->getNullableString(),                       // id
+            $stream->getString(),                               // id
             $stream->getString(),                               // guild_id
             $stream->getString(),                               // name
             $stream->getInt(),                                  // colour

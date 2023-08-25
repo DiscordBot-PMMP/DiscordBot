@@ -433,9 +433,6 @@ final class CommunicationHandler{
     }
 
     private function handleUpdateRolePosition(Role $role): PromiseInterface{
-        if($role->getId() === null){
-            return reject(new ApiRejection("Role does not have a ID."));
-        }
         if($role->getId() === $role->getGuildId()){
             return reject(new ApiRejection("Cannot move the default 'everyone' role."));
         }
@@ -496,10 +493,6 @@ final class CommunicationHandler{
     }
 
     private function handleUpdateRole(RequestUpdateRole $pk): void{
-        if($pk->getRole()->getId() === null){
-            $this->resolveRequest($pk->getUID(), false, "Failed to update role.", ["Role ID must be present."]);
-            return;
-        }
         $this->getGuild($pk, $pk->getRole()->getGuildId(), function(DiscordGuild $guild) use($pk){
             $guild->roles->fetch($pk->getRole()->getId())->then(function(DiscordRole $role) use($guild, $pk){
                 $role->position = $pk->getRole()->getPosition();

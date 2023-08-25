@@ -553,8 +553,8 @@ final class Api{
      * @return PromiseInterface Resolves with Role model.
      */
     public function createRole(string $guild_id, string $name = "new role", RolePermissions $permissions = null,
-                                     int $colour = 0, bool $hoist = false, ?string $icon_data = null,
-                                     ?string $unicode_emoji = null, bool $mentionable = false, ?string $reason = null): PromiseInterface{
+                               int $colour = 0, bool $hoist = false, ?string $icon_data = null,
+                               ?string $unicode_emoji = null, bool $mentionable = false, ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
@@ -582,9 +582,6 @@ final class Api{
     public function updateRole(Role $role, ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
-        }
-        if($role->getId() === null){
-            return rejectPromise(new ApiRejection("Role must be created before being able to update (missing ID)."));
         }
         $pk = new RequestUpdateRole($role, $reason);
         $this->plugin->writeOutboundData($pk);
