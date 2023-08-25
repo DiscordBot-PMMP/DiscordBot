@@ -16,7 +16,7 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
- * Emitted when a invite gets deleted/revoked/expires.
+ * Emitted when an invite gets deleted/revoked/expires.
  *
  * @see InviteCreated
  */
