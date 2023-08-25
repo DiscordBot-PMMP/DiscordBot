@@ -22,26 +22,36 @@ final class MemberUpdate extends Packet{
 
     private Member $member;
 
-    public function __construct(Member $member, ?int $uid = null){
+    /** Old member if cached. */
+    private ?Member $old_member;
+
+    public function __construct(Member $member, ?Member $old_member, ?int $uid = null){
         parent::__construct($uid);
         $this->member = $member;
+        $this->old_member = $old_member;
     }
 
     public function getMember(): Member{
         return $this->member;
     }
 
+    public function getOldMember(): ?Member{
+        return $this->old_member;
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putInt($this->getUID());
         $stream->putSerializable($this->member);
+        $stream->putNullableSerializable($this->old_member);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         $uid = $stream->getInt();
         return new self(
-            $stream->getSerializable(Member::class), // member
+            $stream->getSerializable(Member::class),         // member
+            $stream->getNullableSerializable(Member::class), // old_member
             $uid
         );
     }

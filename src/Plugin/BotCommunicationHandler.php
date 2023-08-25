@@ -334,7 +334,7 @@ final class BotCommunicationHandler{
     }
 
     private function handleMemberUpdate(MemberUpdatePacket $packet): void{
-        (new MemberUpdatedEvent($this->plugin, $packet->getMember()))->call();
+        (new MemberUpdatedEvent($this->plugin, $packet->getMember(), $packet->getOldMember()))->call();
     }
 
     private function handleMemberLeave(MemberLeavePacket $packet): void{

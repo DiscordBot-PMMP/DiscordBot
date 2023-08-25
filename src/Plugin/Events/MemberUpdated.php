@@ -25,12 +25,20 @@ final class MemberUpdated extends DiscordBotEvent{
 
     private Member $member;
 
-    public function __construct(Plugin $plugin, Member $member){
+    /** Old member if cached. */
+    private ?Member $old_member;
+
+    public function __construct(Plugin $plugin, Member $member, ?Member $old_member){
         parent::__construct($plugin);
         $this->member = $member;
+        $this->old_member = $old_member;
     }
 
     public function getMember(): Member{
         return $this->member;
+    }
+
+    public function getOldMember(): ?Member{
+        return $this->old_member;
     }
 }
