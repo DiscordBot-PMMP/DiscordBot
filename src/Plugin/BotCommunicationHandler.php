@@ -290,7 +290,7 @@ final class BotCommunicationHandler{
     }
 
     private function handleChannelUpdate(ChannelUpdatePacket $packet): void{
-        (new ChannelUpdatedEvent($this->plugin, $packet->getChannel()))->call();
+        (new ChannelUpdatedEvent($this->plugin, $packet->getChannel(), $packet->getOldChannel()))->call();
     }
 
     private function handleChannelDelete(ChannelDeletePacket $packet): void{
