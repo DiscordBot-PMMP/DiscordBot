@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
+use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
@@ -27,7 +28,9 @@ final class RoleDeleted extends DiscordBotEvent{
 
     private string $role_id;
 
-    public function __construct(Plugin $plugin, string $guild_id, string $role_id){
+    private ?Role $cached_role;
+
+    public function __construct(Plugin $plugin, string $guild_id, string $role_id, ?Role $cached_role){
         parent::__construct($plugin);
         if(!Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Invalid guild_id given.");
@@ -37,6 +40,7 @@ final class RoleDeleted extends DiscordBotEvent{
         }
         $this->guild_id = $guild_id;
         $this->role_id = $role_id;
+        $this->cached_role = $cached_role;
     }
 
     public function getGuildId(): string{
@@ -45,5 +49,9 @@ final class RoleDeleted extends DiscordBotEvent{
 
     public function getRoleId(): string{
         return $this->role_id;
+    }
+
+    public function getCachedRole(): ?Role{
+        return $this->cached_role;
     }
 }

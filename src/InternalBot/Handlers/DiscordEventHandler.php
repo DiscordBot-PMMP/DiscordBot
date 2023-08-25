@@ -396,7 +396,8 @@ final class DiscordEventHandler{
         if($role->guild_id === null){
             throw new \AssertionError("Role delete event with null guild_id.");
         }
-        $packet = new RoleDeletePacket($role->guild_id, ($role instanceof DiscordRole) ? $role->id : $role->role_id);
+        $packet = new RoleDeletePacket($role->guild_id, ($role instanceof DiscordRole) ? $role->id : $role->role_id,
+            ($role instanceof DiscordRole) ? ModelConverter::genModelRole($role) : null);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
