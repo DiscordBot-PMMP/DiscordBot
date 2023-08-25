@@ -57,13 +57,12 @@ final class Emoji implements BinarySerializable{
     /** Whether this emoji can be used, may be false due to loss of Server Boosts */
     private ?bool $available;
 
-    //No support for create/update/delete emoji.
+    //TODO-Next-Minor support for create/update/delete emoji.
 
     /**
      * Use this for creating standard Emoji objects to use with the API.
      *
      * @param string $unicode Raw emoji string eg ✅ or 🤔 or 🤖 etc etc.
-     * @return self
      */
     public static function fromUnicode(string $unicode): self{
         return new self(null, $unicode, null, null, null, null, null, null);
@@ -71,11 +70,6 @@ final class Emoji implements BinarySerializable{
 
     /**
      * Use this for creating an Emoji object from a custom emoji ID and Name inside a guild.
-     *
-     * @param string    $id
-     * @param string    $name
-     * @param bool|null $animated
-     * @return self
      */
     public static function fromPrivate(string $id, string $name, ?bool $animated = null): self{
         return new self($id, $name, null, null, null, null, $animated, null);
@@ -180,12 +174,14 @@ final class Emoji implements BinarySerializable{
         $this->available = $available;
     }
 
+    /** @internal Used by the network protocol to send emoji. */
     public function toApiString(): string{
         if($this->id === null){
             return $this->name ?? "";
         }
         return (($this->animated ?? false) ? "a" : "") . ":{$this->name}:{$this->id}";
     }
+
     public function __toString(): string{
         if($this->id === null){
             return $this->name ?? "";
