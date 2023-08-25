@@ -59,8 +59,27 @@ final class Emoji implements BinarySerializable{
 
     //No support for create/update/delete emoji.
 
-    //Standard emoji constructor new Emoji(null, "✅") = ✅
-    //Custom emoji constructor new Emoji("123456789", "test", ["123456789"], "123456789", true, false, false, true) = a:test:123456789
+    /**
+     * Use this for creating standard Emoji objects to use with the API.
+     *
+     * @param string $unicode Raw emoji string eg ✅ or 🤔 or 🤖 etc etc.
+     * @return self
+     */
+    public static function fromUnicode(string $unicode): self{
+        return new self(null, $unicode, null, null, null, null, null, null);
+    }
+
+    /**
+     * Use this for creating an Emoji object from a custom emoji ID and Name inside a guild.
+     *
+     * @param string    $id
+     * @param string    $name
+     * @param bool|null $animated
+     * @return self
+     */
+    public static function fromPrivate(string $id, string $name, ?bool $animated = null): self{
+        return new self($id, $name, null, null, null, null, $animated, null);
+    }
 
     /** @param ?string[] $role_ids Role IDs */
     public function __construct(?string $id, ?string $name, ?array $role_ids, ?string $user_id, ?bool $require_colons,

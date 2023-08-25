@@ -51,10 +51,16 @@ final class Interaction implements BinarySerializable{
     /** member/user ID of the invoking user. */
     private ?string $user_id;
 
-    /** A continuation token for responding to the interaction, internal use only. */
+    /**
+     * A continuation token for responding to the interaction, internal use only.
+     * @internal
+     */
     private string $token;
 
-    /** Read-only property, always 1 (from discord gateway) */
+    /**
+     * Read-only property, always 1 (from discord gateway)
+     * @internal
+     */
     private int $version;
 
     /** For MESSAGE_COMPONENT type, the original message the component is attached to */
@@ -80,8 +86,8 @@ final class Interaction implements BinarySerializable{
         $this->setGuildId($guild_id);
         $this->setChannelId($channel_id);
         $this->setUserId($user_id);
-        $this->setToken($token);
-        $this->setVersion($version);
+        $this->token = $token;
+        $this->version = $version;
         $this->setMessage($message);
         $this->setPermissions($permissions);
         $this->setLocale($locale);
@@ -123,6 +129,18 @@ final class Interaction implements BinarySerializable{
     }
 
     public function setData(ApplicationCommandData|MessageComponentData|ModalSubmitData|null $data): void{
+        if($data instanceof ApplicationCommandData && $this->type !== InteractionType::APPLICATION_COMMAND && $this->type !== InteractionType::APPLICATION_COMMAND_AUTOCOMPLETE){
+            throw new \AssertionError("Invalid data type ApplicationCommandData for interaction type '" . $this->type->name . "'.");
+        }
+        if($data instanceof MessageComponentData && $this->type !== InteractionType::MESSAGE_COMPONENT){
+            throw new \AssertionError("Invalid data type MessageComponentData for interaction type '" . $this->type->name . "'.");
+        }
+        if($data instanceof ModalSubmitData && $this->type !== InteractionType::MODAL_SUBMIT){
+            throw new \AssertionError("Invalid data type ModalSubmitData for interaction type '" . $this->type->name . "'.");
+        }
+        if($data === null && $this->type !== InteractionType::PING){
+            throw new \AssertionError("Invalid data type null for interaction type '" . $this->type->name . "'.");
+        }
         $this->data = $data;
     }
 
@@ -163,16 +181,8 @@ final class Interaction implements BinarySerializable{
         return $this->token;
     }
 
-    public function setToken(string $token): void{
-        $this->token = $token;
-    }
-
     public function getVersion(): int{
         return $this->version;
-    }
-
-    public function setVersion(int $version): void{
-        $this->version = $version;
     }
 
     public function getMessage(): ?Message{
