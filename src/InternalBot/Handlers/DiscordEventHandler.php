@@ -371,7 +371,7 @@ final class DiscordEventHandler{
     }
 
     public function onChannelDelete(DiscordChannel $channel, Discord $discord): void{
-        $packet = new ChannelDeletePacket($channel->guild_id, $channel->id);
+        $packet = new ChannelDeletePacket($channel->guild_id, $channel->id, ModelConverter::genModelChannel($channel));
         $this->client->getThread()->writeOutboundData($packet);
     }
 

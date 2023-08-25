@@ -291,7 +291,7 @@ final class BotCommunicationHandler{
     }
 
     private function handleChannelDelete(ChannelDeletePacket $packet): void{
-        (new ChannelDeletedEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId()))->call();
+        (new ChannelDeletedEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId(), $packet->getCachedChannel()))->call();
     }
 
     private function handleChannelPinsUpdate(ChannelPinsUpdatePacket $packet): void{
