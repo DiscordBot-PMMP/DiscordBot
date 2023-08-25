@@ -368,6 +368,10 @@ final class User implements BinarySerializable{
         }
     }
 
+    public function __toString(): string{
+        return "<@{$this->id}>";
+    }
+
     //----- Serialization -----//
 
     public function binarySerialize(): BinaryStream{

@@ -240,6 +240,10 @@ final class Member implements BinarySerializable{
         $this->presence = $presence;
     }
 
+    public function __toString(): string{
+        return "<@{$this->user_id}>";
+    }
+
     //----- Serialization -----//
 
     public function binarySerialize(): BinaryStream{

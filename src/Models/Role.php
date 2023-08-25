@@ -192,6 +192,10 @@ final class Role implements BinarySerializable{
         $this->tags = $tags;
     }
 
+    public function __toString(): string{
+        return "<@&{$this->id}>";
+    }
+
     //----- Serialization -----//
 
     public function binarySerialize(): BinaryStream{

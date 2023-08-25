@@ -416,6 +416,10 @@ final class Channel implements BinarySerializable{
         $this->applied_tags = $applied_tags;
     }
 
+    public function __toString(): string{
+        return "<#{$this->id}>";
+    }
+
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putString($this->id);
