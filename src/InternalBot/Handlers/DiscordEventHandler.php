@@ -195,25 +195,16 @@ final class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onMessageUpdate(DiscordMessage|\stdClass $data, Discord $discord, ?DiscordMessage $old): void{
-        $packet = new MessageUpdatePacket($data->guild_id ?? null, $data->channel_id, $data->id,
-            ($data instanceof DiscordMessage) ? ModelConverter::genModelMessage($data) : null,
+    public function onMessageUpdate(DiscordMessage|\stdClass $message, Discord $discord, ?DiscordMessage $old): void{
+        $packet = new MessageUpdatePacket($message->guild_id ?? null, $message->channel_id, $message->id,
+            ($message instanceof DiscordMessage) ? ModelConverter::genModelMessage($message) : null,
             ($old instanceof DiscordMessage) ? ModelConverter::genModelMessage($old) : null);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onMessageDelete(DiscordMessage|\stdClass $data, Discord $discord): void{
-        if(!$data instanceof DiscordMessage || !$this->checkMessage($data)){
-            //Unknown message deleted (send partial data).
-            $message = [
-                "guild_id" => $data->guild_id ?? null,
-                "channel_id" => $data->channel_id,
-                "message_id" => $data->id
-            ];
-        }else{
-            $message = ModelConverter::genModelMessage($data);
-        }
-        $packet = new MessageDeletePacket($message);
+    public function onMessageDelete(DiscordMessage|\stdClass $message, Discord $discord): void{
+        $packet = new MessageDeletePacket($message->guild_id ?? null, $message->channel_id, $message->id,
+            ($message instanceof DiscordMessage) ? ModelConverter::genModelMessage($message) : null);
         $this->client->getThread()->writeOutboundData($packet);
     }
 

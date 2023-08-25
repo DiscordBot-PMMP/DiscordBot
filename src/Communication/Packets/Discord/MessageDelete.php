@@ -20,57 +20,56 @@ final class MessageDelete extends Packet{
 
     public const SERIALIZE_ID = 20;
 
-    /**
-     * @var Message|array{"message_id": string, "channel_id": string, "guild_id": ?string}
-     */
-    private Message|array $message;
+    private ?string $guild_id;
 
-    /**
-     * @param Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} $message
-     */
-    public function __construct(Message|array $message, ?int $uid = null){
+    private string $channel_id;
+
+    private string $message_id;
+
+    private ?Message $cached_message;
+
+    public function __construct(?string $guild_id, string $channel_id, string $message_id, ?Message $cached_message, ?int $uid = null){
         parent::__construct($uid);
-        $this->message = $message;
+        $this->guild_id = $guild_id;
+        $this->channel_id = $channel_id;
+        $this->message_id = $message_id;
+        $this->cached_message = $cached_message;
     }
 
-    /**
-     * @return Message|array{"message_id": string, "channel_id": string, "guild_id": ?string}
-     */
-    public function getMessage(): Message|array{
-        return $this->message;
+    public function getGuildId(): ?string{
+        return $this->guild_id;
+    }
+
+    public function getChannelId(): string{
+        return $this->channel_id;
+    }
+
+    public function getMessageId(): string{
+        return $this->message_id;
+    }
+
+    public function getCachedMessage(): ?Message{
+        return $this->cached_message;
     }
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
         $stream->putInt($this->getUID());
-        if($this->message instanceof Message){
-            $stream->putBool(false); // not partial
-            $stream->putSerializable($this->message);
-        }else{
-            $stream->putBool(true); // partial
-            $stream->putNullableString($this->message["guild_id"]);
-            $stream->putString($this->message["channel_id"]);
-            $stream->putString($this->message["message_id"]);
-        }
+        $stream->putNullableString($this->guild_id);
+        $stream->putString($this->channel_id);
+        $stream->putString($this->message_id);
+        $stream->putNullableSerializable($this->cached_message);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         $uid = $stream->getInt();
-        if($stream->getBool()){ //partial
-            return new self(
-                [
-                    "guild_id" => $stream->getNullableString(),
-                    "channel_id" => $stream->getString(),
-                    "message_id" => $stream->getString()
-                ],
-                $uid
-            );
-        }else{
-            return new self(
-                $stream->getSerializable(Message::class),
-                $uid
-            );
-        }
+        return new self(
+            $stream->getNullableString(),                     // guild_id
+            $stream->getString(),                             // channel_id
+            $stream->getString(),                             // message_id
+            $stream->getNullableSerializable(Message::class), // cached_message
+            $uid
+        );
     }
 }

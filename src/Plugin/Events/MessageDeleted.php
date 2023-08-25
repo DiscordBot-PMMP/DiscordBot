@@ -27,31 +27,45 @@ use pocketmine\plugin\Plugin;
  */
 final class MessageDeleted extends DiscordBotEvent{
 
-    /** @var Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} */
-    private Message|array $message;
+    private ?string $guild_id;
 
-    /** @param Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} $message */
-    public function __construct(Plugin $plugin, Message|array $message){
+    private string $channel_id;
+
+    private string $message_id;
+
+    private ?Message $cached_message;
+
+    public function __construct(Plugin $plugin, ?string $guild_id, string $channel_id, string $message_id,
+                                ?Message $cached_message){
         parent::__construct($plugin);
-        if(!$message instanceof Message){
-            if(!isset($message["message_id"], $message["channel_id"])){
-                throw new \AssertionError("Invalid message given, missing message_id or channel_id.");
-            }
-            if(!Utils::validDiscordSnowflake($message["message_id"])){
-                throw new \AssertionError("Invalid message_id given.");
-            }
-            if(!Utils::validDiscordSnowflake($message["channel_id"])){
-                throw new \AssertionError("Invalid channel_id given.");
-            }
-            if(isset($message["guild_id"]) && !Utils::validDiscordSnowflake($message["guild_id"])){
-                throw new \AssertionError("Invalid guild_id given.");
-            }
+        if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Invalid guild_id given.");
         }
-        $this->message = $message;
+        if(!Utils::validDiscordSnowflake($channel_id)){
+            throw new \AssertionError("Invalid channel_id given.");
+        }
+        if(!Utils::validDiscordSnowflake($message_id)){
+            throw new \AssertionError("Invalid message_id given.");
+        }
+        $this->guild_id = $guild_id;
+        $this->channel_id = $channel_id;
+        $this->message_id = $message_id;
+        $this->cached_message = $cached_message;
     }
 
-    /** @return Message|array{"message_id": string, "channel_id": string, "guild_id": ?string} */
-    public function getMessage(): Message|array{
-        return $this->message;
+    public function getGuildId(): ?string{
+        return $this->guild_id;
+    }
+
+    public function getChannelId(): string{
+        return $this->channel_id;
+    }
+
+    public function getMessageId(): string{
+        return $this->message_id;
+    }
+
+    public function getCachedMessage(): ?Message{
+        return $this->cached_message;
     }
 }

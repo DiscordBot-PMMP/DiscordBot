@@ -256,7 +256,8 @@ final class BotCommunicationHandler{
     }
 
     private function handleMessageDelete(MessageDeletePacket $packet): void{
-        (new MessageDeletedEvent($this->plugin, $packet->getMessage()))->call();
+        (new MessageDeletedEvent($this->plugin, $packet->getGuildId(), $packet->getChannelId(), $packet->getMessageId(),
+            $packet->getCachedMessage()))->call();
     }
 
     private function handleMessageDeleteBulk(MessageDeleteBulkPacket $packet): void{
