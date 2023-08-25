@@ -10,12 +10,12 @@ Here are a list of plugins that provide user functionality:
 # Requirements
 
 ---
-| Name          | Version | Included in releases |
-|---------------|---------|:--------------------:|
-| PHP           | ^ 8.1   |          ❌           |
-| PocketMine-MP | ^ 5.0   |          ❌           |
-| DiscordPHP    | 10.0.0  |          ✅           |
-| Promise       | 2.x     |          ✅           |
+| Name          | Version    | Included in releases |
+|---------------|------------|:--------------------:|
+| PHP           | ^ 8.1      |          ❌           |
+| PocketMine-MP | ^ 5.0      |          ❌           |
+| DiscordPHP    | 10.0.0-RC6 |          ✅           |
+| Promise       | 2.10       |          ✅           |
 # Installation
 
 ---
@@ -51,5 +51,6 @@ If you do become an active contributor to the plugin I will help you set up effi
 - [Discord-PHP/DiscordPHP](https://github.com/DiscordPHP/DiscordPHP) - Used internally to communicate with discord.
 - [ReactPHP/Promise](https://github.com/reactphp/promise) - Used to provide a promise API Library to developers.
 - [[Dev] PHPStan/PHPStan](https://github.com/phpstan/phpstan) - Used to analyse the plugins code for any potential problems.
+- [[Dev] PHP-CS-Fixer/PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer) - Used to maintain the plugins code to a standard.
 
 And many more sub-dependencies that allow the above to function.
