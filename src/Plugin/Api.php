@@ -916,6 +916,8 @@ final class Api{
     /**
      * Edit a sent message.
      *
+     * TODO, add support for editing message files & stickers.
+     *
      * Note you can't convert a 'REPLY' message to a normal 'MESSAGE'.
      * Note at the moment we don't support editing/removing/adding stickers/files :(
      *
@@ -928,7 +930,6 @@ final class Api{
         if(strlen($message->getContent() ?? "") > 2000){
             return rejectPromise(new ApiRejection("Message content cannot be larger than 2000 characters for bots."));
         }
-        //TODO Rest of validation.
         $pk = new RequestEditMessage($message);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
