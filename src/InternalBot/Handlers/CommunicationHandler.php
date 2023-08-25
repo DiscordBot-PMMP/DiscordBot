@@ -505,6 +505,7 @@ final class CommunicationHandler{
                 $role->position = $pk->getRole()->getPosition();
                 $role->hoist = $pk->getRole()->getHoist();
                 //$role->icon = $pk->getRole()->getIcon();                  TODO Image data not hash from model
+                /** @phpstan-ignore-next-line Setting undefined property. */
                 $role->unicode_emoji = $pk->getRole()->getUnicodeEmoji();
                 $role->mentionable = $pk->getRole()->getMentionable();
                 $role->name = $pk->getRole()->getName();
