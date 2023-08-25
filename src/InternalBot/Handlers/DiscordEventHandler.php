@@ -308,8 +308,9 @@ final class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onGuildUpdate(DiscordGuild $guild, Discord $discord): void{
-        $packet = new GuildUpdatePacket(ModelConverter::genModelGuild($guild));
+    public function onGuildUpdate(DiscordGuild $guild, Discord $discord, ?DiscordGuild $old): void{
+        $packet = new GuildUpdatePacket(ModelConverter::genModelGuild($guild),
+            ($old instanceof DiscordGuild) ? ModelConverter::genModelGuild($old) : null);
         $this->client->getThread()->writeOutboundData($packet);
     }
 

@@ -349,7 +349,7 @@ final class BotCommunicationHandler{
     }
 
     private function handleGuildUpdate(GuildUpdatePacket $packet): void{
-        (new GuildUpdatedEvent($this->plugin, $packet->getGuild()))->call();
+        (new GuildUpdatedEvent($this->plugin, $packet->getGuild(), $packet->getOldGuild()))->call();
     }
 
     private function handleGuildLeave(GuildLeavePacket $packet): void{

@@ -25,12 +25,20 @@ final class GuildUpdated extends DiscordBotEvent{
 
     private Guild $guild;
 
-    public function __construct(Plugin $plugin, Guild $guild){
+    /** Old guild if cached. */
+    private ?Guild $old_guild;
+
+    public function __construct(Plugin $plugin, Guild $guild, ?Guild $old_guild){
         parent::__construct($plugin);
         $this->guild = $guild;
+        $this->old_guild = $old_guild;
     }
 
     public function getGuild(): Guild{
         return $this->guild;
+    }
+
+    public function getOldGuild(): ?Guild{
+        return $this->old_guild;
     }
 }
