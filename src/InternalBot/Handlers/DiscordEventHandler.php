@@ -191,32 +191,6 @@ final class DiscordEventHandler{
     public function onMessageCreate(DiscordMessage $message, Discord $discord): void{
         if(!$this->checkMessage($message)) return;
         if($message->author?->id === "305060807887159296") $message->react("❤️");
-        /*if($message->author?->id === "282819886198030336"){
-            $msg = MessageBuilder::new()->setContent("Hello " . $message->author->username . "!");
-            $msg->setReplyTo($message);
-            $msg->addComponent((ActionRow::new())
-                ->addComponent(Button::new(Button::STYLE_PRIMARY, "button_1")->setLabel("Test Primary 1"))
-                ->addComponent(Button::new(Button::STYLE_PRIMARY, "button_2")->setLabel("Test Primary 2")->setEmoji("🎉"))
-                ->addComponent(Button::new(Button::STYLE_PRIMARY, "button_3")->setLabel("Test Primary 3")->setDisabled(true))
-                ->addComponent(Button::new(Button::STYLE_PRIMARY, "button_4")->setLabel("Test Primary 4")->setEmoji("❌")->setDisabled(true)))
-                ->addComponent((ActionRow::new())
-                ->addComponent(Button::new(Button::STYLE_SECONDARY, "button_5")->setLabel("Test Secondary 1"))
-                ->addComponent(Button::new(Button::STYLE_SECONDARY, "button_6")->setLabel("Test Secondary 2")->setEmoji("🤞"))
-                ->addComponent(Button::new(Button::STYLE_SECONDARY, "button_7")->setLabel("Test Secondary 3")->setDisabled(true))
-                ->addComponent(Button::new(Button::STYLE_SECONDARY, "button_8")->setLabel("Test Secondary 4")->setEmoji("❌")->setDisabled(true)))
-                ->addComponent((ActionRow::new())
-                ->addComponent(Button::new(Button::STYLE_SUCCESS, "button_9")->setLabel("Test Success 1"))
-                ->addComponent(Button::new(Button::STYLE_SUCCESS, "button_10")->setLabel("Test Success 2")->setEmoji("🥸"))
-                ->addComponent(Button::new(Button::STYLE_SUCCESS, "button_11")->setLabel("Test Success 3")->setDisabled(true))
-                ->addComponent(Button::new(Button::STYLE_SUCCESS, "button_12")->setLabel("Test Success 4")->setEmoji("❌")->setDisabled(true)))
-                ->addComponent((ActionRow::new())
-                ->addComponent(Button::new(Button::STYLE_DANGER, "button_13")->setLabel("Test Danger 1"))
-                ->addComponent(Button::new(Button::STYLE_DANGER, "button_14")->setLabel("Test Danger 2")->setEmoji("❤️‍🔥"))
-                ->addComponent(Button::new(Button::STYLE_DANGER, "button_15")->setLabel("Test Danger 3")->setDisabled(true))
-                ->addComponent(Button::new(Button::STYLE_DANGER, "button_16")->setLabel("Test Danger 4")->setEmoji("❌")->setDisabled(true)))
-                ->addComponent(MentionableSelect::new("id"));
-            $message->reply($msg);
-        }*/
         $packet = new MessageSentPacket(ModelConverter::genModelMessage($message));
         $this->client->getThread()->writeOutboundData($packet);
     }
