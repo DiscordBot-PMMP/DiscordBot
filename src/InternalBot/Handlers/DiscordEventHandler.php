@@ -259,18 +259,26 @@ final class DiscordEventHandler{
             $this->logger->warning("Message reaction add event with null user_id, ignoring. ID: " . $reaction->channel_id . " " . $reaction->message_id);
             return;
         }
+        if($reaction->emoji === null){
+            $this->logger->warning("Message reaction add event with null emoji, ignoring. ID: " . $reaction->channel_id . " " . $reaction->message_id);
+            return;
+        }
         $packet = new MessageReactionAddPacket($reaction->guild_id, $reaction->channel_id, $reaction->message_id,
-            $reaction->reaction_id, $reaction->user_id);
+            ModelConverter::genModelEmoji($reaction->emoji), $reaction->user_id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
     public function onMessageReactionRemove(DiscordMessageReaction $reaction): void{
         if($reaction->user_id === null){
-            $this->logger->warning("Message reaction add event with null user_id, ignoring. ID: " . $reaction->channel_id . " " . $reaction->message_id);
+            $this->logger->warning("Message reaction remove event with null user_id, ignoring. ID: " . $reaction->channel_id . " " . $reaction->message_id);
+            return;
+        }
+        if($reaction->emoji === null){
+            $this->logger->warning("Message reaction remove event with null emoji, ignoring. ID: " . $reaction->channel_id . " " . $reaction->message_id);
             return;
         }
         $packet = new MessageReactionRemovePacket($reaction->guild_id, $reaction->channel_id, $reaction->message_id,
-            $reaction->reaction_id, $reaction->user_id);
+            ModelConverter::genModelEmoji($reaction->emoji), $reaction->user_id);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
@@ -280,8 +288,12 @@ final class DiscordEventHandler{
     }
 
     public function onMessageReactionRemoveEmoji(DiscordMessageReaction $reaction): void{
+        if($reaction->emoji === null){
+            $this->logger->warning("Message reaction remove emoji event with null emoji, ignoring. ID: " . $reaction->channel_id . " " . $reaction->message_id);
+            return;
+        }
         $packet = new MessageReactionRemoveEmojiPacket($reaction->guild_id, $reaction->channel_id, $reaction->message_id,
-            $reaction->reaction_id);
+            ModelConverter::genModelEmoji($reaction->emoji));
         $this->client->getThread()->writeOutboundData($packet);
     }
 

@@ -14,6 +14,7 @@ namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
 use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\Emoji;
 
 final class RequestRemoveReaction extends Packet{
 
@@ -28,9 +29,10 @@ final class RequestRemoveReaction extends Packet{
 
     private string $user_id;
 
-    private string $emoji;
+    private Emoji $emoji;
 
-    public function __construct(?string $guild_id, string $channel_id, string $message_id, string $user_id, string $emoji, ?int $uid = null){
+    public function __construct(?string $guild_id, string $channel_id, string $message_id, string $user_id, Emoji $emoji,
+                                ?int $uid = null){
         parent::__construct($uid);
         $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
@@ -55,7 +57,7 @@ final class RequestRemoveReaction extends Packet{
         return $this->user_id;
     }
 
-    public function getEmoji(): string{
+    public function getEmoji(): Emoji{
         return $this->emoji;
     }
 
@@ -66,18 +68,18 @@ final class RequestRemoveReaction extends Packet{
         $stream->putString($this->channel_id);
         $stream->putString($this->message_id);
         $stream->putString($this->user_id);
-        $stream->putString($this->emoji);
+        $stream->putSerializable($this->emoji);
         return $stream;
     }
 
     public static function fromBinary(BinaryStream $stream): self{
         $uid = $stream->getInt();
         return new self(
-            $stream->getNullableString(), // guild_id
-            $stream->getString(),         // channel_id
-            $stream->getString(),         // message_id
-            $stream->getString(),         // user_id
-            $stream->getString(),         // emoji
+            $stream->getNullableString(),           // guild_id
+            $stream->getString(),                   // channel_id
+            $stream->getString(),                   // message_id
+            $stream->getString(),                   // user_id
+            $stream->getSerializable(Emoji::class), // emoji
             $uid
         );
     }

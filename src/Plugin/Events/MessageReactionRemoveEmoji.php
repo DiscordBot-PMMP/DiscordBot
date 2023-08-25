@@ -12,6 +12,7 @@
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
+use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
@@ -30,9 +31,9 @@ final class MessageReactionRemoveEmoji extends DiscordBotEvent{
 
     private string $message_id;
 
-    private string $emoji;
+    private Emoji $emoji;
 
-    public function __construct(Plugin $plugin, ?string $guild_id, string $channel_id, string $message_id, string $emoji){
+    public function __construct(Plugin $plugin, ?string $guild_id, string $channel_id, string $message_id, Emoji $emoji){
         parent::__construct($plugin);
         if($guild_id !== null && !Utils::validDiscordSnowflake($guild_id)){
             throw new \AssertionError("Invalid guild ID given.");
@@ -61,7 +62,7 @@ final class MessageReactionRemoveEmoji extends DiscordBotEvent{
         return $this->message_id;
     }
 
-    public function getEmoji(): string{
+    public function getEmoji(): Emoji{
         return $this->emoji;
     }
 }

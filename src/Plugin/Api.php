@@ -660,13 +660,14 @@ final class Api{
     /**
      * Remove a single reaction.
      *
-     * @param string $emoji Raw emoji eg '👍' or 'a:NAME:ID' for custom animated or ':NAME:ID' for custom non-animated.
-     *                      See Emoji::toApiString() for more info.
-     * @see Emoji::toApiString()
+     * @param Emoji $emoji e.g. Emoji::fromUnicode('👍') or Emoji::fromPrivate() for custom/private/animated.
+     *                     See Emoji::class for more info.
      * @return PromiseInterface Resolves with no data.
+     * @see Emoji::fromUnicode()
+     * @see Emoji::fromPrivate()
      */
     public function removeReaction(?string $guild_id, string $channel_id, string $message_id, string $user_id,
-                                   string $emoji): PromiseInterface{
+                                   Emoji $emoji): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
@@ -690,15 +691,17 @@ final class Api{
     /**
      * Remove all reactions on a message.
      *
-     * @param string|null $emoji If no emoji specified ALL reactions by EVERYONE will be deleted,
-     *                           if specified everyone's reaction with that emoji will be removed.
+     * @param Emoji|null $emoji If no emoji specified ALL reactions by EVERYONE will be deleted,
+     *                          if specified everyone's reaction with that emoji will be removed.
      *
-     *                           Raw emoji eg '👍' or 'a:NAME:ID' for custom animated or ':NAME:ID' for custom non-animated.
-     *                           See Emoji::toApiString() for more info.
-     * @see Emoji::toApiString()
+     *                          e.g. Emoji::fromUnicode('👍') or Emoji::fromPrivate() for custom/private/animated.
+     *                          See Emoji::class for more info.
      * @return PromiseInterface Resolves with no data.
+     * @see Emoji::fromUnicode()
+     * @see Emoji::fromPrivate()
      */
-    public function removeAllReactions(?string $guild_id, string $channel_id, string $message_id, ?string $emoji = null): PromiseInterface{
+    public function removeAllReactions(?string $guild_id, string $channel_id, string $message_id,
+                                       ?Emoji $emoji = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
@@ -721,12 +724,13 @@ final class Api{
      *
      * Note, If you have already reacted with the emoji provided it will still respond with a successful promise resolution.
      *
-     * @param string $emoji emoji string eg '👍' OR 'a:NAME:ID' for custom animated or ':NAME:ID' for custom non-animated.
-     *                      See Emoji::toApiString() for more info.
-     * @see Emoji::toApiString()
+     * @param Emoji $emoji e.g. Emoji::fromUnicode('👍') or Emoji::fromPrivate() for custom/private/animated.
+     *                     See Emoji::class for more info.
      * @return PromiseInterface Resolves with no data.
+     * @see Emoji::fromPrivate()
+     * @see Emoji::fromUnicode()
      */
-    public function addReaction(?string $guild_id, string $channel_id, string $message_id, string $emoji): PromiseInterface{
+    public function addReaction(?string $guild_id, string $channel_id, string $message_id, Emoji $emoji): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
