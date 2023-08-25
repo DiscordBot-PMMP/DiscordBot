@@ -150,7 +150,7 @@ final class BotCommunicationHandler{
 
     private function handleReady(DiscordReadyPacket $packet): void{
         //Default activity, Feel free to change in event / later time
-        $ac = Activity::create(VersionInfo::NAME . " v" . VersionInfo::BASE_VERSION . " | DiscordBot " . \JaxkDev\DiscordBot\VERSION, ActivityType::GAME);
+        $ac = Activity::create("DiscordBot " . \JaxkDev\DiscordBot\VERSION . " | " . VersionInfo::NAME . " v" . VersionInfo::BASE_VERSION , ActivityType::GAME);
 
         $event = new DiscordReadyEvent($this->plugin, $packet->getBotUser(), $ac, Status::IDLE);
         $event->call();
