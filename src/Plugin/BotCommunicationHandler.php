@@ -218,7 +218,7 @@ final class BotCommunicationHandler{
     }
 
     private function handleThreadUpdate(ThreadUpdatePacket $packet): void{
-        (new ThreadUpdatedEvent($this->plugin, $packet->getThread()))->call();
+        (new ThreadUpdatedEvent($this->plugin, $packet->getThread(), $packet->getOldThread()))->call();
     }
 
     private function handleThreadDelete(ThreadDeletePacket $packet): void{

@@ -329,8 +329,9 @@ final class DiscordEventHandler{
         $this->client->getThread()->writeOutboundData($packet);
     }
 
-    public function onThreadUpdate(DiscordThread $thread, Discord $discord): void{
-        $packet = new ThreadUpdatePacket(ModelConverter::genModelChannel($thread));
+    public function onThreadUpdate(DiscordThread $thread, Discord $discord, ?DiscordThread $old): void{
+        $packet = new ThreadUpdatePacket(ModelConverter::genModelChannel($thread),
+            ($old instanceof DiscordThread) ? ModelConverter::genModelChannel($old) : null);
         $this->client->getThread()->writeOutboundData($packet);
     }
 
