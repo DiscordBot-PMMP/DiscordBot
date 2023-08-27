@@ -3,10 +3,12 @@ DiscordBot is not a plugin that provides anything for players/users, this plugin
 with an extensive API to interact with a Discord Bot via DiscordPHP
 
 Here are a list of plugins that provide user functionality:
-- Chat Bridge - https://github.com/DiscordBot-PMMP/ChatBridge
-- *More to be listed (If you use this plugin open an issue to list your plugin)*
+- [Chat Bridge](https://github.com/DiscordBot-PMMP/ChatBridge) | Bi-directional chat between Discord and Minecraft
+- [Discord Account](https://github.com/DiscordBot-PMMP/DiscordAccount) | Link your Discord account to your Minecraft account
+- *More to be listed (If you use this plugin open a PR to add your plugin here)*
 
-> Developers, see [API.md](API.md) for more information on how to use the API
+> Developers, see [API.md](API.md) for more information on how to use the DiscordBot API \
+> Advanced Developers, see [Network_API.md](Network_API.md) for more information on the network protocol / external bots.
 # Requirements
 
 ---
