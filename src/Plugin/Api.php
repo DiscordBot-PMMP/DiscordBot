@@ -87,7 +87,6 @@ use pocketmine\event\EventPriority;
 use function count;
 use function in_array;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
-use function preg_match;
 use function strlen;
 
 /**
@@ -929,16 +928,9 @@ final class Api{
                 return rejectPromise(new ApiRejection("Invalid sticker ID '$id'."));
             }
         }
-        /**
-         * @var string $name
-         * @var string $data
-         */
         foreach($files ?? [] as $name => $data){
             if(strlen($name) > 256){
                 return rejectPromise(new ApiRejection("File name cannot be larger than 256 characters."));
-            }
-            if(!preg_match('/^[a-zA-Z0-9-_]+.[a-zA-Z0-9-_]+$/', $name)){
-                return rejectPromise(new ApiRejection("File name must contain a file extension, eg 'test.txt'"));
             }
             if(strlen($data) > 8388608){
                 return rejectPromise(new ApiRejection("File data cannot be larger than 8388608 bytes."));
@@ -1346,9 +1338,6 @@ final class Api{
         foreach($files ?? [] as $name => $data){
             if(strlen($name) > 256){
                 return rejectPromise(new ApiRejection("File name cannot be larger than 256 characters."));
-            }
-            if(!preg_match('/^[a-zA-Z0-9-_]+.[a-zA-Z0-9-_]+$/', $name)){
-                return rejectPromise(new ApiRejection("File name must contain a file extension, eg 'test.txt'"));
             }
             if(strlen($data) > 8388608){
                 return rejectPromise(new ApiRejection("File data cannot be larger than 8388608 bytes."));
