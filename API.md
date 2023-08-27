@@ -18,7 +18,7 @@ Firstly a quick few notes about the API and what it covers.
 
 
  + All API Calls can be made through `JaxkDev\DiscordBot\Plugin\Api.php` an instance is available from the plugin instance
-(`JaxkDev\DiscordBot\Plugin\Main.php`)
+(`JaxkDev\DiscordBot\Plugin\Main.php` - `getApi()`)
 
 
 + All discord data types such as Member, Role, Channel etc
@@ -58,15 +58,16 @@ the message did not get sent, and a `ApiRejection` (exception) will be passed ba
 /** @var $api \JaxkDev\DiscordBot\Plugin\Api */
 $api = $DiscordBotPluginInstance->getApi();
 /** @var $promise \JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface */
-$promise = $api->sendMessage(new \JaxkDev\DiscordBot\Models\Messages\Message("channel_id", null, "Hello world !"));
+$promise = $api->sendMessage("guild_id or null for DMs", "channel_id or user_id for DMs", "Hello world !"));
 
 // You could do other things here if necessary
 // but be sure to register your callbacks before finishing.
 
 //To handle both resolved and rejected:
 $promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResultion $resolution){
-    echo "Resolved !";
     //Yay, it worked and the message was sent successfully.
+    echo "Resolved !";
+    var_dump($resolution->getData()[0]); // will dump the Message model in array index 0.
 }, function(\JaxkDev\DiscordBot\Plugin\ApiRejection $rejectedError){
     echo "Rejected :(";
     //Oh no, It failed and $rejectedError can tell you why.
@@ -103,13 +104,13 @@ For information on the data thats returned with `$resolution->getData()` see the
 
 ---
 
-## Discord api - weird things
+## Discord API - weird things
 
-Discord does do some fancy weird things a lot like minecraft, so I've listed a few things that are important to note.
+Discord does do some fancy weird things, so I've listed a few things that are important to note below.
 
-`discord gateway v10` The current version DiscordBot/DiscordPHP uses.
+`Discord Gateway v10` The current version DiscordBot-InternalBot/DiscordPHP uses.
 
-+ DM Channels (TODO Confirm on v8)
++ DM Channels
     + Each DM has its own channel however because discord makes ID's for those channels irrelevant of any user IDs so dphp sends a channel create event before any update to a DM such
       as sending a message, pinning etc. we cannot reliably store a DM Channel because of its unique ID's.
 
