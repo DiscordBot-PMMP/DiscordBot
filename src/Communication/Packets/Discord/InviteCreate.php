@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Invite;
 
 final class InviteCreate extends Packet{
 
-    public const SERIALIZE_ID = 15;
+    public const SERIALIZE_ID = 212;
 
     private Invite $invite;
 

@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class Disconnect extends Packet{
 
-    public const SERIALIZE_ID = 4;
+    public const SERIALIZE_ID = 101;
 
     private string $message;
 

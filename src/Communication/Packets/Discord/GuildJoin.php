@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Guild\Guild;
 
 final class GuildJoin extends Packet{
 
-    public const SERIALIZE_ID = 12;
+    public const SERIALIZE_ID = 208;
 
     private Guild $guild;
 

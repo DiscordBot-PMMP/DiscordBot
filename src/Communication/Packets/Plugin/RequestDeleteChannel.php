@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestDeleteChannel extends Packet{
 
-    public const SERIALIZE_ID = 46;
+    public const SERIALIZE_ID = 411;
 
     private string $guild_id;
 

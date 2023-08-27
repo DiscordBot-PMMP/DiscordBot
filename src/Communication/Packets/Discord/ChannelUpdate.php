@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Channels\Channel;
 
 final class ChannelUpdate extends Packet{
 
-    public const SERIALIZE_ID = 11;
+    public const SERIALIZE_ID = 206;
 
     private Channel $channel;
 

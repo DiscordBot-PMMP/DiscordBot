@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Presence\Presence;
 
 final class RequestUpdateBotPresence extends Packet{
 
-    public const SERIALIZE_ID = 79;
+    public const SERIALIZE_ID = 444;
 
     private Presence $presence;
 

@@ -19,7 +19,7 @@ use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
 
 final class RequestInteractionRespondWithModal extends Packet{
 
-    public const SERIALIZE_ID = 87;
+    public const SERIALIZE_ID = 434;
 
     private Interaction $interaction;
 

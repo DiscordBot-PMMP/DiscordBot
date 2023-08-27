@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Role;
 
 final class RoleCreate extends Packet{
 
-    public const SERIALIZE_ID = 28;
+    public const SERIALIZE_ID = 226;
 
     private Role $role;
 

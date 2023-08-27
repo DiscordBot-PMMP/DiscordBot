@@ -20,7 +20,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
  */
 final class Connect extends Packet{
 
-    public const SERIALIZE_ID = 3;
+    public const SERIALIZE_ID = 100;
 
     private int $version;
     private int $magic;

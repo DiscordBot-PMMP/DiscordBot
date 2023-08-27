@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestUnbanMember extends Packet{
 
-    public const SERIALIZE_ID = 74;
+    public const SERIALIZE_ID = 442;
 
     private string $guild_id;
 

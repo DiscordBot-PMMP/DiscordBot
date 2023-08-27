@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Emoji;
 
 final class RequestRemoveAllReactions extends Packet{
 
-    public const SERIALIZE_ID = 71;
+    public const SERIALIZE_ID = 438;
 
     /** @var string|null Can be null for DMs */
     private ?string $guild_id;

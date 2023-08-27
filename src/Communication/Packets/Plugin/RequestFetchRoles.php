@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestFetchRoles extends Packet{
 
-    public const SERIALIZE_ID = 62;
+    public const SERIALIZE_ID = 428;
 
     private string $guild_id;
 

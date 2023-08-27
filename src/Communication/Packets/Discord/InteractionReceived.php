@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Interactions\Interaction;
 
 final class InteractionReceived extends Packet{
 
-    public const SERIALIZE_ID = 32;
+    public const SERIALIZE_ID = 211;
 
     private Interaction $interaction;
 

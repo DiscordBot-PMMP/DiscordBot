@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestFetchGuilds extends Packet{
 
-    public const SERIALIZE_ID = 55;
+    public const SERIALIZE_ID = 421;
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();

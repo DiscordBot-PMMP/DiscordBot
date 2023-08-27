@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Member;
 
 final class MemberUpdate extends Packet{
 
-    public const SERIALIZE_ID = 19;
+    public const SERIALIZE_ID = 216;
 
     private Member $member;
 

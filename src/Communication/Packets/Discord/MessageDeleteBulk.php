@@ -22,7 +22,7 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
  */
 final class MessageDeleteBulk extends Packet{
 
-    public const SERIALIZE_ID = 33;
+    public const SERIALIZE_ID = 218;
 
     /** @var string[] IDs of remaining message that we don't have cached. */
     private array $message_ids;

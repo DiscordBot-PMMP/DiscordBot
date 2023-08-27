@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\User;
 
 final class DiscordConnected extends Packet{
 
-    public const SERIALIZE_ID = 5;
+    public const SERIALIZE_ID = 207;
 
     private User $bot_user;
 

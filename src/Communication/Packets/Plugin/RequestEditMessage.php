@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
 
 final class RequestEditMessage extends Packet{
 
-    public const SERIALIZE_ID = 50;
+    public const SERIALIZE_ID = 416;
 
     private Message $message;
 

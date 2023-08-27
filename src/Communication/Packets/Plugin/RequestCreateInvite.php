@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestCreateInvite extends Packet{
 
-    public const SERIALIZE_ID = 67;
+    public const SERIALIZE_ID = 406;
 
     private string $guild_id;
 

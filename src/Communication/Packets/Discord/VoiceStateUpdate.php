@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\VoiceState;
 
 final class VoiceStateUpdate extends Packet{
 
-    public const SERIALIZE_ID = 31;
+    public const SERIALIZE_ID = 232;
 
     private VoiceState $voice_state;
 

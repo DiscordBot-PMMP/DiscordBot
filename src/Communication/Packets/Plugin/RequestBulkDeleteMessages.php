@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestBulkDeleteMessages extends Packet{
 
-    public const SERIALIZE_ID = 86;
+    public const SERIALIZE_ID = 404;
 
     /** @var string|null Can be null for DMs */
     private ?string $guild_id;

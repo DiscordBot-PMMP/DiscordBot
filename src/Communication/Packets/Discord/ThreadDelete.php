@@ -19,7 +19,7 @@ use JaxkDev\DiscordBot\Models\Channels\ChannelType;
 
 final class ThreadDelete extends Packet{
 
-    public const SERIALIZE_ID = 37;
+    public const SERIALIZE_ID = 230;
 
     private ChannelType $type;
 

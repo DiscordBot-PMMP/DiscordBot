@@ -19,7 +19,7 @@ use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 
 final class RequestSendMessage extends Packet{
 
-    public const SERIALIZE_ID = 77;
+    public const SERIALIZE_ID = 441;
 
     private ?string $guild_id;
 

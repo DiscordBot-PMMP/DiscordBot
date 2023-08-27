@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class InviteDelete extends Packet{
 
-    public const SERIALIZE_ID = 16;
+    public const SERIALIZE_ID = 213;
 
     private ?string $guild_id;
 

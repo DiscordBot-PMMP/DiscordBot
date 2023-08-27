@@ -19,7 +19,7 @@ use JaxkDev\DiscordBot\Models\Interactions\Interaction;
 
 final class RequestInteractionRespondWithAutocomplete extends Packet{
 
-    public const SERIALIZE_ID = 88;
+    public const SERIALIZE_ID = 432;
 
     private Interaction $interaction;
 

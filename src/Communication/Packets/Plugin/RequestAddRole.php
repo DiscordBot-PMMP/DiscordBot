@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestAddRole extends Packet{
 
-    public const SERIALIZE_ID = 41;
+    public const SERIALIZE_ID = 401;
 
     private string $guild_id;
 

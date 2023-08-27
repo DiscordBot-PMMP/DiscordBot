@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Emoji;
 
 final class MessageReactionAdd extends Packet{
 
-    public const SERIALIZE_ID = 21;
+    public const SERIALIZE_ID = 219;
 
     /** @var string|null Can be null for DMs */
     private ?string $guild_id;

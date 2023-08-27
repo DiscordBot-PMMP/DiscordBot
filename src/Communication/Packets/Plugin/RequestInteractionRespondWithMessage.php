@@ -20,7 +20,7 @@ use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
 
 final class RequestInteractionRespondWithMessage extends Packet{
 
-    public const SERIALIZE_ID = 76;
+    public const SERIALIZE_ID = 433;
 
     private Interaction $interaction;
 

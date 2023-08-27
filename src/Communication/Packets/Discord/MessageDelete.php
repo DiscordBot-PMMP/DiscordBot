@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
 
 final class MessageDelete extends Packet{
 
-    public const SERIALIZE_ID = 20;
+    public const SERIALIZE_ID = 217;
 
     private ?string $guild_id;
 

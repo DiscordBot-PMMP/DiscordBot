@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
 
 final class MessageUpdate extends Packet{
 
-    public const SERIALIZE_ID = 26;
+    public const SERIALIZE_ID = 224;
 
     private ?string $guild_id;
 

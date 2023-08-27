@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Guild\Guild;
 
 final class GuildLeave extends Packet{
 
-    public const SERIALIZE_ID = 13;
+    public const SERIALIZE_ID = 209;
 
     private string $guild_id;
 

@@ -20,7 +20,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
  */
 final class RequestCreateThreadFromMessage extends Packet{
 
-    public const SERIALIZE_ID = 84;
+    public const SERIALIZE_ID = 409;
 
     private string $guild_id;
 

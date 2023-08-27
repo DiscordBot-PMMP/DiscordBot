@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestFetchMessage extends Packet{
 
-    public const SERIALIZE_ID = 59;
+    public const SERIALIZE_ID = 425;
 
     /** @var string|null Can be null for DMs */
     private ?string $guild_id;

@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestDeleteWebhook extends Packet{
 
-    public const SERIALIZE_ID = 49;
+    public const SERIALIZE_ID = 415;
 
     private string $guild_id;
 

@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Role;
 
 final class RoleDelete extends Packet{
 
-    public const SERIALIZE_ID = 29;
+    public const SERIALIZE_ID = 227;
 
     private string $guild_id;
 

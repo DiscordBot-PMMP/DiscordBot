@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Role;
 
 final class RequestUpdateRole extends Packet{
 
-    public const SERIALIZE_ID = 82;
+    public const SERIALIZE_ID = 447;
 
     private Role $role;
 

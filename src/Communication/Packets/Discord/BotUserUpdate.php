@@ -22,7 +22,7 @@ use JaxkDev\DiscordBot\Models\User;
  */
 final class BotUserUpdate extends Packet{
 
-    public const SERIALIZE_ID = 34;
+    public const SERIALIZE_ID = 202;
 
     private User $bot;
 

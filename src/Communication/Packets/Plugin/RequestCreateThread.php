@@ -21,7 +21,7 @@ use JaxkDev\DiscordBot\Models\Channels\ChannelType;
  */
 final class RequestCreateThread extends Packet{
 
-    public const SERIALIZE_ID = 85;
+    public const SERIALIZE_ID = 408;
 
     private string $guild_id;
 

@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestFetchBans extends Packet{
 
-    public const SERIALIZE_ID = 51;
+    public const SERIALIZE_ID = 417;
 
     private string $guild_id;
 

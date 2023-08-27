@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Webhook;
 
 final class RequestUpdateWebhook extends Packet{
 
-    public const SERIALIZE_ID = 83;
+    public const SERIALIZE_ID = 448;
 
     private Webhook $webhook;
 

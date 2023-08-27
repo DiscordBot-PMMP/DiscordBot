@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestPinMessage extends Packet{
 
-    public const SERIALIZE_ID = 70;
+    public const SERIALIZE_ID = 437;
 
     /** @var string|null Can be null for DMs */
     private ?string $guild_id;

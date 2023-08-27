@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestUnpinMessage extends Packet{
 
-    public const SERIALIZE_ID = 78;
+    public const SERIALIZE_ID = 443;
 
     /** @var string|null Can be null for DMs */
     private ?string $guild_id;

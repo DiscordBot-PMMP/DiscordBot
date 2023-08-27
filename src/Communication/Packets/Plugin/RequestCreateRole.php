@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 
 final class RequestCreateRole extends Packet{
 
-    public const SERIALIZE_ID = 44;
+    public const SERIALIZE_ID = 407;
 
     private string $guild_id;
 

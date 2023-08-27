@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Messages\Message;
 
 final class MessageSent extends Packet{
 
-    public const SERIALIZE_ID = 25;
+    public const SERIALIZE_ID = 223;
 
     private Message $message;
 

@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestBroadcastTyping extends Packet{
 
-    public const SERIALIZE_ID = 42;
+    public const SERIALIZE_ID = 403;
 
     /** @var string|null Can be null for DMs */
     private ?string $guild_id;

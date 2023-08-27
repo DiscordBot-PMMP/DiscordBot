@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestLeaveGuild extends Packet{
 
-    public const SERIALIZE_ID = 69;
+    public const SERIALIZE_ID = 436;
 
     private string $guild_id;
 

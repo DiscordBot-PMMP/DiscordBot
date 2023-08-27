@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class MessageReactionRemoveAll extends Packet{
 
-    public const SERIALIZE_ID = 23;
+    public const SERIALIZE_ID = 221;
 
     /** @var string|null Can be null for DMs */
     private ?string $guild_id;

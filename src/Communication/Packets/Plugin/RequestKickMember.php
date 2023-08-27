@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestKickMember extends Packet{
 
-    public const SERIALIZE_ID = 68;
+    public const SERIALIZE_ID = 435;
 
     private string $guild_id;
 

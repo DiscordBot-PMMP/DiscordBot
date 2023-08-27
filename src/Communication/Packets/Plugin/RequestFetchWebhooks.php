@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestFetchWebhooks extends Packet{
 
-    public const SERIALIZE_ID = 65;
+    public const SERIALIZE_ID = 431;
 
     private string $guild_id;
 

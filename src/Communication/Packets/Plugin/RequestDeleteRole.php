@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class RequestDeleteRole extends Packet{
 
-    public const SERIALIZE_ID = 48;
+    public const SERIALIZE_ID = 414;
 
     private string $guild_id;
 

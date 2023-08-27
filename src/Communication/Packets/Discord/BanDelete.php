@@ -17,7 +17,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
 final class BanDelete extends Packet{
 
-    public const SERIALIZE_ID = 7;
+    public const SERIALIZE_ID = 201;
 
     private string $guild_id;
 

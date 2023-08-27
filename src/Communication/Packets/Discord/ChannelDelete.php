@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Channels\Channel;
 
 final class ChannelDelete extends Packet{
 
-    public const SERIALIZE_ID = 9;
+    public const SERIALIZE_ID = 204;
 
     private ?string $guild_id;
 

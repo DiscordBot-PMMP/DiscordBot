@@ -18,7 +18,7 @@ use JaxkDev\DiscordBot\Models\Channels\Channel;
 
 final class ThreadUpdate extends Packet{
 
-    public const SERIALIZE_ID = 38;
+    public const SERIALIZE_ID = 231;
 
     private Channel $thread;
 
