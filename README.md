@@ -56,4 +56,6 @@ If you do become an active contributor to the plugin I will help you set up effi
 - [[Dev] PHPStan/PHPStan](https://github.com/phpstan/phpstan) - Used to analyse the plugins code for any potential problems.
 - [[Dev] PHP-CS-Fixer/PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer) - Used to maintain the plugins code to a standard.
 
+- [[Dev] ![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org) - Used to maintain a changelog format.
+
 And many more sub-dependencies that allow the above to function.
