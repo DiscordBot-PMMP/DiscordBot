@@ -927,6 +927,17 @@ final class Api{
                 return rejectPromise(new ApiRejection("Invalid sticker ID '$id'."));
             }
         }
+        foreach($files ?? [] as $name => $data){
+            if(strlen($name) > 256){
+                return rejectPromise(new ApiRejection("File name cannot be larger than 256 characters."));
+            }
+            if(!preg_match('/^[a-zA-Z0-9-_]+.[a-zA-Z0-9-_]+$/', $name)){
+                return rejectPromise(new ApiRejection("File name must contain a file extension, eg 'test.txt'"));
+            }
+            if(strlen($data) > 8388608){
+                return rejectPromise(new ApiRejection("File data cannot be larger than 8388608 bytes."));
+            }
+        }
         $pk = new RequestSendMessage($guild_id, $channel_id, $content, $reply_message_id, $embeds, $tts, $components,
             $sticker_ids, $files);
         $this->plugin->writeOutboundData($pk);
