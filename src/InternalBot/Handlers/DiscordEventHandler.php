@@ -73,6 +73,9 @@ use Monolog\Logger;
 
 final class DiscordEventHandler{
 
+    /** @var array<string, DiscordInteraction> */
+    public array $interaction_cache = [];
+
     private Client $client;
 
     private Logger $logger;
@@ -160,6 +163,11 @@ final class DiscordEventHandler{
     }
 
     public function onInteractionCreate(DiscordInteraction $interaction): void{
+        $this->interaction_cache[$interaction->id] = $interaction;
+        $this->client->getDiscordClient()->getLoop()->addTimer(30, function() use ($interaction){
+            //Remove interaction from cache after 30 seconds.
+            unset($this->interaction_cache[$interaction->id]);
+        });
         $this->client->getThread()->writeOutboundData(new InteractionReceivedPacket(ModelConverter::genModelInteraction($interaction)));
     }
 

@@ -245,6 +245,10 @@ final class Client{
         return $this->communicationHandler;
     }
 
+    public function getDiscordEventHandler(): DiscordEventHandler{
+        return $this->discordEventHandler;
+    }
+
     public function sysErrorHandler(int $severity, string $message, string $file, int $line): bool{
         $this->close(new ErrorException($message, 0, $severity, $file, $line));
         return true;

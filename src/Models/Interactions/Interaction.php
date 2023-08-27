@@ -75,6 +75,12 @@ final class Interaction implements BinarySerializable{
     /** Guild's preferred locale, if invoked in a guild */
     private ?string $guild_locale;
 
+    /**
+     * Whether the response to this interaction has been deferred/responded to already.
+     * Not serialised / sent over network protocol.
+     */
+    private bool $responded = false;
+
     public function __construct(string $id, string $application_id, InteractionType $type,
                                 ApplicationCommandData|MessageComponentData|ModalSubmitData|null $data, ?string $guild_id,
                                 ?string $channel_id, ?string $user_id, string $token, int $version, ?Message $message,
@@ -215,6 +221,14 @@ final class Interaction implements BinarySerializable{
 
     public function setGuildLocale(?string $guild_locale): void{
         $this->guild_locale = $guild_locale;
+    }
+
+    public function getResponded(): bool{
+        return $this->responded;
+    }
+
+    public function setResponded(): void{
+        $this->responded = true;
     }
 
     public function binarySerialize(): BinaryStream{

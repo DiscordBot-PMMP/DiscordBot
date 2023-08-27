@@ -68,6 +68,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRoles;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
@@ -133,53 +134,56 @@ final class CommunicationHandler{
             return;
         }
 
+        //Ideally handlers will be in packets to avoid this ever-growing list but due to autoload on plugin class we cant.
+
         //API Packets:
-        if($pk instanceof RequestUpdateBotPresence)           $this->handleUpdateBotPresence($pk);
-        elseif($pk instanceof RequestFetchBans)               $this->handleFetchBans($pk);
-        elseif($pk instanceof RequestFetchChannel)            $this->handleFetchChannel($pk);
-        elseif($pk instanceof RequestFetchChannels)           $this->handleFetchChannels($pk);
-        elseif($pk instanceof RequestFetchGuild)              $this->handleFetchGuild($pk);
-        elseif($pk instanceof RequestFetchGuilds)             $this->handleFetchGuilds($pk);
-        elseif($pk instanceof RequestFetchInvites)            $this->handleFetchInvites($pk);
-        elseif($pk instanceof RequestFetchMember)             $this->handleFetchMember($pk);
-        elseif($pk instanceof RequestFetchMembers)            $this->handleFetchMembers($pk);
-        elseif($pk instanceof RequestFetchMessage)            $this->handleFetchMessage($pk);
-        elseif($pk instanceof RequestFetchPinnedMessages)     $this->handleFetchPinnedMessages($pk);
-        elseif($pk instanceof RequestFetchRole)               $this->handleFetchRole($pk);
-        elseif($pk instanceof RequestFetchRoles)              $this->handleFetchRoles($pk);
-        elseif($pk instanceof RequestFetchUser)               $this->handleFetchUser($pk);
-        elseif($pk instanceof RequestFetchUsers)              $this->handleFetchUsers($pk);
-        elseif($pk instanceof RequestFetchWebhooks)           $this->handleFetchWebhooks($pk);
-        elseif($pk instanceof RequestUpdateNickname)          $this->handleUpdateNickname($pk);
-        elseif($pk instanceof RequestBroadcastTyping)         $this->handleBroadcastTyping($pk);
-        elseif($pk instanceof RequestSendMessage)             $this->handleSendMessage($pk);
-        elseif($pk instanceof RequestEditMessage)             $this->handleEditMessage($pk);
-        elseif($pk instanceof RequestAddReaction)             $this->handleAddReaction($pk);
-        elseif($pk instanceof RequestRemoveReaction)          $this->handleRemoveReaction($pk);
-        elseif($pk instanceof RequestRemoveAllReactions)      $this->handleRemoveAllReactions($pk);
-        elseif($pk instanceof RequestDeleteMessage)           $this->handleDeleteMessage($pk);
-        elseif($pk instanceof RequestBulkDeleteMessages)      $this->handleBulkDeleteMessages($pk);
-        elseif($pk instanceof RequestPinMessage)              $this->handlePinMessage($pk);
-        elseif($pk instanceof RequestUnpinMessage)            $this->handleUnpinMessage($pk);
-        elseif($pk instanceof RequestAddRole)                 $this->handleAddRole($pk);
-        elseif($pk instanceof RequestRemoveRole)              $this->handleRemoveRole($pk);
-        elseif($pk instanceof RequestCreateRole)              $this->handleCreateRole($pk);
-        elseif($pk instanceof RequestUpdateRole)              $this->handleUpdateRole($pk);
-        elseif($pk instanceof RequestDeleteRole)              $this->handleDeleteRole($pk);
-        elseif($pk instanceof RequestKickMember)              $this->handleKickMember($pk);
-        elseif($pk instanceof RequestCreateInvite)            $this->handleCreateInvite($pk);
-        elseif($pk instanceof RequestDeleteInvite)            $this->handleDeleteInvite($pk);
-        elseif($pk instanceof RequestCreateChannel)           $this->handleCreateChannel($pk);
-        elseif($pk instanceof RequestUpdateChannel)           $this->handleUpdateChannel($pk);
-        elseif($pk instanceof RequestDeleteChannel)           $this->handleDeleteChannel($pk);
-        elseif($pk instanceof RequestCreateThread)            $this->handleCreateThread($pk);
-        elseif($pk instanceof RequestCreateThreadFromMessage) $this->handleCreateThreadFromMessage($pk);
-        elseif($pk instanceof RequestBanMember)               $this->handleBanMember($pk);
-        elseif($pk instanceof RequestUnbanMember)             $this->handleUnbanMember($pk);
-        elseif($pk instanceof RequestCreateWebhook)           $this->handleCreateWebhook($pk);
-        elseif($pk instanceof RequestUpdateWebhook)           $this->handleUpdateWebhook($pk);
-        elseif($pk instanceof RequestDeleteWebhook)           $this->handleDeleteWebhook($pk);
-        elseif($pk instanceof RequestLeaveGuild)              $this->handleLeaveGuild($pk);
+        if($pk instanceof RequestUpdateBotPresence)                 $this->handleUpdateBotPresence($pk);
+        elseif($pk instanceof RequestFetchBans)                     $this->handleFetchBans($pk);
+        elseif($pk instanceof RequestFetchChannel)                  $this->handleFetchChannel($pk);
+        elseif($pk instanceof RequestFetchChannels)                 $this->handleFetchChannels($pk);
+        elseif($pk instanceof RequestFetchGuild)                    $this->handleFetchGuild($pk);
+        elseif($pk instanceof RequestFetchGuilds)                   $this->handleFetchGuilds($pk);
+        elseif($pk instanceof RequestFetchInvites)                  $this->handleFetchInvites($pk);
+        elseif($pk instanceof RequestFetchMember)                   $this->handleFetchMember($pk);
+        elseif($pk instanceof RequestFetchMembers)                  $this->handleFetchMembers($pk);
+        elseif($pk instanceof RequestFetchMessage)                  $this->handleFetchMessage($pk);
+        elseif($pk instanceof RequestFetchPinnedMessages)           $this->handleFetchPinnedMessages($pk);
+        elseif($pk instanceof RequestFetchRole)                     $this->handleFetchRole($pk);
+        elseif($pk instanceof RequestFetchRoles)                    $this->handleFetchRoles($pk);
+        elseif($pk instanceof RequestFetchUser)                     $this->handleFetchUser($pk);
+        elseif($pk instanceof RequestFetchUsers)                    $this->handleFetchUsers($pk);
+        elseif($pk instanceof RequestFetchWebhooks)                 $this->handleFetchWebhooks($pk);
+        elseif($pk instanceof RequestInteractionRespondWithMessage) $this->handleInteractionRespondWithMessage($pk);
+        elseif($pk instanceof RequestUpdateNickname)                $this->handleUpdateNickname($pk);
+        elseif($pk instanceof RequestBroadcastTyping)               $this->handleBroadcastTyping($pk);
+        elseif($pk instanceof RequestSendMessage)                   $this->handleSendMessage($pk);
+        elseif($pk instanceof RequestEditMessage)                   $this->handleEditMessage($pk);
+        elseif($pk instanceof RequestAddReaction)                   $this->handleAddReaction($pk);
+        elseif($pk instanceof RequestRemoveReaction)                $this->handleRemoveReaction($pk);
+        elseif($pk instanceof RequestRemoveAllReactions)            $this->handleRemoveAllReactions($pk);
+        elseif($pk instanceof RequestDeleteMessage)                 $this->handleDeleteMessage($pk);
+        elseif($pk instanceof RequestBulkDeleteMessages)            $this->handleBulkDeleteMessages($pk);
+        elseif($pk instanceof RequestPinMessage)                    $this->handlePinMessage($pk);
+        elseif($pk instanceof RequestUnpinMessage)                  $this->handleUnpinMessage($pk);
+        elseif($pk instanceof RequestAddRole)                       $this->handleAddRole($pk);
+        elseif($pk instanceof RequestRemoveRole)                    $this->handleRemoveRole($pk);
+        elseif($pk instanceof RequestCreateRole)                    $this->handleCreateRole($pk);
+        elseif($pk instanceof RequestUpdateRole)                    $this->handleUpdateRole($pk);
+        elseif($pk instanceof RequestDeleteRole)                    $this->handleDeleteRole($pk);
+        elseif($pk instanceof RequestKickMember)                    $this->handleKickMember($pk);
+        elseif($pk instanceof RequestCreateInvite)                  $this->handleCreateInvite($pk);
+        elseif($pk instanceof RequestDeleteInvite)                  $this->handleDeleteInvite($pk);
+        elseif($pk instanceof RequestCreateChannel)                 $this->handleCreateChannel($pk);
+        elseif($pk instanceof RequestUpdateChannel)                 $this->handleUpdateChannel($pk);
+        elseif($pk instanceof RequestDeleteChannel)                 $this->handleDeleteChannel($pk);
+        elseif($pk instanceof RequestCreateThread)                  $this->handleCreateThread($pk);
+        elseif($pk instanceof RequestCreateThreadFromMessage)       $this->handleCreateThreadFromMessage($pk);
+        elseif($pk instanceof RequestBanMember)                     $this->handleBanMember($pk);
+        elseif($pk instanceof RequestUnbanMember)                   $this->handleUnbanMember($pk);
+        elseif($pk instanceof RequestCreateWebhook)                 $this->handleCreateWebhook($pk);
+        elseif($pk instanceof RequestUpdateWebhook)                 $this->handleUpdateWebhook($pk);
+        elseif($pk instanceof RequestDeleteWebhook)                 $this->handleDeleteWebhook($pk);
+        elseif($pk instanceof RequestLeaveGuild)                    $this->handleLeaveGuild($pk);
     }
 
     private function handleFetchBans(RequestFetchBans $pk): void{
@@ -327,6 +331,134 @@ final class CommunicationHandler{
                 $this->resolveRequest($pk->getUID(), true, "Fetched webhooks.", $webhooks);
             });
         }
+    }
+
+    private function handleInteractionRespondWithMessage(RequestInteractionRespondWithMessage $pk): void{
+        $interaction = $this->client->getDiscordEventHandler()->interaction_cache[$pk->getInteraction()->getId()] ?? null;
+        if($interaction === null){
+            $this->resolveRequest($pk->getUID(), false, "Interaction not found.", ["Interaction ID not found in cache.", ""]);
+            return;
+        }
+        $message = DiscordMessageBuilder::new();
+        if(($content = $pk->getContent()) !== null){
+            $message->setContent($content);
+        }
+        if(($tts = $pk->getTts()) !== null){
+            $message->setTts($tts);
+        }
+        foreach(($pk->getEmbeds() ?? []) as $embed){
+            $e = new DiscordEmbed($this->client->getDiscordClient());
+            if(($title = $embed->getTitle()) !== null){
+                $e->setTitle($title);
+            }
+            if(($colour = $embed->getColour()) !== null){
+                $e->setColor($colour);
+            }
+            if(($desc = $embed->getDescription()) !== null){
+                $e->setDescription($desc);
+            }
+            if(($url = $embed->getUrl()) !== null){
+                $e->setURL($url);
+            }
+            if(($time = $embed->getTimestamp()) !== null){
+                try{
+                    $e->setTimestamp($time);
+                }catch(\Throwable){}
+            }
+            if(($author = $embed->getAuthor()) !== null){
+                $e->setAuthor($author->getName(), $author->getIconUrl(), $author->getUrl());
+            }
+            if(($footer = $embed->getFooter()) !== null){
+                $e->setFooter($footer->getText(), $footer->getIconUrl());
+            }
+            if(($image = $embed->getImage()) !== null){
+                $e->setImage($image->getUrl());
+            }
+            if(($thumb = $embed->getThumbnail()) !== null){
+                $e->setThumbnail($thumb->getUrl());
+            }
+            foreach($embed->getFields() as $field){
+                $e->addFieldValues($field->getName(), $field->getValue(), $field->getInline());
+            }
+            $message->addEmbed($e);
+        }
+        foreach(($pk->getComponents() ?? []) as $component){
+            $all = $component->getComponents();
+            //A bit annoying but DiscordPHP doesn't do it like discord does, they put SelectMenu into ActionRow for us...
+            //So we have to take it OUT of our ActionRow so DiscordPHP can put it back in...
+            if(($raw_c = $all[0] ?? null) instanceof SelectMenu){
+                $c = null;
+                if($raw_c->getType() === ComponentType::CHANNEL_SELECT){
+                    $c = new DiscordChannelSelect($raw_c->getCustomId());
+                    $c->setChannelTypes(array_map(fn($v) => $v->value, $raw_c->getChannelTypes()));
+                }elseif($raw_c->getType() === ComponentType::ROLE_SELECT){
+                    $c = new DiscordRoleSelect($raw_c->getCustomId());
+                }elseif($raw_c->getType() === ComponentType::USER_SELECT){
+                    $c = new DiscordUserSelect($raw_c->getCustomId());
+                }elseif($raw_c->getType() === ComponentType::MENTIONABLE_SELECT){
+                    $c = new DiscordMentionableSelect($raw_c->getCustomId());
+                }elseif($raw_c->getType() === ComponentType::STRING_SELECT){
+                    $c = new DiscordStringSelect($raw_c->getCustomId());
+                    foreach($raw_c->getOptions() as $option){
+                        $opt = new DiscordOption($option->getLabel(), $option->getValue());
+                        $opt->setDescription($option->getDescription());
+                        if(($emoji = $option->getEmoji()) !== null){
+                            $e = new DiscordEmoji($this->client->getDiscordClient(), [
+                                "id" => $emoji->getId(),
+                                "name" => $emoji->getName(),
+                                "animated" => $emoji->getAnimated()
+                            ]);
+                            $opt->setEmoji($e);
+                        }
+                        if(($def = $option->getDefault()) !== null){
+                            $opt->setDefault($def);
+                        }
+                        $c->addOption($opt);
+                    }
+                }else{
+                    $this->logger->warning("Unknown select menu type: {$raw_c->getType()->name}");
+                    continue;
+                }
+                $c->setPlaceholder($raw_c->getPlaceholder());
+                $c->setMinValues($raw_c->getMinValues());
+                $c->setMaxValues($raw_c->getMaxValues());
+                $c->setDisabled($raw_c->getDisabled());
+                $message->addComponent($c);
+                continue;
+            }elseif($raw_c !== null && !($raw_c instanceof Button)){
+                $this->logger->warning("Unknown component type: " . get_class($raw_c));
+                continue;
+            }
+            $c = new DiscordActionRow();
+            /** @var Button $raw */
+            foreach($all as $raw){
+                $button = new DiscordButton($raw->getStyle()->value, $raw->getCustomId());
+                $button->setDisabled($raw->getDisabled());
+                $button->setLabel($raw->getLabel());
+                if(($emoji = $raw->getEmoji()) !== null){
+                    $e = new DiscordEmoji($this->client->getDiscordClient(), [
+                        "id" => $emoji->getId(),
+                        "name" => $emoji->getName(),
+                        "animated" => $emoji->getAnimated()
+                    ]);
+                    $button->setEmoji($e);
+                }
+                if($raw->getUrl() !== null){
+                    $button->setUrl($raw->getUrl());
+                }
+                $c->addComponent($button);
+            }
+            $message->addComponent($c);
+        }
+        foreach(($pk->getFiles() ?? []) as $file_name => $file_data){
+            $message->addFileFromContent($file_name, $file_data);
+        }
+        $interaction->respondWithMessage($message, $pk->getEphemeral())->then(function() use($pk){
+            $this->resolveRequest($pk->getUID(), true, "Responded to interaction.");
+        }, function(\Throwable $e) use($pk){
+            $this->resolveRequest($pk->getUID(), false, "Failed to respond to interaction.", [$e->getMessage(), $e->getTraceAsString()]);
+            $this->logger->debug("Failed to respond to interaction ({$pk->getUID()}) - {$e->getMessage()}");
+        });
     }
 
     private function handleDeleteWebhook(RequestDeleteWebhook $pk): void{

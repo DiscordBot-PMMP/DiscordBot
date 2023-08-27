@@ -44,6 +44,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRoles;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
@@ -65,6 +66,8 @@ use JaxkDev\DiscordBot\Models\Channels\ForumTag;
 use JaxkDev\DiscordBot\Models\Channels\Overwrite;
 use JaxkDev\DiscordBot\Models\Channels\VideoQualityMode;
 use JaxkDev\DiscordBot\Models\Emoji;
+use JaxkDev\DiscordBot\Models\Interactions\Interaction;
+use JaxkDev\DiscordBot\Models\Interactions\InteractionType;
 use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
 use JaxkDev\DiscordBot\Models\Messages\Component\ComponentType;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
@@ -84,12 +87,11 @@ use pocketmine\event\EventPriority;
 use function count;
 use function in_array;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
+use function preg_match;
 use function strlen;
 
 /**
  * For internal and developers use for interacting with the discord bot.
- *
- * TODO interactionResponse
  *
  * @see Main::getApi() To get instance.
  */
@@ -1296,6 +1298,60 @@ final class Api{
             return rejectPromise(new ApiRejection("Invalid user ID '$user_id'."));
         }
         $pk = new RequestUpdateNickname($guild_id, $user_id, $nickname, $reason);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    public function interactionRespondWithMessage(Interaction $interaction, ?string $content = null, ?array $embeds = null,
+                                                  ?bool $tts = null, ?array $components = null, ?array $files = null,
+                                                  bool $ephemeral = false): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if($interaction->getType() === InteractionType::APPLICATION_COMMAND_AUTOCOMPLETE || $interaction->getType() === InteractionType::PING){
+            return rejectPromise(new ApiRejection("Interaction type '{$interaction->getType()->name}' is not supported by this method."));
+        }
+        if($interaction->getResponded()){
+            return rejectPromise(new ApiRejection("Interaction has already been responded to."));
+        }
+        if(strlen($content ?? "") > 2000){
+            return rejectPromise(new ApiRejection("Message content cannot be larger than 2000 characters for bots."));
+        }
+        if(count($embeds ?? []) > 10){
+            return rejectPromise(new ApiRejection("Embed array cannot contain more than 10 embeds."));
+        }
+        foreach(($embeds ?? []) as $embed){
+            if(!$embed instanceof Embed){
+                return rejectPromise(new ApiRejection("Embed array must all be of type '" . Embed::class . "'."));
+            }
+        }
+        if(count($components ?? []) > 5){
+            return rejectPromise(new ApiRejection("Components array cannot contain more than 5 ActionRow components."));
+        }
+        foreach(($components ?? []) as $comp){
+            if(!$comp instanceof ActionRow){
+                return rejectPromise(new ApiRejection("Components array must all be of type '" . ActionRow::class . "'."));
+            }
+            foreach($comp->getComponents() as $c){
+                if($c->getType() === ComponentType::TEXT_INPUT){
+                    //Text inputs are MODAL FORM only, cannot be sent via message response, see Api::interactionRespondWithModal().
+                    return rejectPromise(new ApiRejection("Components array cannot contain TEXT_INPUT type."));
+                }
+            }
+        }
+        foreach($files ?? [] as $name => $data){
+            if(strlen($name) > 256){
+                return rejectPromise(new ApiRejection("File name cannot be larger than 256 characters."));
+            }
+            if(!preg_match('/^[a-zA-Z0-9-_]+.[a-zA-Z0-9-_]+$/', $name)){
+                return rejectPromise(new ApiRejection("File name must contain a file extension, eg 'test.txt'"));
+            }
+            if(strlen($data) > 8388608){
+                return rejectPromise(new ApiRejection("File data cannot be larger than 8388608 bytes."));
+            }
+        }
+        $interaction->setResponded();
+        $pk = new RequestInteractionRespondWithMessage($interaction, $content, $embeds, $tts, $components, $files, $ephemeral);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

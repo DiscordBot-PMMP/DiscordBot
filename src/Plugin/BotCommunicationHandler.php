@@ -50,6 +50,18 @@ use JaxkDev\DiscordBot\Communication\Packets\Heartbeat as HeartbeatPacket;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Communication\Packets\Resolution as ResolutionPacket;
 use JaxkDev\DiscordBot\Models\Ban;
+use JaxkDev\DiscordBot\Models\Emoji;
+use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
+use JaxkDev\DiscordBot\Models\Messages\Component\Button;
+use JaxkDev\DiscordBot\Models\Messages\Component\ButtonStyle;
+use JaxkDev\DiscordBot\Models\Messages\Component\ComponentType;
+use JaxkDev\DiscordBot\Models\Messages\Component\SelectMenu;
+use JaxkDev\DiscordBot\Models\Messages\Component\SelectOption;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Author;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Embed;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Field;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Footer;
+use JaxkDev\DiscordBot\Models\Messages\Embed\Image;
 use JaxkDev\DiscordBot\Models\Presence\Activity\Activity;
 use JaxkDev\DiscordBot\Models\Presence\Activity\ActivityType;
 use JaxkDev\DiscordBot\Models\Presence\Status;
@@ -193,19 +205,19 @@ final class BotCommunicationHandler{
                 new Button(ButtonStyle::LINK, "Button 5", null, null, "https://google.com/button")
             ]),
             new ActionRow([
-                new Button(ButtonStyle::PRIMARY, "Button 1", new Emoji(null, "😊", null, null, null, null, null, null), "button1-2", null, true),
-                new Button(ButtonStyle::SECONDARY, "Button 2", new Emoji(null, "😊", null, null, null, null, null, null), "button2-2", null, true),
-                new Button(ButtonStyle::SUCCESS, "Button 3", new Emoji(null, "😊", null, null, null, null, null, null), "button3-2", null, true),
-                new Button(ButtonStyle::DANGER, "Button 4", new Emoji(null, "😊", null, null, null, null, null, null), "button4-2", null, true),
-                new Button(ButtonStyle::LINK, "Button 5", new Emoji(null, "😊", null, null, null, null, null, null), null, "https://google.com/button", true)
+                new Button(ButtonStyle::PRIMARY, "Button 1", Emoji::fromUnicode("😊"), "button1-2", null, true),
+                new Button(ButtonStyle::SECONDARY, "Button 2", Emoji::fromUnicode("😊"), "button2-2", null, true),
+                new Button(ButtonStyle::SUCCESS, "Button 3", Emoji::fromUnicode("😊"), "button3-2", null, true),
+                new Button(ButtonStyle::DANGER, "Button 4", Emoji::fromUnicode("😊"), "button4-2", null, true),
+                new Button(ButtonStyle::LINK, "Button 5", null, null, "https://google.com/button", true)
             ]),
             new ActionRow([
                 new SelectMenu(ComponentType::STRING_SELECT, "select_1", [new SelectOption("Option 1", "option1", "description?"), new SelectOption("Option 2", "option2", "description?", null, true), new SelectOption("Option 3", "option3", "description?", new Emoji(null, "😊", null, null, null, null, null, null))], [], "Placeholder", 1, 2, false),
             ])
         ], [], ["test.txt" => "Hi there this is my test :) 🥶", "test2.png" => file_get_contents("/Users/jackhonour/Downloads/IMG_0628.JPG")])->then(function(ApiResolution $data){
-            var_dump($data);
+            //var_dump($data);
         }, function(\Throwable $e){
-            var_dump($e);
+            //var_dump($e);
         });*/
 
         $this->plugin->getApi()->updateBotPresence($event->getStatus(), $event->getActivity())->otherwise(function(ApiRejection $a){

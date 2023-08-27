@@ -82,6 +82,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRoles;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
@@ -208,7 +209,7 @@ final class NetworkApi{
         RequestRemoveRole::SERIALIZE_ID => RequestRemoveRole::class,
         RequestUnbanMember::SERIALIZE_ID => RequestUnbanMember::class,
         RequestDeleteInvite::SERIALIZE_ID => RequestDeleteInvite::class,
-        //GAP @ 76
+        RequestInteractionRespondWithMessage::SERIALIZE_ID => RequestInteractionRespondWithMessage::class,
         RequestSendMessage::SERIALIZE_ID => RequestSendMessage::class,
         RequestUnpinMessage::SERIALIZE_ID => RequestUnpinMessage::class,
         RequestUpdateBotPresence::SERIALIZE_ID => RequestUpdateBotPresence::class,
