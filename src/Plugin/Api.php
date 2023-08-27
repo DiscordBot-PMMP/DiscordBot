@@ -436,9 +436,13 @@ final class Api{
     /**
      * Update a webhooks name or avatar hash.
      *
+     * To change webhook avatar, set avatar to null in Webhook model and provide new VALID IMAGE DATA (Utils::imageToDiscordData()) as $new_avatar_data.
+     * To remove webhook avatar, set avatar to null in Webhook model.
+     *
      * @return PromiseInterface Resolves with a Webhook model.
+     *@link Utils::imageToDiscordData()
      */
-    public function updateWebhook(Webhook $webhook, ?string $reason = null): PromiseInterface{
+    public function updateWebhook(Webhook $webhook, ?string $new_avatar_data = null, ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
@@ -450,6 +454,9 @@ final class Api{
         }
         if(!Utils::validDiscordSnowflake($webhook->getId())){
             return rejectPromise(new ApiRejection("Invalid webhook ID '{$webhook->getId()}'."));
+        }
+        if($new_avatar_data !== null && !Utils::validImageData($new_avatar_data)){
+            return rejectPromise(new ApiRejection("Webhook new avatar data is invalid."));
         }
         $pk = new RequestUpdateWebhook($webhook, $reason);
         $this->plugin->writeOutboundData($pk);
