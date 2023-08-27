@@ -50,15 +50,38 @@ TODO
 
 ## [2.0.4] - 2021-10-02
 
-TODO
+### Fixed
+
+- Fix logger always displaying debug messages ([#41](https://github.com/DiscordBot-PMMP/DiscordBot/issues/41))
 
 ## [2.0.3] - 2021-09-04
 
-TODO
+### Changed
+
+- Changed disable procedure to prevent errors on shutdown.
+
+### Added
+
+- Add more status checks during data dump to reduce hangs on quit.
 
 ## [2.0.2] - 2021-09-03
 
-TODO
+### Changed
+
+- Bump `team-reflex/discord-php` to `v6.0.2`
+
+### Added
+
+- Add check for `vendor` conflicts with PocketMine-MP ([`808da34`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/808da3407da3e771cf2d8ee2ea724bcfa5d99726))
+
+### Removed
+
+- Remove logger injection into PocketMines ([`88937c0`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/88937c03ba007a6ca8c2cf29e0f206c9b7267ed3)) 
+- Remove `reloadConfig` & `saveConfig` from `PluginBase` inheritance ([`85ad7e1`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/85ad7e1c8564ad1a230ef0a088fd46df8da07216))
+
+### Fixed
+
+- Fix `opcache extension not found` error on GitHub Actions ([`ff2ebe8`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/ff2ebe8a76300cf9708a72742e51c6adb2525643))
 
 ## [2.0.1] - 2021-08-26
 
