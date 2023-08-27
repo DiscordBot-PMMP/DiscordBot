@@ -105,7 +105,12 @@ final class Message implements BinarySerializable{
      */
     private ?Message $referenced_message;
 
-    //interaction?
+    /**
+     * This is sent on the message object when the message is a response to an Interaction without an existing message.
+     * This means responses to Message Components do not include this property,
+     * instead including a message reference object as components always exist on preexisting messages.
+     */
+    private ?MessageInteraction $message_interaction;
 
     private ?string $thread_id;
 
@@ -129,8 +134,8 @@ final class Message implements BinarySerializable{
                                 array $mentions, array $mention_roles, array $attachments, array $embeds,
                                 array $reactions, bool $pinned, ?string $webhook_id, ?Activity $activity,
                                 ?string $application_id, ?Reference $message_reference, ?int $flags,
-                                ?Message $referenced_message, ?string $thread_id, array $components,
-                                array $sticker_items){
+                                ?Message $referenced_message, ?MessageInteraction $message_interaction,
+                                ?string $thread_id, array $components, array $sticker_items){
         $this->type = $type;
         $this->setId($id);
         $this->setChannelId($channel_id);
@@ -152,6 +157,7 @@ final class Message implements BinarySerializable{
         $this->setMessageReference($message_reference);
         $this->setFlags($flags);
         $this->setReferencedMessage($referenced_message);
+        $this->setMessageInteraction($message_interaction);
         $this->setThreadId($thread_id);
         $this->setComponents($components);
         $this->setStickerItems($sticker_items);
@@ -371,6 +377,14 @@ final class Message implements BinarySerializable{
         $this->referenced_message = $referenced_message;
     }
 
+    public function getMessageInteraction(): ?MessageInteraction{
+        return $this->message_interaction;
+    }
+
+    public function setMessageInteraction(?MessageInteraction $message_interaction): void{
+        $this->message_interaction = $message_interaction;
+    }
+
     public function getThreadId(): ?string{
         return $this->thread_id;
     }
@@ -438,6 +452,7 @@ final class Message implements BinarySerializable{
         $stream->putNullableSerializable($this->message_reference);
         $stream->putNullableInt($this->flags);
         $stream->putNullableSerializable($this->referenced_message);
+        $stream->putNullableSerializable($this->message_interaction);
         $stream->putNullableString($this->thread_id);
         $stream->putSerializableArray($this->components);
         $stream->putSerializableArray($this->sticker_items);
@@ -446,30 +461,31 @@ final class Message implements BinarySerializable{
 
     public static function fromBinary(BinaryStream $stream): self{
         return new self(
-            MessageType::from($stream->getByte()),               // type
-            $stream->getString(),                                // id
-            $stream->getString(),                                // channel_id
-            $stream->getNullableString(),                        // author_id
-            $stream->getNullableString(),                        // content
-            $stream->getLong(),                                  // timestamp
-            $stream->getNullableLong(),                          // edited_timestamp
-            $stream->getBool(),                                  // tts
-            $stream->getBool(),                                  // mention_everyone
-            $stream->getStringArray(),                           // mentions
-            $stream->getStringArray(),                           // mention_roles
-            $stream->getSerializableArray(Attachment::class),    // attachments
-            $stream->getSerializableArray(Embed::class),         // embeds
-            $stream->getSerializableArray(Reaction::class),      // reactions
-            $stream->getBool(),                                  // pinned
-            $stream->getNullableString(),                        // webhook_id
-            $stream->getNullableSerializable(Activity::class),   // activity
-            $stream->getNullableString(),                        // application_id
-            $stream->getNullableSerializable(Reference::class),  // message_reference
-            $stream->getNullableInt(),                           // flags
-            $stream->getNullableSerializable(Message::class),    // referenced_message
-            $stream->getNullableString(),                        // thread_id
-            $stream->getSerializableArray(ActionRow::class),     // components
-            $stream->getSerializableArray(StickerPartial::class) // sticker_items
+            MessageType::from($stream->getByte()),                       // type
+            $stream->getString(),                                        // id
+            $stream->getString(),                                        // channel_id
+            $stream->getNullableString(),                                // author_id
+            $stream->getNullableString(),                                // content
+            $stream->getLong(),                                          // timestamp
+            $stream->getNullableLong(),                                  // edited_timestamp
+            $stream->getBool(),                                          // tts
+            $stream->getBool(),                                          // mention_everyone
+            $stream->getStringArray(),                                   // mentions
+            $stream->getStringArray(),                                   // mention_roles
+            $stream->getSerializableArray(Attachment::class),            // attachments
+            $stream->getSerializableArray(Embed::class),                 // embeds
+            $stream->getSerializableArray(Reaction::class),              // reactions
+            $stream->getBool(),                                          // pinned
+            $stream->getNullableString(),                                // webhook_id
+            $stream->getNullableSerializable(Activity::class),           // activity
+            $stream->getNullableString(),                                // application_id
+            $stream->getNullableSerializable(Reference::class),          // message_reference
+            $stream->getNullableInt(),                                   // flags
+            $stream->getNullableSerializable(Message::class),            // referenced_message
+            $stream->getNullableSerializable(MessageInteraction::class), // message_interaction
+            $stream->getNullableString(),                                // thread_id
+            $stream->getSerializableArray(ActionRow::class),             // components
+            $stream->getSerializableArray(StickerPartial::class)         // sticker_items
         );
     }
 }

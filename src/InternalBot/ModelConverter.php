@@ -43,6 +43,7 @@ use Discord\Parts\Thread\Thread as DiscordThread;
 use Discord\Parts\User\Activity as DiscordActivity;
 use Discord\Parts\User\Member as DiscordMember;
 use Discord\Parts\User\User as DiscordUser;
+use Discord\Parts\WebSockets\MessageInteraction as DiscordMessageInteraction;
 use Discord\Parts\WebSockets\VoiceStateUpdate as DiscordVoiceStateUpdate;
 use JaxkDev\DiscordBot\Models\Ban;
 use JaxkDev\DiscordBot\Models\Channels\Channel;
@@ -91,6 +92,7 @@ use JaxkDev\DiscordBot\Models\Messages\Embed\Image;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Provider;
 use JaxkDev\DiscordBot\Models\Messages\Embed\Video;
 use JaxkDev\DiscordBot\Models\Messages\Message;
+use JaxkDev\DiscordBot\Models\Messages\MessageInteraction;
 use JaxkDev\DiscordBot\Models\Messages\MessageType;
 use JaxkDev\DiscordBot\Models\Messages\Reaction;
 use JaxkDev\DiscordBot\Models\Messages\Reference;
@@ -436,9 +438,15 @@ abstract class ModelConverter{
             ($discordMessage->edited_timestamp ?? null)?->getTimestamp(), $discordMessage->tts,
             $discordMessage->mention_everyone, $mentions, $mention_roles, $attachments, $embeds, $reactions,
             $discordMessage->pinned, $discordMessage->webhook_id ?? null, $activity,
-                $discordMessage->application_id ?? null, $reference, $discordMessage->flags ?? null, $referenced_message,
+            $discordMessage->application_id ?? null, $reference, $discordMessage->flags ?? null, $referenced_message,
+            ($i = $discordMessage->interaction) === null ? null : self::genModelMessageInteraction($i),
             ($discordMessage->thread ?? null)?->id, $components, $stickers
         );
+    }
+
+    static public function genModelMessageInteraction(DiscordMessageInteraction $interaction): MessageInteraction{
+        return new MessageInteraction($interaction->id, InteractionType::from($interaction->type), $interaction->name,
+            self::genModelUser($interaction->user), ($m = $interaction->member) === null ? null : self::genModelMember($m));
     }
 
     /** @param object{"guild_id": ?string, "channel_id": ?string, "message_id": ?string, "fail_if_not_exists": ?bool} $ref */
