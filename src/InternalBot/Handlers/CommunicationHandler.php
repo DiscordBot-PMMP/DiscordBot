@@ -19,6 +19,7 @@ use Discord\Builders\Components\MentionableSelect as DiscordMentionableSelect;
 use Discord\Builders\Components\Option as DiscordOption;
 use Discord\Builders\Components\RoleSelect as DiscordRoleSelect;
 use Discord\Builders\Components\StringSelect as DiscordStringSelect;
+use Discord\Builders\Components\TextInput;
 use Discord\Builders\Components\UserSelect as DiscordUserSelect;
 use Discord\Builders\MessageBuilder as DiscordMessageBuilder;
 use Discord\Helpers\Collection as DiscordCollection;
@@ -69,6 +70,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithModal;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
@@ -154,6 +156,7 @@ final class CommunicationHandler{
         elseif($pk instanceof RequestFetchUsers)                    $this->handleFetchUsers($pk);
         elseif($pk instanceof RequestFetchWebhooks)                 $this->handleFetchWebhooks($pk);
         elseif($pk instanceof RequestInteractionRespondWithMessage) $this->handleInteractionRespondWithMessage($pk);
+        elseif($pk instanceof RequestInteractionRespondWithModal)   $this->handleInteractionRespondWithModal($pk);
         elseif($pk instanceof RequestUpdateNickname)                $this->handleUpdateNickname($pk);
         elseif($pk instanceof RequestBroadcastTyping)               $this->handleBroadcastTyping($pk);
         elseif($pk instanceof RequestSendMessage)                   $this->handleSendMessage($pk);
@@ -331,6 +334,38 @@ final class CommunicationHandler{
                 $this->resolveRequest($pk->getUID(), true, "Fetched webhooks.", $webhooks);
             });
         }
+    }
+
+    private function handleInteractionRespondWithModal(RequestInteractionRespondWithModal $pk): void{
+        $interaction = $this->client->getDiscordEventHandler()->interaction_cache[$pk->getInteraction()->getId()] ?? null;
+        if($interaction === null){
+            $this->resolveRequest($pk->getUID(), false, "Interaction not found.", ["Interaction ID not found in cache.", ""]);
+            return;
+        }
+        $actions = [];
+        foreach($pk->getComponents() as $component){
+            /** @var \JaxkDev\DiscordBot\Models\Messages\Component\TextInput|null $text */
+            $text = $component->getComponents()[0] ?? null;
+            if($text === null){
+                $this->resolveRequest($pk->getUID(), false, "Invalid component.", ["Each component ActionRow must have 1 TextInput component."]);
+                return;
+            }
+            $a = new DiscordActionRow();
+            $t = new TextInput($text->getLabel(), $text->getStyle()->value, $text->getCustomId());
+            $t->setMinLength($text->getMinLength())
+                ->setMaxLength($text->getMaxLength())
+                ->setRequired($text->getRequired())
+                ->setValue($text->getValue())
+                ->setPlaceholder($text->getPlaceholder());
+            $a->addComponent($t);
+            $actions[] = $a;
+        }
+        $interaction->showModal($pk->getTitle(), $pk->getCustomId(), $actions)->then(function() use($pk){
+            $this->resolveRequest($pk->getUID(), true, "Modal sent.");
+        }, function(\Throwable $e) use($pk){
+            $this->resolveRequest($pk->getUID(), false, "Failed to send modal.", [$e->getMessage(), $e->getTraceAsString()]);
+            $this->logger->debug("Failed to send modal ({$pk->getUID()}) - {$e->getMessage()}");
+        });
     }
 
     private function handleInteractionRespondWithMessage(RequestInteractionRespondWithMessage $pk): void{

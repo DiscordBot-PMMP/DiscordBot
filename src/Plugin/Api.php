@@ -45,6 +45,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithMessage;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithModal;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestLeaveGuild;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestPinMessage;
@@ -87,6 +88,7 @@ use pocketmine\event\EventPriority;
 use function count;
 use function in_array;
 use function JaxkDev\DiscordBot\Libs\React\Promise\reject as rejectPromise;
+use function sizeof;
 use function strlen;
 
 /**
@@ -1345,6 +1347,48 @@ final class Api{
         }
         $interaction->setResponded();
         $pk = new RequestInteractionRespondWithMessage($interaction, $content, $embeds, $tts, $components, $files, $ephemeral);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Respond to an interaction with a popup modal form.
+     *
+     * @param ActionRow[] $components (Only TEXT_INPUT components are supported in modal forms)
+     */
+    public function interactionRespondWithModal(Interaction $interaction, string $title, string $custom_id,
+                                                array $components): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if($interaction->getType() === InteractionType::MODAL_SUBMIT || $interaction->getType() === InteractionType::PING){
+            return rejectPromise(new ApiRejection("Interaction type '{$interaction->getType()->name}' is not supported by this method."));
+        }
+        if($interaction->getResponded()){
+            return rejectPromise(new ApiRejection("Interaction has already been responded to."));
+        }
+        if(strlen($title) > 45){
+            return rejectPromise(new ApiRejection("Modal title cannot be larger than 45 characters."));
+        }
+        if(strlen($custom_id) > 100){
+            return rejectPromise(new ApiRejection("Custom ID cannot be larger than 100 characters."));
+        }
+        if(sizeof($components) > 5 || sizeof($components) === 0){
+            return rejectPromise(new ApiRejection("Components array must contain between 1 and 5 ActionRow components."));
+        }
+        foreach($components as $comp){
+            if(!$comp instanceof ActionRow){
+                return rejectPromise(new ApiRejection("Components array must all be of type '" . ActionRow::class . "'."));
+            }
+            foreach($comp->getComponents() as $c){
+                if($c->getType() !== ComponentType::TEXT_INPUT){
+                    //Only text inputs are supported in modal forms.
+                    return rejectPromise(new ApiRejection("Components array can only contain TEXT_INPUT type."));
+                }
+            }
+        }
+        $interaction->setResponded();
+        $pk = new RequestInteractionRespondWithModal($interaction, $title, $custom_id, $components);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }
