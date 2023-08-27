@@ -929,6 +929,10 @@ final class Api{
                 return rejectPromise(new ApiRejection("Invalid sticker ID '$id'."));
             }
         }
+        /**
+         * @var string $name
+         * @var string $data
+         */
         foreach($files ?? [] as $name => $data){
             if(strlen($name) > 256){
                 return rejectPromise(new ApiRejection("File name cannot be larger than 256 characters."));
