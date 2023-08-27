@@ -577,13 +577,20 @@ final class Api{
      *
      * If hoisted position changed, all roles that move to account for the change will emit an updated event.
      *
+     * To change role icon, set icon to null in Role model and provide new VALID IMAGE DATA (Utils::imageToDiscordData()) as $new_icon_data.
+     * To remove role icon, set icon to null in Role model.
+     *
+     * @link Utils::imageToDiscordData()
      * @return PromiseInterface Resolves with a Role model.
      */
-    public function updateRole(Role $role, ?string $reason = null): PromiseInterface{
+    public function updateRole(Role $role, ?string $new_icon_data = null, ?string $reason = null): PromiseInterface{
         if(!$this->ready){
             return rejectPromise(new ApiRejection("API is not ready for requests."));
         }
-        $pk = new RequestUpdateRole($role, $reason);
+        if($new_icon_data !== null && !Utils::validImageData($new_icon_data)){
+            return rejectPromise(new ApiRejection("Invalid icon data '$new_icon_data'."));
+        }
+        $pk = new RequestUpdateRole($role, $new_icon_data, $reason);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

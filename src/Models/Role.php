@@ -39,7 +39,7 @@ final class Role implements BinarySerializable{
     /** If this role is pinned in the user listing */
     private bool $hoist;
 
-    /** Role icon */
+    /** Role icon or role icon image data when updating icon. */
     private ?string $icon;
 
     /** Role unicode emoji */
@@ -132,7 +132,7 @@ final class Role implements BinarySerializable{
     }
 
     public function getIconUrl(): ?string{
-        return ($this->icon === null) ? null : "https://cdn.discordapp.com/role-icons/{$this->id}/{$this->icon}.png";
+        return ($this->icon === null || !Utils::validImageData($this->icon)) ? null : "https://cdn.discordapp.com/role-icons/{$this->id}/{$this->icon}.png";
     }
 
     public function getIcon(): ?string{
