@@ -19,7 +19,7 @@ use Discord\Builders\Components\MentionableSelect as DiscordMentionableSelect;
 use Discord\Builders\Components\Option as DiscordOption;
 use Discord\Builders\Components\RoleSelect as DiscordRoleSelect;
 use Discord\Builders\Components\StringSelect as DiscordStringSelect;
-use Discord\Builders\Components\TextInput;
+use Discord\Builders\Components\TextInput as DiscordTextInput;
 use Discord\Builders\Components\UserSelect as DiscordUserSelect;
 use Discord\Builders\MessageBuilder as DiscordMessageBuilder;
 use Discord\Helpers\Collection as DiscordCollection;
@@ -69,6 +69,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRoles;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithAutocomplete;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithModal;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -93,6 +94,7 @@ use JaxkDev\DiscordBot\Models\Channels\ForumTag;
 use JaxkDev\DiscordBot\Models\Messages\Component\Button;
 use JaxkDev\DiscordBot\Models\Messages\Component\ComponentType;
 use JaxkDev\DiscordBot\Models\Messages\Component\SelectMenu;
+use JaxkDev\DiscordBot\Models\Messages\Component\TextInput;
 use JaxkDev\DiscordBot\Models\Presence\Status;
 use JaxkDev\DiscordBot\Models\Role;
 use JaxkDev\DiscordBot\Plugin\ApiRejection;
@@ -139,54 +141,55 @@ final class CommunicationHandler{
         //Ideally handlers will be in packets to avoid this ever-growing list but due to autoload on plugin class we cant.
 
         //API Packets:
-        if($pk instanceof RequestUpdateBotPresence)                 $this->handleUpdateBotPresence($pk);
-        elseif($pk instanceof RequestFetchBans)                     $this->handleFetchBans($pk);
-        elseif($pk instanceof RequestFetchChannel)                  $this->handleFetchChannel($pk);
-        elseif($pk instanceof RequestFetchChannels)                 $this->handleFetchChannels($pk);
-        elseif($pk instanceof RequestFetchGuild)                    $this->handleFetchGuild($pk);
-        elseif($pk instanceof RequestFetchGuilds)                   $this->handleFetchGuilds($pk);
-        elseif($pk instanceof RequestFetchInvites)                  $this->handleFetchInvites($pk);
-        elseif($pk instanceof RequestFetchMember)                   $this->handleFetchMember($pk);
-        elseif($pk instanceof RequestFetchMembers)                  $this->handleFetchMembers($pk);
-        elseif($pk instanceof RequestFetchMessage)                  $this->handleFetchMessage($pk);
-        elseif($pk instanceof RequestFetchPinnedMessages)           $this->handleFetchPinnedMessages($pk);
-        elseif($pk instanceof RequestFetchRole)                     $this->handleFetchRole($pk);
-        elseif($pk instanceof RequestFetchRoles)                    $this->handleFetchRoles($pk);
-        elseif($pk instanceof RequestFetchUser)                     $this->handleFetchUser($pk);
-        elseif($pk instanceof RequestFetchUsers)                    $this->handleFetchUsers($pk);
-        elseif($pk instanceof RequestFetchWebhooks)                 $this->handleFetchWebhooks($pk);
-        elseif($pk instanceof RequestInteractionRespondWithMessage) $this->handleInteractionRespondWithMessage($pk);
-        elseif($pk instanceof RequestInteractionRespondWithModal)   $this->handleInteractionRespondWithModal($pk);
-        elseif($pk instanceof RequestUpdateNickname)                $this->handleUpdateNickname($pk);
-        elseif($pk instanceof RequestBroadcastTyping)               $this->handleBroadcastTyping($pk);
-        elseif($pk instanceof RequestSendMessage)                   $this->handleSendMessage($pk);
-        elseif($pk instanceof RequestEditMessage)                   $this->handleEditMessage($pk);
-        elseif($pk instanceof RequestAddReaction)                   $this->handleAddReaction($pk);
-        elseif($pk instanceof RequestRemoveReaction)                $this->handleRemoveReaction($pk);
-        elseif($pk instanceof RequestRemoveAllReactions)            $this->handleRemoveAllReactions($pk);
-        elseif($pk instanceof RequestDeleteMessage)                 $this->handleDeleteMessage($pk);
-        elseif($pk instanceof RequestBulkDeleteMessages)            $this->handleBulkDeleteMessages($pk);
-        elseif($pk instanceof RequestPinMessage)                    $this->handlePinMessage($pk);
-        elseif($pk instanceof RequestUnpinMessage)                  $this->handleUnpinMessage($pk);
-        elseif($pk instanceof RequestAddRole)                       $this->handleAddRole($pk);
-        elseif($pk instanceof RequestRemoveRole)                    $this->handleRemoveRole($pk);
-        elseif($pk instanceof RequestCreateRole)                    $this->handleCreateRole($pk);
-        elseif($pk instanceof RequestUpdateRole)                    $this->handleUpdateRole($pk);
-        elseif($pk instanceof RequestDeleteRole)                    $this->handleDeleteRole($pk);
-        elseif($pk instanceof RequestKickMember)                    $this->handleKickMember($pk);
-        elseif($pk instanceof RequestCreateInvite)                  $this->handleCreateInvite($pk);
-        elseif($pk instanceof RequestDeleteInvite)                  $this->handleDeleteInvite($pk);
-        elseif($pk instanceof RequestCreateChannel)                 $this->handleCreateChannel($pk);
-        elseif($pk instanceof RequestUpdateChannel)                 $this->handleUpdateChannel($pk);
-        elseif($pk instanceof RequestDeleteChannel)                 $this->handleDeleteChannel($pk);
-        elseif($pk instanceof RequestCreateThread)                  $this->handleCreateThread($pk);
-        elseif($pk instanceof RequestCreateThreadFromMessage)       $this->handleCreateThreadFromMessage($pk);
-        elseif($pk instanceof RequestBanMember)                     $this->handleBanMember($pk);
-        elseif($pk instanceof RequestUnbanMember)                   $this->handleUnbanMember($pk);
-        elseif($pk instanceof RequestCreateWebhook)                 $this->handleCreateWebhook($pk);
-        elseif($pk instanceof RequestUpdateWebhook)                 $this->handleUpdateWebhook($pk);
-        elseif($pk instanceof RequestDeleteWebhook)                 $this->handleDeleteWebhook($pk);
-        elseif($pk instanceof RequestLeaveGuild)                    $this->handleLeaveGuild($pk);
+        if($pk instanceof RequestUpdateBotPresence)                      $this->handleUpdateBotPresence($pk);
+        elseif($pk instanceof RequestFetchBans)                          $this->handleFetchBans($pk);
+        elseif($pk instanceof RequestFetchChannel)                       $this->handleFetchChannel($pk);
+        elseif($pk instanceof RequestFetchChannels)                      $this->handleFetchChannels($pk);
+        elseif($pk instanceof RequestFetchGuild)                         $this->handleFetchGuild($pk);
+        elseif($pk instanceof RequestFetchGuilds)                        $this->handleFetchGuilds($pk);
+        elseif($pk instanceof RequestFetchInvites)                       $this->handleFetchInvites($pk);
+        elseif($pk instanceof RequestFetchMember)                        $this->handleFetchMember($pk);
+        elseif($pk instanceof RequestFetchMembers)                       $this->handleFetchMembers($pk);
+        elseif($pk instanceof RequestFetchMessage)                       $this->handleFetchMessage($pk);
+        elseif($pk instanceof RequestFetchPinnedMessages)                $this->handleFetchPinnedMessages($pk);
+        elseif($pk instanceof RequestFetchRole)                          $this->handleFetchRole($pk);
+        elseif($pk instanceof RequestFetchRoles)                         $this->handleFetchRoles($pk);
+        elseif($pk instanceof RequestFetchUser)                          $this->handleFetchUser($pk);
+        elseif($pk instanceof RequestFetchUsers)                         $this->handleFetchUsers($pk);
+        elseif($pk instanceof RequestFetchWebhooks)                      $this->handleFetchWebhooks($pk);
+        elseif($pk instanceof RequestInteractionRespondWithAutocomplete) $this->handleInteractionRespondWithAutocomplete($pk);
+        elseif($pk instanceof RequestInteractionRespondWithMessage)      $this->handleInteractionRespondWithMessage($pk);
+        elseif($pk instanceof RequestInteractionRespondWithModal)        $this->handleInteractionRespondWithModal($pk);
+        elseif($pk instanceof RequestUpdateNickname)                     $this->handleUpdateNickname($pk);
+        elseif($pk instanceof RequestBroadcastTyping)                    $this->handleBroadcastTyping($pk);
+        elseif($pk instanceof RequestSendMessage)                        $this->handleSendMessage($pk);
+        elseif($pk instanceof RequestEditMessage)                        $this->handleEditMessage($pk);
+        elseif($pk instanceof RequestAddReaction)                        $this->handleAddReaction($pk);
+        elseif($pk instanceof RequestRemoveReaction)                     $this->handleRemoveReaction($pk);
+        elseif($pk instanceof RequestRemoveAllReactions)                 $this->handleRemoveAllReactions($pk);
+        elseif($pk instanceof RequestDeleteMessage)                      $this->handleDeleteMessage($pk);
+        elseif($pk instanceof RequestBulkDeleteMessages)                 $this->handleBulkDeleteMessages($pk);
+        elseif($pk instanceof RequestPinMessage)                         $this->handlePinMessage($pk);
+        elseif($pk instanceof RequestUnpinMessage)                       $this->handleUnpinMessage($pk);
+        elseif($pk instanceof RequestAddRole)                            $this->handleAddRole($pk);
+        elseif($pk instanceof RequestRemoveRole)                         $this->handleRemoveRole($pk);
+        elseif($pk instanceof RequestCreateRole)                         $this->handleCreateRole($pk);
+        elseif($pk instanceof RequestUpdateRole)                         $this->handleUpdateRole($pk);
+        elseif($pk instanceof RequestDeleteRole)                         $this->handleDeleteRole($pk);
+        elseif($pk instanceof RequestKickMember)                         $this->handleKickMember($pk);
+        elseif($pk instanceof RequestCreateInvite)                       $this->handleCreateInvite($pk);
+        elseif($pk instanceof RequestDeleteInvite)                       $this->handleDeleteInvite($pk);
+        elseif($pk instanceof RequestCreateChannel)                      $this->handleCreateChannel($pk);
+        elseif($pk instanceof RequestUpdateChannel)                      $this->handleUpdateChannel($pk);
+        elseif($pk instanceof RequestDeleteChannel)                      $this->handleDeleteChannel($pk);
+        elseif($pk instanceof RequestCreateThread)                       $this->handleCreateThread($pk);
+        elseif($pk instanceof RequestCreateThreadFromMessage)            $this->handleCreateThreadFromMessage($pk);
+        elseif($pk instanceof RequestBanMember)                          $this->handleBanMember($pk);
+        elseif($pk instanceof RequestUnbanMember)                        $this->handleUnbanMember($pk);
+        elseif($pk instanceof RequestCreateWebhook)                      $this->handleCreateWebhook($pk);
+        elseif($pk instanceof RequestUpdateWebhook)                      $this->handleUpdateWebhook($pk);
+        elseif($pk instanceof RequestDeleteWebhook)                      $this->handleDeleteWebhook($pk);
+        elseif($pk instanceof RequestLeaveGuild)                         $this->handleLeaveGuild($pk);
     }
 
     private function handleFetchBans(RequestFetchBans $pk): void{
@@ -336,6 +339,24 @@ final class CommunicationHandler{
         }
     }
 
+    private function handleInteractionRespondWithAutocomplete(RequestInteractionRespondWithAutocomplete $pk): void{
+        $interaction = $this->client->getDiscordEventHandler()->interaction_cache[$pk->getInteraction()->getId()] ?? null;
+        if($interaction === null){
+            $this->resolveRequest($pk->getUID(), false, "Interaction not found.", ["Interaction ID not found in cache.", ""]);
+            return;
+        }
+        $choices = [];
+        foreach($pk->getChoices() as $choice){
+            $choices[] = new DiscordOption($choice->getName(), (string)$choice->getValue());
+        }
+        $interaction->autoCompleteResult($choices)->then(function() use($pk){
+            $this->resolveRequest($pk->getUID(), true, "Autocomplete choices sent.");
+        }, function(\Throwable $e) use($pk){
+            $this->resolveRequest($pk->getUID(), false, "Failed to send autocomplete choices.", [$e->getMessage(), $e->getTraceAsString()]);
+            $this->logger->debug("Failed to send autocomplete choices ({$pk->getUID()}) - {$e->getMessage()}");
+        });
+    }
+
     private function handleInteractionRespondWithModal(RequestInteractionRespondWithModal $pk): void{
         $interaction = $this->client->getDiscordEventHandler()->interaction_cache[$pk->getInteraction()->getId()] ?? null;
         if($interaction === null){
@@ -344,14 +365,14 @@ final class CommunicationHandler{
         }
         $actions = [];
         foreach($pk->getComponents() as $component){
-            /** @var \JaxkDev\DiscordBot\Models\Messages\Component\TextInput|null $text */
+            /** @var TextInput|null $text */
             $text = $component->getComponents()[0] ?? null;
             if($text === null){
                 $this->resolveRequest($pk->getUID(), false, "Invalid component.", ["Each component ActionRow must have 1 TextInput component."]);
                 return;
             }
             $a = new DiscordActionRow();
-            $t = new TextInput($text->getLabel(), $text->getStyle()->value, $text->getCustomId());
+            $t = new DiscordTextInput($text->getLabel(), $text->getStyle()->value, $text->getCustomId());
             $t->setMinLength($text->getMinLength())
                 ->setMaxLength($text->getMaxLength())
                 ->setRequired($text->getRequired())

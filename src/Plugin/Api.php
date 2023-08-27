@@ -44,6 +44,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRoles;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithAutocomplete;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithModal;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -67,6 +68,7 @@ use JaxkDev\DiscordBot\Models\Channels\ForumTag;
 use JaxkDev\DiscordBot\Models\Channels\Overwrite;
 use JaxkDev\DiscordBot\Models\Channels\VideoQualityMode;
 use JaxkDev\DiscordBot\Models\Emoji;
+use JaxkDev\DiscordBot\Models\Interactions\Commands\CommandOptionChoice;
 use JaxkDev\DiscordBot\Models\Interactions\Interaction;
 use JaxkDev\DiscordBot\Models\Interactions\InteractionType;
 use JaxkDev\DiscordBot\Models\Messages\Component\ActionRow;
@@ -1389,6 +1391,36 @@ final class Api{
         }
         $interaction->setResponded();
         $pk = new RequestInteractionRespondWithModal($interaction, $title, $custom_id, $components);
+        $this->plugin->writeOutboundData($pk);
+        return ApiResolver::create($pk->getUID());
+    }
+
+    /**
+     * Send discord a response to an interaction with a list of choices for the user to pick from.
+     *
+     * @param Interaction           $interaction Only valid on APPLICATION_COMMAND_AUTOCOMPLETE interactions.
+     * @param CommandOptionChoice[] $choices     Max 25
+     */
+    public function interactionRespondWithAutocomplete(Interaction $interaction, array $choices): PromiseInterface{
+        if(!$this->ready){
+            return rejectPromise(new ApiRejection("API is not ready for requests."));
+        }
+        if($interaction->getType() !== InteractionType::APPLICATION_COMMAND_AUTOCOMPLETE){
+            return rejectPromise(new ApiRejection("Interaction type '{$interaction->getType()->name}' is not supported by this method."));
+        }
+        if($interaction->getResponded()){
+            return rejectPromise(new ApiRejection("Interaction has already been responded to."));
+        }
+        if(sizeof($choices) > 25 || sizeof($choices) === 0){
+            return rejectPromise(new ApiRejection("Choices array must contain between 1 and 25 CommandOptionChoice models."));
+        }
+        foreach($choices as $choice){
+            if(!$choice instanceof CommandOptionChoice){
+                return rejectPromise(new ApiRejection("Choices array must all be of type '" . CommandOptionChoice::class . "'."));
+            }
+        }
+        $interaction->setResponded();
+        $pk = new RequestInteractionRespondWithAutocomplete($interaction, $choices);
         $this->plugin->writeOutboundData($pk);
         return ApiResolver::create($pk->getUID());
     }

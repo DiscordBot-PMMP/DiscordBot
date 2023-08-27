@@ -82,6 +82,7 @@ use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchRoles;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUser;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchUsers;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestFetchWebhooks;
+use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithAutocomplete;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithMessage;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestInteractionRespondWithModal;
 use JaxkDev\DiscordBot\Communication\Packets\Plugin\RequestKickMember;
@@ -222,7 +223,8 @@ final class NetworkApi{
         RequestCreateThread::SERIALIZE_ID => RequestCreateThread::class,
         RequestBulkDeleteMessages::SERIALIZE_ID => RequestBulkDeleteMessages::class,
         RequestInteractionRespondWithModal::SERIALIZE_ID => RequestInteractionRespondWithModal::class,
-        //Reserved 88-99
+        RequestInteractionRespondWithAutocomplete::SERIALIZE_ID => RequestInteractionRespondWithAutocomplete::class,
+        //Reserved 89-99
 
         //100 Next ID
     ];
