@@ -6,47 +6,113 @@ TODO
 
 ## [2.1.10] - 2023-05-28
 
-TODO
+### Changed
+
+- Modify composer PHP version constraint to match `plugin.yml` ([`33e675d`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/33e675d36bbd0e96ce65c3f517331aa3453918d5))
 
 ## [2.1.9] - 2023-05-21
 
-TODO
+### Fixed
+
+- Fix invalid PHP version constrain, making [2.1.7](#217---2023-05-20) and [2.1.8](#218---2023-05-21) unusable ([`5080128`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/5080128afc77c76d33ec1028f65130303c9136d1))
 
 ## [2.1.8] - 2023-05-21
 
-TODO
+_This release was pulled due to a bug causing it to not load, use v2.1.9_
+
+### Fixed
+
+- Fix invalid activity URL ([#84](https://github.com/DiscordBot-PMMP/DiscordBot/issues/84), [`e6390ba`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/e6390baeef14b064f8e42faf993b5df7cea02f36))
+- Fix unknown message type on delete ([#85](https://github.com/DiscordBot-PMMP/DiscordBot/issues/85), [`e5b7892`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/e5b78923d3aef46548466a0615f5ca039ba22f54))
 
 ## [2.1.7] - 2023-05-20
 
-TODO
+_This release was pulled due to a bug causing it to not load, use v2.1.9_
+
+### Changed
+
+- Modify PHP upper version constraint ([`d535038`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/d5350386ee8694b60fa901971d8c6c52a44cb1e5))
 
 ## [2.1.6] - 2022-12-23
 
-TODO
+### Fixed
+
+- Fix empty attachment assertions ([#78](https://github.com/DiscordBot-PMMP/DiscordBot/issues/78), [`894d272`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/894d272008c5d934f285fdacc5f6a3a8ed4160ec))
+- Fix unknown message type on delete ([#79](https://github.com/DiscordBot-PMMP/DiscordBot/issues/79), [`9064092`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/906409206c3846ad51b55993efaf6aa80f5738ac))
 
 ## [2.1.5] - 2022-08-28
 
-TODO
+### Changed
+
+- Modify startup behaviour, `xdebug` extension is now allowed ([`57218df`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/57218dfccc98e2757356e808db4cede023b273e5))
 
 ## [2.1.4] - 2022-07-22
 
-TODO
+### Changed
+
+- Modify `debugdiscord` command to be async ([#63](https://github.com/DiscordBot-PMMP/DiscordBot/issues/63), [`a67b8ce`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/a67b8ceab7f9109ad265cf454aae6c486e2e42e1))
+
+### Fixed
+
+- Fix new discord snowflakes crashing plugin ([`5992231`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/5992231c003f59dda518e939a5275278229b8875))
 
 ## [2.1.3] - 2022-05-08
 
-TODO
+### Fixed
+
+- Fix owners/admins joining voice channel ([#59](https://github.com/DiscordBot-PMMP/DiscordBot/issues/59), [`19c2905`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/19c2905b7040130d412deeafbe783d8c5c698a2b))
+- Fix nullable message attachment content type ([#55](https://github.com/DiscordBot-PMMP/DiscordBot/issues/55), [`a8de8ca`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/a8de8ca7a898c4ed1fe3e0edb6f2381c58e8d82c))
 
 ## [2.1.2] - 2022-04-06
 
-TODO
+_This release removes the need for our custom promise library._
+
+### Changed
+
+- Bump `react/promise` to `v2.9.0` ([`a7ab550`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/a7ab55072a6f3ee1a6d99f5dcfe7c47c554a5ba5))
+
+### Removed
+
+- Drop `discordbot-pmmp/promise` ([`a7ab550`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/a7ab55072a6f3ee1a6d99f5dcfe7c47c554a5ba5))
+
+### Fixed
+
+- Fix invites created with no owner ([#52](https://github.com/DiscordBot-PMMP/DiscordBot/issues/52))
 
 ## [2.1.1] - 2021-12-12
 
-TODO
+### Changed
+
+- Modify Activity `url` checks to be less strict ([#51](https://github.com/DiscordBot-PMMP/DiscordBot/issues/51), [`ca8d43e`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/ca8d43ef6a5f32a83c0733982390573cdb0e8c1f))
+
+### Added
+
+- Add `MembersVoiceChannel` to the data dump ([`b7ff955`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/b7ff9555c1f2ed9a352b8ff8090831a6bd269a37))
+
+### Fixed
+
+- Fix blank channel ID in `VoiceStateUpdate` ([#49](https://github.com/DiscordBot-PMMP/DiscordBot/issues/49))
+- Fix referenced message assertion in `ModelConverter` ([#50](https://github.com/DiscordBot-PMMP/DiscordBot/issues/50))
 
 ## [2.1.0] - 2021-12-02
 
-TODO
+### Changed
+
+- Deprecate `Storage::getServerBans` in favour of `Storage::getBansByServer` ([`a966944`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/a9669441b4234bce6a4ca3ab7a3e75b3e7468c3e))
+- Modify thread logger to not write to console.
+- Modify plugin structure to use PSR-4 ([`d7c6ebe`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/d7c6ebe2641c03048ac07a320649ba330ac72317))
+
+### Added
+
+- Add `servers` and `users` getters in `Storage` ([`a966944`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/a9669441b4234bce6a4ca3ab7a3e75b3e7468c3e))
+- Add PocketMine-MP 4.x support ([`1467c49`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/1467c493d8ba67b830b783dd2334ffb79e6d0c87))
+- Add PHP ^8.0.3 support ([`797f2d0`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/797f2d0015881398a70644ff304168ed62bf94de))
+
+### Removed
+
+- Remove `logging.debug` option from config ([`608a5ae`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/608a5ae64a0780044b8f441db980955915c58282))
+- Drop PocketMine-MP 3.x support ([`1467c49`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/1467c493d8ba67b830b783dd2334ffb79e6d0c87))
+- Drop PHP 7.4 support ([`797f2d0`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/797f2d0015881398a70644ff304168ed62bf94de))
 
 ## [2.0.4] - 2021-10-02
 
@@ -104,15 +170,15 @@ _**Breaking:** Plugin re-released as a central API._
 
 ## [1.0.0_A3] - 2020-11-28
 
-_This release was never published to public._
+❌ _This release was never published to public._
 
 ## [1.0.0_A2] - 2020-11-22
 
-_This release was never published to public._
+❌ _This release was never published to public._
 
 ## [1.0.0_A1] - 2020-11-19
 
-_This release was never published to public._
+❌ _This release was never published to public._
 
 
 [3.0.0]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.0
