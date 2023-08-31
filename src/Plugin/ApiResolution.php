@@ -1,24 +1,27 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Plugin;
 
-class ApiResolution{
+use function array_slice;
+use function count;
+use function is_string;
 
-    /** @var string[] */
-    private $data;
+final class ApiResolution{
+
+    private array $data;
 
     public function __construct(array $data = []){
-        if(sizeof($data) === 0 or !is_string($data[0])){
+        if(count($data) === 0 || !is_string($data[0])){
             throw new \AssertionError("Expected data for ApiResolution to contain at least a message.");
         }
         $this->data = $data;
@@ -30,8 +33,6 @@ class ApiResolution{
 
     /**
      * See API Docs for potential data to be returned per API request.
-     *
-     * @return array
      */
     public function getData(): array{
         return array_slice($this->data, 1);

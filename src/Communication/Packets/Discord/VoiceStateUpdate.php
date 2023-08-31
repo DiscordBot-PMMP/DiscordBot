@@ -1,59 +1,48 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\VoiceState;
 
-class VoiceStateUpdate extends Packet{
+final class VoiceStateUpdate extends Packet{
 
-    /** @var string */
-    private $member_id;
+    public const SERIALIZE_ID = 232;
 
-    /** @var VoiceState */
-    private $voice_state;
+    private VoiceState $voice_state;
 
-    public function __construct(string $member_id, VoiceState $voice_state){
-        parent::__construct();
-        $this->member_id = $member_id;
+    public function __construct(VoiceState $voice_state, ?int $uid = null){
+        parent::__construct($uid);
         $this->voice_state = $voice_state;
-    }
-
-    public function getMemberId(): string{
-        return $this->member_id;
     }
 
     public function getVoiceState(): VoiceState{
         return $this->voice_state;
     }
 
-    public function serialize(): ?string{
-        return serialize([
-            $this->UID,
-            $this->member_id,
-            $this->voice_state
-        ]);
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
+        $stream->putSerializable($this->voice_state);
+        return $stream;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->UID,
-            $this->member_id,
-            $this->voice_state
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
+        return new self(
+            $stream->getSerializable(VoiceState::class), // voice_state
+            $uid
+        );
     }
 }

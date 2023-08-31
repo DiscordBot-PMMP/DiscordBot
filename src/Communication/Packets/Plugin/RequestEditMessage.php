@@ -1,27 +1,29 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Messages\Message;
 
-class RequestEditMessage extends Packet{
+final class RequestEditMessage extends Packet{
 
-    /** @var Message */
-    private $message;
+    public const SERIALIZE_ID = 416;
 
-    public function __construct(Message $message){
-        parent::__construct();
+    private Message $message;
+
+    public function __construct(Message $message, ?int $uid = null){
+        parent::__construct($uid);
         $this->message = $message;
     }
 
@@ -29,21 +31,18 @@ class RequestEditMessage extends Packet{
         return $this->message;
     }
 
-    public function serialize(): ?string{
-        return serialize([
-            $this->UID,
-            $this->message
-        ]);
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
+        $stream->putSerializable($this->message);
+        return $stream;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->UID,
-            $this->message
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
+        return new self(
+            $stream->getSerializable(Message::class),
+            $uid
+        );
     }
 }

@@ -1,97 +1,73 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
-//Yes quite a lot of nullables... (https://discord.com/developers/docs/resources/channel#embed-object)
-class Embed implements \Serializable{
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
+use function count;
+use function strlen;
 
-    // https://discord.com/developers/docs/resources/channel#embed-object-embed-types
-    const
-        TYPE_RICH = 'rich',
-        TYPE_IMAGE = 'image',
-        TYPE_VIDEO = 'video',
-        TYPE_GIFV = 'gifv',
-        TYPE_ARTICLE = 'article',
-        TYPE_LINK = 'link';
+/**
+ * @implements BinarySerializable<Embed>
+ * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-structure
+ */
+final class Embed implements BinarySerializable{
 
-    /** @var null|string 2048 characters */
-    private $title;
+    /** 256 characters */
+    private ?string $title;
 
-    /** @var null|string */
-    private $type;
+    /** 4096 characters */
+    private ?string $description;
 
-    /** @var null|string 4096 characters */
-    private $description;
+    private ?string $url;
 
-    /** @var null|string */
-    private $url;
+    private ?int $timestamp;
 
-    /** @var null|int */
-    private $timestamp;
+    private ?int $colour;
 
-    /** @var null|int */
-    private $colour;
+    private ?Footer $footer;
 
-    //Provider?? https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
+    private ?Image $image;
 
-    /** @var Footer */
-    private $footer;
+    private ?Image $thumbnail;
 
-    /** @var Image */
-    private $image;
+    private ?Video $video;
 
-    /** @var Image */
-    private $thumbnail;
+    private ?Provider $provider;
 
-    /** @var Video */
-    private $video;
-
-    /** @var Author */
-    private $author;
+    private ?Author $author;
 
     /** @var Field[] 25 max */
-    private $fields = [];
+    private array $fields = [];
 
     /**
-     * Embed constructor.
-     *
-     * @param string|null $title
-     * @param string|null $type
-     * @param string|null $description
-     * @param string|null $url
-     * @param int|null    $timestamp
-     * @param int|null    $colour
-     * @param Footer|null $footer
-     * @param Image|null  $image
-     * @param Image|null  $thumbnail
-     * @param Video|null  $video
-     * @param Author|null $author
-     * @param Field[]     $fields
+     * @param Field[] $fields
      */
-    public function __construct(?string $title = null, ?string $type = null, ?string $description = null, ?string $url = null,
-                                   ?int $timestamp = null, ?int $colour = null, Footer $footer = null, Image $image = null,
-                                   Image $thumbnail = null, Video $video = null, Author $author = null, array $fields = []){
+    public function __construct(?string $title = null, ?string $description = null, ?string $url = null,
+                                ?int $timestamp = null, ?int $colour = null, ?Footer $footer = null,
+                                ?Image $image = null, ?Image $thumbnail = null, ?Video $video = null,
+                                ?Provider $provider = null, ?Author $author = null, array $fields = []){
         $this->setTitle($title);
-        $this->setType($type);
         $this->setDescription($description);
         $this->setUrl($url);
         $this->setTimestamp($timestamp);
         $this->setColour($colour);
-        $this->setFooter($footer ?? new Footer());
-        $this->setImage($image ?? new Image());
-        $this->setThumbnail($thumbnail ?? new Image());
-        $this->setVideo($video ?? new Video());
-        $this->setAuthor($author ?? new Author());
+        $this->setFooter($footer);
+        $this->setImage($image);
+        $this->setThumbnail($thumbnail);
+        $this->setVideo($video);
+        $this->setProvider($provider);
+        $this->setAuthor($author);
         $this->setFields($fields);
     }
 
@@ -100,21 +76,10 @@ class Embed implements \Serializable{
     }
 
     public function setTitle(?string $title): void{
-        if($title !== null and strlen($title) > 2048){
-            throw new \AssertionError("Embed title can only have up to 2048 characters.");
+        if($title !== null && strlen($title) > 256){
+            throw new \AssertionError("Embed title can only have up to 256 characters.");
         }
         $this->title = $title;
-    }
-
-    public function getType(): ?string{
-        return $this->type;
-    }
-
-    public function setType(?string $type): void{
-        if($type !== null and (!in_array($type, [self::TYPE_LINK, self::TYPE_ARTICLE, self::TYPE_GIFV, self::TYPE_VIDEO, self::TYPE_IMAGE, self::TYPE_RICH], true))){
-            throw new \AssertionError("Invalid embed type '{$type}' provided.");
-        }
-        $this->type = $type;
     }
 
     public function getDescription(): ?string{
@@ -122,7 +87,7 @@ class Embed implements \Serializable{
     }
 
     public function setDescription(?string $description): void{
-        if($description !== null and strlen($description) > 4096){
+        if($description !== null && strlen($description) > 4096){
             throw new \AssertionError("Embed description can only have up to 4096 characters.");
         }
         $this->description = $description;
@@ -152,43 +117,51 @@ class Embed implements \Serializable{
         $this->colour = $colour;
     }
 
-    public function getFooter(): Footer{
+    public function getFooter(): ?Footer{
         return $this->footer;
     }
 
-    public function setFooter(Footer $footer): void{
+    public function setFooter(?Footer $footer): void{
         $this->footer = $footer;
     }
 
-    public function getImage(): Image{
+    public function getImage(): ?Image{
         return $this->image;
     }
 
-    public function setImage(Image $image): void{
+    public function setImage(?Image $image): void{
         $this->image = $image;
     }
 
-    public function getThumbnail(): Image{
+    public function getThumbnail(): ?Image{
         return $this->thumbnail;
     }
 
-    public function setThumbnail(Image $thumbnail): void{
+    public function setThumbnail(?Image $thumbnail): void{
         $this->thumbnail = $thumbnail;
     }
 
-    public function getVideo(): Video{
+    public function getVideo(): ?Video{
         return $this->video;
     }
 
-    public function setVideo(Video $video): void{
+    public function setVideo(?Video $video): void{
         $this->video = $video;
     }
 
-    public function getAuthor(): Author{
+    public function getProvider(): ?Provider{
+        return $this->provider;
+    }
+
+    public function setProvider(?Provider $provider): void{
+        $this->provider = $provider;
+    }
+
+    public function getAuthor(): ?Author{
         return $this->author;
     }
 
-    public function setAuthor(Author $author): void{
+    public function setAuthor(?Author $author): void{
         $this->author = $author;
     }
 
@@ -199,49 +172,48 @@ class Embed implements \Serializable{
 
     /** @param Field[] $fields */
     public function setFields(array $fields): void{
-        if(sizeof($fields) > 25){
+        if(count($fields) > 25){
             throw new \AssertionError("Embed can only have up to 25 fields.");
+        }
+        foreach($fields as $field){
+            if(!($field instanceof Field)){
+                throw new \AssertionError("Embed fields must be of type Field.");
+            }
         }
         $this->fields = $fields;
     }
 
-    //----- Serialization -----//
-
-    public function serialize(): ?string{
-        return serialize([
-            $this->title,
-            $this->type,
-            $this->description,
-            $this->url,
-            $this->timestamp,
-            $this->colour,
-            $this->footer,
-            $this->image,
-            $this->thumbnail,
-            $this->video,
-            $this->author,
-            $this->fields
-        ]);
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putNullableString($this->title);
+        $stream->putNullableString($this->description);
+        $stream->putNullableString($this->url);
+        $stream->putNullableLong($this->timestamp);
+        $stream->putNullableInt($this->colour);
+        $stream->putNullableSerializable($this->footer);
+        $stream->putNullableSerializable($this->image);
+        $stream->putNullableSerializable($this->thumbnail);
+        $stream->putNullableSerializable($this->video);
+        $stream->putNullableSerializable($this->provider);
+        $stream->putNullableSerializable($this->author);
+        $stream->putSerializableArray($this->fields);
+        return $stream;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->title,
-            $this->type,
-            $this->description,
-            $this->url,
-            $this->timestamp,
-            $this->colour,
-            $this->footer,
-            $this->image,
-            $this->thumbnail,
-            $this->video,
-            $this->author,
-            $this->fields
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getNullableString(),                      // title
+            $stream->getNullableString(),                      // description
+            $stream->getNullableString(),                      // url
+            $stream->getNullableLong(),                        // timestamp
+            $stream->getNullableInt(),                         // colour
+            $stream->getNullableSerializable(Footer::class),   // footer
+            $stream->getNullableSerializable(Image::class),    // image
+            $stream->getNullableSerializable(Image::class),    // thumbnail
+            $stream->getNullableSerializable(Video::class),    // video
+            $stream->getNullableSerializable(Provider::class), // provider
+            $stream->getNullableSerializable(Author::class),   // author
+            $stream->getSerializableArray(Field::class)        // fields
+        );
     }
 }

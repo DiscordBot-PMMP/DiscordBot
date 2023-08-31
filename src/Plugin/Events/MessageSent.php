@@ -1,12 +1,12 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
@@ -21,10 +21,9 @@ use pocketmine\plugin\Plugin;
  * @see MessageDeleted
  * @see MessageUpdated
  */
-class MessageSent extends DiscordBotEvent{
+final class MessageSent extends DiscordBotEvent{
 
-    /** @var Message */
-    private $message;
+    private Message $message;
 
     public function __construct(Plugin $plugin, Message $message){
         parent::__construct($plugin);

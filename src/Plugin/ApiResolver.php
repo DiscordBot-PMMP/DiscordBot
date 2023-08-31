@@ -1,12 +1,12 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
@@ -17,16 +17,13 @@ use JaxkDev\DiscordBot\Libs\React\Promise\Deferred;
 use JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface;
 use pocketmine\Server;
 
-/**
- * @internal
- */
-abstract class ApiResolver{
+/** @internal */
+final class ApiResolver{
 
-    /** @var \AttachableLogger */
-    static private $logger;
+    static private ?\AttachableLogger $logger;
 
     /** @var Array<int, Deferred> */
-    static private $map = [];
+    static private array $map = [];
 
     static public function create(int $uid): PromiseInterface{
         if(isset(self::$map[$uid])){
@@ -51,18 +48,18 @@ abstract class ApiResolver{
             }
             unset(self::$map[$packet->getPid()]);
         }else{
-            if(self::$logger === null){
+            if((self::$logger ?? null) === null){
                 $pl = null;
                 try{
                     $pl = Server::getInstance()->getPluginManager()->getPlugin("DiscordBot");
-                }catch(\RuntimeException $e){}
+                }catch(\RuntimeException){}
                 if($pl instanceof Main){
                     self::$logger = $pl->getLogger();
                 }else{
                     throw new \RuntimeException("Failed to fetch DiscordBot logger.");
                 }
             }
-            self::$logger->debug("A unidentified resolution has been received, ID: {$packet->getPid()}, Successful: {$packet->wasSuccessful()}, Message: {$packet->getResponse()}");
+            self::$logger->debug("An unidentified resolution has been received, ID: {$packet->getPid()}, Successful: {$packet->wasSuccessful()}, Message: {$packet->getResponse()}");
         }
     }
 }

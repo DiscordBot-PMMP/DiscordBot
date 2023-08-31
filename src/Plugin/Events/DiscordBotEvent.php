@@ -1,12 +1,12 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
@@ -21,4 +21,4 @@ use pocketmine\event\plugin\PluginEvent;
  * for example the storage will still have the full member/user model.
  * But once you and all other plugins have finished handling the event the member will be deleted from storage
  */
-class DiscordBotEvent extends PluginEvent{}
+abstract class DiscordBotEvent extends PluginEvent{}

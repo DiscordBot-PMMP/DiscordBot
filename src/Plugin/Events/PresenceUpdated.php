@@ -1,68 +1,54 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Plugin\Events;
 
-use JaxkDev\DiscordBot\Models\Activity;
-use JaxkDev\DiscordBot\Models\Member;
+use JaxkDev\DiscordBot\Models\Presence\Presence;
+use JaxkDev\DiscordBot\Plugin\Utils;
 use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a members presence is updated.
  */
-class PresenceUpdated extends DiscordBotEvent{
+final class PresenceUpdated extends DiscordBotEvent{
 
-    /** @var Member */
-    private $member;
+    private string $guild_id;
 
-    /** @var string */
-    private $new_status;
+    private string $user_id;
 
-    /** @var array{"mobile": string|null, "desktop": string|null, "web": string|null} */
-    private $new_client_status;
+    private Presence $new_presence;
 
-    /** @var Activity[] */
-    private $new_activities;
-
-    /**
-     * @param Plugin                                                                    $plugin
-     * @param Member                                                                    $member
-     * @param string                                                                    $new_status
-     * @param array{"mobile": string|null, "desktop": string|null, "web": string|null}  $new_client_status
-     * @param Activity[]                                                                $new_activities
-     */
-    public function __construct(Plugin $plugin, Member $member, string $new_status, array $new_client_status, array $new_activities){
+    public function __construct(Plugin $plugin, string $guild_id, string $user_id, Presence $new_presence){
         parent::__construct($plugin);
-        $this->member = $member;
-        $this->new_status = $new_status;
-        $this->new_client_status = $new_client_status;
-        $this->new_activities = $new_activities;
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Invalid guild ID given.");
+        }
+        if(!Utils::validDiscordSnowflake($user_id)){
+            throw new \AssertionError("Invalid user ID given.");
+        }
+        $this->guild_id = $guild_id;
+        $this->user_id = $user_id;
+        $this->new_presence = $new_presence;
     }
 
-    public function getMember(): Member{
-        return $this->member;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
-    public function getNewStatus(): string{
-        return $this->new_status;
+    public function getUserId(): string{
+        return $this->user_id;
     }
 
-    /** @return array{"mobile": string|null, "desktop": string|null, "web": string|null} */
-    public function getNewClientStatus(): array{
-        return $this->new_client_status;
-    }
-
-    /** @return Activity[] */
-    public function getNewActivities(): array{
-        return $this->new_activities;
+    public function getNewPresence(): Presence{
+        return $this->new_presence;
     }
 }

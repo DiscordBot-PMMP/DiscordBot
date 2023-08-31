@@ -11,7 +11,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ratchet/rfc6455" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ratchet/pawl" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/mollie/polyfill-libsodium" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/team-reflex/discord-php" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/react/child-process" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/trafficcophp/bytebuffer" />
@@ -21,7 +20,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/react/promise-timer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/react/stream" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/react/cache" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/react/partial" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php80" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/translation-contracts" />
@@ -40,7 +38,40 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/react/http" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/react/socket" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/fig/http-message-util" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php81" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/react/promise-stream" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/classloader" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/path-util" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/log-pthreads" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/assert" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/adhocore/json-comment" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/brick/math" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/fgrosse/phpasn1" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/netresearch/jsonmapper" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/phpstan" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/phpstan-strict-rules" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/bedrock-block-upgrade-schema" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/bedrock-data" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/bedrock-item-upgrade-schema" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/bedrock-protocol" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/binaryutils" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/callback-validator" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/color" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/errorhandler" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/locale-data" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/log" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/math" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/nbt" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/pocketmine-mp" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/raklib" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/raklib-ipc" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/snooze" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/ramsey/collection" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/ramsey/uuid" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/filesystem" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/simple-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/react/async" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -1,44 +1,55 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
-// https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
-class Image implements \Serializable{
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-    /** @var null|string Must be prefixed with `https` */
-    private $url;
+/**
+ * @implements BinarySerializable<Image>
+ * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
+ */
+final class Image implements BinarySerializable{
 
-    /** @var null|int */
-    private $width;
+    private string $url;
 
-    /** @var null|int */
-    private $height;
+    private ?string $proxy_url;
 
-    public function __construct(?string $url = null, ?int $width = null, ?int $height = null){
+    private ?int $width;
+
+    private ?int $height;
+
+    public function __construct(string $url, ?string $proxy_url = null, ?int $width = null, ?int $height = null){
         $this->setUrl($url);
+        $this->setProxyUrl($proxy_url);
         $this->setWidth($width);
         $this->setHeight($height);
     }
 
-    public function getUrl(): ?string{
+    public function getUrl(): string{
         return $this->url;
     }
 
-    public function setUrl(?string $url): void{
-        if($url !== null and strpos($url , "https" ) !== 0){
-            throw new \AssertionError("URL '$url' must start with https.");
-        }
+    public function setUrl(string $url): void{
         $this->url = $url;
+    }
+
+    public function getProxyUrl(): ?string{
+        return $this->proxy_url;
+    }
+
+    public function setProxyUrl(?string $proxy_url): void{
+        $this->proxy_url = $proxy_url;
     }
 
     public function getWidth(): ?int{
@@ -57,25 +68,21 @@ class Image implements \Serializable{
         $this->height = $height;
     }
 
-    //----- Serialization -----//
-
-    public function serialize(): ?string{
-        return serialize([
-            $this->url,
-            $this->width,
-            $this->height
-        ]);
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->getUrl());
+        $stream->putNullableString($this->getProxyUrl());
+        $stream->putNullableInt($this->getWidth());
+        $stream->putNullableInt($this->getHeight());
+        return $stream;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->url,
-            $this->width,
-            $this->height
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(),         // url
+            $stream->getNullableString(), // proxy_url
+            $stream->getNullableInt(),    // width
+            $stream->getNullableInt()     // height
+        );
     }
 }

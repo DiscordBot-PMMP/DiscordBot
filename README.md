@@ -3,19 +3,21 @@ DiscordBot is not a plugin that provides anything for players/users, this plugin
 with an extensive API to interact with a Discord Bot via DiscordPHP
 
 Here are a list of plugins that provide user functionality:
-- Chat Bridge - https://github.com/DiscordBot-PMMP/ChatBridge
-- *More to be listed (If you use this plugin open an issue to list your plugin)*
+- [Chat Bridge](https://github.com/DiscordBot-PMMP/ChatBridge) | Bi-directional chat between Discord and Minecraft
+- [Discord Account](https://github.com/DiscordBot-PMMP/DiscordAccount) | Link your Discord account to your Minecraft account
+- *More to be listed (If you use this plugin open a PR to add your plugin here)*
 
-> Developers, see [API.md](API.md) for more information on how to use the API
+> Developers, see [API.md](API.md) for more information on how to use the DiscordBot API \
+> Advanced Developers, see [Network_API.md](Network_API.md) for more information on the network protocol / external bots.
 # Requirements
 
 ---
-| Name                 | Version |  Included in releases  |
-|----------------------|---------|:----------------------:|
-| PHP                  | ^ 8.0.3 |          [ ]           |
-| PocketMine-MP        | ^ 4.0   |          [ ]           |
-| DiscordPHP           | 6.0.3   |          [X]           |
-| Promise              | 2.x-dev |          [X]           |
+| Name          | Version    | Included in releases |
+|---------------|------------|:--------------------:|
+| PHP           | ^ 8.1      |          ❌           |
+| PocketMine-MP | ^ 5.0      |          ❌           |
+| DiscordPHP    | 10.0.0-RC6 |          ✅           |
+| Promise       | 2.10       |          ✅           |
 # Installation
 
 ---
@@ -39,18 +41,21 @@ To see more information about the project via composer/packagist please see [her
 No support is given for users or developers running from source,
 I myself build the plugin into a phar before testing.
 
-If you do become an active contributor to the plugin I will help you setup efficient workflows to ease testing.
+If you do become an active contributor to the plugin I will help you set up efficient workflows to ease testing.
 
 # Credits
 
 ---
 ### Contributors
-- [@JaxkDev](https://github.com/JaxkDev) - Lead Developer
+- [@JaxkDev](https://github.com/JaxkDev) - Lead developer
+- [@dktapps](https://github.com/dktapps) - ext-pmmpthread support
 
 ### Libraries
 - [Discord-PHP/DiscordPHP](https://github.com/DiscordPHP/DiscordPHP) - Used internally to communicate with discord.
 - [ReactPHP/Promise](https://github.com/reactphp/promise) - Used to provide a promise API Library to developers.
 - [[Dev] PHPStan/PHPStan](https://github.com/phpstan/phpstan) - Used to analyse the plugins code for any potential problems.
-- [[Dev] PHPUnit/PHPUnit](https://github.com/sebastianbergmann/phpunit/) - Used to run tests to ensure everything is working as it should be.
+- [[Dev] PHP-CS-Fixer/PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer) - Used to maintain the plugins code to a standard.
+
+- [[Dev] ![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org) - Used to maintain a changelog format.
 
 And many more sub-dependencies that allow the above to function.

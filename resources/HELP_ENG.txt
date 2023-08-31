@@ -1,6 +1,9 @@
-How to setup the bot:
+How to set up the bot:
 
 Visit https://github.com/DiscordBot-PMMP/DiscordBot/wiki
+
+
+MAKE SURE YOU DO EVERY STEP FROM ABOVE, OTHERWISE THE BOT WILL NOT WORK.
 
 
 ===========================================================================================
@@ -8,21 +11,28 @@ Visit https://github.com/DiscordBot-PMMP/DiscordBot/wiki
 
 Config.yml Explained:
 
-version: 2                        DO NOT EVER TOUCH THIS.
+version: x                        DO NOT EVER TOUCH THIS.
 
-discord:
-  token: "ABCD123"                DO NOT EVER SHOW THIS TOKEN TO ANYBODY !!! Paste your discord bots token into here,
-                                  for help on how to set up the bot and get the token, see the beginning of this file.
-  use_plugin_cacert: true|false   DO NOT modify this without being told to explicitly, You have been warned...
+type: "internal"                  What type of bot to use, internal or external.
+                                  external option requires a separate program to be running. (Not yet stable, use internal)
 
 logging:
   max_files: 28                   How many log files to keep on disk at any one time.
   directory: "logs"               What directory to keep log files in, relative from plugin_data/DiscordBot/
 
 protocol:
-  packets_per_tick: 50            How many packets can be processed per tick.
-  heartbeat_allowance: 60         How many seconds after last heartbeat received before the plugin/thread is declared dead.
+  general:
+    packets_per_tick: 50          How many packets can be processed per tick.
+    heartbeat_allowance: 60       How many seconds after last heartbeat received before the plugin/bot is declared dead.
 
-                                  DO NOT modify the protocol fields without being told to explicitly, You have been warned...
+  internal:
+    token: "ABCD123"              DO NOT EVER SHOW THIS TOKEN TO ANYBODY !!! Paste your discord bots token into here.
+                                  for help on how to set up the bot and get the token, see the beginning of this file.
+                                  -- ONLY MODIFY THIS IF YOU ARE USING THE INTERNAL BOT --
+
+  external:
+    host: "0.0.0.0"               The Address of the external bot socket, only change if bot is running on a different device.
+    port: 22222                   Only change if you have a port conflict with another plugin. (must match external bot config)
+                                  -- ONLY MODIFY THIS IF YOU ARE USING THE EXTERNAL BOT --
 
 ===========================================================================================
