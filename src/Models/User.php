@@ -18,7 +18,6 @@ use JaxkDev\DiscordBot\Plugin\Utils;
 use function array_keys;
 use function count;
 use function ctype_digit;
-
 use function in_array;
 use function str_contains;
 use function strlen;

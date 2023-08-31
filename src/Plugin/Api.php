@@ -949,7 +949,7 @@ final class Api{
     /**
      * Edit a sent message.
      *
-     * TODO, add support for editing message files & stickers.
+     * TODO-Next-Minor, add support for editing message files & stickers.
      *
      * Note you can't convert a 'REPLY' message to a normal 'MESSAGE'.
      * Note at the moment we don't support editing/removing/adding stickers/files :(

@@ -158,7 +158,7 @@ final class BotCommunicationHandler{
             $this->plugin->getLogger()->logException($a);
         });
 
-        //TODO, Commands here.
+        //TODO-Next-Minor, Commands here.
         //Use single event at ready event to register ALL commands.
         //This will stop duplicates reaching discord side.
     }

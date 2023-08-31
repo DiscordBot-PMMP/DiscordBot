@@ -1234,7 +1234,7 @@ final class CommunicationHandler{
                 }
                 $builder->addComponent($c);
             }
-            //TODO Stickers & Files.
+            //TODO-Next-Minor Stickers & Files.
 
             if($message->getMessageReference()?->getChannelId() !== null && $message->getMessageReference()->getMessageId() !== null){
                 $this->getMessage($pk, $message->getMessageReference()->getChannelId(), $message->getMessageReference()->getMessageId(), function(DiscordMessage $reply) use($dMessage, $builder, $pk){
