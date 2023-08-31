@@ -1,8 +1,25 @@
 # Changelog
 
-## [3.0.0] - 2023-xx-xx
+## [3.0.0] - 2023-09-01
 
-TODO
+_If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md)
+
+### Changed
+
+- _Breaking:_ Bump `team-reflex/discord-php` to `v10.x`
+- Bump `react/promise` to `v2.10.0`
+
+### Added
+
+- Add PocketMine-MP `5.x` support ([``](https://github.com/DiscordBot-PMMP/DiscordBot/commit/1467c493d8ba67b830b783dd2334ffb79e6d0c87))
+- Add PHP `8.1.x` support ([``](https://github.com/DiscordBot-PMMP/DiscordBot/commit/797f2d0015881398a70644ff304168ed62bf94de))
+- Add `composer/ca-bundle` version `^1.3`
+- Add `pocketmine/binaryutils` version `0.2.4`
+
+### Removed
+
+- _Breaking:_ Drop PocketMine-MP `4.x` support.
+- _Breaking:_ Drop PHP `8.0.x` support.
 
 ## [2.1.10] - 2023-05-28
 
