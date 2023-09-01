@@ -40,7 +40,7 @@ class React implements DriverInterface
     protected $browser;
 
     /**
-     * Constructs the Guzzle driver.
+     * Constructs the React driver.
      *
      * @param LoopInterface $loop
      * @param array         $options

@@ -13,24 +13,31 @@ namespace Discord\WebSockets\Events;
 
 use Discord\Parts\User\Member;
 use Discord\WebSockets\Event;
-use Discord\Helpers\Deferred;
+use Discord\Parts\Guild\Guild;
 
+/**
+ * @link https://discord.com/developers/docs/topics/gateway-events#guild-member-add
+ *
+ * @since 2.1.3
+ */
 class GuildMemberAdd extends Event
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function handle(Deferred &$deferred, $data): void
+    public function handle($data)
     {
-        /** @var \Discord\Parts\User\Member */
-        $member = $this->factory->create(Member::class, $data, true);
+        /** @var Member */
+        $memberPart = $this->factory->part(Member::class, (array) $data, true);
 
-        if ($guild = $this->discord->guilds->get('id', $member->guild_id)) {
-            $guild->members->push($member);
+        /** @var ?Guild */
+        if ($guild = yield $this->discord->guilds->cacheGet($data->guild_id)) {
+            $guild->members->set($data->user->id, $memberPart);
             ++$guild->member_count;
         }
 
-        $this->discord->users->push($member->user);
-        $deferred->resolve($member);
+        $this->cacheUser($data->user);
+
+        return $memberPart;
     }
 }

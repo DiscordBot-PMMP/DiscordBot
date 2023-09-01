@@ -121,23 +121,27 @@ class Bucket
     {
         // We are already checking the queue.
         if ($this->checkerRunning) {
-            $this->logger->debug($this.' already checking queue');
             return;
         }
 
         $checkQueue = function () use (&$checkQueue) {
             // Check for rate-limits
-            if ($this->requestRemaining < 1 && ! is_null($this->resetTimer)) {
-                $this->logger->info($this.' expecting rate limit, timer interval '.(($this->resetTimer->getInterval() ?? 0) * 1000).' ms');
+            if ($this->requestRemaining < 1 && ! is_null($this->requestRemaining)) {
+                $interval = 0;
+                if ($this->resetTimer) {
+                    $interval = $this->resetTimer->getInterval() ?? 0;
+                }
+                $this->logger->info($this.' expecting rate limit, timer interval '.($interval * 1000).' ms');
                 $this->checkerRunning = false;
+                $checkQueue = null;
 
                 return;
             }
 
             // Queue is empty, job done.
             if ($this->queue->isEmpty()) {
-                $this->logger->debug($this.' queue empty');
                 $this->checkerRunning = false;
+                $checkQueue = null;
 
                 return;
             }
@@ -189,6 +193,8 @@ class Bucket
                     // Will be restarted when global rate-limit finished.
                     else {
                         $this->checkerRunning = false;
+                        $checkQueue = null;
+
                         $this->logger->debug($this.' stopping queue checker');
                     }
                 } else {

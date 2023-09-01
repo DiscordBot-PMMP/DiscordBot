@@ -11,19 +11,21 @@
 
 namespace Discord\Http;
 
+use Discord\Http\Exceptions\BadRequestException;
 use Discord\Http\Exceptions\ContentTooLongException;
 use Discord\Http\Exceptions\InvalidTokenException;
+use Discord\Http\Exceptions\MethodNotAllowedException;
 use Discord\Http\Exceptions\NoPermissionsException;
 use Discord\Http\Exceptions\NotFoundException;
+use Discord\Http\Exceptions\RateLimitException;
 use Discord\Http\Exceptions\RequestFailedException;
-use Exception;
+use Discord\Http\Multipart\MultipartBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\ExtendedPromiseInterface;
 use SplQueue;
-use Throwable;
 
 /**
  * Discord HTTP client.
@@ -37,14 +39,14 @@ class Http
      *
      * @var string
      */
-    public const VERSION = 'v8.1.2';
+    public const VERSION = 'v10.3.0';
 
     /**
      * Current Discord HTTP API version.
      *
      * @var string
      */
-    public const HTTP_API_VERSION = 8;
+    public const HTTP_API_VERSION = 10;
 
     /**
      * Discord API base URL.
@@ -273,13 +275,11 @@ class Http
             'X-Ratelimit-Precision' => 'millisecond',
         ];
 
-        // If there is content and Content-Type is not set,
-        // assume it is JSON.
         if (! is_null($content) && ! isset($headers['Content-Type'])) {
-            $content = json_encode($content);
-
-            $baseHeaders['Content-Type'] = 'application/json';
-            $baseHeaders['Content-Length'] = strlen($content);
+            $baseHeaders = array_merge(
+                $baseHeaders,
+                $this->guessContent($content)
+            );
         }
 
         $headers = array_merge($baseHeaders, $headers);
@@ -288,6 +288,28 @@ class Http
         $this->sortIntoBucket($request);
 
         return $deferred->promise();
+    }
+
+    /**
+     * Guesses the headers and transforms the content of a request.
+     *
+     * @param mixed $content
+     */
+    protected function guessContent(&$content)
+    {
+        if ($content instanceof MultipartBody) {
+            $headers = $content->getHeaders();
+            $content = (string) $content;
+
+            return $headers;
+        }
+
+        $content = json_encode($content);
+
+        return [
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen($content),
+        ];
     }
 
     /**
@@ -316,6 +338,34 @@ class Http
 
             // Discord Rate-limit
             if ($statusCode == 429) {
+                if (! isset($data->global)) {
+                    if ($response->hasHeader('X-RateLimit-Global')) {
+                        $data->global = $response->getHeader('X-RateLimit-Global')[0] == 'true';
+                    } else {
+                        // Some other 429
+                        $this->logger->error($request.' does not contain global rate-limit value');
+                        $rateLimitError = new RateLimitException('No rate limit global response', $statusCode);
+                        $deferred->reject($rateLimitError);
+                        $request->getDeferred()->reject($rateLimitError);
+
+                        return;
+                    }
+                }
+
+                if (! isset($data->retry_after)) {
+                    if ($response->hasHeader('Retry-After')) {
+                        $data->retry_after = $response->getHeader('Retry-After')[0];
+                    } else {
+                        // Some other 429
+                        $this->logger->error($request.' does not contain retry after rate-limit value');
+                        $rateLimitError = new RateLimitException('No rate limit retry after response', $statusCode);
+                        $deferred->reject($rateLimitError);
+                        $request->getDeferred()->reject($rateLimitError);
+
+                        return;
+                    }
+                }
+
                 $rateLimit = new RateLimit($data->global, $data->retry_after);
                 $this->logger->warning($request.' hit rate-limit: '.$rateLimit);
 
@@ -358,9 +408,10 @@ class Http
                 $deferred->resolve($response);
                 $request->getDeferred()->resolve($data);
             }
-        }, function (Exception $e) use ($request) {
+        }, function (\Exception $e) use ($request, $deferred) {
             $this->logger->warning($request.' failed: '.$e->getMessage());
 
+            $deferred->reject($e);
             $request->getDeferred()->reject($e);
         });
 
@@ -410,6 +461,7 @@ class Http
     {
         if ($this->waiting >= static::CONCURRENT_REQUESTS || $this->queue->isEmpty()) {
             $this->logger->debug('http not checking', ['waiting' => $this->waiting, 'empty' => $this->queue->isEmpty()]);
+
             return;
         }
 
@@ -436,34 +488,44 @@ class Http
      *
      * @param ResponseInterface $response
      *
-     * @return Throwable
+     * @return \Throwable
      */
-    public function handleError(ResponseInterface $response): Throwable
+    public function handleError(ResponseInterface $response): \Throwable
     {
         $reason = $response->getReasonPhrase().' - ';
 
+        $errorBody = (string) $response->getBody();
+        $errorCode = $response->getStatusCode();
+
         // attempt to prettyify the response content
-        if (($content = json_decode((string) $response->getBody())) !== null) {
+        if (($content = json_decode($errorBody)) !== null) {
+            if (! empty($content->code)) {
+                $errorCode = $content->code;
+            }
             $reason .= json_encode($content, JSON_PRETTY_PRINT);
         } else {
-            $reason .= (string) $response->getBody();
+            $reason .= $errorBody;
         }
 
         switch ($response->getStatusCode()) {
+            case 400:
+                return new BadRequestException($reason, $errorCode);
             case 401:
-                return new InvalidTokenException($reason);
+                return new InvalidTokenException($reason, $errorCode);
             case 403:
-                return new NoPermissionsException($reason);
+                return new NoPermissionsException($reason, $errorCode);
             case 404:
-                return new NotFoundException($reason);
+                return new NotFoundException($reason, $errorCode);
+            case 405:
+                return new MethodNotAllowedException($reason, $errorCode);
             case 500:
-                if (strpos(strtolower((string) $response->getBody()), 'longer than 2000 characters') !== false ||
-                    strpos(strtolower((string) $response->getBody()), 'string value is too long') !== false) {
+                if (strpos(strtolower($errorBody), 'longer than 2000 characters') !== false ||
+                    strpos(strtolower($errorBody), 'string value is too long') !== false) {
                     // Response was longer than 2000 characters and was blocked by Discord.
-                    return new ContentTooLongException('Response was more than 2000 characters. Use another method to get this data.');
+                    return new ContentTooLongException('Response was more than 2000 characters. Use another method to get this data.', $errorCode);
                 }
             default:
-                return new RequestFailedException($reason);
+                return new RequestFailedException($reason, $errorCode);
         }
     }
 

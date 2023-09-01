@@ -13,22 +13,32 @@ namespace Discord\WebSockets\Events;
 
 use Discord\Parts\Guild\Ban;
 use Discord\WebSockets\Event;
-use Discord\Helpers\Deferred;
 
+/**
+ * @link https://discord.com/developers/docs/topics/gateway-events#guild-ban-remove
+ *
+ * @since 2.1.3
+ */
 class GuildBanRemove extends Event
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function handle(Deferred &$deferred, $data): void
+    public function handle($data)
     {
-        $ban = $this->factory->create(Ban::class, $data, true);
+        $banPart = null;
 
-        if ($guild = $ban->guild) {
-            $guild->bans->pull($ban->user->id);
-            $this->discord->guilds->push($guild);
+        /** @var ?Guild */
+        if ($guild = yield $this->discord->guilds->cacheGet($data->guild_id)) {
+            /** @var ?Ban */
+            if ($banPart = yield $guild->bans->cachePull($data->user->id)) {
+                $banPart->fill((array) $data);
+                $banPart->created = false;
+            }
         }
 
-        $deferred->resolve($ban);
+        $this->cacheUser($data->user);
+
+        return $banPart ?? $this->factory->part(Ban::class, (array) $data);
     }
 }

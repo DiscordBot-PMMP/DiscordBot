@@ -12,29 +12,36 @@
 namespace Discord\Repository\Guild;
 
 use Discord\Http\Endpoint;
-use Discord\Parts\Guild\Invite;
+use Discord\Parts\Channel\Invite;
 use Discord\Repository\AbstractRepository;
 
 /**
- * Contains invites to guilds.
+ * Contains invites to a guild.
  *
- * @see \Discord\Parts\Guild\Invite
+ * @since 4.0.0
+ *
+ * @see Invite
  * @see \Discord\Parts\Guild\Guild
+ *
+ * @method Invite|null get(string $discrim, $key)
+ * @method Invite|null pull(string|int $key, $default = null)
+ * @method Invite|null first()
+ * @method Invite|null last()
+ * @method Invite|null find()
  */
 class InviteRepository extends AbstractRepository
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $endpoints = [
         'all' => Endpoint::GUILD_INVITES,
         'get' => Endpoint::INVITE,
-        'create' => Endpoint::GUILD_INVITES,
         'delete' => Endpoint::INVITE,
     ];
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $class = Invite::class;
 }

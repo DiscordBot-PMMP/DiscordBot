@@ -11,11 +11,12 @@ declare(strict_types=1);
  * with this source code in the LICENSE.md file.
  */
 
+use Discord\Builders\MessageBuilder;
 use Discord\Discord;
 use Discord\Helpers\Collection;
 use Discord\Parts\Channel\Channel;
 use Discord\Parts\Channel\Message;
-use Discord\Parts\Guild\Invite;
+use Discord\Parts\Channel\Invite;
 
 /**
  * @covers \Discord\Parts\Channel\Channel
@@ -81,7 +82,7 @@ final class ChannelTest extends DiscordTestCase
         return wait(function (Discord $discord, $resolve) {
             $this->channel()->sendMessage('testing get message')
                 ->then(function (Message $message) {
-                    return $this->channel()->getMessage($message->id)
+                    return $this->channel()->messages->fetch($message->id)
                         ->then(function (Message $getMessage) use ($message) {
                             $this->assertEquals($getMessage->id, $message->id);
                         });
@@ -184,12 +185,12 @@ final class ChannelTest extends DiscordTestCase
     }
 
     /**
-     * @covers \Discord\Parts\Channel\Channel::getInvites
+     * @covers \Discord\Repository\Channel\InviteRepository::freshen
      */
     public function testCanGetInvites()
     {
         return wait(function (Discord $discord, $resolve) {
-            $this->channel()->getInvites()
+            $this->channel()->invites->freshen()
                 ->then(function (Collection $invites) {
                     $this->assertInstanceOf(Collection::class, $invites);
 
@@ -215,7 +216,7 @@ final class ChannelTest extends DiscordTestCase
         return wait(function (Discord $discord, $resolve) {
             $this->channel()->sendMessage('testing edit through channel')
                 ->then(function (Message $message) {
-                    return $this->channel()->editMessage($message, 'new content')
+                    return $message->edit(MessageBuilder::new()->setContent('new content'))
                         ->then(function (Message $updatedMessage) use ($message) {
                             $this->assertEquals('new content', $updatedMessage->content);
                             $this->assertEquals($message->id, $updatedMessage->id);
@@ -233,7 +234,7 @@ final class ChannelTest extends DiscordTestCase
         return wait(function (Discord $discord, $resolve) {
             // upload readme
             $baseDir = dirname(dirname(dirname((new ReflectionClass(Discord::class))->getFileName())));
-            $this->channel()->sendFile($baseDir.DIRECTORY_SEPARATOR.'README.md')
+            $this->channel()->sendMessage(MessageBuilder::new()->addFile($baseDir.DIRECTORY_SEPARATOR.'README.md'))
                 ->then(function (Message $message) {
                     $this->assertEquals(1, count($message->attachments));
                 })
@@ -254,18 +255,17 @@ final class ChannelTest extends DiscordTestCase
     }
 
     /**
-     * @covers \Discord\Parts\Channel\Channel::allowVoice
+     * @covers \Discord\Parts\Channel\Channel::isTextBased
      */
-    public function testTextChannelDoesNotAllowVoice()
+    public function testTextChannelIsTextBased()
     {
-        $this->assertFalse($this->channel()->allowVoice());
-        $this->assertTrue($this->channel()->allowText());
+        $this->assertTrue($this->channel()->isTextBased());
     }
 
     /**
-     * @covers \Discord\Parts\Channel\Channel::allowVoice
+     * @covers \Discord\Parts\Channel\Channel::isVoiceBased
      */
-    public function testVoiceChannelDoesNotAllowText()
+    public function testVoiceChannelIsVoiceBased()
     {
         /**
          * @var Channel
@@ -274,7 +274,6 @@ final class ChannelTest extends DiscordTestCase
             return $channel->type == Channel::TYPE_VOICE;
         })->first();
 
-        $this->assertFalse($vc->allowText());
-        $this->assertTrue($vc->allowVoice());
+        $this->assertTrue($vc->isVoiceBased());
     }
 }

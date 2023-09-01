@@ -13,17 +13,21 @@ namespace Discord\WebSockets\Events;
 
 use Discord\Parts\WebSockets\VoiceServerUpdate as VoiceServerUpdatePart;
 use Discord\WebSockets\Event;
-use Discord\Helpers\Deferred;
 
+/**
+ * @link https://discord.com/developers/docs/topics/gateway-events#voice-server-update
+ *
+ * @see \Discord\Parts\WebSockets\VoiceServerUpdate
+ *
+ * @since 4.0.0
+ */
 class VoiceServerUpdate extends Event
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function handle(Deferred &$deferred, $data): void
+    public function handle($data)
     {
-        $part = $this->factory->create(VoiceServerUpdatePart::class, $data, true);
-
-        $deferred->resolve($part);
+        return $this->factory->part(VoiceServerUpdatePart::class, (array) $data, true);
     }
 }

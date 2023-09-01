@@ -11,13 +11,13 @@
 
 namespace Discord\Http\Exceptions;
 
-use Exception;
+use RuntimeException;
 
 /**
  * Thrown when a request to Discord's REST API fails.
  *
  * @author David Cole <david.cole1340@gmail.com>
  */
-class RequestFailedException extends Exception
+class RequestFailedException extends RuntimeException
 {
 }

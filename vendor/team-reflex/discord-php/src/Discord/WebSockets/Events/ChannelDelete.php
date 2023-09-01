@@ -13,23 +13,30 @@ namespace Discord\WebSockets\Events;
 
 use Discord\Parts\Channel\Channel;
 use Discord\WebSockets\Event;
-use Discord\Helpers\Deferred;
 
+/**
+ * @link https://discord.com/developers/docs/topics/gateway-events#channel-delete
+ *
+ * @since 2.1.3
+ */
 class ChannelDelete extends Event
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function handle(Deferred &$deferred, $data): void
+    public function handle($data)
     {
-        $channel = $this->factory->create(Channel::class, $data);
+        $channelPart = null;
 
-        if ($guild = $channel->guild) {
-            $guild->channels->pull($channel->id);
-
-            $this->discord->guilds->push($guild);
+        /** @var ?Guild */
+        if ($guild = yield $this->discord->guilds->cacheGet($data->guild_id)) {
+            /** @var Channel */
+            if ($channelPart = yield $guild->channels->cachePull($data->id)) {
+                $channelPart->fill((array) $data);
+                $channelPart->created = false;
+            }
         }
 
-        $deferred->resolve($channel);
+        return $channelPart ?? $this->factory->part(Channel::class, (array) $data);
     }
 }

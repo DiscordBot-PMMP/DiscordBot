@@ -18,4 +18,5 @@ namespace Discord\Http\Exceptions;
  */
 class NotFoundException extends RequestFailedException
 {
+    protected $code = 404;
 }

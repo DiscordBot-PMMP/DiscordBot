@@ -12,7 +12,21 @@
 namespace Discord\Parts\Permissions;
 
 /**
- * @inheritdoc
+ * Represents a set of permissions for a given role.
+ *
+ * @since 2.1.3
+ *
+ * @property bool $kick_members                        Allows kicking members
+ * @property bool $ban_members                         Allows banning members
+ * @property bool $administrator                       Allows all permissions and bypasses channel permission overwrites
+ * @property bool $manage_guild                        Allows management and editing of the guild
+ * @property bool $view_audit_log                      Allows for viewing of audit logs
+ * @property bool $view_guild_insights                 Allows for viewing guild insights
+ * @property bool $change_nickname                     Allows for modification of own nickname
+ * @property bool $manage_nicknames                    Allows for modification of other users nicknames
+ * @property bool $manage_guild_expressions            Allows management and editing of emojis, stickers, and soundboard sounds
+ * @property bool $moderate_members                    Allows for timing out users to prevent them from sending or reacting to messages in chat and threads, and from speaking in voice and stage channels
+ * @property bool $view_creator_monetization_analytics Allows for viewing role subscription insights
  *
  * @property bool $priority_speaker
  * @property bool $stream
@@ -22,34 +36,23 @@ namespace Discord\Parts\Permissions;
  * @property bool $deafen_members
  * @property bool $move_members
  * @property bool $use_vad
- *
- * @property bool $add_reactions
- * @property bool $send_messages
- * @property bool $send_tts_messages
- * @property bool $manage_messages
- * @property bool $embed_links
- * @property bool $attach_files
- * @property bool $read_message_history
- * @property bool $mention_everyone
- * @property bool $use_external_emojis
- *
- * @property bool $kick_members
- * @property bool $ban_members
- * @property bool $administrator
- * @property bool $manage_guild
- * @property bool $view_audit_log
- * @property bool $view_guild_insights
- * @property bool $change_nickname
- * @property bool $manage_nicknames
- * @property bool $manage_emojis
+ * @property bool $request_to_speak
+ * @property bool $manage_events
+ * @property bool $manage_threads
+ * @property bool $create_public_threads
+ * @property bool $create_private_threads
+ * @property bool $send_messages_in_threads
+ * @property bool $use_embedded_activities
+ * @property bool $use_soundboard
+ * @property bool $use_external_sounds
  */
 class RolePermission extends Permission
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public static function getPermissions(): array
     {
-        return array_merge(parent::ALL_PERMISSIONS, parent::TEXT_PERMISSIONS, parent::VOICE_PERMISSIONS, parent::ROLE_PERMISSIONS);
+        return array_merge(parent::ALL_PERMISSIONS, parent::TEXT_PERMISSIONS, parent::VOICE_PERMISSIONS, parent::STAGE_PERMISSIONS, parent::ROLE_PERMISSIONS);
     }
 }

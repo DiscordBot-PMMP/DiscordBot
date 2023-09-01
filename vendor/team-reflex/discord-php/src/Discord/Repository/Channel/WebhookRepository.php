@@ -16,12 +16,22 @@ use Discord\Parts\Channel\Webhook;
 use Discord\Repository\AbstractRepository;
 
 /**
- * @inheritdoc
+ * Contains webhooks for a channel.
+ *
+ * @see Webhook
+ *
+ * @since 5.0.0
+ *
+ * @method Webhook|null get(string $discrim, $key)
+ * @method Webhook|null pull(string|int $key, $default = null)
+ * @method Webhook|null first()
+ * @method Webhook|null last()
+ * @method Webhook|null find()
  */
 class WebhookRepository extends AbstractRepository
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $endpoints = [
         'all' => Endpoint::CHANNEL_WEBHOOKS,
@@ -32,7 +42,7 @@ class WebhookRepository extends AbstractRepository
     ];
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $class = Webhook::class;
 }

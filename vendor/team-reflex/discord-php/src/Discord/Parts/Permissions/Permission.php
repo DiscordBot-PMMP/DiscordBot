@@ -12,81 +12,143 @@
 namespace Discord\Parts\Permissions;
 
 use Discord\Discord;
+use Discord\Helpers\BigInt;
 use Discord\Parts\Part;
 
 /**
  * Permission represents a set of permissions for a given role or overwrite.
  *
- * @property int  $bitwise
- * @property bool $create_instant_invite
- * @property bool $manage_channels
- * @property bool $view_channel
- * @property bool $manage_roles
- * @property bool $manage_webhooks
+ * Note: The const declared here are the bit position, not the bitwise value.
+ *
+ * @link https://discord.com/developers/docs/topics/permissions
+ *
+ * @since 2.1.3 Namespace moved from Guild to Permissions
+ * @since 2.0.0
+ *
+ * @property int|string $bitwise                  Bitwise value of the enabled/disabled permissions
+ * @property bool       $create_instant_invite    Allows creation of instant invites
+ * @property bool       $manage_channels          Allows management and editing of channels
+ * @property bool       $add_reactions            Allows for the addition of reactions to messages
+ * @property bool       $view_channel             Allows guild members to view a channel, which includes reading messages in text channels and joining voice channels
+ * @property bool       $send_messages            Allows for sending messages in a channel and creating threads in a forum (does not allow sending messages in threads)
+ * @property bool       $send_tts_messages        Allows for sending of `/tts` messages
+ * @property bool       $manage_messages          Allows for deletion of other users messages
+ * @property bool       $embed_links              Links sent by users with this permission will be auto-embedded
+ * @property bool       $attach_files             Allows for uploading images and files
+ * @property bool       $read_message_history     Allows for reading of message history
+ * @property bool       $mention_everyone         Allows for using the `@everyone` tag to notify all users in a channel, and the `@here` tag to notify all online users in a channel
+ * @property bool       $use_external_emojis      Allows the usage of custom emojis from other servers
+ * @property bool       $manage_roles             Allows management and editing of roles
+ * @property bool       $manage_webhooks          Allows management and editing of webhooks
+ * @property bool       $use_application_commands Allows members to use application commands, including slash commands and context menu commands.
+ * @property bool       $use_external_stickers    Allows the usage of custom stickers from other servers
+ * @property bool       $send_voice_messages      Allows sending voice messages
  */
 abstract class Permission extends Part
 {
     /**
-     * Array of permissions that only apply to voice channels.
-     *
-     * @var array
-     */
-    public const VOICE_PERMISSIONS = [
-        'priority_speaker' => 0x100,
-        'stream' => 0x200,
-        'connect' => 0x100000,
-        'speak' => 0x200000,
-        'mute_members' => 0x400000,
-        'deafen_members' => 0x800000,
-        'move_members' => 0x1000000,
-        'use_vad' => 0x2000000,
-    ];
-
-    /**
      * Array of permissions that only apply to text channels.
+     * i.e. indicated T in documentation.
+     *
+     * The constant values here are the bit position, not the bitwise value
+     *
+     * @see ChannelPermission
      *
      * @var array
      */
     public const TEXT_PERMISSIONS = [
-        'add_reactions' => 0x40,
-        'send_messages' => 0x800,
-        'send_tts_messages' => 0x1000,
-        'manage_messages' => 0x2000,
-        'embed_links' => 0x4000,
-        'attach_files' => 0x8000,
-        'read_message_history' => 0x10000,
-        'mention_everyone' => 0x20000,
-        'use_external_emojis' => 0x40000,
+        'manage_threads' => 34,
+        'create_public_threads' => 35,
+        'create_private_threads' => 36,
+        'send_messages_in_threads' => 38,
     ];
 
     /**
-     * Array of permissions that can only be applied to roles.
+     * Array of permissions that only apply to voice channels.
+     * i.e. indicated V in documentation.
+     *
+     * @see ChannelPermission
      *
      * @var array
      */
-    public const ROLE_PERMISSIONS = [
-        'kick_members' => 0x2,
-        'ban_members' => 0x4,
-        'administrator' => 0x8,
-        'manage_guild' => 0x20,
-        'view_audit_log' => 0x80,
-        'view_guild_insights' => 0x80000,
-        'change_nickname' => 0x4000000,
-        'manage_nicknames' => 0x8000000,
-        'manage_emojis' => 0x40000000,
+    public const VOICE_PERMISSIONS = [
+        'priority_speaker' => 8,
+        'stream' => 9,
+        'connect' => 20,
+        'speak' => 21,
+        'mute_members' => 22,
+        'deafen_members' => 23,
+        'move_members' => 24,
+        'use_vad' => 25,
+        'manage_events' => 33,
+        'use_embedded_activities' => 39,
+        'use_soundboard' => 42,
+        'use_external_sounds' => 45,
+    ];
+
+    /**
+     * Array of permissions that only apply to stage channels.
+     * i.e. indicated S in documentation.
+     *
+     * @see ChannelPermission
+     *
+     * @var array
+     */
+    public const STAGE_PERMISSIONS = [
+        'stream' => 9,
+        'connect' => 20,
+        'mute_members' => 22,
+        'move_members' => 24,
+        'request_to_speak' => 32,
+        'manage_events' => 33,
     ];
 
     /**
      * Array of permissions for all roles.
+     * i.e. indicated T,V,S in documentation.
      *
      * @var array
      */
     public const ALL_PERMISSIONS = [
-        'create_instant_invite' => 0x1,
-        'manage_channels' => 0x10,
-        'view_channel' => 0x400,
-        'manage_roles' => 0x10000000,
-        'manage_webhooks' => 0x20000000,
+        'create_instant_invite' => 0,
+        'manage_channels' => 4,
+        'add_reactions' => 6,
+        'view_channel' => 10,
+        'send_messages' => 11,
+        'send_tts_messages' => 12,
+        'manage_messages' => 13,
+        'embed_links' => 14,
+        'attach_files' => 15,
+        'read_message_history' => 16,
+        'mention_everyone' => 17,
+        'use_external_emojis' => 18,
+        'manage_roles' => 28,
+        'manage_webhooks' => 29,
+        'use_application_commands' => 31,
+        'use_external_stickers' => 37,
+        'send_voice_messages' => 46,
+    ];
+
+    /**
+     * Array of permissions that can only be applied to roles.
+     * i.e. indicated empty in documentation.
+     *
+     * @see RolePermission
+     *
+     * @var array
+     */
+    public const ROLE_PERMISSIONS = [
+        'kick_members' => 1,
+        'ban_members' => 2,
+        'administrator' => 3,
+        'manage_guild' => 5,
+        'view_audit_log' => 7,
+        'view_guild_insights' => 19,
+        'change_nickname' => 26,
+        'manage_nicknames' => 27,
+        'manage_guild_expressions' => 30,
+        'moderate_members' => 40,
+        'view_creator_monetization_analytics' => 41,
     ];
 
     /**
@@ -97,7 +159,7 @@ abstract class Permission extends Part
     private $permissions = [];
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function __construct(Discord $discord, array $attributes = [], bool $created = false)
     {
@@ -124,15 +186,27 @@ abstract class Permission extends Part
     /**
      * Gets the bitwise attribute of the permission.
      *
-     * @return int
+     * @link https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
+     *
+     * @return int|string
      */
-    protected function getBitwiseAttribute(): int
+    protected function getBitwiseAttribute()
     {
+        if (BigInt::is32BitWithGMP()) { // x86 with GMP
+            $bitwise = \gmp_init(0);
+
+            foreach ($this->permissions as $permission => $value) {
+                \gmp_setbit($bitwise, $value, $this->attributes[$permission]);
+            }
+
+            return \gmp_strval($bitwise);
+        }
+
         $bitwise = 0;
 
         foreach ($this->permissions as $permission => $value) {
             if ($this->attributes[$permission]) {
-                $bitwise |= $value;
+                $bitwise |= 1 << $value;
             }
         }
 
@@ -142,20 +216,39 @@ abstract class Permission extends Part
     /**
      * Sets the bitwise attribute of the permission.
      *
+     * @link https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
+     *
      * @param int|string $bitwise
      */
     protected function setBitwiseAttribute($bitwise)
     {
-        if (is_string($bitwise)) {
+        if (PHP_INT_SIZE === 8 && is_string($bitwise)) { // x64
             $bitwise = (int) $bitwise;
         }
 
         foreach ($this->permissions as $permission => $value) {
-            if (($bitwise & $value) == $value) {
-                $this->attributes[$permission] = true;
-            } else {
-                $this->attributes[$permission] = false;
-            }
+            $this->attributes[$permission] = BigInt::test($bitwise, $value);
         }
+    }
+
+    /**
+     * @deprecated 10.0.0 Use `manage_guild_expressions`
+     */
+    protected function getManageEmojisAndStickersAttribute()
+    {
+        return $this->attributes['manage_guild_expressions'] ?? null;
+    }
+
+    /**
+     * @deprecated 10.0.0 Use `manage_guild_expressions`
+     */
+    protected function setManageEmojisAndStickersAttribute(bool $value): void
+    {
+        $this->attributes['manage_guild_expressions'] = $value;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->bitwise;
     }
 }

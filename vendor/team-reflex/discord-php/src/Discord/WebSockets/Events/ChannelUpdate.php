@@ -13,26 +13,48 @@ namespace Discord\WebSockets\Events;
 
 use Discord\Parts\Channel\Channel;
 use Discord\WebSockets\Event;
-use Discord\Helpers\Deferred;
 
+/**
+ * @link https://discord.com/developers/docs/topics/gateway-events#channel-update
+ *
+ * @since 2.1.3
+ */
 class ChannelUpdate extends Event
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function handle(Deferred &$deferred, $data): void
+    public function handle($data)
     {
-        $channel = $this->factory->create(Channel::class, $data, true);
+        $oldChannel = $repository = null;
 
-        if ($channel->is_private) {
-            $old = $this->discord->private_channels->get('id', $channel->id);
-            $this->discord->private_channels->push($channel);
-        } elseif ($guild = $this->discord->guilds->get('id', $channel->guild_id)) {
-            $old = $guild->channels->get('id', $channel->id);
-            $guild->channels->push($channel);
-            $this->discord->guilds->push($guild);
+        /** @var Channel */
+        $channelPart = $this->factory->part(Channel::class, (array) $data, true);
+
+        if ($channelPart->is_private) {
+            /** @var ?Channel */
+            if (! $oldChannel = yield $this->discord->private_channels->cacheGet($data->id)) {
+                $repository = $this->discord->private_channels;
+            }
+        } elseif ($guild = $channelPart->guild) {
+            /** @var ?Channel */
+            if (! $oldChannel = yield $guild->channels->cacheGet($data->id)) {
+                $repository = $guild->channels;
+            }
         }
 
-        $deferred->resolve([$channel, $old]);
+        if ($oldChannel) {
+            // Swap
+            $channelPart = $oldChannel;
+            $oldChannel = clone $oldChannel;
+
+            $channelPart->fill((array) $data);
+        }
+
+        if ($repository) {
+            $repository->set($data->id, $channelPart);
+        }
+
+        return [$channelPart, $oldChannel];
     }
 }

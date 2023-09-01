@@ -17,23 +17,31 @@ use Discord\Repository\AbstractRepository;
 /**
  * Contains voice states for users in the voice channel.
  *
- * @see \Discord\Parts\WebSockets\VoiceStateUpdate
+ * @see VoiceStateUpdate
  * @see \Discord\Parts\Channel\Channel
+ *
+ * @since 4.0.0
+ *
+ * @method VoiceStateUpdate|null get(string $discrim, $key)
+ * @method VoiceStateUpdate|null pull(string|int $key, $default = null)
+ * @method VoiceStateUpdate|null first()
+ * @method VoiceStateUpdate|null last()
+ * @method VoiceStateUpdate|null find()
  */
 class VoiceMemberRepository extends AbstractRepository
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $discrim = 'user_id';
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $endpoints = [];
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $class = VoiceStateUpdate::class;
 }

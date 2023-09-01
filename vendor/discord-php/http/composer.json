@@ -11,17 +11,33 @@
     ],
     "autoload": {
         "psr-4": {
-            "Discord\\Http\\": "src/Discord"
+            "Discord\\Http\\": "src/Discord",
+            "Tests\\Discord\\Http\\": "tests/Discord"
         }
     },
     "require": {
-        "php": "^7.2|^8.0",
+        "php": "^7.4|^8.0",
         "react/http": "^1.2",
-        "psr/log": "^1.1"
+        "psr/log": "^1.1 || ^2.0 || ^3.0",
+        "react/promise": "^2.2"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "For alternative to ReactPHP/Http Browser"
     },
     "require-dev": {
         "monolog/monolog": "^2.2",
         "friendsofphp/php-cs-fixer": "^2.17",
-        "psy/psysh": "^0.10.6"
+        "psy/psysh": "^0.10.6",
+        "guzzlehttp/guzzle": "^6.0|^7.0",
+        "phpunit/phpunit": "^9.5",
+        "mockery/mockery": "^1.5",
+        "react/async": "^4 || ^3"
+    },
+    "scripts": {
+        "test": "php tests/Drivers/_server.php& HTTP_SERVER_PID=$!; ./vendor/bin/phpunit; kill $HTTP_SERVER_PID;",
+        "test-discord": "./vendor/bin/phpunit --testsuite Discord",
+        "test-drivers": "php tests/Drivers/_server.php& HTTP_SERVER_PID=$!; ./vendor/bin/phpunit --testsuite Drivers; kill $HTTP_SERVER_PID;",
+        "test-coverage": "php tests/Drivers/_server.php& HTTP_SERVER_PID=$!; php -d xdebug.mode=coverage ./vendor/bin/phpunit --coverage-text; kill $HTTP_SERVER_PID;",
+        "test-coverage-html": "php tests/Drivers/_server.php& HTTP_SERVER_PID=$!; php -d xdebug.mode=coverage ./vendor/bin/phpunit --coverage-html .phpunit.cache/cov-html; kill $HTTP_SERVER_PID;"
     }
 }

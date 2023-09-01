@@ -18,14 +18,18 @@ use Discord\Parts\User\User;
 /**
  * Represents an entry in the audit log.
  *
- * @property string     $id
- * @property string     $user_id
- * @property User       $user
- * @property string     $target_id
- * @property int        $action_type
- * @property Collection $changes
- * @property Options    $options
- * @property string     $reason
+ * @since 5.1.0
+ *
+ * @link https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object
+ *
+ * @property      ?string      $target_id   Id of the affected entity (webhook, user, role, etc.).
+ * @property      Collection   $changes     Changes made to the target_id.
+ * @property      ?string      $user_id     The user who made the changes.
+ * @property-read User|null    $user
+ * @property      string       $id          Id of the entry.
+ * @property      int          $action_type Type of action that occurred.
+ * @property      Options|null $options     Additional info for certain action types.
+ * @property      string|null  $reason      The reason for the change (0-512 characters).
  */
 class Entry extends Part
 {
@@ -65,17 +69,37 @@ class Entry extends Part
     public const INTEGRATION_CREATE = 80;
     public const INTEGRATION_UPDATE = 81;
     public const INTEGRATION_DELETE = 82;
+    public const STAGE_INSTANCE_CREATE = 83;
+    public const STAGE_INSTANCE_UPDATE = 84;
+    public const STAGE_INSTANCE_DELETE = 85;
+    public const STICKER_CREATE = 90;
+    public const STICKER_UPDATE = 91;
+    public const STICKER_DELETE = 92;
+    public const GUILD_SCHEDULED_EVENT_CREATE = 100;
+    public const GUILD_SCHEDULED_EVENT_UPDATE = 101;
+    public const GUILD_SCHEDULED_EVENT_DELETE = 102;
+    public const THREAD_CREATE = 110;
+    public const THREAD_UPDATE = 111;
+    public const THREAD_DELETE = 112;
+    public const APPLICATION_COMMAND_PERMISSION_UPDATE = 121;
+    public const AUTO_MODERATION_RULE_CREATE = 140;
+    public const AUTO_MODERATION_RULE_UPDATE = 141;
+    public const AUTO_MODERATION_RULE_DELETE = 142;
+    public const AUTO_MODERATION_BLOCK_MESSAGE = 143;
+    public const AUTO_MODERATION_FLAG_TO_CHANNEL = 144;
+    public const AUTO_MODERATION_USER_COMMUNICATION_DISABLED = 145;
+
     // AUDIT LOG ENTRY TYPES
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $fillable = [
-        'id',
-        'user_id',
         'target_id',
-        'action_type',
         'changes',
+        'user_id',
+        'id',
+        'action_type',
         'options',
         'reason',
     ];
@@ -83,7 +107,7 @@ class Entry extends Part
     /**
      * Returns the user who made the changes.
      *
-     * @return User
+     * @return User|null
      */
     protected function getUserAttribute(): ?User
     {
@@ -93,7 +117,7 @@ class Entry extends Part
     /**
      * Returns a collection of changes.
      *
-     * @see https://discord.com/developers/docs/resources/audit-log#audit-log-change-object
+     * @link https://discord.com/developers/docs/resources/audit-log#audit-log-change-object
      *
      * @return Collection
      */
@@ -109,6 +133,6 @@ class Entry extends Part
      */
     protected function getOptionsAttribute(): Options
     {
-        return $this->factory->create(Options::class, $this->attributes['options'] ?? [], true);
+        return $this->createOf(Options::class, $this->attributes['options'] ?? []);
     }
 }

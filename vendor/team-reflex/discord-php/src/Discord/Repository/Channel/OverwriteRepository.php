@@ -16,22 +16,30 @@ use Discord\Parts\Channel\Overwrite;
 use Discord\Repository\AbstractRepository;
 
 /**
- * Contains permission overwrites for channels.
+ * Contains permission overwrites for a channel.
  *
- * @see \Discord\Parts\Channel\Overwrite
+ * @see Overwrite
  * @see \Discord\Parts\Channel\Channel
+ *
+ * @since 4.0.0
+ *
+ * @method Overwrite|null get(string $discrim, $key)
+ * @method Overwrite|null pull(string|int $key, $default = null)
+ * @method Overwrite|null first()
+ * @method Overwrite|null last()
+ * @method Overwrite|null find()
  */
 class OverwriteRepository extends AbstractRepository
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $endpoints = [
         'delete' => Endpoint::CHANNEL_PERMISSIONS,
     ];
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $class = Overwrite::class;
 }

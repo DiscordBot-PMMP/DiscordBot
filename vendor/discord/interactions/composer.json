@@ -1,0 +1,28 @@
+{
+    "name": "discord/interactions",
+    "description": "Utils for implementing the Discord Interactions API",
+    "type": "library",
+    "require-dev": {
+        "simplito/elliptic-php": "^1.0"
+    },
+    "archive": {
+      "exclude": ["!README.md", "!composer.json", "examples", "vendor"]
+    },
+    "license": "MIT",
+    "keywords": ["discord"],
+    "authors": [
+        {
+            "name": "Ian Webster",
+            "email": "ianw_php@ianww.com"
+        }
+    ],
+    "autoload": {
+      "psr-4": {"Discord\\": "discord"}
+    },
+    "suggest": {
+        "simplito/elliptic-php": "Required to validate interaction signatures."
+    },
+    "conflict": {
+        "simplito/elliptic-php": "<1.0,>=1.1"
+    }
+}

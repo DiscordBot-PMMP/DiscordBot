@@ -18,4 +18,5 @@ namespace Discord\Http\Exceptions;
  */
 class NoPermissionsException extends RequestFailedException
 {
+    protected $code = 403;
 }

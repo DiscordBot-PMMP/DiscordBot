@@ -17,6 +17,8 @@ use React\Stream\WritableStreamInterface;
 
 /**
  * Handles recieving audio from Discord.
+ *
+ * @since 3.2.0
  */
 class RecieveStream extends EventEmitter implements DuplexStreamInterface
 {
@@ -115,7 +117,7 @@ class RecieveStream extends EventEmitter implements DuplexStreamInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function isReadable()
     {
@@ -123,7 +125,7 @@ class RecieveStream extends EventEmitter implements DuplexStreamInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function isWritable()
     {
@@ -131,7 +133,7 @@ class RecieveStream extends EventEmitter implements DuplexStreamInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function write($data)
     {
@@ -139,7 +141,7 @@ class RecieveStream extends EventEmitter implements DuplexStreamInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function end($data = null)
     {
@@ -152,7 +154,7 @@ class RecieveStream extends EventEmitter implements DuplexStreamInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function close()
     {
@@ -167,7 +169,7 @@ class RecieveStream extends EventEmitter implements DuplexStreamInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function pause()
     {
@@ -183,7 +185,7 @@ class RecieveStream extends EventEmitter implements DuplexStreamInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function resume()
     {
@@ -207,7 +209,7 @@ class RecieveStream extends EventEmitter implements DuplexStreamInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function pipe(WritableStreamInterface $dest, array $options = [])
     {
@@ -235,7 +237,7 @@ class RecieveStream extends EventEmitter implements DuplexStreamInterface
         });
 
         $dest->on('drain', function () {
-            $this->unpause();
+            $this->resume();
         });
 
         $end = isset($options['end']) ? $options['end'] : true;
@@ -267,7 +269,7 @@ class RecieveStream extends EventEmitter implements DuplexStreamInterface
         });
 
         $dest->on('drain', function () {
-            $this->unpause();
+            $this->resume();
         });
 
         $end = isset($options['end']) ? $options['end'] : true;

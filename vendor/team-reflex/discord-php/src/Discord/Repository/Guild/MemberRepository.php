@@ -11,21 +11,30 @@
 
 namespace Discord\Repository\Guild;
 
+use Discord\Helpers\Deferred;
 use Discord\Http\Endpoint;
 use Discord\Parts\User\Member;
 use Discord\Repository\AbstractRepository;
-use React\Promise\PromiseInterface;
+use React\Promise\ExtendedPromiseInterface;
 
 /**
  * Contains members of a guild.
  *
- * @see \Discord\Parts\User\Member
+ * @since 4.0.0
+ *
+ * @see Member
  * @see \Discord\Parts\Guild\Guild
+ *
+ * @method Member|null get(string $discrim, $key)
+ * @method Member|null pull(string|int $key, $default = null)
+ * @method Member|null first()
+ * @method Member|null last()
+ * @method Member|null find()
  */
 class MemberRepository extends AbstractRepository
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $endpoints = [
         'all' => Endpoint::GUILD_MEMBERS,
@@ -35,21 +44,64 @@ class MemberRepository extends AbstractRepository
     ];
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $class = Member::class;
 
     /**
-     * Alias for delete.
+     * Alias for `$member->delete()`.
      *
-     * @param Member $member The member to kick.
+     * @link https://discord.com/developers/docs/resources/guild#remove-guild-member
      *
-     * @return PromiseInterface
+     * @param Member      $member The member to kick.
+     * @param string|null $reason Reason for Audit Log.
      *
-     * @see self::delete()
+     * @return ExtendedPromiseInterface
      */
-    public function kick(Member $member): PromiseInterface
+    public function kick(Member $member, ?string $reason = null): ExtendedPromiseInterface
     {
-        return $this->delete($member);
+        return $this->delete($member, $reason);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param array $queryparams Query string params to add to the request, leave null to paginate all members (Warning: Be careful to use this on very large guild)
+     */
+    public function freshen(array $queryparams = null): ExtendedPromiseInterface
+    {
+        if (isset($queryparams)) {
+            return parent::freshen($queryparams);
+        }
+
+        $endpoint = new Endpoint($this->endpoints['all']);
+        $endpoint->bindAssoc($this->vars);
+
+        $deferred = new Deferred();
+
+        ($paginate = function ($afterId = 0) use (&$paginate, $deferred, $endpoint) {
+            $endpoint->addQuery('limit', 1000);
+            $endpoint->addQuery('after', $afterId);
+
+            $this->http->get($endpoint)->then(function ($response) use ($paginate, $deferred, $afterId) {
+                if (empty($response)) {
+                    $deferred->resolve($this);
+
+                    return;
+                } elseif (! $afterId) {
+                    $this->items = [];
+                }
+
+                foreach ($response as $value) {
+                    $lastValueId = $value->user->id;
+                }
+
+                $this->cacheFreshen($response)->then(function () use ($paginate, $lastValueId) {
+                    $paginate($lastValueId);
+                });
+            }, [$deferred, 'reject']);
+        })();
+
+        return $deferred->promise();
     }
 }

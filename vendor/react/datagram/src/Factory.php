@@ -3,12 +3,12 @@
 namespace React\Datagram;
 
 use React\Datagram\Socket;
-use React\Dns\Config\Config;
+use React\Dns\Config\Config as DnsConfig;
 use React\Dns\Resolver\Factory as DnsFactory;
-use React\Dns\Resolver\Resolver;
+use React\Dns\Resolver\ResolverInterface;
+use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Promise;
-use React\Promise\CancellablePromiseInterface;
 use \Exception;
 
 class Factory
@@ -18,20 +18,29 @@ class Factory
 
     /**
      *
-     * @param LoopInterface $loop
-     * @param Resolver|null $resolver Resolver instance to use. Will otherwise
+     * This class takes an optional `LoopInterface|null $loop` parameter that can be used to
+     * pass the event loop instance to use for this object. You can use a `null` value
+     * here in order to use the [default loop](https://github.com/reactphp/event-loop#loop).
+     * This value SHOULD NOT be given unless you're sure you want to explicitly use a
+     * given event loop instance.
+     *
+     * @param ?LoopInterface $loop
+     * @param ?ResolverInterface $resolver Resolver instance to use. Will otherwise
      *     try to load the system default DNS config or fall back to using
      *     Google's public DNS 8.8.8.8
      */
-    public function __construct(LoopInterface $loop, Resolver $resolver = null)
+    public function __construct(LoopInterface $loop = null, ResolverInterface $resolver = null)
     {
+        $loop = $loop ?: Loop::get();
         if ($resolver === null) {
             // try to load nameservers from system config or default to Google's public DNS
-            $config = Config::loadSystemConfigBlocking();
-            $server = $config->nameservers ? \reset($config->nameservers) : '8.8.8.8';
+            $config = DnsConfig::loadSystemConfigBlocking();
+            if (!$config->nameservers) {
+                $config->nameservers[] = '8.8.8.8'; // @codeCoverageIgnore
+            }
 
             $factory = new DnsFactory();
-            $resolver = $factory->create($server, $loop);
+            $resolver = $factory->create($config, $loop);
         }
 
         $this->loop = $loop;
@@ -113,7 +122,7 @@ class Factory
     protected function resolveHost($host)
     {
         // there's no need to resolve if the host is already given as an IP address
-        if (false !== \filter_var($host, \FILTER_VALIDATE_IP)) {
+        if (@\inet_pton($host) !== false) {
             return Promise\resolve($host);
         }
 
@@ -130,7 +139,7 @@ class Factory
                 $reject(new \RuntimeException('Cancelled creating socket during DNS lookup'));
 
                 // (try to) cancel pending DNS lookup, otherwise ignoring its results
-                if ($promise instanceof CancellablePromiseInterface) {
+                if (\method_exists($promise, 'cancel')) {
                     $promise->cancel();
                 }
             }

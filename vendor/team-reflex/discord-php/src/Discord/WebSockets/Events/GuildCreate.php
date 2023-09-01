@@ -11,105 +11,140 @@
 
 namespace Discord\WebSockets\Events;
 
-use Discord\Parts\Channel\Channel;
-use Discord\Parts\Guild\Ban;
-use Discord\Parts\Guild\Guild;
-use Discord\Parts\Guild\Role;
-use Discord\Parts\User\Member;
-use Discord\Parts\User\User;
-use Discord\Parts\WebSockets\VoiceStateUpdate as VoiceStateUpdatePart;
-use Discord\WebSockets\Event;
 use Discord\Helpers\Deferred;
+use Discord\Parts\Channel\Channel;
+use Discord\Parts\Guild\Guild;
+use Discord\Parts\User\Member;
+use Discord\WebSockets\Event;
 use Discord\Http\Endpoint;
 
+use function React\Promise\all;
+
+/**
+ * @link https://discord.com/developers/docs/topics/gateway-events#guild-create
+ *
+ * @since 2.1.3
+ */
 class GuildCreate extends Event
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function handle(Deferred &$deferred, $data)
+    public function handle($data)
     {
-        if (isset($data->unavailable) && $data->unavailable) {
-            $deferred->reject(['unavailable', $data->id]);
-
-            return $deferred->promise();
+        if (! empty($data->unavailable)) {
+            return $data;
         }
 
         /** @var Guild */
-        $guildPart = $this->factory->create(Guild::class, $data, true);
-        foreach ($data->roles as $role) {
-            $role = (array) $role;
-            $role['guild_id'] = $guildPart->id;
-            $rolePart = $this->factory->create(Role::class, $role, true);
-
-            $guildPart->roles->offsetSet($rolePart->id, $rolePart);
-        }
-
-        foreach ($data->channels as $channel) {
-            $channel = (array) $channel;
-            $channel['guild_id'] = $data->id;
-            $channelPart = $this->factory->create(Channel::class, $channel, true);
-
-            $guildPart->channels->offsetSet($channelPart->id, $channelPart);
-        }
+        $guildPart = $this->factory->part(Guild::class, (array) $data, true);
 
         foreach ($data->members as $member) {
-            $member = (array) $member;
-            $member['guild_id'] = $data->id;
+            $userId = $member->user->id;
+            $member->guild_id = $data->id;
+            $rawMembers[$userId] = $member;
+            /** @var Member[] */
+            $members[$userId] = $this->factory->part(Member::class, (array) $rawMembers[$userId], true);
 
-            if (! $this->discord->users->has($member['user']->id)) {
-                $userPart = $this->factory->create(User::class, $member['user'], true);
-                $this->discord->users->offsetSet($userPart->id, $userPart);
+            if (! $this->discord->users->offsetExists($userId)) {
+                $await[] = $this->discord->users->cache->set($userId, $this->discord->users->create($member->user, true));
             }
-
-            $memberPart = $this->factory->create(Member::class, $member, true);
-            $guildPart->members->offsetSet($memberPart->id, $memberPart);
         }
-
         foreach ($data->presences as $presence) {
-            if ($member = $guildPart->members->offsetGet($presence->user->id)) {
-                $member->fill((array) $presence);
-                $guildPart->members->offsetSet($member->id, $member);
+            if (! array_key_exists($presence->user->id, $members)) {
+                $this->discord->getLogger()->warning('Presence data exists but no member data was received', [
+                    'user_id' => $presence->user->id,
+                    'guild_id' => $data->id,
+                    'large' => $data->large,
+                    'member_count' => $data->member_count,
+                    'members_count' => count($data->members),
+                    'rawMembers_looped' => count($rawMembers),
+                    'presences_count' => count($data->presences),
+                ]);
+                continue;
             }
+            $members[$presence->user->id]->fill((array) $presence);
+        }
+        if (! empty($members)) {
+            $await[] = $guildPart->members->cache->setMultiple($members);
         }
 
-        foreach ($data->voice_states as $state) {
-            if ($channel = $guildPart->channels->offsetGet($state->channel_id)) {
-                $state = (array) $state;
-                $state['guild_id'] = $guildPart->id;
-
-                $stateUpdate = $this->factory->create(VoiceStateUpdatePart::class, $state, true);
-
-                $channel->members->offsetSet($stateUpdate->user_id, $stateUpdate);
-                $guildPart->channels->offsetSet($channel->id, $channel);
-            }
-        }
-
-        $resolve = function () use (&$guildPart, $deferred) {
-            if ($guildPart->large || $guildPart->member_count > $guildPart->members->count()) {
-                $this->discord->addLargeGuild($guildPart);
-            }
-
-            $this->discord->guilds->offsetSet($guildPart->id, $guildPart);
-
-            $deferred->resolve($guildPart);
-        };
-
-        if ($this->discord->options['retrieveBans']) {
-            $this->http->get(Endpoint::bind(Endpoint::GUILD_BANS, $guildPart->id))->done(function ($rawBans) use (&$guildPart, $resolve) {
-                foreach ($rawBans as $ban) {
-                    $ban = (array) $ban;
-                    $ban['guild'] = $guildPart;
-
-                    $banPart = $this->factory->create(Ban::class, $ban, true);
-
-                    $guildPart->bans->offsetSet($banPart->id, $banPart);
+        foreach ($data->voice_states as $voice_state) {
+            /** @var ?Channel */
+            if ($voiceChannel = $guildPart->channels->offsetGet($voice_state->channel_id)) {
+                $userId = $voice_state->user_id;
+                $voice_state->guild_id = $data->id;
+                if (! isset($voice_state->member) && isset($rawMembers[$userId])) {
+                    $voice_state->member = $rawMembers[$userId];
                 }
-
-                $resolve();
-            }, $resolve);
-        } else {
-            $resolve();
+                $await[] = $voiceChannel->members->cache->set($userId, $voiceChannel->members->create($voice_state, true));
+            }
         }
+
+        foreach ($data->threads as $thread) {
+            /** @var ?Channel */
+            if ($parent = $guildPart->channels->offsetGet($thread->parent_id)) {
+                $await[] = $parent->threads->cache->set($thread->id, $parent->threads->create($thread, true));
+            }
+        }
+
+        foreach ($data->stage_instances as $stageInstance) {
+            /** @var ?Channel */
+            if ($channel = $guildPart->channels->offsetGet($stageInstance->channel_id)) {
+                $await[] = $channel->stage_instances->cache->set($stageInstance->id, $channel->stage_instances->create($stageInstance, true));
+            }
+        }
+
+        foreach ($data->guild_scheduled_events as $scheduledEvent) {
+            $await[] = $guildPart->guild_scheduled_events->cache->set($scheduledEvent->id, $guildPart->guild_scheduled_events->create($scheduledEvent, true));
+        }
+
+        $all = yield all($await)->then(function () use (&$guildPart) {
+            return $this->discord->guilds->cache->set($guildPart->id, $guildPart)->then(function ($success) use ($guildPart) {
+                return $guildPart;
+            });
+        });
+
+        if (
+            (
+                $this->discord->options['retrieveBans'] === true
+                || (
+                    is_array($this->discord->options['retrieveBans'])
+                    && in_array($data->id, $this->discord->options['retrieveBans'])
+                )
+            )
+            && $members[$this->discord->id]->getPermissions()->ban_members ?? true
+        ) {
+            $loadBans = new Deferred();
+            $banPagination = function ($lastUserId = null) use (&$banPagination, $guildPart, $loadBans) {
+                $bind = Endpoint::bind(Endpoint::GUILD_BANS, $guildPart->id);
+                if (isset($lastUserId)) {
+                    $bind->addQuery('after', $lastUserId);
+                }
+                $this->http->get($bind)->done(function ($bans) use (&$banPagination, $guildPart, $loadBans) {
+                    if (empty($bans)) {
+                        $loadBans->resolve();
+
+                        return;
+                    }
+
+                    foreach ($bans as $ban) {
+                        $lastUserId = $ban->user->id;
+                        $ban->guild_id = $guildPart->id;
+                        $guildPart->bans->cache->set($lastUserId, $guildPart->bans->create($ban, true));
+                    }
+
+                    $banPagination($lastUserId);
+                }, [$loadBans, 'resolve']);
+            };
+            $banPagination();
+            yield $loadBans->promise();
+        }
+
+        if ($data->large || $data->member_count > count($rawMembers)) {
+            $this->discord->addLargeGuild($guildPart);
+        }
+
+        return $all;
     }
 }

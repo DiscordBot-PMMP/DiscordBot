@@ -13,46 +13,69 @@ namespace Discord\WebSockets\Events;
 
 use Discord\Parts\WebSockets\MessageReaction;
 use Discord\WebSockets\Event;
-use Discord\Helpers\Deferred;
+use Discord\Parts\Channel\Channel;
+use Discord\Parts\Channel\Message;
 use Discord\Parts\Channel\Reaction;
+use Discord\Parts\Guild\Guild;
+use Discord\Parts\Thread\Thread;
 
+/**
+ * @link https://discord.com/developers/docs/topics/gateway-events#message-reaction-add
+ *
+ * @since 4.0.4
+ */
 class MessageReactionAdd extends Event
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function handle(Deferred &$deferred, $data): void
+    public function handle($data)
     {
-        $reaction = new MessageReaction($this->discord, (array) $data, true);
-
-        if ($channel = $reaction->channel) {
-            if ($message = $channel->messages->offsetGet($reaction->message_id)) {
-                $addedReaction = false;
-
-                foreach ($message->reactions as $react) {
-                    if ($react->id == $reaction->reaction_id) {
-                        ++$react->count;
-
-                        if ($reaction->user_id == $this->discord->id) {
-                            $react->me = true;
-                        }
-
-                        $addedReaction = true;
+        /** @var ?Guild */
+        if (isset($data->guild_id) && $guild = yield $this->discord->guilds->cacheGet($data->guild_id)) {
+            /** @var ?Channel */
+            if (! $channel = yield $guild->channels->cacheGet($data->channel_id)) {
+                /** @var Channel */
+                foreach ($guild->channels as $channel) {
+                    /** @var ?Thread */
+                    if ($thread = yield $channel->threads->cacheGet($data->channel_id)) {
+                        $channel = $thread;
                         break;
                     }
                 }
-
-                // New reaction added
-                if (! $addedReaction) {
-                    $message->reactions->push($message->reactions->create([
-                        'count' => 1,
-                        'me' => $reaction->user_id == $this->discord->id,
-                        'emoji' => $reaction->emoji->getRawAttributes(),
-                    ], true));
-                }
             }
+        } else {
+            /** @var ?Channel */
+            $channel = yield $this->discord->private_channels->cacheGet($data->channel_id);
         }
 
-        $deferred->resolve($reaction);
+        $reaction = new MessageReaction($this->discord, (array) $data, true);
+
+        /** @var ?Message */
+        if (isset($channel) && $message = yield $channel->messages->cacheGet($data->message_id)) {
+            $me = $data->user_id == $this->discord->id;
+
+            /** @var ?Reaction */
+            if ($react = yield $message->reactions->cacheGet($reaction->reaction_id)) {
+                ++$react->count;
+                $react->me = $me;
+            } else { // New reaction added
+                /** @var Reaction */
+                $react = $message->reactions->create([
+                    'count' => 1,
+                    'me' => $me,
+                    'emoji' => $data->emoji,
+                ], true);
+            }
+
+            $message->reactions->pushItem($react);
+        }
+
+        if (isset($data->member) && $guild) {
+            $this->cacheMember($guild->members, (array) $data->member);
+            $this->cacheUser($data->member->user);
+        }
+
+        return $reaction;
     }
 }

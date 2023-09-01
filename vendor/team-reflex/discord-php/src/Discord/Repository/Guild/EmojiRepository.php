@@ -16,25 +16,34 @@ use Discord\Parts\Guild\Emoji;
 use Discord\Repository\AbstractRepository;
 
 /**
- * Contains emojis that belong to guilds.
+ * Contains emojis of a guild.
  *
- * @see \Discord\Parts\Guild\Emoji
+ * @see Emoji
  * @see \Discord\Parts\Guild\Guild
+ *
+ * @since 4.0.2
+ *
+ * @method Emoji|null get(string $discrim, $key)
+ * @method Emoji|null pull(string|int $key, $default = null)
+ * @method Emoji|null first()
+ * @method Emoji|null last()
+ * @method Emoji|null find()
  */
 class EmojiRepository extends AbstractRepository
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $endpoints = [
         'all' => Endpoint::GUILD_EMOJIS,
+        'get' => Endpoint::GUILD_EMOJI,
         'create' => Endpoint::GUILD_EMOJIS,
         'delete' => Endpoint::GUILD_EMOJI,
         'update' => Endpoint::GUILD_EMOJI,
     ];
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected $class = Emoji::class;
 }

@@ -13,27 +13,32 @@ namespace Discord\WebSockets\Events;
 
 use Discord\Parts\Channel\Channel;
 use Discord\WebSockets\Event;
-use Discord\Helpers\Deferred;
+use Discord\Parts\Guild\Guild;
 
+/**
+ * @link https://discord.com/developers/docs/topics/gateway-events#channel-create
+ *
+ * @since 2.1.3
+ */
 class ChannelCreate extends Event
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function handle(Deferred &$deferred, $data): void
+    public function handle($data)
     {
         /** @var Channel */
-        $channel = $this->factory->create(Channel::class, $data, true);
+        $channelPart = $this->factory->part(Channel::class, (array) $data, true);
 
-        if ($channel->is_private) {
-            $this->discord->private_channels->push($channel);
+        if ($channelPart->is_private) {
+            $this->discord->private_channels->set($data->id, $channelPart);
         } else {
-            if ($guild = $this->discord->guilds->get('id', $channel->guild_id)) {
-                $guild->channels->push($channel);
-                $this->discord->guilds->push($guild);
+            /** @var ?Guild */
+            if ($guild = yield $this->discord->guilds->cacheGet($data->guild_id)) {
+                $guild->channels->set($data->id, $channelPart);
             }
         }
 
-        $deferred->resolve($channel);
+        return $channelPart;
     }
 }
