@@ -46,7 +46,8 @@ $discordbot->getApi()->fetchGuilds()->then(function(\JaxkDev\DiscordBot\Plugin\A
     // Handle error
     var_dump($rejection->getMessage());
 });
-
+```
+```php
 //Fetch a specific guild:
 $discordbot->getApi()->fetchGuild($guildId)->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $apiResolution) {
     /** @var \JaxkDev\DiscordBot\Models\Guild $guild */
@@ -70,7 +71,8 @@ $discordbot->getApi()->fetchChannels($guildId)->then(function(\JaxkDev\DiscordBo
     // Handle error
     var_dump($rejection->getMessage());
 });
-
+```
+```php
 //Fetch a specific channel:
 $discordbot->getApi()->fetchChannel($guildId, $channelId)->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $apiResolution) {
     /** @var \JaxkDev\DiscordBot\Models\Channel $channel */
@@ -80,7 +82,8 @@ $discordbot->getApi()->fetchChannel($guildId, $channelId)->then(function(\JaxkDe
     // Handle error
     var_dump($rejection->getMessage());
 });
-
+```
+```php
 //Fetch a specific DM channel:
 $discordbot->getApi()->fetchChannel(null, $userId)->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $apiResolution) {
     /** @var \JaxkDev\DiscordBot\Models\Channel $channel */
@@ -104,7 +107,8 @@ $discordbot->getApi()->fetchMembers($guildId)->then(function(\JaxkDev\DiscordBot
     // Handle error
     var_dump($rejection->getMessage());
 });
-
+```
+```php
 //Fetch a specific member:
 $discordbot->getApi()->fetchMember($guildId, $userId)->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $apiResolution) {
     /** @var \JaxkDev\DiscordBot\Models\Member $member */
@@ -128,7 +132,8 @@ $discordbot->getApi()->fetchUsers()->then(function(\JaxkDev\DiscordBot\Plugin\Ap
     // Handle error
     var_dump($rejection->getMessage());
 });
-
+```
+```php
 //Fetch a specific user:
 $discordbot->getApi()->fetchUser($userId)->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $apiResolution) {
     /** @var \JaxkDev\DiscordBot\Models\User $user */
@@ -152,7 +157,8 @@ $discordbot->getApi()->fetchRoles($guildId)->then(function(\JaxkDev\DiscordBot\P
     // Handle error
     var_dump($rejection->getMessage());
 });
-
+```
+```php
 //Fetch a specific role:
 $discordbot->getApi()->fetchRole($guildId, $roleId)->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $apiResolution) {
     /** @var \JaxkDev\DiscordBot\Models\Role $role */
@@ -189,7 +195,8 @@ $discordbot->getApi()->fetchMessage($guildId, $channelId, $messageId)->then(func
     // Handle error
     var_dump($rejection->getMessage());
 });
-
+```
+```php
 //Fetch a specific message in a DM channel:
 $discordbot->getApi()->fetchMessage(null, $userId, $messageId)->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $apiResolution) {
     /** @var \JaxkDev\DiscordBot\Models\Message $message */
@@ -199,7 +206,8 @@ $discordbot->getApi()->fetchMessage(null, $userId, $messageId)->then(function(\J
     // Handle error
     var_dump($rejection->getMessage());
 });
-
+```
+```php
 //Fetch all pinned messages in a channel:
 $discordbot->getApi()->fetchPinnedMessages($guildId, $channelId)->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $apiResolution) {
     /** @var \JaxkDev\DiscordBot\Models\Message $message */
@@ -210,7 +218,8 @@ $discordbot->getApi()->fetchPinnedMessages($guildId, $channelId)->then(function(
     // Handle error
     var_dump($rejection->getMessage());
 });
-
+```
+```php
 //Fetch all pinned messages in a DM channel:
 $discordbot->getApi()->fetchPinnedMessages(null, $userId)->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $apiResolution) {
     /** @var \JaxkDev\DiscordBot\Models\Message $message */
@@ -235,7 +244,8 @@ $discordbot->getApi()->fetchWebhooks($guildId)->then(function(\JaxkDev\DiscordBo
     // Handle error
     var_dump($rejection->getMessage());
 });
-
+```
+```php
 //Fetch all webhooks in a specific channel:
 $discordbot->getApi()->fetchWebhooks($guildId, $channelId)->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $apiResolution) {
     /** @var \JaxkDev\Discord\Webhook $webhook */
@@ -247,6 +257,57 @@ $discordbot->getApi()->fetchWebhooks($guildId, $channelId)->then(function(\JaxkD
     var_dump($rejection->getMessage());
 });
 ```
+
+### Events
+
+While the events are mostly the same, there are some changes to the data they provide and loads of new events to use !
+
+Please individually look at the event class file you are using to see the changes if any.
+
+#### Added Events:
+- `BotUserUpdated`
+- `InteractionReceived`
+- `MessagesBulkDeleted`
+- `ThreadCreated`
+- `ThreadDeleted`
+- `ThreadUpdated`
+- `WebhooksUpdated`
+
+#### Renamed Events:
+- `ServerDeleted` -> `GuildDeleted`
+- `ServerJoined` -> `GuildJoined`
+- `ServerUpdated` -> `GuildUpdated`
+
+#### Removed Events:
+- `VoiceChannelMemberJoined`
+- `VoiceChannelMemberLeft`
+- `VoiceChannelMemberMoved`
+
+
+### Config
+
+The config has been adjusted to cater for new fields, any existing config from version `2.x` will automatically be
+updated on server start with no user action required.
+
+See the [HELP_ENG.txt](resources/HELP_ENG.txt) file for help with config options.
+
+
+### Models
+
+All models have undergone a massive update in order to reflect the most up-to-date discord documentation with gateway `v10`
+
+This means various classes have been removed, updated and added. Including the use of enums for stricter types.
+
+Please see the [Models](src/Models) directory for a full list of models and their properties, assume all Models from `v2.x` will not work without updating.
+
+
+### API
+
+The API structure has remained the same, promises and the ApiResolution/Rejection parameters have remained unchanged.
+
+However, many functions have changed signatures. Check all of your functions against new signatures found in [Api.php](src/Plugin/Api.php)
+
+Please note the new optional `$reason` parameter on most functions is to provide a reason for the audit log in discord.
 
 
 [3.0.0]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.0
