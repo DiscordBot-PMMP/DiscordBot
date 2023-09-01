@@ -1,60 +1,48 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Discord;
 
-use JaxkDev\DiscordBot\Models\Member;
-use JaxkDev\DiscordBot\Models\User;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\Member;
 
-class MemberJoin extends Packet{
+final class MemberJoin extends Packet{
 
-    /** @var Member */
-    private $member;
+    public const SERIALIZE_ID = 214;
 
-    /** @var User */
-    private $user;
+    private Member $member;
 
-    public function __construct(Member $member, User $user){
-        parent::__construct();
+    public function __construct(Member $member, ?int $uid = null){
+        parent::__construct($uid);
         $this->member = $member;
-        $this->user = $user;
     }
 
     public function getMember(): Member{
         return $this->member;
     }
 
-    public function getUser(): User{
-        return $this->user;
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
+        $stream->putSerializable($this->member);
+        return $stream;
     }
 
-    public function serialize(): ?string{
-        return serialize([
-            $this->UID,
-            $this->member,
-            $this->user
-        ]);
-    }
-
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->UID,
-            $this->member,
-            $this->user
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
+        return new self(
+            $stream->getSerializable(Member::class), // member
+            $uid
+        );
     }
 }

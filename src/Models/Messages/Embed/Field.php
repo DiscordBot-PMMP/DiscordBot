@@ -1,28 +1,34 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
-// https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
-class Field implements \Serializable{
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
+use function strlen;
 
-    /** @var string 256 characters */
-    private $name;
+/**
+ * @implements BinarySerializable<Field>
+ * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
+ */
+final class Field implements BinarySerializable{
 
-    /** @var string 2048 characters */
-    private $value;
+    /** 256 characters */
+    private string $name;
 
-    /** @var bool */
-    private $inline = false;
+    /** 1024 characters */
+    private string $value;
+
+    private bool $inline;
 
     public function __construct(string $name, string $value, bool $inline = false){
         $this->setName($name);
@@ -46,13 +52,13 @@ class Field implements \Serializable{
     }
 
     public function setValue(string $value): void{
-        if(strlen($value) > 2048){
-            throw new \AssertionError("Embed field value can only have up to 2048 characters.");
+        if(strlen($value) > 1024){
+            throw new \AssertionError("Embed field value can only have up to 1024 characters.");
         }
         $this->value = $value;
     }
 
-    public function isInline(): bool{
+    public function getInline(): bool{
         return $this->inline;
     }
 
@@ -60,25 +66,19 @@ class Field implements \Serializable{
         $this->inline = $inline;
     }
 
-    //----- Serialization -----//
-
-    public function serialize(): ?string{
-        return serialize([
-            $this->name,
-            $this->value,
-            $this->inline
-        ]);
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->name);
+        $stream->putString($this->value);
+        $stream->putBool($this->inline);
+        return $stream;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->name,
-            $this->value,
-            $this->inline
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(), // name
+            $stream->getString(), // value
+            $stream->getBool()    // inline
+        );
     }
 }

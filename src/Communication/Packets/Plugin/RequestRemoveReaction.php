@@ -1,39 +1,48 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
+use JaxkDev\DiscordBot\Models\Emoji;
 
-class RequestRemoveReaction extends Packet{
+final class RequestRemoveReaction extends Packet{
 
-    /** @var string */
-    private $channel_id;
+    public const SERIALIZE_ID = 439;
 
-    /** @var string */
-    private $message_id;
+    /** @var string|null Can be null for DMs */
+    private ?string $guild_id;
 
-    /** @var string */
-    private $user_id;
+    private string $channel_id;
 
-    /** @var string */
-    private $emoji;
+    private string $message_id;
 
-    public function __construct(string $channel_id, string $message_id, string $user_id, string $emoji){
-        parent::__construct();
+    private string $user_id;
+
+    private Emoji $emoji;
+
+    public function __construct(?string $guild_id, string $channel_id, string $message_id, string $user_id, Emoji $emoji,
+                                ?int $uid = null){
+        parent::__construct($uid);
+        $this->guild_id = $guild_id;
         $this->channel_id = $channel_id;
         $this->message_id = $message_id;
         $this->user_id = $user_id;
         $this->emoji = $emoji;
+    }
+
+    public function getGuildId(): ?string{
+        return $this->guild_id;
     }
 
     public function getChannelId(): string{
@@ -48,31 +57,30 @@ class RequestRemoveReaction extends Packet{
         return $this->user_id;
     }
 
-    public function getEmoji(): string{
+    public function getEmoji(): Emoji{
         return $this->emoji;
     }
 
-    public function serialize(): ?string{
-        return serialize([
-            $this->UID,
-            $this->channel_id,
-            $this->message_id,
-            $this->user_id,
-            $this->emoji
-        ]);
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
+        $stream->putNullableString($this->guild_id);
+        $stream->putString($this->channel_id);
+        $stream->putString($this->message_id);
+        $stream->putString($this->user_id);
+        $stream->putSerializable($this->emoji);
+        return $stream;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->UID,
-            $this->channel_id,
-            $this->message_id,
-            $this->user_id,
-            $this->emoji
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
+        return new self(
+            $stream->getNullableString(),           // guild_id
+            $stream->getString(),                   // channel_id
+            $stream->getString(),                   // message_id
+            $stream->getString(),                   // user_id
+            $stream->getSerializable(Emoji::class), // emoji
+            $uid
+        );
     }
 }

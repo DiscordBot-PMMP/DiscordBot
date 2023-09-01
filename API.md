@@ -1,22 +1,24 @@
 # DiscordBot API
 
-Would love to have this as a github site, However i don't have the time.
+Would love to have this as a GitHub site, However I don't have the time.
 
-**Version 2.x documentation.**
+**Version 3.x documentation.**
 
 ---
 
 ## API Structure
 Firstly a quick few notes about the API and what it covers.
 
-+ These namespaces are **INTERNAL ONLY**:
++ These namespaces are **INTERNAL ONLY** and not to be used:
     + `JaxkDev\DiscordBot\Bot`
     + `JaxkDev\DiscordBot\Communication`
-    + vendor libs, (Not actually autoloaded in the main thread)
+    + `JaxkDev\DiscordBot\ExternalBot`
+    + `JaxkDev\DiscordBot\InternalBot`
+    + vendor libs, (Not actually loaded in the main thread)
 
 
  + All API Calls can be made through `JaxkDev\DiscordBot\Plugin\Api.php` an instance is available from the plugin instance
-(`JaxkDev\DiscordBot\Plugin\Main.php`)
+(`JaxkDev\DiscordBot\Plugin\Main.php` - `getApi()`)
 
 
 + All discord data types such as Member, Role, Channel etc
@@ -24,11 +26,11 @@ That is all located in the namespace `JaxkDev\DiscordBot\Models` all type info a
 in the relevant file.
 
 
-+ All the actual discord data such as servers, roles members can be found in plugin storage anywhere from 
-5seconds to 500seconds after the plugin enables.
++ All the actual discord data such as guilds, roles, members etc. can be obtained via `Api->fetchXYZ()` methods after 
+the API is ready for requests (`Api->isReady()`).
 
     + Listen to `JaxkDev\DiscordBot\Plugin\Events\DiscordReady.php` this is emitted when bot is connected
-**and** initial data has been received, only use the API and Storage after this event.
+, only use the API after this event.
 
 ---
 
@@ -56,15 +58,16 @@ the message did not get sent, and a `ApiRejection` (exception) will be passed ba
 /** @var $api \JaxkDev\DiscordBot\Plugin\Api */
 $api = $DiscordBotPluginInstance->getApi();
 /** @var $promise \JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface */
-$promise = $api->sendMessage(new \JaxkDev\DiscordBot\Models\Messages\Message("channel_id", null, "Hello world !"));
+$promise = $api->sendMessage("guild_id or null for DMs", "channel_id or user_id for DMs", "Hello world !"));
 
 // You could do other things here if necessary
 // but be sure to register your callbacks before finishing.
 
 //To handle both resolved and rejected:
 $promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResultion $resolution){
-    echo "Resolved !";
     //Yay, it worked and the message was sent successfully.
+    echo "Resolved !";
+    var_dump($resolution->getData()[0]); // will dump the Message model in array index 0.
 }, function(\JaxkDev\DiscordBot\Plugin\ApiRejection $rejectedError){
     echo "Rejected :(";
     //Oh no, It failed and $rejectedError can tell you why.
@@ -101,18 +104,15 @@ For information on the data thats returned with `$resolution->getData()` see the
 
 ---
 
-## Discord api - weird things
+## Discord API - weird things
 
-Discord does do some fancy weird things a lot like minecraft, so I've listed a few things that are important to note.
+Discord does do some fancy weird things, so I've listed a few things that are important to note below.
 
-`discord gateway v8` The default and current version DiscordBot/DiscordPHP uses.
+`Discord Gateway v10` The current version DiscordBot-InternalBot/DiscordPHP uses.
 
-+ DM Channels (TODO Confirm on v8)
++ DM Channels
     + Each DM has its own channel however because discord makes ID's for those channels irrelevant of any user IDs so dphp sends a channel create event before any update to a DM such
       as sending a message, pinning etc. we cannot reliably store a DM Channel because of its unique ID's.
 
 + Voice Channels
     + Due to binaries required and resources this plugin does not support any interaction with voice channels (joining/playing sounds/leaving)
-
-+ Discord gateway v9
-    + Threads...

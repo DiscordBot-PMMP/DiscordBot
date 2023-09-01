@@ -1,39 +1,43 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 
-class RequestUpdateNickname extends Packet{
+final class RequestUpdateNickname extends Packet{
 
-    /** @var string */
-    private $server_id;
+    public const SERIALIZE_ID = 446;
 
-    /** @var string */
-    private $user_id;
+    private string $guild_id;
 
-    /** @var string|null */
-    private $nickname;
+    private string $user_id;
 
-    public function __construct(string $server_id, string $user_id, ?string $nickname = null){
-        parent::__construct();
-        $this->server_id = $server_id;
+    private ?string $nickname;
+
+    private ?string $reason;
+
+    public function __construct(string $guild_id, string $user_id, ?string $nickname = null, ?string $reason = null,
+                                ?int $uid = null){
+        parent::__construct($uid);
+        $this->guild_id = $guild_id;
         $this->user_id = $user_id;
         $this->nickname = $nickname;
+        $this->reason = $reason;
     }
 
-    public function getServerId(): string{
-        return $this->server_id;
+    public function getGuildId(): string{
+        return $this->guild_id;
     }
 
     public function getUserId(): string{
@@ -44,25 +48,28 @@ class RequestUpdateNickname extends Packet{
         return $this->nickname;
     }
 
-    public function serialize(): ?string{
-        return serialize([
-            $this->UID,
-            $this->server_id,
-            $this->user_id,
-            $this->nickname
-        ]);
+    public function getReason(): ?string{
+        return $this->reason;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->UID,
-            $this->server_id,
-            $this->user_id,
-            $this->nickname
-        ] = $data;
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
+        $stream->putString($this->guild_id);
+        $stream->putString($this->user_id);
+        $stream->putNullableString($this->nickname);
+        $stream->putNullableString($this->reason);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
+        return new self(
+            $stream->getString(),         // guild_id
+            $stream->getString(),         // user_id
+            $stream->getNullableString(), // nickname
+            $stream->getNullableString(), // reason
+            $uid
+        );
     }
 }

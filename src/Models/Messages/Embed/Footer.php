@@ -1,36 +1,46 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Models\Messages\Embed;
 
-class Footer implements \Serializable{
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
+use function strlen;
 
-    /** @var null|string 2048 characters */
-    private $text;
+/**
+ * @implements BinarySerializable<Footer>
+ * @link https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
+ */
+final class Footer implements BinarySerializable{
 
-    /** @var null|string Must be prefixed with `https` */
-    private $icon_url;
+    /** 2048 characters */
+    private string $text;
 
-    public function __construct(?string $text = null, ?string $icon_url = null){
+    private ?string $icon_url;
+
+    private ?string $proxy_icon_url;
+
+    public function __construct(string $text, ?string $icon_url = null, ?string $proxy_icon_url = null){
         $this->setText($text);
         $this->setIconUrl($icon_url);
+        $this->setProxyIconUrl($proxy_icon_url);
     }
 
-    public function getText(): ?string{
+    public function getText(): string{
         return $this->text;
     }
 
-    public function setText(?string $text): void{
-        if($text !== null and strlen($text) > 2048){
+    public function setText(string $text): void{
+        if(strlen($text) > 2048){
             throw new \AssertionError("Embed footer text can only have up to 2048 characters.");
         }
         $this->text = $text;
@@ -41,29 +51,30 @@ class Footer implements \Serializable{
     }
 
     public function setIconUrl(?string $icon_url): void{
-        if($icon_url !== null and strpos($icon_url , "https" ) !== 0){
-            throw new \AssertionError("Embed footer icon URL '$icon_url' must start with https.");
-        }
         $this->icon_url = $icon_url;
     }
 
-    //----- Serialization -----//
-
-    public function serialize(): ?string{
-        return serialize([
-            $this->text,
-            $this->icon_url
-        ]);
+    public function getProxyIconUrl(): ?string{
+        return $this->proxy_icon_url;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->text,
-            $this->icon_url
-        ] = $data;
+    public function setProxyIconUrl(?string $proxy_icon_url): void{
+        $this->proxy_icon_url = $proxy_icon_url;
+    }
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->getText());
+        $stream->putNullableString($this->getIconUrl());
+        $stream->putNullableString($this->getProxyIconUrl());
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(),         // text
+            $stream->getNullableString(), // icon_url
+            $stream->getNullableString()  // proxy_icon_url
+        );
     }
 }

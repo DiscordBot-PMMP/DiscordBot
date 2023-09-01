@@ -1,12 +1,12 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
@@ -17,13 +17,12 @@ use pocketmine\plugin\Plugin;
 
 /**
  * Emitted when a ban gets deleted (AKA Revoked).
- * 
+ *
  * @see BanCreated (AKA Initialised)
  */
-class BanDeleted extends DiscordBotEvent{
+final class BanDeleted extends DiscordBotEvent{
 
-    /** @var Ban */
-    private $ban;
+    private Ban $ban;
 
     public function __construct(Plugin $plugin, Ban $ban){
         parent::__construct($plugin);

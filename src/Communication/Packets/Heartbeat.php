@@ -1,46 +1,46 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-class Heartbeat extends Packet{
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 
-    /** @var float */
-    private $heartbeat;
+final class Heartbeat extends Packet{
 
-    public function __construct(float $heartbeat){
-        parent::__construct();
+    public const SERIALIZE_ID = 1;
+
+    private int $heartbeat;
+
+    public function __construct(int $heartbeat, ?int $uid = null){
+        parent::__construct($uid);
         $this->heartbeat = $heartbeat;
     }
 
-    public function getHeartbeat(): float{
+    public function getHeartbeat(): int{
         return $this->heartbeat;
     }
 
-    public function serialize(): ?string{
-        return serialize([
-            $this->UID,
-            $this->heartbeat
-        ]);
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
+        $stream->putInt($this->heartbeat);
+        return $stream;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->UID,
-            $this->heartbeat
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
+        return new self(
+            $stream->getInt(), // heartbeat
+            $uid
+        );
     }
 }

@@ -1,36 +1,41 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Communication\Packets;
 
-abstract class Packet implements \Serializable{
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
 
-    // Used for responses.
-    /** @var int */
-    public static $UID_COUNT = 0;
+/**
+ * @implements BinarySerializable<self>
+ */
+abstract class Packet implements BinarySerializable{
 
-    /** @var int */
-    protected $UID;
+    public static int $UID_COUNT = 1;
 
-    public function __construct(){
-        Packet::$UID_COUNT += 2;  //BotThread = Odd, PluginThread = Even. (Keeps them unique, *shrugs*)
-        $this->UID = Packet::$UID_COUNT;
+    protected int $UID;
+
+    public function __construct(?int $uid = null){
+        if($uid === null){
+            if(Packet::$UID_COUNT > 4294967295){
+                //32bit int overflow, reset.
+                Packet::$UID_COUNT = 1;
+            }
+            $this->UID = Packet::$UID_COUNT++;
+        }else{
+            $this->UID = $uid;
+        }
     }
 
     public function getUID(): int{
         return $this->UID;
     }
-
-    public abstract function serialize(): ?string;
-
-    public abstract function unserialize($data): void;
 }

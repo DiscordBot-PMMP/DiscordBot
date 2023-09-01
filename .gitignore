@@ -7,11 +7,14 @@
 .ds_store
 /.cache/
 /code-coverage/
+/tools/php-cs-fixer/vendor/
 
 *.phar
 *.txt
 *.DS_STORE
 
+tools/TEST.php
+tools/PHPSTAN.php
 phpstan.neon
 /vendor/nesbot/carbon/src/Carbon/Lang/
 /vendor/guzzlehttp/psr7/vendor-bin/
@@ -20,3 +23,4 @@ phpstan.neon
 
 phpunit.xml
 .phpunit.result.cache
+.php-cs-fixer.cache

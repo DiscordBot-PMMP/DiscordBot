@@ -1,51 +1,72 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Models\Messages;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
+
 use JaxkDev\DiscordBot\Plugin\Utils;
+use function str_starts_with;
+use function strlen;
+use function substr;
 
-class Attachment implements \Serializable{
+/**
+ * @implements BinarySerializable<Attachment>
+ * @link https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
+ */
+final class Attachment implements BinarySerializable{
 
-    /** @var string */
-    private $id;
+    private string $id;
 
-    /** @var string */
-    private $file_name;
+    private string $file_name;
 
-    /** @var string|null https://en.wikipedia.org/wiki/Media_type */
-    private $content_type;
+    /** Max 1024 chars */
+    private ?string $description;
 
-    /** @var int Size of the resource in bytes */
-    private $size;
+    /** https://en.wikipedia.org/wiki/Media_type */
+    private ?string $content_type;
 
-    /** @var string Is this always a discord cdn url? */
-    private $url;
+    /** Size of file in bytes */
+    private int $size;
 
-    /** @var int|null Image width, null if not an image. */
-    private $width;
+    private string $url;
 
-    /** @var int|null Image height, null if not an image. */
-    private $height;
+    private string $proxy_url;
 
-    public function __construct(string $id, string $file_name, ?string $content_type, int $size, string $url,
-                                ?int $width = null, ?int $height = null){
+    /** Image height, null if not an image. */
+    private ?int $height;
+
+    /** Image width, null if not an image. */
+    private ?int $width;
+
+    /** Whether this attachment is ephemeral. */
+    private ?bool $ephemeral;
+
+    //No support for voice messages, still in development (Aug 23).
+
+    public function __construct(string $id, string $file_name, ?string $description, ?string $content_type, int $size,
+                                string $url, string $proxy_url, ?int $height = null, ?int $width = null,
+                                ?bool $ephemeral = null){
         $this->setId($id);
         $this->setFileName($file_name);
+        $this->setDescription($description);
         $this->setContentType($content_type);
         $this->setSize($size);
         $this->setUrl($url);
-        $this->setWidth($width);
+        $this->setProxyUrl($proxy_url);
         $this->setHeight($height);
+        $this->setWidth($width);
+        $this->setEphemeral($ephemeral);
     }
 
     public function getId(): string{
@@ -67,8 +88,19 @@ class Attachment implements \Serializable{
         $this->file_name = $file_name;
     }
 
-    public function getContentType(): string{
-        return $this->content_type??"Unknown"; //Maintain BC, TODO change to null in v3.0
+    public function getDescription(): ?string{
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): void{
+        if($description !== null && strlen($description) > 1024){
+            throw new \AssertionError("Description '$description' is invalid.");
+        }
+        $this->description = $description;
+    }
+
+    public function getContentType(): ?string{
+        return $this->content_type;
     }
 
     public function setContentType(?string $content_type): void{
@@ -91,22 +123,15 @@ class Attachment implements \Serializable{
     }
 
     public function setUrl(string $url): void{
-        if(!str_starts_with($url, "https://")){
-            //TODO Check again, can't see in docs now.
-            throw new \AssertionError("URL '$url' is invalid, must be prefixed 'https://'.");
-        }
         $this->url = $url;
     }
 
-    public function getWidth(): ?int{
-        return $this->width;
+    public function getProxyUrl(): string{
+        return $this->proxy_url;
     }
 
-    public function setWidth(?int $width): void{
-        if($width !== null and $width < 0){
-            throw new \AssertionError("Width '$width' is invalid.");
-        }
-        $this->width = $width;
+    public function setProxyUrl(string $proxy_url): void{
+        $this->proxy_url = $proxy_url;
     }
 
     public function getHeight(): ?int{
@@ -114,43 +139,72 @@ class Attachment implements \Serializable{
     }
 
     public function setHeight(?int $height): void{
-        if($height !== null and $height < 0){
+        if($height !== null && $height < 0){
             throw new \AssertionError("Height '$height' is invalid.");
         }
         $this->height = $height;
     }
 
-    public function isSpoiler(): bool{
+    public function getWidth(): ?int{
+        return $this->width;
+    }
+
+    public function setWidth(?int $width): void{
+        if($width !== null && $width < 0){
+            throw new \AssertionError("Width '$width' is invalid.");
+        }
+        $this->width = $width;
+    }
+
+    public function getEphemeral(): ?bool{
+        return $this->ephemeral;
+    }
+
+    public function setEphemeral(?bool $ephemeral): void{
+        $this->ephemeral = $ephemeral;
+    }
+
+    public function getSpoiler(): bool{
         return str_starts_with($this->file_name, "SPOILER_");
     }
 
-    //----- Serialization -----//
-
-    public function serialize(): ?string{
-        return serialize([
-            $this->id,
-            $this->file_name,
-            $this->content_type,
-            $this->size,
-            $this->url,
-            $this->width,
-            $this->height
-        ]);
+    public function setSpoiler(bool $spoiler): void{
+        if($this->getSpoiler()){
+            if(!$spoiler){
+                $this->file_name = substr($this->file_name, strlen("SPOILER_"));
+            }
+        }elseif($spoiler){
+            $this->file_name = "SPOILER_{$this->file_name}";
+        }
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->id,
-            $this->file_name,
-            $this->content_type,
-            $this->size,
-            $this->url,
-            $this->width,
-            $this->height
-        ] = $data;
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->getId());
+        $stream->putString($this->getFileName());
+        $stream->putNullableString($this->getDescription());
+        $stream->putNullableString($this->getContentType());
+        $stream->putInt($this->getSize());
+        $stream->putString($this->getUrl());
+        $stream->putString($this->getProxyUrl());
+        $stream->putNullableInt($this->getHeight());
+        $stream->putNullableInt($this->getWidth());
+        $stream->putNullableBool($this->getEphemeral());
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(),         // id
+            $stream->getString(),         // file_name
+            $stream->getNullableString(), // description
+            $stream->getNullableString(), // content_type
+            $stream->getInt(),            // size
+            $stream->getString(),         // url
+            $stream->getString(),         // proxy_url
+            $stream->getNullableInt(),    // height
+            $stream->getNullableInt(),    // width
+            $stream->getNullableBool()    // ephemeral
+        );
     }
 }

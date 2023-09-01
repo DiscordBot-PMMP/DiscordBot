@@ -1,24 +1,31 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Models\Permissions;
 
 // Remember categories are classed as channels.
-class ChannelPermissions extends Permissions{
+use JaxkDev\DiscordBot\Communication\BinaryStream;
+use function array_merge;
 
-    /**
-     * @return Array<string, int>
-     */
+/** @extends Permissions<ChannelPermissions> */
+final class ChannelPermissions extends Permissions{
+
+    /** @return Array<string, int> */
     static function getPossiblePermissions(): array{
-        return array_merge(Permissions::ALL_PERMISSIONS, Permissions::TEXT_PERMISSIONS, Permissions::VOICE_PERMISSIONS);
+        return array_merge(Permissions::ALL_PERMISSIONS, Permissions::TEXT_PERMISSIONS,
+            Permissions::VOICE_PERMISSIONS, Permissions::STAGE_PERMISSIONS);
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self($stream->getLong());
     }
 }

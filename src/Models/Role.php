@@ -1,67 +1,106 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Models;
 
+use JaxkDev\DiscordBot\Communication\BinarySerializable;
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Permissions\RolePermissions;
 use JaxkDev\DiscordBot\Plugin\Utils;
 
-class Role implements \Serializable{
+/**
+ * @implements BinarySerializable<Role>
+ * @link https://discord.com/developers/docs/topics/permissions#role-object
+ */
+final class Role implements BinarySerializable{
 
-    /** @var null|string */
-    private $id;
+    public const SERIALIZE_ID = 8;
 
-    /** @var string */
-    private $name;
+    private string $id;
 
-    /** @var RolePermissions */
-    private $permissions;
+    /** The guild this role is part of, used for internal mapping. */
+    private string $guild_id;
 
-    /** @var int */
-    private $colour;
+    /** Role name */
+    private string $name;
 
-    /** @var bool Is role hoisted on member list. */
-    private $hoisted;
+    /** Integer representation of hexadecimal color code  */
+    private int $colour;
 
-    /** @var int */
-    private $hoisted_position;
+    /** If this role is pinned in the user listing */
+    private bool $hoist;
 
-    /** @var bool */
-    private $mentionable;
+    /** Role icon or role icon image data when updating icon. */
+    private ?string $icon;
 
-    /** @var string */
-    private $server_id;
+    /** Role unicode emoji */
+    private ?string $unicode_emoji;
 
-    public function __construct(string $name, int $colour, bool $hoisted, int $hoisted_position, bool $mentionable,
-                                string $server_id, RolePermissions $permissions = null, ?string $id = null){
+    /** Position of this role */
+    private int $position;
+
+    /** Permissions */
+    private RolePermissions $permissions;
+
+    /** Whether this role is managed by an integration */
+    private bool $managed;
+
+    /** Whether this role is mentionable */
+    private bool $mentionable;
+
+    /** The tags this role has */
+    private ?RoleTags $tags;
+
+    /**
+     * @internal See API::createRole()
+     * @see API::createRole()
+     */
+    public function __construct(string $id, string $guild_id, string $name, int $colour, bool $hoist, ?string $icon,
+                                ?string $unicode_emoji, int $position, RolePermissions $permissions, bool $managed,
+                                bool $mentionable, ?RoleTags $tags){
+        $this->setId($id);
+        $this->setGuildId($guild_id);
         $this->setName($name);
         $this->setColour($colour);
-        $this->setHoisted($hoisted);
-        $this->setHoistedPosition($hoisted_position);
+        $this->setHoist($hoist);
+        $this->setIcon($icon);
+        $this->setUnicodeEmoji($unicode_emoji);
+        $this->setPosition($position);
+        $this->setPermissions($permissions);
+        $this->setManaged($managed);
         $this->setMentionable($mentionable);
-        $this->setServerId($server_id);
-        $this->setPermissions($permissions??new RolePermissions(0));
-        $this->setId($id);
+        $this->setTags($tags);
     }
 
-    public function getId(): ?string{
+    public function getId(): string{
         return $this->id;
     }
 
-    public function setId(?string $id): void{
-        if($id !== null and !Utils::validDiscordSnowflake($id)){
+    public function setId(string $id): void{
+        if(!Utils::validDiscordSnowflake($id)){
             throw new \AssertionError("Role ID '$id' is invalid.");
         }
         $this->id = $id;
+    }
+
+    public function getGuildId(): string{
+        return $this->guild_id;
+    }
+
+    public function setGuildId(string $guild_id): void{
+        if(!Utils::validDiscordSnowflake($guild_id)){
+            throw new \AssertionError("Guild ID '$guild_id' is invalid.");
+        }
+        $this->guild_id = $guild_id;
     }
 
     public function getName(): string{
@@ -72,6 +111,54 @@ class Role implements \Serializable{
         $this->name = $name;
     }
 
+    public function getColour(): int{
+        return $this->colour;
+    }
+
+    /** @param int $colour Hex [0x000000 - 0xFFFFFF] */
+    public function setColour(int $colour): void{
+        if($colour < 0 || $colour > 0xFFFFFF){
+            throw new \AssertionError("Colour '$colour' is outside the bounds 0x000000-0xFFFFFF.");
+        }
+        $this->colour = $colour;
+    }
+
+    public function getHoist(): bool{
+        return $this->hoist;
+    }
+
+    public function setHoist(bool $hoist): void{
+        $this->hoist = $hoist;
+    }
+
+    public function getIconUrl(): ?string{
+        return ($this->icon === null || !Utils::validImageData($this->icon)) ? null : "https://cdn.discordapp.com/role-icons/{$this->id}/{$this->icon}.png";
+    }
+
+    public function getIcon(): ?string{
+        return $this->icon;
+    }
+
+    public function setIcon(?string $icon): void{
+        $this->icon = $icon;
+    }
+
+    public function getUnicodeEmoji(): ?string{
+        return $this->unicode_emoji;
+    }
+
+    public function setUnicodeEmoji(?string $unicode_emoji): void{
+        $this->unicode_emoji = $unicode_emoji;
+    }
+
+    public function getPosition(): int{
+        return $this->position;
+    }
+
+    public function setPosition(int $position): void{
+        $this->position = $position;
+    }
+
     public function getPermissions(): RolePermissions{
         return $this->permissions;
     }
@@ -80,37 +167,15 @@ class Role implements \Serializable{
         $this->permissions = $permissions;
     }
 
-    public function getColour(): int{
-        return $this->colour;
+    public function getManaged(): bool{
+        return $this->managed;
     }
 
-    /**
-     * @param int $colour Hex [0x000000 - 0xFFFFFF]
-     */
-    public function setColour(int $colour): void{
-        if($colour < 0 or $colour > 0xFFFFFF){
-            throw new \AssertionError("Colour '$colour' is outside the bounds 0x000000-0xFFFFFF.");
-        }
-        $this->colour = $colour;
+    public function setManaged(bool $managed): void{
+        $this->managed = $managed;
     }
 
-    public function isHoisted(): bool{
-        return $this->hoisted;
-    }
-
-    public function setHoisted(bool $hoisted): void{
-        $this->hoisted = $hoisted;
-    }
-
-    public function getHoistedPosition(): int{
-        return $this->hoisted_position;
-    }
-
-    public function setHoistedPosition(int $hoisted_position): void{
-        $this->hoisted_position = $hoisted_position;
-    }
-
-    public function isMentionable(): bool{
+    public function getMentionable(): bool{
         return $this->mentionable;
     }
 
@@ -118,46 +183,51 @@ class Role implements \Serializable{
         $this->mentionable = $mentionable;
     }
 
-    public function getServerId(): string{
-        return $this->server_id;
+    public function getTags(): ?RoleTags{
+        return $this->tags;
     }
 
-    public function setServerId(string $server_id): void{
-        if(!Utils::validDiscordSnowflake($server_id)){
-            throw new \AssertionError("Server ID '$server_id' is invalid.");
-        }
-        $this->server_id = $server_id;
+    public function setTags(?RoleTags $tags): void{
+        $this->tags = $tags;
+    }
+
+    public function __toString(): string{
+        return "<@&{$this->id}>";
     }
 
     //----- Serialization -----//
 
-    public function serialize(): ?string{
-        return serialize([
-            $this->id,
-            $this->name,
-            $this->colour,
-            $this->permissions,
-            $this->mentionable,
-            $this->hoisted,
-            $this->hoisted_position,
-            $this->server_id
-        ]);
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putString($this->id);
+        $stream->putString($this->guild_id);
+        $stream->putString($this->name);
+        $stream->putInt($this->colour);
+        $stream->putBool($this->hoist);
+        $stream->putNullableString($this->icon);
+        $stream->putNullableString($this->unicode_emoji);
+        $stream->putInt($this->position);
+        $stream->putSerializable($this->permissions);
+        $stream->putBool($this->managed);
+        $stream->putBool($this->mentionable);
+        $stream->putNullableSerializable($this->tags);
+        return $stream;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->id,
-            $this->name,
-            $this->colour,
-            $this->permissions,
-            $this->mentionable,
-            $this->hoisted,
-            $this->hoisted_position,
-            $this->server_id
-        ] = $data;
+    public static function fromBinary(BinaryStream $stream): self{
+        return new self(
+            $stream->getString(),                               // id
+            $stream->getString(),                               // guild_id
+            $stream->getString(),                               // name
+            $stream->getInt(),                                  // colour
+            $stream->getBool(),                                 // hoist
+            $stream->getNullableString(),                       // icon
+            $stream->getNullableString(),                       // unicode_emoji
+            $stream->getInt(),                                  // position
+            $stream->getSerializable(RolePermissions::class),   // permissions
+            $stream->getBool(),                                 // managed
+            $stream->getBool(),                                 // mentionable
+            $stream->getNullableSerializable(RoleTags::class)   // tags
+        );
     }
 }

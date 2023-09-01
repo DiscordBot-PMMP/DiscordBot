@@ -1,49 +1,67 @@
 <?php
+
 /*
  * DiscordBot, PocketMine-MP Plugin.
  *
  * Licensed under the Open Software License version 3.0 (OSL-3.0)
  * Copyright (C) 2020-present JaxkDev
  *
- * Twitter :: @JaxkDev
- * Discord :: JaxkDev#2698
+ * Discord :: JaxkDev
  * Email   :: JaxkDev@gmail.com
  */
 
 namespace JaxkDev\DiscordBot\Communication\Packets\Plugin;
 
+use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Communication\Packets\Packet;
 use JaxkDev\DiscordBot\Models\Role;
 
-class RequestUpdateRole extends Packet{
+final class RequestUpdateRole extends Packet{
 
-    /** @var Role */
-    private $role;
+    public const SERIALIZE_ID = 447;
 
-    public function __construct(Role $role){
-        parent::__construct();
+    private Role $role;
+
+    /** @var string|null If changing icon, set this to validImageData. */
+    private ?string $new_icon_data;
+
+    private ?string $reason;
+
+    public function __construct(Role $role, ?string $new_icon_data, ?string $reason = null, ?int $uid = null){
+        parent::__construct($uid);
         $this->role = $role;
+        $this->new_icon_data = $new_icon_data;
+        $this->reason = $reason;
     }
 
     public function getRole(): Role{
         return $this->role;
     }
 
-    public function serialize(): ?string{
-        return serialize([
-            $this->UID,
-            $this->role
-        ]);
+    public function getNewIconData(): ?string{
+        return $this->new_icon_data;
     }
 
-    public function unserialize($data): void{
-        $data = unserialize($data);
-        if(!is_array($data)){
-            throw new \AssertionError("Failed to unserialize data to array, got '".gettype($data)."' instead.");
-        }
-        [
-            $this->UID,
-            $this->role
-        ] = $data;
+    public function getReason(): ?string{
+        return $this->reason;
+    }
+
+    public function binarySerialize(): BinaryStream{
+        $stream = new BinaryStream();
+        $stream->putInt($this->getUID());
+        $stream->putSerializable($this->role);
+        $stream->putNullableString($this->new_icon_data);
+        $stream->putNullableString($this->reason);
+        return $stream;
+    }
+
+    public static function fromBinary(BinaryStream $stream): self{
+        $uid = $stream->getInt();
+        return new self(
+            $stream->getSerializable(Role::class), // role
+            $stream->getNullableString(),          // new_icon_data
+            $stream->getNullableString(),          // reason
+            $uid
+        );
     }
 }
