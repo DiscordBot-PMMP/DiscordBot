@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Fix presence update event activity buttons ([#99](https://github.com/DiscordBot-PMMP/DiscordBot/issues/99))
 - Fix channel update event causing chaos ([#98](https://github.com/DiscordBot-PMMP/DiscordBot/pull/98), [@Laith98Dev](https://github.com/Laith98Dev))
 
 ## [3.0.0] - 2023-09-01

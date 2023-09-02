@@ -118,6 +118,7 @@ use JaxkDev\DiscordBot\Models\WebhookType;
 use function array_map;
 use function array_values;
 use function implode;
+use function is_string;
 
 abstract class ModelConverter{
 
@@ -244,10 +245,10 @@ abstract class ModelConverter{
         $emoji = ($discordActivity->emoji === null ? null : self::genModelEmoji($discordActivity->emoji));
         /** @var ?object{"join": string|null, "spectate": string|null, "match": string|null} $secrets */
         $secrets = $discordActivity->secrets;
-        /** @var object{"url": string|null, "label": string}[] $dButtons */
+        /** @var (object{"url": string|null, "label": string}|string)[] $dButtons */
         $dButtons = $discordActivity->buttons ?? [];
         /** @var ActivityButton[] $buttons */
-        $buttons = ($dButtons === [] ? [] : array_map(fn(/** @var ?object{"url": string|null, "label": string}[] $button */ $button) => new ActivityButton($button->label, $button->url ?? null), $dButtons));
+        $buttons = ($dButtons === [] ? [] : array_map(fn(/** @var string|object{"url": string|null, "label": string} $button */ $button) => new ActivityButton(is_string($button) ? $button : $button->label, is_string($button) ? null : $button->url ?? null), $dButtons));
 
         return new Activity($discordActivity->name, ActivityType::from($discordActivity->type), $discordActivity->url ?? null,
             $discordActivity->created_at?->getTimestamp(), $timestamps?->start ?? null, $timestamps?->end ?? null,
