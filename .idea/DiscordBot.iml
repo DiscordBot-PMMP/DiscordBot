@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="JaxkDev\DiscordBot\" />
+      <sourceFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ralouphie/getallheaders" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/evenement/evenement" />
@@ -44,17 +45,47 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/path-util" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/log-pthreads" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/assert" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/adhocore/json-comment" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/brick/math" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/fgrosse/phpasn1" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/netresearch/jsonmapper" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/binaryutils" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/simple-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/react/async" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/doctrine/annotations" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/doctrine/lexer" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/friendsofphp/php-cs-fixer" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/psr/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/psr/container" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/psr/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/psr/log" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/sebastian/diff" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/console" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/deprecation-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/event-dispatcher-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/filesystem" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/finder" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/options-resolver" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/polyfill-intl-grapheme" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/polyfill-intl-normalizer" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/polyfill-php80" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/polyfill-php81" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/process" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/service-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/stopwatch" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/php-cs-fixer/vendor/symfony/string" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/adhocore/json-comment" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/brick/math" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/extension-installer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/phpstan" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/phpstan-deprecation-rules" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/phpstan-strict-rules" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/bedrock-block-upgrade-schema" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/bedrock-data" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/bedrock-item-upgrade-schema" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/bedrock-protocol" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/binaryutils" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/callback-validator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/color" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/errorhandler" />
@@ -62,6 +93,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/log" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/math" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/nbt" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/netresearch-jsonmapper" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/pocketmine-mp" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/raklib" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pocketmine/raklib-ipc" />
@@ -70,8 +102,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/ramsey/uuid" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/filesystem" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-ctype" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/simple-cache" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/react/async" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
