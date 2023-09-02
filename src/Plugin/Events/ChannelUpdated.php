@@ -30,10 +30,10 @@ final class ChannelUpdated extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, Channel $channel, ?Channel $old_channel){
         parent::__construct($plugin);
-        if(!$channel->getType()->isThread()){
+        if($channel->getType()->isThread()){
             throw new \AssertionError("Channel cannot be a thread.");
         }
-        if($old_channel !== null && !$old_channel->getType()->isThread()){
+        if($old_channel !== null && $old_channel->getType()->isThread()){
             throw new \AssertionError("Old channel cannot be a thread.");
         }
         $this->channel = $channel;
