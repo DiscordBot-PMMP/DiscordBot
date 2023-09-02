@@ -205,6 +205,7 @@ _**Breaking:** Plugin re-released as a central API._
 ❌ _This release was never published to public._
 
 
+[3.0.1]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.1
 [3.0.0]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.0
 [2.1.10]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/2.1.10
 [2.1.9]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/2.1.9
