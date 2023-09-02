@@ -1,5 +1,5 @@
 name: DiscordBot
-version: 3.0.1-dev
+version: 3.0.1
 author: JaxkDev
 src-namespace-prefix: JaxkDev\DiscordBot
 main: JaxkDev\DiscordBot\Plugin\Main
