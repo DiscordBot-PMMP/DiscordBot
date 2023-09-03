@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.2] - 2023-09-xx
+
+### Changed
+
+- Bump network version to `2`
+
+### Fixed
+
+- Fix `TextInput` serialization ([#103](https://github.com/DiscordBot-PMMP/DiscordBot/issues/103))
+
 ## [3.0.1] - 2023-09-03
 
 ### Fixed
@@ -204,7 +214,7 @@ _**Breaking:** Plugin re-released as a central API._
 
 ❌ _This release was never published to public._
 
-
+[3.0.2]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.2
 [3.0.1]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.1
 [3.0.0]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.0
 [2.1.10]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/2.1.10
