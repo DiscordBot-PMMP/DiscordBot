@@ -156,6 +156,7 @@ final class TextInput extends Component{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $stream->getByte();
         return new self(
             $stream->getString(),                     // custom_id
             TextInputStyle::from($stream->getByte()), // style

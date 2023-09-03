@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- Fix Modal Text response conversion ([``]())
 - Fix `TextInput` serialization ([#103](https://github.com/DiscordBot-PMMP/DiscordBot/issues/103))
 
 ## [3.0.1] - 2023-09-03
@@ -28,8 +29,8 @@ _If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md)_
 
 ### Added
 
-- Add PocketMine-MP `5.x` support ([``](https://github.com/DiscordBot-PMMP/DiscordBot/commit/1467c493d8ba67b830b783dd2334ffb79e6d0c87))
-- Add PHP `8.1.x` support ([``](https://github.com/DiscordBot-PMMP/DiscordBot/commit/797f2d0015881398a70644ff304168ed62bf94de))
+- Add PocketMine-MP `5.x` support
+- Add PHP `8.1.x` support
 - Add `composer/ca-bundle` version `^1.3`
 - Add `pocketmine/binaryutils` version `0.2.4`
 

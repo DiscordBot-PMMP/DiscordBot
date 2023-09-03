@@ -205,7 +205,31 @@ abstract class ModelConverter{
         if($data->components === null){
             throw new AssertionError("Components is null for modal submit data.");
         }
-        return new ModalSubmitData($data->custom_id, self::genModelComponents($data->components->toArray()));
+        //Discord is a bit weird with components, so we have to do this.
+        //top level is an ActionRow, we don't want that.
+        $components = [];
+        //ActionRow $comp
+        foreach($data->components as $comp){
+            if($comp->type !== ComponentType::ACTION_ROW->value){
+                throw new AssertionError("Expected action row component, got {$comp->type}.");
+            }
+            //Text Input $component
+            foreach($comp->components ?? [] as $component){
+                if($component->type !== ComponentType::TEXT_INPUT->value){
+                    throw new AssertionError("Expected text input component, got {$component->type}.");
+                }
+                if($component->custom_id === null){
+                    throw new AssertionError("Custom id is null for text input component.");
+                }
+                if($component->value === null){
+                    throw new AssertionError("Value is null for text input component.");
+                }
+                //TODO-Next-Major BREAKING: Discord doesnt send all data only value & custom_id
+                $components[] = new TextInput($component->custom_id, TextInputStyle::SHORT, "", 1, 1, false,
+                    $component->value, null);
+            }
+        }
+        return new ModalSubmitData($data->custom_id, $components);
     }
 
     /**
