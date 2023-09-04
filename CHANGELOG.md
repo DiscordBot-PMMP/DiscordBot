@@ -1,5 +1,7 @@
 # Changelog
 
+## [3.0.3] - 2023-xx-xx
+
 ## [3.0.2] - 2023-09-04
 
 ### Changed
@@ -215,6 +217,7 @@ _**Breaking:** Plugin re-released as a central API._
 
 ❌ _This release was never published to public._
 
+[3.0.3]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.2
 [3.0.2]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.2
 [3.0.1]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.1
 [3.0.0]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.0
