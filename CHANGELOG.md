@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.2] - 2023-09-04
+
+### Changed
+
+- Bump network version to `2`
+
+### Fixed
+
+- Fix Modal Text response conversion ([#104](https://github.com/DiscordBot-PMMP/DiscordBot/issues/104))
+- Fix `TextInput` serialization ([#103](https://github.com/DiscordBot-PMMP/DiscordBot/issues/103))
+
 ## [3.0.1] - 2023-09-03
 
 ### Fixed
@@ -18,8 +29,8 @@ _If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md)_
 
 ### Added
 
-- Add PocketMine-MP `5.x` support ([``](https://github.com/DiscordBot-PMMP/DiscordBot/commit/1467c493d8ba67b830b783dd2334ffb79e6d0c87))
-- Add PHP `8.1.x` support ([``](https://github.com/DiscordBot-PMMP/DiscordBot/commit/797f2d0015881398a70644ff304168ed62bf94de))
+- Add PocketMine-MP `5.x` support
+- Add PHP `8.1.x` support
 - Add `composer/ca-bundle` version `^1.3`
 - Add `pocketmine/binaryutils` version `0.2.4`
 
@@ -204,7 +215,8 @@ _**Breaking:** Plugin re-released as a central API._
 
 ❌ _This release was never published to public._
 
-
+[3.0.2]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.2
+[3.0.1]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.1
 [3.0.0]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.0
 [2.1.10]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/2.1.10
 [2.1.9]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/2.1.9

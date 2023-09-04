@@ -124,6 +124,7 @@ final class Button extends Component{
     }
 
     public static function fromBinary(BinaryStream $stream): Button{
+        $stream->getByte();
         return new self(
             ButtonStyle::from($stream->getByte()),          // style
             $stream->getNullableString(),                   // label
