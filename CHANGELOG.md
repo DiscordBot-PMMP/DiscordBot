@@ -8,7 +8,7 @@
 
 ### Fixed
 
-- Fix Modal Text response conversion ([``]())
+- Fix Modal Text response conversion ([#104](https://github.com/DiscordBot-PMMP/DiscordBot/issues/104))
 - Fix `TextInput` serialization ([#103](https://github.com/DiscordBot-PMMP/DiscordBot/issues/103))
 
 ## [3.0.1] - 2023-09-03
