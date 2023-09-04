@@ -121,7 +121,7 @@ use JaxkDev\DiscordBot\Models\Webhook;
 final class NetworkApi{
 
     // Version will change for any breaking changes to the protocol (Models / Packets)
-    public const VERSION = 1;
+    public const VERSION = 2;
     public const MAGIC = 0x4a61786b; //Jaxk (max 4 bytes)
 
     /** @var array<int, class-string<Packet>> */

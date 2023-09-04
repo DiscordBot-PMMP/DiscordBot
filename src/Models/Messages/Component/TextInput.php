@@ -143,6 +143,7 @@ final class TextInput extends Component{
 
     public function binarySerialize(): BinaryStream{
         $stream = new BinaryStream();
+        $stream->putByte($this->type->value);
         $stream->putString($this->custom_id);
         $stream->putByte($this->style->value);
         $stream->putString($this->label);
@@ -155,6 +156,7 @@ final class TextInput extends Component{
     }
 
     public static function fromBinary(BinaryStream $stream): self{
+        $stream->getByte();
         return new self(
             $stream->getString(),                     // custom_id
             TextInputStyle::from($stream->getByte()), // style
