@@ -17,7 +17,6 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Sticker;
 use JaxkDev\DiscordBot\Plugin\Utils;
-use function in_array;
 
 /**
  * @implements BinarySerializable<Guild>
@@ -176,7 +175,7 @@ final class Guild implements BinarySerializable{
     /** The NSFW level of the guild */
     private NsfwLevel $nsfw_level;
 
-    /*
+    /**
      * Custom guild stickers
      * @var Sticker[]
      */
@@ -395,11 +394,6 @@ final class Guild implements BinarySerializable{
 
     /** @param string[] $features */
     public function setFeatures(array $features): void{
-        foreach($features as $feature){
-            if(!in_array($feature, self::FEATURES, true)){
-                throw new \AssertionError("Feature '$feature' is invalid.");
-            }
-        }
         $this->features = $features;
     }
 
