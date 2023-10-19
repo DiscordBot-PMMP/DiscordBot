@@ -70,6 +70,7 @@ final class Socket{
     public function close(string $reason = "Unknown"): void{
         if(!$this->open){
             $this->logger->warning("Cannot close a non-open socket.");
+            return;
         }
         @socket_close($this->socket);
         $this->open = false;

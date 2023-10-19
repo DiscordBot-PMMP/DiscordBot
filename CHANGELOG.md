@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.3] - 2023-10-19
+
+### Fixed
+
+- Fix external client not closing socket correctly ([`029c621`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/029c621b26fd919479e144784dca56efa980367f))
+
+### Removed
+
+- Removed hardcoded guild features list & assertions ([#111](https://github.com/DiscordBot-PMMP/DiscordBot/issues/111))
+
 ## [3.0.2] - 2023-09-04
 
 ### Changed
@@ -215,6 +225,7 @@ _**Breaking:** Plugin re-released as a central API._
 
 ❌ _This release was never published to public._
 
+[3.0.3]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.3
 [3.0.2]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.2
 [3.0.1]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.1
 [3.0.0]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.0

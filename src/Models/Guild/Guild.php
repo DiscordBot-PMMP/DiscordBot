@@ -17,7 +17,6 @@ use JaxkDev\DiscordBot\Communication\BinaryStream;
 use JaxkDev\DiscordBot\Models\Emoji;
 use JaxkDev\DiscordBot\Models\Sticker;
 use JaxkDev\DiscordBot\Plugin\Utils;
-use function in_array;
 
 /**
  * @implements BinarySerializable<Guild>
@@ -38,40 +37,6 @@ final class Guild implements BinarySerializable{
         "SUPPRESS_JOIN_NOTIFICATION_REPLIES" => (1 << 3),
         "SUPPRESS_ROLE_SUBSCRIPTION_PURCHASE_NOTIFICATIONS" => (1 << 4),
         "SUPPRESS_ROLE_SUBSCRIPTION_PURCHASE_NOTIFICATION_REPLIES" => (1 << 5)
-    ];
-
-    /**
-     * @link https://discord.com/developers/docs/resources/guild#guild-object-guild-features
-     * @var string[]
-     */
-    public const FEATURES = [
-        "ANIMATED_BANNER",
-        "ANIMATED_ICON",
-        "APPLICATION_COMMAND_PERMISSIONS_V2",
-        "AUTO_MODERATION",
-        "BANNER",
-        "COMMUNITY",
-        "CREATOR_MONETIZABLE_PROVISIONAL",
-        "CREATOR_STORE_PAGE",
-        "DEVELOPER_SUPPORT_SERVER",
-        "DISCOVERABLE",
-        "FEATURABLE",
-        "INVITES_DISABLED",
-        "INVITE_SPLASH",
-        "MEMBER_VERIFICATION_GATE_ENABLED",
-        "MORE_STICKERS",
-        "NEWS",
-        "PARTNERED",
-        "PREVIEW_ENABLED",
-        "RAID_ALERTS_DISABLED",
-        "ROLE_ICONS",
-        "ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE",
-        "ROLE_SUBSCRIPTIONS_ENABLED",
-        "TICKETED_EVENTS_ENABLED",
-        "VANITY_URL",
-        "VERIFIED",
-        "VIP_REGIONS",
-        "WELCOME_SCREEN_ENABLED"
     ];
 
     /** Guild id */
@@ -120,7 +85,7 @@ final class Guild implements BinarySerializable{
     private array $emojis;
 
     /**
-     * @link https://discord.com/developers/docs/resources/guild#guild-object-guild-features
+     * @link https://discord.com/developers/docs/resources/guild#guild-object-guild-features - NOTE, Does not contain all features.
      * @var string[]
      */
     private array $features;
@@ -176,7 +141,7 @@ final class Guild implements BinarySerializable{
     /** The NSFW level of the guild */
     private NsfwLevel $nsfw_level;
 
-    /*
+    /**
      * Custom guild stickers
      * @var Sticker[]
      */
@@ -395,11 +360,6 @@ final class Guild implements BinarySerializable{
 
     /** @param string[] $features */
     public function setFeatures(array $features): void{
-        foreach($features as $feature){
-            if(!in_array($feature, self::FEATURES, true)){
-                throw new \AssertionError("Feature '$feature' is invalid.");
-            }
-        }
         $this->features = $features;
     }
 

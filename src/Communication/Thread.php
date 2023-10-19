@@ -48,10 +48,15 @@ use function ini_set;
         // Note, this does not affect outside thread.
         ini_set("date.timezone", "UTC");
 
-        if($this->config["type"] === "internal"){
-            new InternalClient($this);
-        }else{
-            new ExternalClient($this);
+        try{
+            if($this->config["type"] === "internal"){
+                new InternalClient($this);
+            }else{
+                new ExternalClient($this);
+            }
+        }catch(\Throwable){
+            $this->setStatus(ThreadStatus::STOPPED);
+            exit(1);
         }
     }
 
