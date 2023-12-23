@@ -195,6 +195,9 @@ final class Client{
             $this->discordEventHandler->onReady();
         });
 
+        /*$this->client->on('raw', function($data){
+            //TODO EXTENSIVE DEBUGGING OPTION...
+        });*/
         $this->client->on('ws_closed', [$this, 'webSocketHandler']);
         $this->client->on('error', [$this, 'discordErrorHandler']);
         $this->client->on('closed', [$this, 'close']);
@@ -307,6 +310,8 @@ final class Client{
             foreach(self::printableTrace($error->getTrace()) as $line){
                 $this->logger->critical($line);
             }
+        }else{
+            $this->logger->critical("Unknown error has caused thread to close: " . var_export($error, true));
         }
         try{
             /** @phpstan-ignore-next-line Client may not have open before closing. */

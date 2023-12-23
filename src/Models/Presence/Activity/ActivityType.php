@@ -34,4 +34,7 @@ enum ActivityType: int{
 
     /** Competing in {name} */
     case COMPETING = 5;
+
+    /** An undocumented type that is floating about */
+    //case HANG_STATUS = 6;
 }

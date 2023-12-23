@@ -274,7 +274,7 @@ abstract class ModelConverter{
         /** @var ActivityButton[] $buttons */
         $buttons = ($dButtons === [] ? [] : array_map(fn(/** @var string|object{"url": string|null, "label": string} $button */ $button) => new ActivityButton(is_string($button) ? $button : $button->label, is_string($button) ? null : $button->url ?? null), $dButtons));
 
-        return new Activity($discordActivity->name, ActivityType::from($discordActivity->type), $discordActivity->url ?? null,
+        return new Activity($discordActivity->name, ActivityType::tryFrom($discordActivity->type) ?? ActivityType::CUSTOM, $discordActivity->url ?? null,
             $discordActivity->created_at?->getTimestamp(), $timestamps?->start ?? null, $timestamps?->end ?? null,
             $discordActivity->application_id, $discordActivity->details ?? null, $discordActivity->state ?? null, $emoji,
             $party?->id ?? null, ($party?->size ?? [])[0] ?? null, ($party?->size ?? [])[1] ?? null,
