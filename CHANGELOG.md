@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.4] - 2024-01-xx
+
+### Fixed
+
+- Fixed the thread silently crashing on presence update ([#120](https://github.com/DiscordBot-PMMP/DiscordBot/issues/120), [`3cee56d`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/3cee56ddb6b86bfd5d997e49893045b9957e6e76))
+
 ## [3.0.3] - 2023-10-19
 
 ### Fixed
@@ -225,6 +231,7 @@ _**Breaking:** Plugin re-released as a central API._
 
 ❌ _This release was never published to public._
 
+[3.0.4]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.4
 [3.0.3]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.3
 [3.0.2]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.2
 [3.0.1]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.1
