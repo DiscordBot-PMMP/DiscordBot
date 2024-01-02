@@ -20,6 +20,11 @@ $includedPaths = array_map(function($path) : string{
 }, ['src','vendor','resources']);
 
 $excludedPaths = [
+    ".ico",
+    ".png",
+    ".jpeg",
+    ".jpg",
+    ".neon",
     ".md",  // Nobody will look at readme's etc in a phar...
     "carbon/lang/",  // More useless crap not needed and wasting ridiculous amount of space.
     "discord-php/bin/",  // VC Binaries, not needed.
@@ -143,6 +148,8 @@ function generatePluginMetadataFromYml(string $pluginYmlPath) : ?array{
         "author" => $pluginYml["author"] ?? "", //Gotta love shoghi...
         "authors" => $pluginYml["authors"] ?? "",
         "website" => $pluginYml["website"] ?? "",
-        "creationDate" => time()
+        "creationDate" => time(),
+        "phpVersion" => PHP_VERSION,
+        "builtBy" => "DiscordBot Phar Builder"
     ];
 }
