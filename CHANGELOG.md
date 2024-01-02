@@ -1,10 +1,11 @@
 # Changelog
 
-## [3.0.4] - 2024-01-xx
+## [3.0.4] - 2024-01-02
 
 ### Fixed
 
-- Fixed the thread silently crashing on presence update ([#120](https://github.com/DiscordBot-PMMP/DiscordBot/issues/120), [`3cee56d`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/3cee56ddb6b86bfd5d997e49893045b9957e6e76))
+- Fix silent crash on thread when receiving type 6+ presence updates ([#120](https://github.com/DiscordBot-PMMP/DiscordBot/issues/120), [`3cee56d`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/3cee56ddb6b86bfd5d997e49893045b9957e6e76))
+- Fix ChannelCreateEvent crashing server ([#116](https://github.com/DiscordBot-PMMP/DiscordBot/issues/116), [`f7991d3`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/f7991d3fd7a17c3e4570fd4063449671a7cb1cb5))
 
 ## [3.0.3] - 2023-10-19
 
