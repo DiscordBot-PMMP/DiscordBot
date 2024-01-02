@@ -27,7 +27,7 @@ final class ChannelCreated extends DiscordBotEvent{
 
     public function __construct(Plugin $plugin, Channel $channel){
         parent::__construct($plugin);
-        if(!$channel->getType()->isThread()){
+        if($channel->getType()->isThread()){
             throw new \AssertionError("Channel cannot be a thread.");
         }
         $this->channel = $channel;
