@@ -64,7 +64,7 @@ $promise = $api->sendMessage("guild_id or null for DMs", "channel_id or user_id 
 // but be sure to register your callbacks before finishing.
 
 //To handle both resolved and rejected:
-$promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResultion $resolution){
+$promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $resolution){
     //Yay, it worked and the message was sent successfully.
     echo "Resolved !";
     var_dump($resolution->getData()[0]); // will dump the Message model in array index 0.
@@ -74,7 +74,7 @@ $promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResultion $resolution){
 });
 
 //Or handle just resolved:
-$promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResultion $resolution){
+$promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $resolution){
     echo "Resolved !";
     //Yay, it worked and the message was sent successfully.
 });
