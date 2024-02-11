@@ -107,13 +107,13 @@ final class ApplicationCommandDataOption implements BinarySerializable{
         $stream->putString($this->name);
         $stream->putByte($this->type->value);
         $stream->putBool($this->value !== null);
-        if(is_string($this->value) && $this->type->value === CommandOptionType::STRING){
+        if(is_string($this->value) && $this->type->value === CommandOptionType::STRING->value){
             $stream->putString($this->value);
-        }elseif(is_int($this->value) && $this->type->value === CommandOptionType::INTEGER){
+        }elseif(is_int($this->value) && $this->type->value === CommandOptionType::INTEGER->value){
             $stream->putLong($this->value);
-        }elseif(is_float($this->value) && $this->type->value === CommandOptionType::NUMBER){
+        }elseif(is_float($this->value) && $this->type->value === CommandOptionType::NUMBER->value){
             $stream->putDouble($this->value);
-        }elseif(is_bool($this->value) && $this->type->value === CommandOptionType::BOOLEAN){
+        }elseif(is_bool($this->value) && $this->type->value === CommandOptionType::BOOLEAN->value){
             $stream->putBool($this->value);
         }elseif($this->value !== null){
             throw new \AssertionError("Invalid value type for option type {$this->type->value}");
