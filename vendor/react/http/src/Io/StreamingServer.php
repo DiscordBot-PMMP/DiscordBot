@@ -157,10 +157,17 @@ final class StreamingServer extends EventEmitter
         }
 
         // cancel pending promise once connection closes
+        $connectionOnCloseResponseCancelerHandler = function () {};
         if ($response instanceof PromiseInterface && \method_exists($response, 'cancel')) {
-            $conn->on('close', function () use ($response) {
+            $connectionOnCloseResponseCanceler = function () use ($response) {
                 $response->cancel();
-            });
+            };
+            $connectionOnCloseResponseCancelerHandler = function () use ($connectionOnCloseResponseCanceler, $conn) {
+                if ($connectionOnCloseResponseCanceler !== null) {
+                    $conn->removeListener('close', $connectionOnCloseResponseCanceler);
+                }
+            };
+            $conn->on('close', $connectionOnCloseResponseCanceler);
         }
 
         // happy path: response returned, handle and return immediately
@@ -201,7 +208,7 @@ final class StreamingServer extends EventEmitter
                 $that->emit('error', array($exception));
                 return $that->writeError($conn, Response::STATUS_INTERNAL_SERVER_ERROR, $request);
             }
-        );
+        )->then($connectionOnCloseResponseCancelerHandler, $connectionOnCloseResponseCancelerHandler);
     }
 
     /** @internal */
@@ -326,11 +333,24 @@ final class StreamingServer extends EventEmitter
         }
 
         // build HTTP response header by appending status line and header fields
+        $expected = 0;
         $headers = "HTTP/" . $version . " " . $code . " " . $response->getReasonPhrase() . "\r\n";
         foreach ($response->getHeaders() as $name => $values) {
+            if (\strpos($name, ':') !== false) {
+                $expected = -1;
+                break;
+            }
             foreach ($values as $value) {
                 $headers .= $name . ": " . $value . "\r\n";
+                ++$expected;
             }
+        }
+
+        /** @var array $m legacy PHP 5.3 only */
+        if ($code < 100 || $code > 999 || \substr_count($headers, "\n") !== ($expected + 1) || (\PHP_VERSION_ID >= 50400 ? \preg_match_all(AbstractMessage::REGEX_HEADERS, $headers) : \preg_match_all(AbstractMessage::REGEX_HEADERS, $headers, $m)) !== $expected) {
+            $this->emit('error', array(new \InvalidArgumentException('Unable to send response with invalid response headers')));
+            $this->writeError($connection, Response::STATUS_INTERNAL_SERVER_ERROR, $request);
+            return;
         }
 
         // response to HEAD and 1xx, 204 and 304 responses MUST NOT include a body

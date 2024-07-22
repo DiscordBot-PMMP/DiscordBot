@@ -191,6 +191,7 @@ function async(callable $function): callable
 {
     return static function (mixed ...$args) use ($function): PromiseInterface {
         $fiber = null;
+        /** @var PromiseInterface<T> $promise*/
         $promise = new Promise(function (callable $resolve, callable $reject) use ($function, $args, &$fiber): void {
             $fiber = new \Fiber(function () use ($resolve, $reject, $function, $args, &$fiber): void {
                 try {
@@ -199,16 +200,13 @@ function async(callable $function): callable
                     $reject($exception);
                 } finally {
                     assert($fiber instanceof \Fiber);
-                    FiberMap::unregister($fiber);
+                    FiberMap::unsetPromise($fiber);
                 }
             });
-
-            FiberMap::register($fiber);
 
             $fiber->start();
         }, function () use (&$fiber): void {
             assert($fiber instanceof \Fiber);
-            FiberMap::cancel($fiber);
             $promise = FiberMap::getPromise($fiber);
             if ($promise instanceof PromiseInterface && \method_exists($promise, 'cancel')) {
                 $promise->cancel();
@@ -293,9 +291,9 @@ function await(PromiseInterface $promise): mixed
     $lowLevelFiber = \Fiber::getCurrent();
 
     $promise->then(
-        function (mixed $value) use (&$resolved, &$resolvedValue, &$fiber, $lowLevelFiber, $promise): void {
+        function (mixed $value) use (&$resolved, &$resolvedValue, &$fiber, $lowLevelFiber): void {
             if ($lowLevelFiber !== null) {
-                FiberMap::unsetPromise($lowLevelFiber, $promise);
+                FiberMap::unsetPromise($lowLevelFiber);
             }
 
             /** @var ?\Fiber<mixed,mixed,mixed,mixed> $fiber */
@@ -308,9 +306,9 @@ function await(PromiseInterface $promise): mixed
 
             $fiber->resume($value);
         },
-        function (mixed $throwable) use (&$rejected, &$rejectedThrowable, &$fiber, $lowLevelFiber, $promise): void {
+        function (mixed $throwable) use (&$rejected, &$rejectedThrowable, &$fiber, $lowLevelFiber): void {
             if ($lowLevelFiber !== null) {
-                FiberMap::unsetPromise($lowLevelFiber, $promise);
+                FiberMap::unsetPromise($lowLevelFiber);
             }
 
             if (!$throwable instanceof \Throwable) {
@@ -627,6 +625,7 @@ function coroutine(callable $function, mixed ...$args): PromiseInterface
     }
 
     $promise = null;
+    /** @var Deferred<T> $deferred*/
     $deferred = new Deferred(function () use (&$promise) {
         /** @var ?PromiseInterface<T> $promise */
         if ($promise instanceof PromiseInterface && \method_exists($promise, 'cancel')) {
@@ -685,6 +684,7 @@ function parallel(iterable $tasks): PromiseInterface
 {
     /** @var array<int,PromiseInterface<T>> $pending */
     $pending = [];
+    /** @var Deferred<array<T>> $deferred */
     $deferred = new Deferred(function () use (&$pending) {
         foreach ($pending as $promise) {
             if ($promise instanceof PromiseInterface && \method_exists($promise, 'cancel')) {
@@ -734,6 +734,7 @@ function parallel(iterable $tasks): PromiseInterface
         $deferred->resolve($results);
     }
 
+    /** @var PromiseInterface<array<T>> Remove once defining `Deferred()` above is supported by PHPStan, see https://github.com/phpstan/phpstan/issues/11032 */
     return $deferred->promise();
 }
 
@@ -745,6 +746,7 @@ function parallel(iterable $tasks): PromiseInterface
 function series(iterable $tasks): PromiseInterface
 {
     $pending = null;
+    /** @var Deferred<array<T>> $deferred */
     $deferred = new Deferred(function () use (&$pending) {
         /** @var ?PromiseInterface<T> $pending */
         if ($pending instanceof PromiseInterface && \method_exists($pending, 'cancel')) {
@@ -789,6 +791,7 @@ function series(iterable $tasks): PromiseInterface
 
     $next();
 
+    /** @var PromiseInterface<array<T>> Remove once defining `Deferred()` above is supported by PHPStan, see https://github.com/phpstan/phpstan/issues/11032 */
     return $deferred->promise();
 }
 
@@ -800,6 +803,7 @@ function series(iterable $tasks): PromiseInterface
 function waterfall(iterable $tasks): PromiseInterface
 {
     $pending = null;
+    /** @var Deferred<T> $deferred*/
     $deferred = new Deferred(function () use (&$pending) {
         /** @var ?PromiseInterface<T> $pending */
         if ($pending instanceof PromiseInterface && \method_exists($pending, 'cancel')) {

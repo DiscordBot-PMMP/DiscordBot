@@ -86,7 +86,7 @@ class SlackRecord
         bool $useShortAttachment = false,
         bool $includeContextAndExtra = false,
         array $excludeFields = [],
-        FormatterInterface $formatter = null
+        FormatterInterface|null $formatter = null
     ) {
         $this
             ->setChannel($channel)
@@ -220,7 +220,7 @@ class SlackRecord
     /**
      * Channel used by the bot when posting
      *
-     * @param ?string $channel
+     * @param  ?string $channel
      * @return $this
      */
     public function setChannel(?string $channel = null): self
@@ -233,7 +233,7 @@ class SlackRecord
     /**
      * Username used by the bot when posting
      *
-     * @param ?string $username
+     * @param  ?string $username
      * @return $this
      */
     public function setUsername(?string $username = null): self
@@ -292,7 +292,7 @@ class SlackRecord
     }
 
     /**
-     * @param string[] $excludeFields
+     * @param  string[] $excludeFields
      * @return $this
      */
     public function excludeFields(array $excludeFields = []): self
@@ -321,7 +321,7 @@ class SlackRecord
      */
     private function generateAttachmentField(string $title, $value): array
     {
-        $value = is_array($value)
+        $value = \is_array($value)
             ? sprintf('```%s```', substr($this->stringify($value), 0, 1990))
             : $value;
 

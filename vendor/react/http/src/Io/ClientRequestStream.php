@@ -8,7 +8,6 @@ use Psr\Http\Message\RequestInterface;
 use React\Http\Message\Response;
 use React\Socket\ConnectionInterface;
 use React\Stream\WritableStreamInterface;
-use RingCentral\Psr7 as gPsr;
 
 /**
  * @event response
@@ -57,7 +56,25 @@ class ClientRequestStream extends EventEmitter implements WritableStreamInterfac
     {
         $this->state = self::STATE_WRITING_HEAD;
 
-        $request = $this->request;
+        $expected = 0;
+        $headers = "{$this->request->getMethod()} {$this->request->getRequestTarget()} HTTP/{$this->request->getProtocolVersion()}\r\n";
+        foreach ($this->request->getHeaders() as $name => $values) {
+            if (\strpos($name, ':') !== false) {
+                $expected = -1;
+                break;
+            }
+            foreach ($values as $value) {
+                $headers .= "$name: $value\r\n";
+                ++$expected;
+            }
+        }
+
+        /** @var array $m legacy PHP 5.3 only */
+        if (!\preg_match('#^\S+ \S+ HTTP/1\.[01]\r\n#m', $headers) || \substr_count($headers, "\n") !== ($expected + 1) || (\PHP_VERSION_ID >= 50400 ? \preg_match_all(AbstractMessage::REGEX_HEADERS, $headers) : \preg_match_all(AbstractMessage::REGEX_HEADERS, $headers, $m)) !== $expected) {
+            $this->closeError(new \InvalidArgumentException('Unable to send request with invalid request headers'));
+            return;
+        }
+
         $connectionRef = &$this->connection;
         $stateRef = &$this->state;
         $pendingWrites = &$this->pendingWrites;
@@ -65,7 +82,7 @@ class ClientRequestStream extends EventEmitter implements WritableStreamInterfac
 
         $promise = $this->connectionManager->connect($this->request->getUri());
         $promise->then(
-            function (ConnectionInterface $connection) use ($request, &$connectionRef, &$stateRef, &$pendingWrites, $that) {
+            function (ConnectionInterface $connection) use ($headers, &$connectionRef, &$stateRef, &$pendingWrites, $that) {
                 $connectionRef = $connection;
                 assert($connectionRef instanceof ConnectionInterface);
 
@@ -74,14 +91,6 @@ class ClientRequestStream extends EventEmitter implements WritableStreamInterfac
                 $connection->on('end', array($that, 'handleEnd'));
                 $connection->on('error', array($that, 'handleError'));
                 $connection->on('close', array($that, 'close'));
-
-                assert($request instanceof RequestInterface);
-                $headers = "{$request->getMethod()} {$request->getRequestTarget()} HTTP/{$request->getProtocolVersion()}\r\n";
-                foreach ($request->getHeaders() as $name => $values) {
-                    foreach ($values as $value) {
-                        $headers .= "$name: $value\r\n";
-                    }
-                }
 
                 $more = $connection->write($headers . "\r\n" . $pendingWrites);
 
@@ -152,10 +161,17 @@ class ClientRequestStream extends EventEmitter implements WritableStreamInterfac
         $this->buffer .= $data;
 
         // buffer until double CRLF (or double LF for compatibility with legacy servers)
-        if (false !== strpos($this->buffer, "\r\n\r\n") || false !== strpos($this->buffer, "\n\n")) {
+        $eom = \strpos($this->buffer, "\r\n\r\n");
+        $eomLegacy = \strpos($this->buffer, "\n\n");
+        if ($eom !== false || $eomLegacy !== false) {
             try {
-                $response = gPsr\parse_response($this->buffer);
-                $bodyChunk = (string) $response->getBody();
+                if ($eom !== false && ($eomLegacy === false || $eom < $eomLegacy)) {
+                    $response = Response::parseMessage(\substr($this->buffer, 0, $eom + 2));
+                    $bodyChunk = (string) \substr($this->buffer, $eom + 4);
+                } else {
+                    $response = Response::parseMessage(\substr($this->buffer, 0, $eomLegacy + 1));
+                    $bodyChunk = (string) \substr($this->buffer, $eomLegacy + 2);
+                }
             } catch (\InvalidArgumentException $exception) {
                 $this->closeError($exception);
                 return;
@@ -271,7 +287,8 @@ class ClientRequestStream extends EventEmitter implements WritableStreamInterfac
      */
     public function hasMessageKeepAliveEnabled(MessageInterface $message)
     {
-        $connectionOptions = \RingCentral\Psr7\normalize_header(\strtolower($message->getHeaderLine('Connection')));
+        // @link https://www.rfc-editor.org/rfc/rfc9110#section-7.6.1
+        $connectionOptions = \array_map('trim', \explode(',', \strtolower($message->getHeaderLine('Connection'))));
 
         if (\in_array('close', $connectionOptions, true)) {
             return false;
