@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.0.5] - 2024-07-22
+
+### Changed
+
+- Corrected code examples listed in API.md ([#122](https://github.com/DiscordBot-PMMP/DiscordBot/pull/122), [#131](https://github.com/DiscordBot-PMMP/DiscordBot/pull/131), [@D1veer](https://github.com/D1veer))
+
+### Fixed
+
+- Fix `stdClass::$url` undefined error ([#119](https://github.com/DiscordBot-PMMP/DiscordBot/issues/119), [`386d1eb`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/386d1eb38f8465299a697540046bfb4010e4e0e8))
+- Fix silent crash on thread when using slash commands with options ([#126](https://github.com/DiscordBot-PMMP/DiscordBot/issues/126), [#127](https://github.com/DiscordBot-PMMP/DiscordBot/pull/127), [@Shelly7w7](https://github.com/Shelly7w7))
+- Fix silent crash on thread when receiving auto mod messages ([#124](https://github.com/DiscordBot-PMMP/DiscordBot/issues/124), [`9311815`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/9311815c3024beb9276a026a50d8d609c1d34529))
+
+### Removed
+
+- Removed all library images from release phar ([`97889c0`](https://github.com/DiscordBot-PMMP/DiscordBot/commit/97889c076d4b7ad914e0f47ed0580c63de362ceb))
+
 ## [3.0.4] - 2024-01-02
 
 ### Fixed
@@ -232,6 +248,7 @@ _**Breaking:** Plugin re-released as a central API._
 
 ❌ _This release was never published to public._
 
+[3.0.5]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.5
 [3.0.4]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.4
 [3.0.3]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.3
 [3.0.2]: https://github.com/DiscordBot-PMMP/DiscordBot/releases/tag/3.0.2

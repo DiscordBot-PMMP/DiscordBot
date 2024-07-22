@@ -57,6 +57,7 @@ use function strlen;
 use function strval;
 use function substr;
 use function time;
+use function var_export;
 use const DIRECTORY_SEPARATOR;
 use const E_ALL;
 use const E_COMPILE_ERROR;

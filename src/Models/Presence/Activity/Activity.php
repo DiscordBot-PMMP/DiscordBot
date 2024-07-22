@@ -400,7 +400,7 @@ final class Activity implements BinarySerializable{
         }
 
         if($this->flags_bitwise === null){
-            $this->flags_bitwise = self::FLAGS[$flag] ?? 0;
+            $this->flags_bitwise = self::FLAGS[$flag];
             $this->recalculateFlags();
             return;
         }

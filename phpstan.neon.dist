@@ -8,5 +8,6 @@ parameters:
             - src/Libs
     bootstrapFiles:
         - tools/phpstan/bootstrap.php
-    checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        - identifier: missingType.iterableValue

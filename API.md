@@ -58,13 +58,13 @@ the message did not get sent, and a `ApiRejection` (exception) will be passed ba
 /** @var $api \JaxkDev\DiscordBot\Plugin\Api */
 $api = $DiscordBotPluginInstance->getApi();
 /** @var $promise \JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface */
-$promise = $api->sendMessage("guild_id or null for DMs", "channel_id or user_id for DMs", "Hello world !"));
+$promise = $api->sendMessage("guild_id or null for DMs", "channel_id or user_id for DMs", "Hello world !");
 
 // You could do other things here if necessary
 // but be sure to register your callbacks before finishing.
 
 //To handle both resolved and rejected:
-$promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResultion $resolution){
+$promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $resolution){
     //Yay, it worked and the message was sent successfully.
     echo "Resolved !";
     var_dump($resolution->getData()[0]); // will dump the Message model in array index 0.
@@ -74,7 +74,7 @@ $promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResultion $resolution){
 });
 
 //Or handle just resolved:
-$promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResultion $resolution){
+$promise->then(function(\JaxkDev\DiscordBot\Plugin\ApiResolution $resolution){
     echo "Resolved !";
     //Yay, it worked and the message was sent successfully.
 });

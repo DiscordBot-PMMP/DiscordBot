@@ -204,6 +204,7 @@ final class DiscordEventHandler{
     }
 
     public function onMessageUpdate(DiscordMessage|\stdClass $message, Discord $discord, ?DiscordMessage $old): void{
+        if($message instanceof DiscordMessage && !$this->checkMessage($message)) return;
         $packet = new MessageUpdatePacket($message->guild_id ?? null, $message->channel_id, $message->id,
             ($message instanceof DiscordMessage) ? ModelConverter::genModelMessage($message) : null,
             ($old instanceof DiscordMessage) ? ModelConverter::genModelMessage($old) : null);
@@ -211,6 +212,7 @@ final class DiscordEventHandler{
     }
 
     public function onMessageDelete(DiscordMessage|\stdClass $message, Discord $discord): void{
+        if($message instanceof DiscordMessage && !$this->checkMessage($message)) return;
         $packet = new MessageDeletePacket($message->guild_id ?? null, $message->channel_id, $message->id,
             ($message instanceof DiscordMessage) ? ModelConverter::genModelMessage($message) : null);
         $this->client->getThread()->writeOutboundData($packet);
@@ -224,6 +226,7 @@ final class DiscordEventHandler{
         $ids = [];
         foreach($collection as $message){
             if($message instanceof DiscordMessage){
+                if(!$this->checkMessage($message)) continue;
                 $messages[] = ModelConverter::genModelMessage($message);
                 if($guild === null){
                     $guild = $message->guild_id;
@@ -431,6 +434,11 @@ final class DiscordEventHandler{
      * Checks if we should handle this message.
      */
     private function checkMessage(DiscordMessage $message): bool{
+        if($message->type == 24){
+            // Auto mod message (currently DiscordPHP crashes due to embed type 'auto_moderation_message')
+            $this->logger->warning("Ignoring message type 24 (Auto mod message).");
+            return false;
+        }
         if($message->author?->id === $this->client->getDiscordClient()->id) return false;
         return true;
     }

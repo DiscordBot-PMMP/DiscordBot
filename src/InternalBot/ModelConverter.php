@@ -583,8 +583,7 @@ abstract class ModelConverter{
             ($discordEmbed->image === null || $discordEmbed->image->url === null) ? null : self::genModelEmbedImage($discordEmbed->image),
             ($discordEmbed->thumbnail === null || $discordEmbed->thumbnail->url === null) ? null : self::genModelEmbedImage($discordEmbed->thumbnail),
             $discordEmbed->video === null ? null : self::genModelEmbedVideo($discordEmbed->video),
-            /** @phpstan-ignore-next-line Poorly documented provider object */
-            $discordEmbed->provider === null ? null : new Provider($discordEmbed->provider?->name, $discordEmbed->provider?->url),
+            $discordEmbed->provider === null ? null : new Provider($discordEmbed->provider?->name ?? null, $discordEmbed->provider?->url ?? null),
             ($discordEmbed->author === null || $discordEmbed->author->name === null) ? null : self::genModelEmbedAuthor($discordEmbed->author),
             $fields);
     }
@@ -620,8 +619,11 @@ abstract class ModelConverter{
      *              available_for_purchase?: null, guild_connections?: null} $roleTags
      */
     static public function genModelRoleTags(object $roleTags): RoleTags{
-        return new RoleTags($roleTags->bot_id ?? null, $roleTags->integration_id ?? null,
-            ($roleTags->premium_subscriber ?? false) === null, $roleTags->subscription_listing_id ?? null,
+        $bot_id = isset($roleTags->bot_id) ? (string)$roleTags->bot_id : null;
+        $integration_id = isset($roleTags->integration_id) ? (string)$roleTags->integration_id : null;
+        $subscription_listing_id = isset($roleTags->subscription_listing_id) ? (string)$roleTags->subscription_listing_id : null;
+        return new RoleTags($bot_id, $integration_id,
+            ($roleTags->premium_subscriber ?? false) === null, $subscription_listing_id,
             ($roleTags->available_for_purchase ?? false) === null, ($roleTags->guild_connections ?? false) === null);
     }
 
